@@ -16856,7 +16856,7 @@ const ATLAN_INSTANCE_URL =
 const ATLAN_API_TOKEN =
   core.getInput("ATLAN_API_TOKEN") || process.env.ATLAN_API_TOKEN;
 
-async function getAssetByExactName(name) {
+async function getAsset({ name }) {
   var myHeaders = {
     Authorization: `Bearer ${ATLAN_API_TOKEN}`,
     "Content-Type": "application/json",
@@ -16888,6 +16888,7 @@ async function getAssetByExactName(name) {
         },
       },
     },
+    attributes: ["sqlAsset"],
   });
 
   var requestOptions = {
@@ -16961,9 +16962,11 @@ async function getDownstreamAssets(guid) {
     requestOptions
   ).then((e) => e.json());
 
-  const relations = response.relations;
+  const relations = response.relations.map(({ toEntityId }) => toEntityId);
 
-  return relations.map(({ toEntityId }) => response.guidEntityMap[toEntityId]);
+  return relations
+    .filter((id, index) => relations.indexOf(id) === index)
+    .map((id) => response.guidEntityMap[id]);
 }
 
 ;// CONCATENATED MODULE: ./src/index.js
@@ -17075,8 +17078,9 @@ async function run() {
 
   changedFiles.forEach(async ({ name, filePath }) => {
     const assetName = await getAssetName(octokit, context, name, filePath);
-    const asset = await getAssetByExactName(assetName);
-    const { guid } = asset;
+    const asset = await getAsset({ name: assetName });
+    const { guid } = asset.attributes.sqlAsset;
+    console.log(guid);
     const downstreamAssets = await getDownstreamAssets(guid);
 
     const comment = await createComment(

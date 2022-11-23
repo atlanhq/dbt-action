@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 import core from "@actions/core";
 import github from "@actions/github";
-import getAssetByExactName from "./api/get-asset.js";
+import getAsset from "./api/get-asset.js";
 import getDownstreamAssets from "./api/get-downstream-assets.js";
 
 dotenv.config();
@@ -106,8 +106,9 @@ async function run() {
 
   changedFiles.forEach(async ({ name, filePath }) => {
     const assetName = await getAssetName(octokit, context, name, filePath);
-    const asset = await getAssetByExactName(assetName);
-    const { guid } = asset;
+    const asset = await getAsset({ name: assetName });
+    const { guid } = asset.attributes.sqlAsset;
+    console.log(guid);
     const downstreamAssets = await getDownstreamAssets(guid);
 
     const comment = await createComment(
