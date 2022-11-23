@@ -1,28 +1,31 @@
 {
-  "name": "atlan-github-action",
+  "name": "@atlanhq/dbt-action",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Get all the downstream assets that get affected when dbt model sql files are changed on pull request conversations.",
+  "main": "dist/index.js",
   "type": "module",
-  "directories": {
-    "test": "test"
-  },
-  "scripts": {
-    "start": "node src/index.js",
-    "build": "ncc build src/index.js -o dist",
-    "sync": "git pull && git push"
-  },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Jaagrav/dbt-demo.git"
+    "url": "git+https://github.com/atlanhq/dbt-action.git"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "github",
+    "actions",
+    "atlan",
+    "atlanhq",
+    "dbt-action"
+  ],
+  "scripts": {
+    "build": "ncc build src/index.js -o dist",
+    "start": "npm run build && act pull_request --container-architecture linux/amd64 --secret-file .env -e event.json",
+    "sync": "git pull && git push"
+  },
+  "author": "Jaagrav Seal <jaagrav.seal@atlan.com> (https://atlan.com/)",
+  "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Jaagrav/dbt-demo/issues"
+    "url": "https://github.com/atlanhq/dbt-action/issues"
   },
-  "homepage": "https://github.com/Jaagrav/dbt-demo#readme",
+  "homepage": "https://github.com/atlanhq/dbt-action#readme",
   "dependencies": {
     "@actions/core": "^1.10.0",
     "@actions/github": "^5.1.1",
