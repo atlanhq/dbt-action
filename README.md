@@ -26,7 +26,7 @@ Get comments about downstream assets affected when you make changes to your dbt 
        runs-on: ubuntu-latest
        steps:
          - name: Run Action
-           uses: atlan/dbt-action@v1
+           uses: atlanhq/dbt-action@v1
            with:
              GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
              ATLAN_INSTANCE_URL: ${{secrets.ATLAN_INSTANCE_URL}}
