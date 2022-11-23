@@ -1,5 +1,5 @@
 
-{{ config(materialized='table', alias='stg_order_items') }}
+{{ config(materialized='table', alias='fct_orders') }}
 
 with customers as (
 
