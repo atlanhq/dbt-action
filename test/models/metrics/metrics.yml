@@ -1,0 +1,31 @@
+
+version: 2
+
+metrics:
+  - name: revenue
+    label: Revenue
+    model: ref('fct_orders')
+    description: "Income from all orders less tax"
+
+    type: sum
+    sql: order_total - tax_paid
+
+    timestamp: ordered_at
+    time_grains: [day, week, month, quarter, year]
+
+    dimensions:
+      - location_name
+
+  - name: customers
+    label: Customers
+    model: ref('fct_orders')
+    description: "Number of customers with a sale"
+
+    type: count_distinct
+    sql: customer_id
+
+    timestamp: ordered_at
+    time_grains: [day, week, month, quarter, year]
+
+    dimensions:
+      - location_name

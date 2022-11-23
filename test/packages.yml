@@ -1,0 +1,4 @@
+
+packages:
+  - package: dbt-labs/metrics
+    version: [">=0.3.0", "<0.4.0"]

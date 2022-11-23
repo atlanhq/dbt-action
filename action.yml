@@ -1,0 +1,22 @@
+name: "Atlan dbt Action"
+description: "Get all the downstream assets that get affected when dbt model sql files are changed on pull request conversations."
+author: "Atlan"
+
+inputs:
+  GITHUB_TOKEN:
+    description: "GitHub token"
+    required: true
+  ATLAN_API_TOKEN:
+    description: "Atlan API token"
+    required: true
+  ATLAN_INSTANCE_URL:
+    description: "Atlan instance URL"
+    required: true
+
+runs:
+  using: "node16"
+  main: "dist/index.js"
+
+branding:
+  icon: activity
+  color: blue

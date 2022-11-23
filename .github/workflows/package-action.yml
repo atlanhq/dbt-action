@@ -1,0 +1,29 @@
+name: Package Action
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  package-action:
+    name: Build Project
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Package Action
+        run: |
+          npm i 
+          npm run build
+          git config --global user.email "it@atlan.com"
+          git config --global user.name "Atlan"
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          git add .
+          git commit -am "chore: package action"
+          git push -u origin main

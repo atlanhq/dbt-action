@@ -1,0 +1,33 @@
+{
+  "name": "atlan-github-action",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "build": "ncc build src/index.js -o dist",
+    "sync": "git pull && git push"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jaagrav/dbt-demo.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Jaagrav/dbt-demo/issues"
+  },
+  "homepage": "https://github.com/Jaagrav/dbt-demo#readme",
+  "dependencies": {
+    "@actions/core": "^1.10.0",
+    "@actions/github": "^5.1.1",
+    "@vercel/ncc": "^0.34.0",
+    "dotenv": "^16.0.3",
+    "node-fetch": "^3.3.0"
+  }
+}

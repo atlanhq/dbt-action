@@ -1,0 +1,21 @@
+version: 3
+
+sources:
+  - name: ecommerce
+    description: E-commerce data
+
+    database: FIVETRAN
+    schema: DBT_DEMO_DATA_DBT_DEMO_DATA
+    loader: manual
+
+    tables:
+      - name: customers
+        description: One record per person who has purchased one or more items
+      - name: orders
+        description: One record per order (consisting of one or more order items)
+      - name: order_items
+        description: Items included in an order
+      - name: locations
+        description: One record per physical store location
+      - name: products
+        description: One record per SKU for items sold in stores
