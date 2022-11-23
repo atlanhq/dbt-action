@@ -108,7 +108,6 @@ async function run() {
     const assetName = await getAssetName(octokit, context, name, filePath);
     const asset = await getAsset({ name: assetName });
     const { guid } = asset.attributes.sqlAsset;
-    console.log(guid);
     const downstreamAssets = await getDownstreamAssets(guid);
 
     const comment = await createComment(
