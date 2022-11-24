@@ -70,5 +70,6 @@ export default async function getAsset({ name }) {
     requestOptions
   ).then((e) => e.json());
 
-  return response.entities[0];
+  if (response?.entities?.length > 0) return response.entities[0];
+  return null;
 }

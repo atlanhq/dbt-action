@@ -138,6 +138,9 @@ async function run() {
   changedFiles.forEach(async ({ name, filePath }) => {
     const assetName = await getAssetName(octokit, context, name, filePath);
     const asset = await getAsset({ name: assetName });
+
+    if (!asset) return;
+
     const { guid } = asset.attributes.sqlAsset;
     const downstreamAssets = await getDownstreamAssets(guid);
 

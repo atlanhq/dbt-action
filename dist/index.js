@@ -16917,7 +16917,8 @@ async function getAsset({ name }) {
     requestOptions
   ).then((e) => e.json());
 
-  return response.entities[0];
+  if (response?.entities?.length > 0) return response.entities[0];
+  return null;
 }
 
 ;// CONCATENATED MODULE: ./src/api/get-downstream-assets.js
@@ -16976,6 +16977,8 @@ async function getDownstreamAssets(guid) {
     `${get_downstream_assets_ATLAN_INSTANCE_URL}/api/meta/lineage/getlineage`,
     requestOptions
   ).then((e) => e.json());
+
+  if (!response.relations) return null;
 
   const relations = response.relations.map(({ toEntityId }) => toEntityId);
 
@@ -17224,10 +17227,11 @@ async function createComment(octokit, context, asset, downstreamAssets) {
         ? getCertificationImage(asset.attributes.certificateStatus)
         : ""
     }
-${asset.typeName
-  .toLowerCase()
-  .replace(asset.attributes.connectorName, "")
-  .toUpperCase()}
+\`${asset.typeName
+      .toLowerCase()
+      .replace(asset.attributes.connectorName, "")
+      .toUpperCase()}\`
+      
 There are ${downstreamAssets.length} downstream asset(s).
 Name | Type | Description | Owners | Terms
 --- | --- | --- | --- | ---
@@ -17255,6 +17259,9 @@ async function run() {
   changedFiles.forEach(async ({ name, filePath }) => {
     const assetName = await getAssetName(octokit, context, name, filePath);
     const asset = await getAsset({ name: assetName });
+
+    if (!asset) return;
+
     const { guid } = asset.attributes.sqlAsset;
     const downstreamAssets = await getDownstreamAssets(guid);
 
