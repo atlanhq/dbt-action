@@ -1,8 +1,13 @@
 import dotenv from "dotenv";
 import core from "@actions/core";
 import github from "@actions/github";
-import getAssetByExactName from "./api/get-asset.js";
+import getAsset from "./api/get-asset.js";
 import getDownstreamAssets from "./api/get-downstream-assets.js";
+import {
+  getConnectorImage,
+  getCertificationImage,
+  getImageURL,
+} from "./utils/get-image-url.js";
 
 dotenv.config();
 
@@ -74,20 +79,46 @@ async function getAssetName(octokit, context, fileName, filePath) {
 async function createComment(octokit, context, asset, downstreamAssets) {
   const { pull_request } = context.payload,
     rows = downstreamAssets.map(
-      ({ displayText, guid, typeName, attributes, meaningNames }) => [
-        `[${displayText}](${ATLAN_INSTANCE_URL}/assets/${guid})`,
-        typeName,
-        attributes?.userDescription || attributes?.description || "--",
-        attributes?.ownerUsers?.join(", ") || "--",
-        meaningNames?.join(", ") || "--",
-      ]
+      ({ displayText, guid, typeName, attributes, meaningNames }) => {
+        const connectorImage = getConnectorImage(attributes.connectorName),
+          certificationImage = attributes?.certificateStatus
+            ? getCertificationImage(attributes?.certificateStatus)
+            : "",
+          readableTypeName = typeName
+            .toLowerCase()
+            .replace(attributes.connectorName, "")
+            .toUpperCase();
+
+        return [
+          `${connectorImage} [${displayText}](${ATLAN_INSTANCE_URL}/assets/${guid}) ${certificationImage}`,
+          `\`${readableTypeName}\``,
+          attributes?.userDescription || attributes?.description || "--",
+          attributes?.ownerUsers?.join(", ") || "--",
+          meaningNames?.join(", ") || "--",
+        ];
+      }
     ),
     comment = `
-## [${asset.displayText}](${ATLAN_INSTANCE_URL}/assets/${asset.guid})
+## ${getConnectorImage(asset.attributes.connectorName)} [${
+      asset.displayText
+    }](${ATLAN_INSTANCE_URL}/assets/${asset.guid}) ${
+      asset.attributes?.certificateStatus
+        ? getCertificationImage(asset.attributes.certificateStatus)
+        : ""
+    }
+\`${asset.typeName
+      .toLowerCase()
+      .replace(asset.attributes.connectorName, "")
+      .toUpperCase()}\`
+      
 There are ${downstreamAssets.length} downstream asset(s).
-Name | Type Name | Description | Owners | Terms
+Name | Type | Description | Owners | Terms
 --- | --- | --- | --- | ---
-${rows.map((row) => row.join(" | ")).join("\n")}`,
+${rows.map((row) => row.join(" | ")).join("\n")}
+
+${getImageURL(
+  "atlan-logo"
+)} [View asset on Atlan.](${ATLAN_INSTANCE_URL}/assets/${asset.guid})`,
     commentObj = {
       ...context.repo,
       issue_number: pull_request.number,
@@ -106,8 +137,8 @@ async function run() {
 
   changedFiles.forEach(async ({ name, filePath }) => {
     const assetName = await getAssetName(octokit, context, name, filePath);
-    const asset = await getAssetByExactName(assetName);
-    const { guid } = asset;
+    const asset = await getAsset({ name: assetName });
+    const { guid } = asset.attributes.sqlAsset;
     const downstreamAssets = await getDownstreamAssets(guid);
 
     const comment = await createComment(

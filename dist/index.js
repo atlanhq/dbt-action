@@ -16856,7 +16856,7 @@ const ATLAN_INSTANCE_URL =
 const ATLAN_API_TOKEN =
   core.getInput("ATLAN_API_TOKEN") || process.env.ATLAN_API_TOKEN;
 
-async function getAssetByExactName(name) {
+async function getAsset({ name }) {
   var myHeaders = {
     Authorization: `Bearer ${ATLAN_API_TOKEN}`,
     "Content-Type": "application/json",
@@ -16888,6 +16888,22 @@ async function getAssetByExactName(name) {
         },
       },
     },
+    attributes: [
+      "name",
+      "description",
+      "userDescription",
+      "sourceURL",
+      "qualifiedName",
+      "connectorName",
+      "certificateStatus",
+      "certificateUpdatedBy",
+      "certificateUpdatedAt",
+      "ownerUsers",
+      "ownerGroups",
+      "classificationNames",
+      "meanings",
+      "sqlAsset",
+    ],
   });
 
   var requestOptions = {
@@ -16961,12 +16977,150 @@ async function getDownstreamAssets(guid) {
     requestOptions
   ).then((e) => e.json());
 
-  const relations = response.relations;
+  const relations = response.relations.map(({ toEntityId }) => toEntityId);
 
-  return relations.map(({ toEntityId }) => response.guidEntityMap[toEntityId]);
+  return relations
+    .filter((id, index) => relations.indexOf(id) === index)
+    .map((id) => response.guidEntityMap[id]);
+}
+
+;// CONCATENATED MODULE: ./src/utils/hosted-images.js
+/* harmony default export */ const hosted_images = ({
+  "atlan-logo": {
+    alt: "Atlan Logo",
+    url: "https://iili.io/H2iiP44.png",
+  },
+  "certification-deprecated": {
+    alt: "Certificate Status Deprecated",
+    url: "https://iili.io/H2iiLa2.png",
+  },
+  "certification-draft": {
+    alt: "Certificate Status Drafted",
+    url: "https://iili.io/H2iiQvS.png",
+  },
+  "certification-verified": {
+    alt: "Certificate Status Verified",
+    url: "https://iili.io/H2iis3l.png",
+  },
+  "connector-airflow": {
+    alt: "Connector Airflow",
+    url: "https://iili.io/H2iibje.png",
+  },
+  "connector-athena": {
+    alt: "Connector Athena",
+    url: "https://iili.io/H2iiDu9.png",
+  },
+  "connector-aws-s3": {
+    alt: "Connector AWS S3",
+    url: "https://iili.io/H2iimZu.png",
+  },
+  "connector-azure-datalake": {
+    alt: "Connector Azure Datalake",
+    url: "https://iili.io/H2iiZy7.png",
+  },
+  "connector-bigquery": {
+    alt: "Connector BigQuery",
+    url: "https://iili.io/H2iiyCb.png",
+  },
+  "connector-databricks": {
+    alt: "Connector Databricks",
+    url: "https://iili.io/H2is9Gj.png",
+  },
+  "connector-dbt": {
+    alt: "Connector dbt",
+    url: "https://iili.io/H2isH6x.png",
+  },
+  "connector-gcp": {
+    alt: "Connector GCP",
+    url: "https://iili.io/H2isd3Q.png",
+  },
+  "connector-glue": {
+    alt: "Connector Glue",
+    url: "https://iili.io/H2isFyP.png",
+  },
+  "connector-grafana": {
+    alt: "Connector Grafana",
+    url: "https://iili.io/H2is38B.png",
+  },
+  "connector-looker": {
+    alt: "Connector Looker",
+    url: "https://iili.io/H2isfu1.png",
+  },
+  "connector-mocks": {
+    alt: "Connector Mocks",
+    url: "https://iili.io/H2isqwF.png",
+  },
+  "connector-mysql": {
+    alt: "Connector MySQL",
+    url: "https://iili.io/H2isnna.png",
+  },
+  "connector-oracle": {
+    alt: "Connector Oracle",
+    url: "https://iili.io/H2isoMJ.png",
+  },
+  "connector-postgres": {
+    alt: "Connector Postgres",
+    url: "https://iili.io/H2isx6v.png",
+  },
+  "connector-powerbi": {
+    alt: "Connector PowerBI",
+    url: "https://iili.io/H2isBZg.png",
+  },
+  "connector-presto": {
+    alt: "Connector Presto",
+    url: "https://iili.io/H2isIFR.png",
+  },
+  "connector-python": {
+    alt: "Connector Python",
+    url: "https://iili.io/H2isTap.png",
+  },
+  "connector-r": {
+    alt: "Connector R",
+    url: "https://iili.io/H2isu8N.png",
+  },
+  "connector-redash": {
+    alt: "Connector Redash",
+    url: "https://iili.io/H2isR9I.png",
+  },
+  "connector-redshift": {
+    alt: "Connector Redshift",
+    url: "https://iili.io/H2is5ut.png",
+  },
+  "connector-sisense": {
+    alt: "Connector Sisense",
+    url: "https://iili.io/H2is7wX.png",
+  },
+  "connector-snowflake": {
+    alt: "Connector Snowflake",
+    url: "https://iili.io/H2iscns.png",
+  },
+  "connector-tableau": {
+    alt: "Connector Tableau",
+    url: "https://iili.io/H2isYtn.png",
+  },
+});
+
+;// CONCATENATED MODULE: ./src/utils/get-image-url.js
+
+
+function getImageURL(name) {
+  try {
+    return `![${hosted_images[name].alt}](${hosted_images[name].url})`;
+  } catch (e) {
+    console.log(name);
+  }
+}
+
+function getConnectorImage(connectorName) {
+  return getImageURL(`connector-${connectorName.toLowerCase()}`);
+}
+
+function getCertificationImage(certificationStatus) {
+  return getImageURL(`certification-${certificationStatus.toLowerCase()}`);
 }
 
 ;// CONCATENATED MODULE: ./src/index.js
+
 
 
 
@@ -17043,20 +17197,45 @@ async function getAssetName(octokit, context, fileName, filePath) {
 async function createComment(octokit, context, asset, downstreamAssets) {
   const { pull_request } = context.payload,
     rows = downstreamAssets.map(
-      ({ displayText, guid, typeName, attributes, meaningNames }) => [
-        `[${displayText}](${src_ATLAN_INSTANCE_URL}/assets/${guid})`,
-        typeName,
-        attributes?.userDescription || attributes?.description || "--",
-        attributes?.ownerUsers?.join(", ") || "--",
-        meaningNames?.join(", ") || "--",
-      ]
+      ({ displayText, guid, typeName, attributes, meaningNames }) => {
+        const connectorImage = getConnectorImage(attributes.connectorName),
+          certificationImage = attributes?.certificateStatus
+            ? getCertificationImage(attributes?.certificateStatus)
+            : "",
+          readableTypeName = typeName
+            .toLowerCase()
+            .replace(attributes.connectorName, "")
+            .toUpperCase();
+
+        return [
+          `${connectorImage} [${displayText}](${src_ATLAN_INSTANCE_URL}/assets/${guid}) ${certificationImage}`,
+          `\`${readableTypeName}\``,
+          attributes?.userDescription || attributes?.description || "--",
+          attributes?.ownerUsers?.join(", ") || "--",
+          meaningNames?.join(", ") || "--",
+        ];
+      }
     ),
     comment = `
-## [${asset.displayText}](${src_ATLAN_INSTANCE_URL}/assets/${asset.guid})
+## ${getConnectorImage(asset.attributes.connectorName)} [${
+      asset.displayText
+    }](${src_ATLAN_INSTANCE_URL}/assets/${asset.guid}) ${
+      asset.attributes?.certificateStatus
+        ? getCertificationImage(asset.attributes.certificateStatus)
+        : ""
+    }
+${asset.typeName
+  .toLowerCase()
+  .replace(asset.attributes.connectorName, "")
+  .toUpperCase()}
 There are ${downstreamAssets.length} downstream asset(s).
-Name | Type Name | Description | Owners | Terms
+Name | Type | Description | Owners | Terms
 --- | --- | --- | --- | ---
-${rows.map((row) => row.join(" | ")).join("\n")}`,
+${rows.map((row) => row.join(" | ")).join("\n")}
+
+${getImageURL(
+  "atlan-logo"
+)} [View asset on Atlan.](${src_ATLAN_INSTANCE_URL}/assets/${asset.guid})`,
     commentObj = {
       ...context.repo,
       issue_number: pull_request.number,
@@ -17075,8 +17254,8 @@ async function run() {
 
   changedFiles.forEach(async ({ name, filePath }) => {
     const assetName = await getAssetName(octokit, context, name, filePath);
-    const asset = await getAssetByExactName(assetName);
-    const { guid } = asset;
+    const asset = await getAsset({ name: assetName });
+    const { guid } = asset.attributes.sqlAsset;
     const downstreamAssets = await getDownstreamAssets(guid);
 
     const comment = await createComment(

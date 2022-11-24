@@ -54,7 +54,9 @@ export default async function getDownstreamAssets(guid) {
     requestOptions
   ).then((e) => e.json());
 
-  const relations = response.relations;
+  const relations = response.relations.map(({ toEntityId }) => toEntityId);
 
-  return relations.map(({ toEntityId }) => response.guidEntityMap[toEntityId]);
+  return relations
+    .filter((id, index) => relations.indexOf(id) === index)
+    .map((id) => response.guidEntityMap[id]);
 }
