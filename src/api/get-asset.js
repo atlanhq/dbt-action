@@ -41,7 +41,22 @@ export default async function getAsset({ name }) {
         },
       },
     },
-    attributes: ["sqlAsset"],
+    attributes: [
+      "name",
+      "description",
+      "userDescription",
+      "sourceURL",
+      "qualifiedName",
+      "connectorName",
+      "certificateStatus",
+      "certificateUpdatedBy",
+      "certificateUpdatedAt",
+      "ownerUsers",
+      "ownerGroups",
+      "classificationNames",
+      "meanings",
+      "sqlAsset",
+    ],
   });
 
   var requestOptions = {
