@@ -16844,7 +16844,7 @@ function fixResponseChunkedTransferBadEnding(request, errorCallback) {
 	});
 }
 
-;// CONCATENATED MODULE: ./src/api/get-asset.js
+;// CONCATENATED MODULE: ./src/api/get-downstream-assets.js
 
 
 
@@ -16856,9 +16856,75 @@ const ATLAN_INSTANCE_URL =
 const ATLAN_API_TOKEN =
   core.getInput("ATLAN_API_TOKEN") || process.env.ATLAN_API_TOKEN;
 
+async function getDownstreamAssets(guid) {
+  var myHeaders = {
+    authorization: `Bearer ${ATLAN_API_TOKEN}`,
+    "content-type": "application/json",
+  };
+
+  var raw = JSON.stringify({
+    depth: 21,
+    guid: guid,
+    hideProcess: true,
+    allowDeletedProcess: false,
+    entityFilters: {
+      attributeName: "__state",
+      operator: "eq",
+      attributeValue: "ACTIVE",
+    },
+    attributes: [
+      "name",
+      "description",
+      "userDescription",
+      "sourceURL",
+      "qualifiedName",
+      "connectorName",
+      "certificateStatus",
+      "certificateUpdatedBy",
+      "certificateUpdatedAt",
+      "ownerUsers",
+      "ownerGroups",
+      "classificationNames",
+      "meanings",
+    ],
+    direction: "OUTPUT",
+  });
+
+  var requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: raw,
+  };
+
+  var response = await fetch(
+    `${ATLAN_INSTANCE_URL}/api/meta/lineage/getlineage`,
+    requestOptions
+  ).then((e) => e.json());
+
+  if (!response.relations) return null;
+
+  const relations = response.relations.map(({ toEntityId }) => toEntityId);
+
+  return relations
+    .filter((id, index) => relations.indexOf(id) === index)
+    .map((id) => response.guidEntityMap[id]);
+}
+
+;// CONCATENATED MODULE: ./src/api/get-asset.js
+
+
+
+
+main.config();
+
+const get_asset_ATLAN_INSTANCE_URL =
+  core.getInput("ATLAN_INSTANCE_URL") || process.env.ATLAN_INSTANCE_URL;
+const get_asset_ATLAN_API_TOKEN =
+  core.getInput("ATLAN_API_TOKEN") || process.env.ATLAN_API_TOKEN;
+
 async function getAsset({ name }) {
   var myHeaders = {
-    Authorization: `Bearer ${ATLAN_API_TOKEN}`,
+    Authorization: `Bearer ${get_asset_ATLAN_API_TOKEN}`,
     "Content-Type": "application/json",
   };
 
@@ -16913,7 +16979,7 @@ async function getAsset({ name }) {
   };
 
   var response = await fetch(
-    `${ATLAN_INSTANCE_URL}/api/meta/search/indexsearch#findAssetByExactName`,
+    `${get_asset_ATLAN_INSTANCE_URL}/api/meta/search/indexsearch#findAssetByExactName`,
     requestOptions
   ).then((e) => e.json());
 
@@ -16921,70 +16987,27 @@ async function getAsset({ name }) {
   return null;
 }
 
-;// CONCATENATED MODULE: ./src/api/get-downstream-assets.js
+;// CONCATENATED MODULE: ./src/api/index.js
 
 
 
+;// CONCATENATED MODULE: ./src/utils/get-image-url.js
 
-main.config();
 
-const get_downstream_assets_ATLAN_INSTANCE_URL =
-  core.getInput("ATLAN_INSTANCE_URL") || process.env.ATLAN_INSTANCE_URL;
-const get_downstream_assets_ATLAN_API_TOKEN =
-  core.getInput("ATLAN_API_TOKEN") || process.env.ATLAN_API_TOKEN;
+function getImageURL(name) {
+  try {
+    return `![${hosted_images[name].alt}](${hosted_images[name].url})`;
+  } catch (e) {
+    console.log(name);
+  }
+}
 
-async function getDownstreamAssets(guid) {
-  var myHeaders = {
-    authorization: `Bearer ${get_downstream_assets_ATLAN_API_TOKEN}`,
-    "content-type": "application/json",
-  };
+function getConnectorImage(connectorName) {
+  return getImageURL(`connector-${connectorName.toLowerCase()}`);
+}
 
-  var raw = JSON.stringify({
-    depth: 21,
-    guid: guid,
-    hideProcess: true,
-    allowDeletedProcess: false,
-    entityFilters: {
-      attributeName: "__state",
-      operator: "eq",
-      attributeValue: "ACTIVE",
-    },
-    attributes: [
-      "name",
-      "description",
-      "userDescription",
-      "sourceURL",
-      "qualifiedName",
-      "connectorName",
-      "certificateStatus",
-      "certificateUpdatedBy",
-      "certificateUpdatedAt",
-      "ownerUsers",
-      "ownerGroups",
-      "classificationNames",
-      "meanings",
-    ],
-    direction: "OUTPUT",
-  });
-
-  var requestOptions = {
-    method: "POST",
-    headers: myHeaders,
-    body: raw,
-  };
-
-  var response = await fetch(
-    `${get_downstream_assets_ATLAN_INSTANCE_URL}/api/meta/lineage/getlineage`,
-    requestOptions
-  ).then((e) => e.json());
-
-  if (!response.relations) return null;
-
-  const relations = response.relations.map(({ toEntityId }) => toEntityId);
-
-  return relations
-    .filter((id, index) => relations.indexOf(id) === index)
-    .map((id) => response.guidEntityMap[id]);
+function getCertificationImage(certificationStatus) {
+  return getImageURL(`certification-${certificationStatus.toLowerCase()}`);
 }
 
 ;// CONCATENATED MODULE: ./src/utils/hosted-images.js
@@ -17103,28 +17126,7 @@ async function getDownstreamAssets(guid) {
   },
 });
 
-;// CONCATENATED MODULE: ./src/utils/get-image-url.js
-
-
-function getImageURL(name) {
-  try {
-    return `![${hosted_images[name].alt}](${hosted_images[name].url})`;
-  } catch (e) {
-    console.log(name);
-  }
-}
-
-function getConnectorImage(connectorName) {
-  return getImageURL(`connector-${connectorName.toLowerCase()}`);
-}
-
-function getCertificationImage(certificationStatus) {
-  return getImageURL(`certification-${certificationStatus.toLowerCase()}`);
-}
-
-;// CONCATENATED MODULE: ./src/index.js
-
-
+;// CONCATENATED MODULE: ./src/utils/create-comment.js
 
 
 
@@ -17133,10 +17135,71 @@ function getCertificationImage(certificationStatus) {
 main.config();
 
 const { IS_DEV } = process.env;
-const GITHUB_TOKEN = core.getInput("GITHUB_TOKEN") || process.env.GITHUB_TOKEN;
-const src_ATLAN_INSTANCE_URL =
+const create_comment_ATLAN_INSTANCE_URL =
   core.getInput("ATLAN_INSTANCE_URL") || process.env.ATLAN_INSTANCE_URL;
 
+async function createComment(
+  octokit,
+  context,
+  asset,
+  downstreamAssets
+) {
+  const { pull_request } = context.payload;
+
+  const rows = downstreamAssets.map(
+    ({ displayText, guid, typeName, attributes, meaningNames }) => {
+      const connectorImage = getConnectorImage(attributes.connectorName),
+        certificationImage = attributes?.certificateStatus
+          ? getCertificationImage(attributes?.certificateStatus)
+          : "",
+        readableTypeName = typeName
+          .toLowerCase()
+          .replace(attributes.connectorName, "")
+          .toUpperCase();
+
+      return [
+        `${connectorImage} [${displayText}](${create_comment_ATLAN_INSTANCE_URL}/assets/${guid}) ${certificationImage}`,
+        `\`${readableTypeName}\``,
+        attributes?.userDescription || attributes?.description || "--",
+        attributes?.ownerUsers?.join(", ") || "--",
+        meaningNames?.join(", ") || "--",
+      ];
+    }
+  );
+
+  const comment = `
+  ## ${getConnectorImage(asset.attributes.connectorName)} [${
+    asset.displayText
+  }](${create_comment_ATLAN_INSTANCE_URL}/assets/${asset.guid}) ${
+    asset.attributes?.certificateStatus
+      ? getCertificationImage(asset.attributes.certificateStatus)
+      : ""
+  }
+  \`${asset.typeName
+    .toLowerCase()
+    .replace(asset.attributes.connectorName, "")
+    .toUpperCase()}\`
+        
+  There are ${downstreamAssets.length} downstream asset(s).
+  Name | Type | Description | Owners | Terms
+  --- | --- | --- | --- | ---
+  ${rows.map((row) => row.join(" | ")).join("\n")}
+  
+  ${getImageURL(
+    "atlan-logo"
+  )} [View asset on Atlan.](${create_comment_ATLAN_INSTANCE_URL}/assets/${asset.guid})`;
+
+  const commentObj = {
+    ...context.repo,
+    issue_number: pull_request.number,
+    body: comment,
+  };
+
+  if (IS_DEV) return comment;
+  return octokit.rest.issues.createComment(commentObj);
+}
+
+;// CONCATENATED MODULE: ./src/utils/file-system.js
 async function getFileContents(octokit, context, filePath) {
   const { repository, pull_request } = context.payload,
     owner = repository.owner.login,
@@ -17197,63 +17260,17 @@ async function getAssetName(octokit, context, fileName, filePath) {
   return fileName;
 }
 
-async function createComment(octokit, context, asset, downstreamAssets) {
-  const { pull_request } = context.payload,
-    rows = downstreamAssets.map(
-      ({ displayText, guid, typeName, attributes, meaningNames }) => {
-        const connectorImage = getConnectorImage(attributes.connectorName),
-          certificationImage = attributes?.certificateStatus
-            ? getCertificationImage(attributes?.certificateStatus)
-            : "",
-          readableTypeName = typeName
-            .toLowerCase()
-            .replace(attributes.connectorName, "")
-            .toUpperCase();
+;// CONCATENATED MODULE: ./src/utils/index.js
 
-        return [
-          `${connectorImage} [${displayText}](${src_ATLAN_INSTANCE_URL}/assets/${guid}) ${certificationImage}`,
-          `\`${readableTypeName}\``,
-          attributes?.userDescription || attributes?.description || "--",
-          attributes?.ownerUsers?.join(", ") || "--",
-          meaningNames?.join(", ") || "--",
-        ];
-      }
-    ),
-    comment = `
-## ${getConnectorImage(asset.attributes.connectorName)} [${
-      asset.displayText
-    }](${src_ATLAN_INSTANCE_URL}/assets/${asset.guid}) ${
-      asset.attributes?.certificateStatus
-        ? getCertificationImage(asset.attributes.certificateStatus)
-        : ""
-    }
-\`${asset.typeName
-      .toLowerCase()
-      .replace(asset.attributes.connectorName, "")
-      .toUpperCase()}\`
-      
-There are ${downstreamAssets.length} downstream asset(s).
-Name | Type | Description | Owners | Terms
---- | --- | --- | --- | ---
-${rows.map((row) => row.join(" | ")).join("\n")}
 
-${getImageURL(
-  "atlan-logo"
-)} [View asset on Atlan.](${src_ATLAN_INSTANCE_URL}/assets/${asset.guid})`,
-    commentObj = {
-      ...context.repo,
-      issue_number: pull_request.number,
-      body: comment,
-    };
 
-  if (IS_DEV) return comment;
-  return octokit.rest.issues.createComment(commentObj);
-}
 
-async function run() {
-  const { context = {} } = github;
-  const octokit = github.getOctokit(GITHUB_TOKEN);
 
+;// CONCATENATED MODULE: ./src/main/print-downstream-assets.js
+
+
+
+async function printDownstreamAssets({ octokit, context }) {
   const changedFiles = await getChangedFiles(octokit, context);
 
   changedFiles.forEach(async ({ name, filePath }) => {
@@ -17273,6 +17290,36 @@ async function run() {
     );
     console.log(comment);
   });
+}
+
+;// CONCATENATED MODULE: ./src/main/index.js
+
+
+;// CONCATENATED MODULE: ./src/index.js
+
+
+
+
+
+
+main.config();
+
+const GITHUB_TOKEN = core.getInput("GITHUB_TOKEN") || process.env.GITHUB_TOKEN;
+
+async function run() {
+  const { context } = github;
+  const octokit = github.getOctokit(GITHUB_TOKEN);
+  const { pull_request } = context.payload;
+  const { state } = pull_request;
+  console.log(pull_request);
+
+  switch (state) {
+    case "open":
+      await printDownstreamAssets({ octokit, context });
+      break;
+    case "closed":
+      console.log(pull_request);
+  }
 }
 
 run().catch((e) => core.setFailed(e.message));
