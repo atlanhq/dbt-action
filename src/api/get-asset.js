@@ -9,7 +9,7 @@ const ATLAN_INSTANCE_URL =
 const ATLAN_API_TOKEN =
   core.getInput("ATLAN_API_TOKEN") || process.env.ATLAN_API_TOKEN;
 
-export default async function getAssetByExactName(name) {
+export default async function getAsset({ name }) {
   var myHeaders = {
     Authorization: `Bearer ${ATLAN_API_TOKEN}`,
     "Content-Type": "application/json",
@@ -41,6 +41,22 @@ export default async function getAssetByExactName(name) {
         },
       },
     },
+    attributes: [
+      "name",
+      "description",
+      "userDescription",
+      "sourceURL",
+      "qualifiedName",
+      "connectorName",
+      "certificateStatus",
+      "certificateUpdatedBy",
+      "certificateUpdatedAt",
+      "ownerUsers",
+      "ownerGroups",
+      "classificationNames",
+      "meanings",
+      "sqlAsset",
+    ],
   });
 
   var requestOptions = {
@@ -54,5 +70,6 @@ export default async function getAssetByExactName(name) {
     requestOptions
   ).then((e) => e.json());
 
-  return response.entities[0];
+  if (response?.entities?.length > 0) return response.entities[0];
+  return null;
 }

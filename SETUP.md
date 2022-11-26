@@ -27,6 +27,23 @@ It is a very useful and easy to use library, which runs your Github Actions loca
   IS_DEV=true
   ```
 
+## Create `event.json` to test the action locally
+
+Since you as a developer would be using your Github PAT to test the action locally, you'll need to locally run the clone of your fork, in order to generate the event.json file, follow the following steps:
+
+- [Fork this repo.](https://github.com/atlanhq/dbt-action/fork)
+- Create a pull request from `test-action` branch to `main` branch. Once you do so, it will automatically run the action.
+- Go to your forked repo's `Actions` page and open the workflow with the name `Test Action`.
+- Click on the one and only job, `Get Downstream Assets`.
+- Click on the step called `Dump GitHub Context` and you'll find a huge json object containing the key `"event"`, copy all of the content present inside this key.
+- Create `event.json` in your root directory.
+- Paste all the content you copied in this file
+  ```json
+  {
+    // ... Paste your copied content ...
+  }
+  ```
+
 ## Test Action Locally
 
 Test on macOS with Apple Silicon processors.
