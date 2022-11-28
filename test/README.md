@@ -58,5 +58,3 @@ To run this project in dbt Cloud:
 - Run a job in your dbt Cloud Deployment Environment with the command `dbt build`
 
 Adding some forceful changes.
-
-Made some minor changes.
