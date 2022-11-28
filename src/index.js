@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 import core from "@actions/core";
 import github from "@actions/github";
 
-import { printDownstreamAssets } from "./main/index.js";
+import { printDownstreamAssets, setResourceOnAsset } from "./main/index.js";
 
 dotenv.config();
 
@@ -12,15 +12,15 @@ async function run() {
   const { context } = github;
   const octokit = github.getOctokit(GITHUB_TOKEN);
   const { pull_request } = context.payload;
-  const { state } = pull_request;
-  console.log(pull_request);
+  const { state, merged } = pull_request;
 
   switch (state) {
     case "open":
       await printDownstreamAssets({ octokit, context });
       break;
     case "closed":
-      console.log(pull_request);
+      if (merged) await setResourceOnAsset({ octokit, context });
+      break;
   }
 }
 
