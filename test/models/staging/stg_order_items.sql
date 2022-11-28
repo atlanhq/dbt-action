@@ -1,5 +1,5 @@
 
-{{ config(alias='stg_locations') }}
+{{ config(alias='stg_order_items') }}
 
 with source as (
 
