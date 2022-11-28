@@ -8,6 +8,8 @@ import {
 export default async function printDownstreamAssets({ octokit, context }) {
   const changedFiles = await getChangedFiles(octokit, context);
 
+  if (changedFiles.length === 0) return;
+
   changedFiles.forEach(async ({ name, filePath }) => {
     const assetName = await getAssetName(octokit, context, name, filePath);
     const asset = await getAsset({ name: assetName });

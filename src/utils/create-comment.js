@@ -73,3 +73,15 @@ export default async function createComment(
   if (IS_DEV) return comment;
   return octokit.rest.issues.createComment(commentObj);
 }
+
+export async function createCustomComment(octokit, context, content) {
+  const { pull_request } = context.payload;
+  const commentObj = {
+    ...context.repo,
+    issue_number: pull_request.number,
+    body: content,
+  };
+
+  if (IS_DEV) return content;
+  return octokit.rest.issues.createComment(commentObj);
+}
