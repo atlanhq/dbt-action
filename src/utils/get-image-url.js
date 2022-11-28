@@ -1,4 +1,4 @@
-import hostedImages from "./hosted-images.js";
+import { hostedImages } from "./index.js";
 
 export function getImageURL(name) {
   try {

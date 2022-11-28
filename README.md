@@ -18,7 +18,7 @@ Get comments about downstream assets affected when you make changes to your dbt 
 
    on:
      pull_request:
-       types: [opened, edited, reopened]
+       types: [opened, edited, synchronize, reopened, closed]
 
    jobs:
      get-downstream-assets:
