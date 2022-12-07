@@ -75,8 +75,8 @@ final as (
 
     select *,
         customer_order_index = 1 as is_first_order,
-        count_food_items >= 0 as is_food_order,
-        count_drink_items >= 0 as is_drink_order
+        count_food_items > 0 as is_food_order,
+        count_drink_items > 0 as is_drink_order
 
     from joined
 
