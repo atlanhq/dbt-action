@@ -17880,7 +17880,7 @@ async function createComment(
   const { pull_request } = context.payload;
 
   const rows = downstreamAssets.map(
-    ({ displayText, guid, typeName, attributes, meaningNames }) => {
+    ({ displayText, guid, typeName, attributes, meanings }) => {
       const connectorImage = getConnectorImage(attributes.connectorName),
         certificationImage = attributes?.certificateStatus
           ? getCertificationImage(attributes?.certificateStatus)
@@ -17895,7 +17895,13 @@ async function createComment(
         `\`${readableTypeName}\``,
         attributes?.userDescription || attributes?.description || "--",
         attributes?.ownerUsers?.join(", ") || "--",
-        meaningNames?.join(", ") || "--",
+        meanings
+          .map(
+            ({ displayText, termGuid }) =>
+              `[${displayText}](${create_comment_ATLAN_INSTANCE_URL}/assets/${termGuid})`
+          )
+          ?.join(", ") || "--",
+        attributes?.sourceURL || "--",
       ];
     }
   );
@@ -17914,8 +17920,8 @@ async function createComment(
     .toUpperCase()}\`
         
   There are ${downstreamAssets.length} downstream asset(s).
-  Name | Type | Description | Owners | Terms
-  --- | --- | --- | --- | ---
+  Name | Type | Description | Owners | Terms | Source URL
+  --- | --- | --- | --- | --- | ---
   ${rows.map((row) => row.join(" | ")).join("\n")}
   
   ${getImageURL(
