@@ -17719,7 +17719,53 @@ async function createResource(guid, name, link) {
   return response;
 }
 
+;// CONCATENATED MODULE: ./src/api/segment.js
+
+
+
+
+
+main.config();
+
+const segment_ATLAN_INSTANCE_URL =
+  core.getInput("ATLAN_INSTANCE_URL") || process.env.ATLAN_INSTANCE_URL;
+const segment_ATLAN_API_TOKEN =
+  core.getInput("ATLAN_API_TOKEN") || process.env.ATLAN_API_TOKEN;
+
+async function sendSegmentEvent(action, properties) {
+  var myHeaders = {
+    authorization: `Bearer ${segment_ATLAN_API_TOKEN}`,
+    "content-type": "application/json",
+  };
+
+  var raw = JSON.stringify({
+    category: "integrations",
+    object: "github",
+    action,
+    properties: {
+      ...properties,
+      github_action_id: `https://github.com/${github.context.payload.repository.full_name}/actions/runs/${github.context.runId}`,
+    },
+  });
+
+  var requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: raw,
+  };
+
+  console.log("send segment event", action, properties);
+
+  var response = await fetch(
+    `${segment_ATLAN_INSTANCE_URL}/api/service/segment/track`,
+    requestOptions
+  );
+
+  return response;
+}
+
 ;// CONCATENATED MODULE: ./src/api/index.js
+
 
 
 
@@ -18026,14 +18072,22 @@ async function printDownstreamAssets({ octokit, context }) {
 
   if (changedFiles.length === 0) return;
 
-  changedFiles.forEach(async ({ name, filePath }) => {
+  for (const { name, filePath } of changedFiles) {
     const assetName = await getAssetName(octokit, context, name, filePath);
     const asset = await getAsset({ name: assetName });
 
     if (!asset) return;
 
     const { guid } = asset.attributes.sqlAsset;
+    const timeStart = Date.now();
     const downstreamAssets = await getDownstreamAssets(guid);
+
+    sendSegmentEvent("dbt_ci_action_downstream_unfurl", {
+      asset_guid: asset.guid,
+      asset_type: asset.typeName,
+      downstream_count: downstreamAssets.length,
+      total_fetch_time: Date.now() - timeStart,
+    });
 
     const comment = await createComment(
       octokit,
@@ -18042,7 +18096,9 @@ async function printDownstreamAssets({ octokit, context }) {
       downstreamAssets
     );
     console.log(comment);
-  });
+  }
+
+  return changedFiles.length;
 }
 
 ;// CONCATENATED MODULE: ./src/main/set-resource-on-asset.js
@@ -18098,27 +18154,35 @@ This pull request has been added as a resource to all the assets modified. ✅
 
 
 
+
 main.config();
 
 const GITHUB_TOKEN = core.getInput("GITHUB_TOKEN") || process.env.GITHUB_TOKEN;
 
 async function run() {
+  const timeStart = Date.now();
   const { context } = github;
   const octokit = github.getOctokit(GITHUB_TOKEN);
   const { pull_request } = context.payload;
   const { state, merged } = pull_request;
 
-  switch (state) {
-    case "open":
-      await printDownstreamAssets({ octokit, context });
-      break;
-    case "closed":
-      if (merged) await setResourceOnAsset({ octokit, context });
-      break;
+  let total_assets = 0;
+
+  if (state === "open") {
+    total_assets = await printDownstreamAssets({ octokit, context });
+  } else if (state === "closed") {
+    if (merged) await setResourceOnAsset({ octokit, context });
   }
+
+  sendSegmentEvent("dbt_ci_action_run", {
+    asset_count: total_assets,
+    total_time: Date.now() - timeStart,
+  });
 }
 
-run().catch((e) => core.setFailed(e.message));
+run().catch((e) => {
+  core.setFailed(e.message);
+});
 
 })();
 
