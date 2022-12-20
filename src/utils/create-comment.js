@@ -22,7 +22,7 @@ export default async function createComment(
   const { pull_request } = context.payload;
 
   const rows = downstreamAssets.map(
-    ({ displayText, guid, typeName, attributes, meaningNames }) => {
+    ({ displayText, guid, typeName, attributes, meanings }) => {
       const connectorImage = getConnectorImage(attributes.connectorName),
         certificationImage = attributes?.certificateStatus
           ? getCertificationImage(attributes?.certificateStatus)
@@ -37,7 +37,13 @@ export default async function createComment(
         `\`${readableTypeName}\``,
         attributes?.userDescription || attributes?.description || "--",
         attributes?.ownerUsers?.join(", ") || "--",
-        meaningNames?.join(", ") || "--",
+        meanings
+          .map(
+            ({ displayText, termGuid }) =>
+              `[${displayText}](${ATLAN_INSTANCE_URL}/assets/${termGuid})`
+          )
+          ?.join(", ") || "--",
+        attributes?.sourceURL || "--",
       ];
     }
   );
@@ -56,8 +62,8 @@ export default async function createComment(
     .toUpperCase()}\`
         
   There are ${downstreamAssets.length} downstream asset(s).
-  Name | Type | Description | Owners | Terms
-  --- | --- | --- | --- | ---
+  Name | Type | Description | Owners | Terms | Source URL
+  --- | --- | --- | --- | --- | ---
   ${rows.map((row) => row.join(" | ")).join("\n")}
   
   ${getImageURL(
