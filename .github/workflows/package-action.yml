@@ -21,9 +21,7 @@ jobs:
         run: |
           npm i 
           npm run build
-          git config --global user.email "it@atlan.com"
-          git config --global user.name "Atlan"
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          git config --global user.name "GitHub Actions"
           git add .
-          git commit -am "chore: package action"
-          git push -u origin main
+          git commit -m "chore: Update dist" || echo "No changes to commit"
+          git push origin HEAD:master

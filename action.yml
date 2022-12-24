@@ -1,5 +1,5 @@
 name: "Atlan dbt Action"
-description: "Get all the downstream assets that get affected when dbt model sql files are changed on pull request conversations."
+description: "Whenever you make a change to a dbt model, Atlan will add downstream lienage impact context right in your pull requests."
 author: "Atlan"
 
 inputs:

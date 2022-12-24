@@ -16,6 +16,8 @@ export default async function sendSegmentEvent(action, properties) {
     "content-type": "application/json",
   };
 
+  var domain = new URL(ATLAN_INSTANCE_URL).hostname;
+
   var raw = JSON.stringify({
     category: "integrations",
     object: "github",
@@ -23,6 +25,7 @@ export default async function sendSegmentEvent(action, properties) {
     properties: {
       ...properties,
       github_action_id: `https://github.com/${context.payload.repository.full_name}/actions/runs/${context.runId}`,
+      domain,
     },
   });
 
@@ -32,12 +35,16 @@ export default async function sendSegmentEvent(action, properties) {
     body: raw,
   };
 
-  console.log("send segment event", action, properties);
-
   var response = await fetch(
     `${ATLAN_INSTANCE_URL}/api/service/segment/track`,
     requestOptions
-  );
+  )
+    .then(() => {
+      console.log("send segment event", action, raw);
+    })
+    .catch((err) => {
+      console.log("couldn't send segment event", err);
+    });
 
   return response;
 }
