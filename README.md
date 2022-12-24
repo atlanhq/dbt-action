@@ -1,58 +1,60 @@
-# Atlan dbt action
+# Atlan dbt Action
 
-Get comments about downstream assets affected when you make changes to your dbt model SQL files.
+### Overview
 
-## Prerequisites
+---
 
-- Login to your Atlan Instance.
-- [Create Atlan Bearer Token.](https://ask.atlan.com/hc/en-us/articles/8312649180049)
+Have you changed a dbt model and realised that it broke a table or a dashboard downstream?
 
-## Usage
+To solve that, we’ve created a GitHub action that will add Atlan's lineage context right in your pull request. So before merging the PR, you know the downstream impact of the change
 
-1. Set up your credentials as secrets in your repository settings using `ATLAN_INSTANCE_URL` and `ATLAN_API_TOKEN`.
+![Github Action comment screenshot](https://iili.io/HI7d0zB.png)
 
-2. Add the following to your workflow
+### Prerequisites
 
-   ```yml
-   name: Atlan dbt action
+---
 
-   on:
-     pull_request:
-       types: [opened, edited, synchronize, reopened, closed]
+- **Atlan API token** → [How to create Atlan api key.](https://ask.atlan.com/hc/en-us/articles/8312649180049)
 
-   jobs:
-     get-downstream-assets:
-       name: Get Downstream Assets
-       runs-on: ubuntu-latest
-       steps:
-         - name: Run Action
-           uses: atlanhq/dbt-action@v1
-           with:
-             GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-             ATLAN_INSTANCE_URL: ${{secrets.ATLAN_INSTANCE_URL}}
-             ATLAN_API_TOKEN: ${{secrets.ATLAN_API_TOKEN}}
-   ```
+### How to setup
+
+---
+
+1. Set Atlan Instance URL and API Token as repository secrets in your repository.
+   1. [How to set GitHub Action secrets in your repository.](https://github.com/Azure/actions-workflow-samples/blob/master/assets/create-secrets-for-GitHub-workflows.md#creating-secrets)
+
+      ![Actions Secrets Screenshot](https://iili.io/HI7gfx2.png)
+
+2. Add the GitHub Action to your workflow
+   1. Create a file in the root directory of your repository, `.github/workflows/atlan-action.yml`
+   2. Add the following code to your workflow file.
+
+       ```yaml
+       name: Atlan dbt action
+       
+       on:
+         pull_request:
+           types: [opened, edited, synchronize, reopened, closed]
+       
+       jobs:
+         get-downstream-impact:
+           name: Get Downstream Assets
+           runs-on: ubuntu-latest
+           steps:
+             - name: Run Action
+               uses: atlanhq/dbt-action@v1
+               with:
+                 GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+                 ATLAN_INSTANCE_URL: ${{secrets.ATLAN_INSTANCE_URL}}
+                 ATLAN_API_TOKEN: ${{secrets.ATLAN_API_TOKEN}}
+       
+       ```
+
 
 ## Inputs
 
-| Name                 | Description                                                                                                                                                                                                | Required |
-| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| `GITHUB_TOKEN`       | Needed to write comments on PRs to print all the downstream assets. [How Github Tokens work?](https://dev.to/github/the-githubtoken-in-github-actions-how-it-works-change-permissions-customizations-3cgp) | `true`   |
-| `ATLAN_INSTANCE_URL` | Needed for making API requests to the user's tenant.                                                                                                                                                       | `true`   |
-| `ATLAN_API_TOKEN`    | Needed for authenticating API requests to the user's tenant. [Create an Atlan Bearer Token.](https://ask.atlan.com/hc/en-us/articles/8312649180049)                                                        | `true`   |
-
-## Setup
-
-Check out the [documentation](https://github.com/atlanhq/dbt-action/blob/main/SETUP.md) for setting up this action and testing it locally.
-
-## Third Party Licenses
-
-This GitHub Action uses a couple of Node.js modules to work.
-
-License and other copyright information for each module are included in the release branch of each action version under `node_modules/{module}`.
-
-More information for each package can be found at `https://www.npmjs.com/package/{package}`
-
-## License
-
-[![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/)
+| Name | Description | Required |
+| --- | --- | --- |
+| GITHUB_TOKEN | Needed to write comments on PRs to print all the downstream assets. https://dev.to/github/the-githubtoken-in-github-actions-how-it-works-change-permissions-customizations-3cgp | true |
+| ATLAN_INSTANCE_URL | Needed for making API requests to the user's tenant. | true |
+| ATLAN_API_TOKEN | Needed for authenticating API requests to the user's tenant. https://ask.atlan.com/hc/en-us/articles/8312649180049 | true |
