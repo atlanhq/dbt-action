@@ -14,7 +14,7 @@ To solve that, we’ve created a GitHub action that will add Atlan's lineage con
 - **Atlan API key** → [How to create Atlan api key.](https://ask.atlan.com/hc/en-us/articles/8312649180049)
 
 
-### How to setup
+## How to setup
 1. Set Atlan Instance URL and API Token as repository secrets in your repository.
    1. [How to set GitHub Action secrets in your repository.](https://github.com/Azure/actions-workflow-samples/blob/master/assets/create-secrets-for-GitHub-workflows.md#creating-secrets)
 
@@ -45,7 +45,7 @@ To solve that, we’ve created a GitHub action that will add Atlan's lineage con
        
        ```
 
-### How to test
+## How to test
 After you've completed both steps in setup, try creating a PR where you've changed any model file. You'll see Atlan Github action running in action and adding comments in your pull request.
 
 
