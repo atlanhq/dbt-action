@@ -35,7 +35,10 @@ async function run() {
 }
 
 run().catch((err) => {
-    sendSegmentEvent("dbt_ci_action_failure", err);
+    sendSegmentEvent("dbt_ci_action_failure", {
+        reason: 'failed_to_run_action',
+        msg: err
+    });
 
     core.setFailed(err.message);
 });
