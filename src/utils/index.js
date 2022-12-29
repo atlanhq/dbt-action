@@ -1,15 +1,18 @@
 export {
-  getImageURL,
-  getConnectorImage,
-  getCertificationImage,
+    getImageURL,
+    getConnectorImage,
+    getCertificationImage,
 } from "./get-image-url.js";
-export { default as hostedImages } from "./hosted-images.js";
+export {default as hostedImages} from "./hosted-images.js";
 export {
-  default as createComment,
-  createCustomComment,
+    default as createComment,
+    createCustomComment,
 } from "./create-comment.js";
 export {
-  getFileContents,
-  getChangedFiles,
-  getAssetName,
+    getFileContents,
+    getChangedFiles,
+    getAssetName,
 } from "./file-system.js";
+export {
+    default as auth
+} from "./auth.js"
