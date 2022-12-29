@@ -17,7 +17,7 @@ async function run() {
     const {pull_request} = context.payload;
     const {state, merged} = pull_request;
 
-    if (!await auth(octokit, context)) throw {message: 'Atlan Action Secrets not set properly.'}
+    if (!await auth(octokit, context)) throw {message: 'Wrong API Token'}
 
     let total_assets = 0;
 
