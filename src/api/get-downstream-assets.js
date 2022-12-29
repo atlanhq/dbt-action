@@ -59,14 +59,14 @@ export default async function getDownstreamAssets(asset, guid, octokit, context)
                 ? getCertificationImage(asset.attributes.certificateStatus)
                 : ""
         }
-            \`${asset.typeName
+\`${asset.typeName
             .toLowerCase()
             .replace(asset.attributes.connectorName, "")
             .toUpperCase()}\`
             
-            ❌ Failed to fetch downstream impacted assets.
+❌ Failed to fetch downstream impacted assets.
             
-            [See lineage on Atlan.](${ATLAN_INSTANCE_URL}/assets/${asset.guid}/lineage)\``;
+[See lineage on Atlan.](${ATLAN_INSTANCE_URL}/assets/${asset.guid}/lineage)`;
 
         createCustomComment(octokit, context, comment)
 
