@@ -33,14 +33,14 @@ export default async function createComment(
                     .toUpperCase();
 
             return [
-                `${connectorImage} [${displayText}](${ATLAN_INSTANCE_URL}/assets/${guid}) ${certificationImage}`,
+                `${connectorImage} [${displayText}](${ATLAN_INSTANCE_URL}/assets/${guid}?utm_source=github) ${certificationImage}`,
                 `\`${readableTypeName}\``,
                 attributes?.userDescription || attributes?.description || "--",
                 attributes?.ownerUsers?.join(", ") || "--",
                 meanings
                     .map(
                         ({displayText, termGuid}) =>
-                            `[${displayText}](${ATLAN_INSTANCE_URL}/assets/${termGuid})`
+                            `[${displayText}](${ATLAN_INSTANCE_URL}/assets/${termGuid}?utm_source=github)`
                     )
                     ?.join(", ") || "--",
                 attributes?.sourceURL || "--",
@@ -51,7 +51,7 @@ export default async function createComment(
     const comment = `
   ## ${getConnectorImage(asset.attributes.connectorName)} [${
         asset.displayText
-    }](${ATLAN_INSTANCE_URL}/assets/${asset.guid}) ${
+    }](${ATLAN_INSTANCE_URL}/assets/${asset.guid}?utm_source=github) ${
         asset.attributes?.certificateStatus
             ? getCertificationImage(asset.attributes.certificateStatus)
             : ""
@@ -68,7 +68,7 @@ export default async function createComment(
   
   ${getImageURL(
         "atlan-logo"
-    )} [View asset on Atlan.](${ATLAN_INSTANCE_URL}/assets/${asset.guid})`;
+    )} [View asset on Atlan.](${ATLAN_INSTANCE_URL}/assets/${asset.guid}?utm_source=github)`;
 
     const commentObj = {
         ...context.repo,

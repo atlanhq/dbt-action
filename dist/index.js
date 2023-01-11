@@ -17677,14 +17677,14 @@ async function createComment(
                     .toUpperCase();
 
             return [
-                `${connectorImage} [${displayText}](${ATLAN_INSTANCE_URL}/assets/${guid}) ${certificationImage}`,
+                `${connectorImage} [${displayText}](${ATLAN_INSTANCE_URL}/assets/${guid}?utm_source=github) ${certificationImage}`,
                 `\`${readableTypeName}\``,
                 attributes?.userDescription || attributes?.description || "--",
                 attributes?.ownerUsers?.join(", ") || "--",
                 meanings
                     .map(
                         ({displayText, termGuid}) =>
-                            `[${displayText}](${ATLAN_INSTANCE_URL}/assets/${termGuid})`
+                            `[${displayText}](${ATLAN_INSTANCE_URL}/assets/${termGuid}?utm_source=github)`
                     )
                     ?.join(", ") || "--",
                 attributes?.sourceURL || "--",
@@ -17695,7 +17695,7 @@ async function createComment(
     const comment = `
   ## ${getConnectorImage(asset.attributes.connectorName)} [${
         asset.displayText
-    }](${ATLAN_INSTANCE_URL}/assets/${asset.guid}) ${
+    }](${ATLAN_INSTANCE_URL}/assets/${asset.guid}?utm_source=github) ${
         asset.attributes?.certificateStatus
             ? getCertificationImage(asset.attributes.certificateStatus)
             : ""
@@ -17712,7 +17712,7 @@ async function createComment(
   
   ${getImageURL(
         "atlan-logo"
-    )} [View asset on Atlan.](${ATLAN_INSTANCE_URL}/assets/${asset.guid})`;
+    )} [View asset on Atlan.](${ATLAN_INSTANCE_URL}/assets/${asset.guid}?utm_source=github)`;
 
     const commentObj = {
         ...context.repo,
@@ -17833,6 +17833,7 @@ async function auth(octokit, context) {
     if (response?.status === 401) {
         await
             createCustomComment(octokit, context, `We couldn't connect to your Atlan Instance, please make sure to set the valid Atlan Bearer Token as \`ATLAN_API_TOKEN\` as this repository's action secret. 
+
 Atlan Instance URL: ${auth_ATLAN_INSTANCE_URL}
 
 Set your repository action secrets [here](https://github.com/${context.payload.repository.full_name}/settings/secrets/actions). For more information on how to setup the Atlan dbt Action, please read the [setup documentation here](https://github.com/atlanhq/dbt-action/blob/main/README.md).`)
@@ -17842,6 +17843,7 @@ Set your repository action secrets [here](https://github.com/${context.payload.r
     if (response === undefined) {
         await
             createCustomComment(octokit, context, `We couldn't connect to your Atlan Instance, please make sure to set the valid Atlan Instance URL as \`ATLAN_INSTANCE_URL\` as this repository's action secret. 
+
 Atlan Instance URL: ${auth_ATLAN_INSTANCE_URL}
 
 Make sure your Atlan Instance URL is set in the following format.
@@ -17917,19 +17919,19 @@ async function getDownstreamAssets(asset, guid, octokit, context) {
     var handleError = async (err) => {
         const comment = `## ${getConnectorImage(asset.attributes.connectorName)} [${
             asset.displayText
-        }](${get_downstream_assets_ATLAN_INSTANCE_URL}/assets/${asset.guid}) ${
+        }](${get_downstream_assets_ATLAN_INSTANCE_URL}/assets/${asset.guid}?utm_source=github) ${
             asset.attributes?.certificateStatus
                 ? getCertificationImage(asset.attributes.certificateStatus)
                 : ""
         }
-            \`${asset.typeName
+\`${asset.typeName
             .toLowerCase()
             .replace(asset.attributes.connectorName, "")
             .toUpperCase()}\`
             
-            ❌ Failed to fetch downstream impacted assets.
+❌ Failed to fetch downstream impacted assets.
             
-            [See lineage on Atlan.](${get_downstream_assets_ATLAN_INSTANCE_URL}/assets/${asset.guid}/lineage)\``;
+[See lineage on Atlan.](${get_downstream_assets_ATLAN_INSTANCE_URL}/assets/${asset.guid}/lineage?utm_source=github)`;
 
         createCustomComment(octokit, context, comment)
 
@@ -18291,7 +18293,7 @@ async function run() {
     const {pull_request} = context.payload;
     const {state, merged} = pull_request;
 
-    if (!await auth(octokit, context)) throw {message: 'Atlan Action Secrets not set properly.'}
+    if (!await auth(octokit, context)) throw {message: 'Wrong API Token'}
 
     let total_assets = 0;
 
@@ -18309,7 +18311,10 @@ async function run() {
 }
 
 run().catch((err) => {
-    sendSegmentEvent("dbt_ci_action_failure", err);
+    sendSegmentEvent("dbt_ci_action_failure", {
+        reason: 'failed_to_run_action',
+        msg: err
+    });
 
     core.setFailed(err.message);
 });
