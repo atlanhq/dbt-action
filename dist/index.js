@@ -17510,273 +17510,6 @@ function fixResponseChunkedTransferBadEnding(request, errorCallback) {
 	});
 }
 
-;// CONCATENATED MODULE: ./src/api/get-downstream-assets.js
-
-
-
-
-main.config();
-
-const ATLAN_INSTANCE_URL =
-  core.getInput("ATLAN_INSTANCE_URL") || process.env.ATLAN_INSTANCE_URL;
-const ATLAN_API_TOKEN =
-  core.getInput("ATLAN_API_TOKEN") || process.env.ATLAN_API_TOKEN;
-
-async function getDownstreamAssets(guid) {
-  var myHeaders = {
-    authorization: `Bearer ${ATLAN_API_TOKEN}`,
-    "content-type": "application/json",
-  };
-
-  var raw = JSON.stringify({
-    depth: 21,
-    guid: guid,
-    hideProcess: true,
-    allowDeletedProcess: false,
-    entityFilters: {
-      attributeName: "__state",
-      operator: "eq",
-      attributeValue: "ACTIVE",
-    },
-    attributes: [
-      "name",
-      "description",
-      "userDescription",
-      "sourceURL",
-      "qualifiedName",
-      "connectorName",
-      "certificateStatus",
-      "certificateUpdatedBy",
-      "certificateUpdatedAt",
-      "ownerUsers",
-      "ownerGroups",
-      "classificationNames",
-      "meanings",
-    ],
-    direction: "OUTPUT",
-  });
-
-  var requestOptions = {
-    method: "POST",
-    headers: myHeaders,
-    body: raw,
-  };
-
-  var response = await fetch(
-    `${ATLAN_INSTANCE_URL}/api/meta/lineage/getlineage`,
-    requestOptions
-  ).then((e) => e.json());
-
-  if (!response.relations) return null;
-
-  const relations = response.relations.map(({ toEntityId }) => toEntityId);
-
-  return relations
-    .filter((id, index) => relations.indexOf(id) === index)
-    .map((id) => response.guidEntityMap[id]);
-}
-
-;// CONCATENATED MODULE: ./src/api/get-asset.js
-
-
-
-
-main.config();
-
-const get_asset_ATLAN_INSTANCE_URL =
-  core.getInput("ATLAN_INSTANCE_URL") || process.env.ATLAN_INSTANCE_URL;
-const get_asset_ATLAN_API_TOKEN =
-  core.getInput("ATLAN_API_TOKEN") || process.env.ATLAN_API_TOKEN;
-
-async function getAsset({ name }) {
-  var myHeaders = {
-    Authorization: `Bearer ${get_asset_ATLAN_API_TOKEN}`,
-    "Content-Type": "application/json",
-  };
-
-  var raw = JSON.stringify({
-    dsl: {
-      from: 0,
-      size: 1,
-      query: {
-        bool: {
-          must: [
-            {
-              match: {
-                __state: "ACTIVE",
-              },
-            },
-            {
-              match: {
-                "__typeName.keyword": "DbtModel",
-              },
-            },
-            {
-              match: {
-                "name.keyword": name,
-              },
-            },
-          ],
-        },
-      },
-    },
-    attributes: [
-      "name",
-      "description",
-      "userDescription",
-      "sourceURL",
-      "qualifiedName",
-      "connectorName",
-      "certificateStatus",
-      "certificateUpdatedBy",
-      "certificateUpdatedAt",
-      "ownerUsers",
-      "ownerGroups",
-      "classificationNames",
-      "meanings",
-      "sqlAsset",
-    ],
-  });
-
-  var requestOptions = {
-    method: "POST",
-    headers: myHeaders,
-    body: raw,
-  };
-
-  var response = await fetch(
-    `${get_asset_ATLAN_INSTANCE_URL}/api/meta/search/indexsearch#findAssetByExactName`,
-    requestOptions
-  ).then((e) => e.json());
-
-  if (response?.entities?.length > 0) return response.entities[0];
-  return null;
-}
-
-// EXTERNAL MODULE: ./node_modules/uuid/dist/index.js
-var uuid_dist = __nccwpck_require__(5840);
-;// CONCATENATED MODULE: ./node_modules/uuid/wrapper.mjs
-
-const v1 = uuid_dist.v1;
-const v3 = uuid_dist.v3;
-const v4 = uuid_dist.v4;
-const v5 = uuid_dist.v5;
-const NIL = uuid_dist/* NIL */.zR;
-const version = uuid_dist/* version */.i8;
-const validate = uuid_dist/* validate */.Gu;
-const stringify = uuid_dist/* stringify */.Pz;
-const parse = uuid_dist/* parse */.Qc;
-
-;// CONCATENATED MODULE: ./src/api/create-resource.js
-
-
-
-
-
-main.config();
-
-const create_resource_ATLAN_INSTANCE_URL =
-  core.getInput("ATLAN_INSTANCE_URL") || process.env.ATLAN_INSTANCE_URL;
-const create_resource_ATLAN_API_TOKEN =
-  core.getInput("ATLAN_API_TOKEN") || process.env.ATLAN_API_TOKEN;
-
-async function createResource(guid, name, link) {
-  var myHeaders = {
-    Authorization: `Bearer ${create_resource_ATLAN_API_TOKEN}`,
-    "Content-Type": "application/json",
-  };
-
-  var raw = JSON.stringify({
-    entities: [
-      {
-        typeName: "Link",
-        attributes: {
-          qualifiedName: v4(),
-          name,
-          link,
-          tenantId: "default",
-        },
-        relationshipAttributes: {
-          asset: {
-            guid,
-          },
-        },
-      },
-    ],
-  });
-
-  var requestOptions = {
-    method: "POST",
-    headers: myHeaders,
-    body: raw,
-  };
-
-  var response = await fetch(
-    `${create_resource_ATLAN_INSTANCE_URL}/api/meta/entity/bulk`,
-    requestOptions
-  ).then((e) => e.json());
-
-  return response;
-}
-
-;// CONCATENATED MODULE: ./src/api/segment.js
-
-
-
-
-
-main.config();
-
-const segment_ATLAN_INSTANCE_URL =
-  core.getInput("ATLAN_INSTANCE_URL") || process.env.ATLAN_INSTANCE_URL;
-const segment_ATLAN_API_TOKEN =
-  core.getInput("ATLAN_API_TOKEN") || process.env.ATLAN_API_TOKEN;
-
-async function sendSegmentEvent(action, properties) {
-  var myHeaders = {
-    authorization: `Bearer ${segment_ATLAN_API_TOKEN}`,
-    "content-type": "application/json",
-  };
-
-  var domain = new URL(segment_ATLAN_INSTANCE_URL).hostname;
-
-  var raw = JSON.stringify({
-    category: "integrations",
-    object: "github",
-    action,
-    properties: {
-      ...properties,
-      github_action_id: `https://github.com/${github.context.payload.repository.full_name}/actions/runs/${github.context.runId}`,
-      domain,
-    },
-  });
-
-  var requestOptions = {
-    method: "POST",
-    headers: myHeaders,
-    body: raw,
-  };
-
-  var response = await fetch(
-    `${segment_ATLAN_INSTANCE_URL}/api/service/segment/track`,
-    requestOptions
-  )
-    .then(() => {
-      console.log("send segment event", action, raw);
-    })
-    .catch((err) => {
-      console.log("couldn't send segment event", err);
-    });
-
-  return response;
-}
-
-;// CONCATENATED MODULE: ./src/api/index.js
-
-
-
-
-
 ;// CONCATENATED MODULE: ./src/utils/get-image-url.js
 
 
@@ -17920,57 +17653,57 @@ function getCertificationImage(certificationStatus) {
 
 main.config();
 
-const { IS_DEV } = process.env;
-const create_comment_ATLAN_INSTANCE_URL =
-  core.getInput("ATLAN_INSTANCE_URL") || process.env.ATLAN_INSTANCE_URL;
+const {IS_DEV} = process.env;
+const ATLAN_INSTANCE_URL =
+    core.getInput("ATLAN_INSTANCE_URL") || process.env.ATLAN_INSTANCE_URL;
 
 async function createComment(
-  octokit,
-  context,
-  asset,
-  downstreamAssets
+    octokit,
+    context,
+    asset,
+    downstreamAssets
 ) {
-  const { pull_request } = context.payload;
+    const {pull_request} = context.payload;
 
-  const rows = downstreamAssets.map(
-    ({ displayText, guid, typeName, attributes, meanings }) => {
-      const connectorImage = getConnectorImage(attributes.connectorName),
-        certificationImage = attributes?.certificateStatus
-          ? getCertificationImage(attributes?.certificateStatus)
-          : "",
-        readableTypeName = typeName
-          .toLowerCase()
-          .replace(attributes.connectorName, "")
-          .toUpperCase();
+    const rows = downstreamAssets.map(
+        ({displayText, guid, typeName, attributes, meanings}) => {
+            const connectorImage = getConnectorImage(attributes.connectorName),
+                certificationImage = attributes?.certificateStatus
+                    ? getCertificationImage(attributes?.certificateStatus)
+                    : "",
+                readableTypeName = typeName
+                    .toLowerCase()
+                    .replace(attributes.connectorName, "")
+                    .toUpperCase();
 
-      return [
-        `${connectorImage} [${displayText}](${create_comment_ATLAN_INSTANCE_URL}/assets/${guid}) ${certificationImage}`,
-        `\`${readableTypeName}\``,
-        attributes?.userDescription || attributes?.description || "--",
-        attributes?.ownerUsers?.join(", ") || "--",
-        meanings
-          .map(
-            ({ displayText, termGuid }) =>
-              `[${displayText}](${create_comment_ATLAN_INSTANCE_URL}/assets/${termGuid})`
-          )
-          ?.join(", ") || "--",
-        attributes?.sourceURL || "--",
-      ];
-    }
-  );
+            return [
+                `${connectorImage} [${displayText}](${ATLAN_INSTANCE_URL}/assets/${guid}?utm_source=github) ${certificationImage}`,
+                `\`${readableTypeName}\``,
+                attributes?.userDescription || attributes?.description || "--",
+                attributes?.ownerUsers?.join(", ") || "--",
+                meanings
+                    .map(
+                        ({displayText, termGuid}) =>
+                            `[${displayText}](${ATLAN_INSTANCE_URL}/assets/${termGuid}?utm_source=github)`
+                    )
+                    ?.join(", ") || "--",
+                attributes?.sourceURL || "--",
+            ];
+        }
+    );
 
-  const comment = `
+    const comment = `
   ## ${getConnectorImage(asset.attributes.connectorName)} [${
-    asset.displayText
-  }](${create_comment_ATLAN_INSTANCE_URL}/assets/${asset.guid}) ${
-    asset.attributes?.certificateStatus
-      ? getCertificationImage(asset.attributes.certificateStatus)
-      : ""
-  }
+        asset.displayText
+    }](${ATLAN_INSTANCE_URL}/assets/${asset.guid}?utm_source=github) ${
+        asset.attributes?.certificateStatus
+            ? getCertificationImage(asset.attributes.certificateStatus)
+            : ""
+    }
   \`${asset.typeName
-    .toLowerCase()
-    .replace(asset.attributes.connectorName, "")
-    .toUpperCase()}\`
+        .toLowerCase()
+        .replace(asset.attributes.connectorName, "")
+        .toUpperCase()}\`
         
   There are ${downstreamAssets.length} downstream asset(s).
   Name | Type | Description | Owners | Terms | Source URL
@@ -17978,93 +17711,470 @@ async function createComment(
   ${rows.map((row) => row.join(" | ")).join("\n")}
   
   ${getImageURL(
-    "atlan-logo"
-  )} [View asset on Atlan.](${create_comment_ATLAN_INSTANCE_URL}/assets/${asset.guid})`;
+        "atlan-logo"
+    )} [View asset on Atlan.](${ATLAN_INSTANCE_URL}/assets/${asset.guid}?utm_source=github)`;
 
-  const commentObj = {
-    ...context.repo,
-    issue_number: pull_request.number,
-    body: comment,
-  };
+    const commentObj = {
+        ...context.repo,
+        issue_number: pull_request.number,
+        body: comment,
+    };
 
-  if (IS_DEV) return comment;
-  return octokit.rest.issues.createComment(commentObj);
+    console.log(comment)
+
+    if (IS_DEV) return comment;
+    return octokit.rest.issues.createComment(commentObj);
 }
 
 async function createCustomComment(octokit, context, content) {
-  const { pull_request } = context.payload;
-  const commentObj = {
-    ...context.repo,
-    issue_number: pull_request.number,
-    body: content,
-  };
+    const {pull_request} = context.payload;
+    const commentObj = {
+        ...context.repo,
+        issue_number: pull_request.number,
+        body: content,
+    };
 
-  if (IS_DEV) return content;
-  return octokit.rest.issues.createComment(commentObj);
+    console.log(content)
+
+    if (IS_DEV) return content;
+    return octokit.rest.issues.createComment(commentObj);
 }
-
 ;// CONCATENATED MODULE: ./src/utils/file-system.js
 async function getFileContents(octokit, context, filePath) {
-  const { repository, pull_request } = context.payload,
-    owner = repository.owner.login,
-    repo = repository.name,
-    head_sha = pull_request.head.sha;
+    const {repository, pull_request} = context.payload,
+        owner = repository.owner.login,
+        repo = repository.name,
+        head_sha = pull_request.head.sha;
 
-  const res = await octokit.request(
-      `GET /repos/${owner}/${repo}/contents/${filePath}?ref=${head_sha}`,
-      {
-        owner,
-        repo,
-        path: filePath,
-      }
-    ),
-    buff = Buffer.from(res.data.content, "base64");
+    const res = await octokit.request(
+            `GET /repos/${owner}/${repo}/contents/${filePath}?ref=${head_sha}`,
+            {
+                owner,
+                repo,
+                path: filePath,
+            }
+        ),
+        buff = Buffer.from(res.data.content, "base64");
 
-  return buff.toString("utf8");
+    return buff.toString("utf8");
 }
 
 async function getChangedFiles(octokit, context) {
-  const { repository, pull_request } = context.payload,
-    owner = repository.owner.login,
-    repo = repository.name,
-    pull_number = pull_request.number;
+    const {repository, pull_request} = context.payload,
+        owner = repository.owner.login,
+        repo = repository.name,
+        pull_number = pull_request.number;
 
-  const res = await octokit.request(
-    `GET /repos/${owner}/${repo}/pulls/${pull_number}/files`,
-    {
-      owner,
-      repo,
-      pull_number,
+    const res = await octokit.request(
+        `GET /repos/${owner}/${repo}/pulls/${pull_number}/files`,
+        {
+            owner,
+            repo,
+            pull_number,
+        }
+    );
+
+    return res.data
+        .map(({filename}) => {
+            const fileNameRegEx = /.*\/models\/.*\/(.*)\.sql/gm,
+                matches = fileNameRegEx.exec(filename);
+            if (matches) {
+                return {
+                    fileName: matches[1],
+                    filePath: filename,
+                };
+            }
+        })
+        .filter((i) => i !== undefined);
+}
+
+async function getAssetName({octokit, context, fileName, filePath}) {
+    var regExp = /config\(.*alias=\'([^']+)\'.*\)/im;
+    var fileContents = await getFileContents(octokit, context, filePath);
+    var matches = regExp.exec(fileContents);
+
+    if (matches) {
+        return matches[1];
     }
-  );
 
-  return res.data
-    .map(({ filename }) => {
-      const fileNameRegEx = /.*\/models\/.*\/(.*)\.sql/gm,
-        matches = fileNameRegEx.exec(filename);
-      if (matches) {
-        return {
-          name: matches[1],
-          filePath: filename,
-        };
-      }
-    })
-    .filter((i) => i !== undefined);
+    return fileName;
 }
 
-async function getAssetName(octokit, context, fileName, filePath) {
-  var regExp = /config\(.*alias=\'([^']+)\'.*\)/im;
-  var fileContents = await getFileContents(octokit, context, filePath);
-  var matches = regExp.exec(fileContents);
+;// CONCATENATED MODULE: ./src/utils/auth.js
 
-  if (matches) {
-    return matches[1];
-  }
 
-  return fileName;
+
+
+
+main.config();
+
+const auth_ATLAN_INSTANCE_URL =
+    core.getInput("ATLAN_INSTANCE_URL") || process.env.ATLAN_INSTANCE_URL;
+const ATLAN_API_TOKEN =
+    core.getInput("ATLAN_API_TOKEN") || process.env.ATLAN_API_TOKEN;
+
+async function auth(octokit, context) {
+    var myHeaders = {
+        authorization: `Bearer ${ATLAN_API_TOKEN}`,
+        "content-type": "application/json",
+    };
+
+    var requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+    };
+
+    var response = await fetch(
+        `${auth_ATLAN_INSTANCE_URL}/api/meta`,
+        requestOptions
+    ).catch((err) => {
+    });
+
+    if (response?.status === 401) {
+        await
+            createCustomComment(octokit, context, `We couldn't connect to your Atlan Instance, please make sure to set the valid Atlan Bearer Token as \`ATLAN_API_TOKEN\` as this repository's action secret. 
+
+Atlan Instance URL: ${auth_ATLAN_INSTANCE_URL}
+
+Set your repository action secrets [here](https://github.com/${context.payload.repository.full_name}/settings/secrets/actions). For more information on how to setup the Atlan dbt Action, please read the [setup documentation here](https://github.com/atlanhq/dbt-action/blob/main/README.md).`)
+        return false
+    }
+
+    if (response === undefined) {
+        await
+            createCustomComment(octokit, context, `We couldn't connect to your Atlan Instance, please make sure to set the valid Atlan Instance URL as \`ATLAN_INSTANCE_URL\` as this repository's action secret. 
+
+Atlan Instance URL: ${auth_ATLAN_INSTANCE_URL}
+
+Make sure your Atlan Instance URL is set in the following format.
+\`https://tenant.atlan.com\`
+
+Set your repository action secrets [here](https://github.com/${context.payload.repository.full_name}/settings/secrets/actions). For more information on how to setup the Atlan dbt Action, please read the [setup documentation here](https://github.com/atlanhq/dbt-action/blob/main/README.md).`)
+        return false
+    }
+
+    return true
 }
-
 ;// CONCATENATED MODULE: ./src/utils/index.js
+
+
+
+
+
+
+;// CONCATENATED MODULE: ./src/api/get-downstream-assets.js
+
+
+
+
+
+
+main.config();
+
+const get_downstream_assets_ATLAN_INSTANCE_URL =
+    core.getInput("ATLAN_INSTANCE_URL") || process.env.ATLAN_INSTANCE_URL;
+const get_downstream_assets_ATLAN_API_TOKEN =
+    core.getInput("ATLAN_API_TOKEN") || process.env.ATLAN_API_TOKEN;
+
+async function getDownstreamAssets(asset, guid, octokit, context) {
+    var myHeaders = {
+        authorization: `Bearer ${get_downstream_assets_ATLAN_API_TOKEN}`,
+        "content-type": "application/json",
+    };
+
+    var raw = JSON.stringify({
+        depth: 21,
+        guid: guid,
+        hideProcess: true,
+        allowDeletedProcess: false,
+        entityFilters: {
+            attributeName: "__state",
+            operator: "eq",
+            attributeValue: "ACTIVE",
+        },
+        attributes: [
+            "name",
+            "description",
+            "userDescription",
+            "sourceURL",
+            "qualifiedName",
+            "connectorName",
+            "certificateStatus",
+            "certificateUpdatedBy",
+            "certificateUpdatedAt",
+            "ownerUsers",
+            "ownerGroups",
+            "classificationNames",
+            "meanings",
+        ],
+        direction: "OUTPUT",
+    });
+
+    var requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: raw,
+    };
+
+    var handleError = async (err) => {
+        const comment = `## ${getConnectorImage(asset.attributes.connectorName)} [${
+            asset.displayText
+        }](${get_downstream_assets_ATLAN_INSTANCE_URL}/assets/${asset.guid}?utm_source=github) ${
+            asset.attributes?.certificateStatus
+                ? getCertificationImage(asset.attributes.certificateStatus)
+                : ""
+        }
+\`${asset.typeName
+            .toLowerCase()
+            .replace(asset.attributes.connectorName, "")
+            .toUpperCase()}\`
+            
+❌ Failed to fetch downstream impacted assets.
+            
+[See lineage on Atlan.](${get_downstream_assets_ATLAN_INSTANCE_URL}/assets/${asset.guid}/lineage?utm_source=github)`;
+
+        createCustomComment(octokit, context, comment)
+
+        sendSegmentEvent("dbt_ci_action_failure", {
+            reason: 'failed_to_fetch_lineage',
+            asset_guid: asset.guid,
+            asset_name: asset.name,
+            asset_typeName: asset.typeName,
+            msg: err
+        });
+    }
+
+    var response = await fetch(
+        `${get_downstream_assets_ATLAN_INSTANCE_URL}/api/meta/lineage/getlineage`,
+        requestOptions
+    ).then((e) => e.json()).catch((err) => {
+        handleError(err)
+    });
+
+    if (!!response.error) {
+        handleError(response.error)
+    }
+
+    if (!response?.relations) return [];
+
+    const relations = response.relations.map(({toEntityId}) => toEntityId);
+
+    return relations
+        .filter((id, index) => relations.indexOf(id) === index)
+        .map((id) => response.guidEntityMap[id]);
+}
+
+;// CONCATENATED MODULE: ./src/api/get-asset.js
+
+
+
+
+
+main.config();
+
+const get_asset_ATLAN_INSTANCE_URL =
+    core.getInput("ATLAN_INSTANCE_URL") || process.env.ATLAN_INSTANCE_URL;
+const get_asset_ATLAN_API_TOKEN =
+    core.getInput("ATLAN_API_TOKEN") || process.env.ATLAN_API_TOKEN;
+
+async function getAsset({name}) {
+    var myHeaders = {
+        Authorization: `Bearer ${get_asset_ATLAN_API_TOKEN}`,
+        "Content-Type": "application/json",
+    };
+
+    var raw = JSON.stringify({
+        dsl: {
+            from: 0,
+            size: 1,
+            query: {
+                bool: {
+                    must: [
+                        {
+                            match: {
+                                __state: "ACTIVE",
+                            },
+                        },
+                        {
+                            match: {
+                                "__typeName.keyword": "DbtModel",
+                            },
+                        },
+                        {
+                            match: {
+                                "name.keyword": name,
+                            },
+                        },
+                    ],
+                },
+            },
+        },
+        attributes: [
+            "name",
+            "description",
+            "userDescription",
+            "sourceURL",
+            "qualifiedName",
+            "connectorName",
+            "certificateStatus",
+            "certificateUpdatedBy",
+            "certificateUpdatedAt",
+            "ownerUsers",
+            "ownerGroups",
+            "classificationNames",
+            "meanings",
+            "sqlAsset",
+        ],
+    });
+
+    var requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: raw,
+    };
+
+    var response = await fetch(
+        `${get_asset_ATLAN_INSTANCE_URL}/api/meta/search/indexsearch#findAssetByExactName`,
+        requestOptions
+    ).then((e) => e.json()).catch(err => {
+        sendSegmentEvent("dbt_ci_action_failure", {
+            reason: 'failed_to_get_asset',
+            asset_name: name,
+            msg: err
+        });
+    });
+
+    if (response?.entities?.length > 0) return response.entities[0];
+    return null;
+}
+
+// EXTERNAL MODULE: ./node_modules/uuid/dist/index.js
+var uuid_dist = __nccwpck_require__(5840);
+;// CONCATENATED MODULE: ./node_modules/uuid/wrapper.mjs
+
+const v1 = uuid_dist.v1;
+const v3 = uuid_dist.v3;
+const v4 = uuid_dist.v4;
+const v5 = uuid_dist.v5;
+const NIL = uuid_dist/* NIL */.zR;
+const version = uuid_dist/* version */.i8;
+const validate = uuid_dist/* validate */.Gu;
+const stringify = uuid_dist/* stringify */.Pz;
+const parse = uuid_dist/* parse */.Qc;
+
+;// CONCATENATED MODULE: ./src/api/create-resource.js
+
+
+
+
+
+
+main.config();
+
+const create_resource_ATLAN_INSTANCE_URL =
+    core.getInput("ATLAN_INSTANCE_URL") || process.env.ATLAN_INSTANCE_URL;
+const create_resource_ATLAN_API_TOKEN =
+    core.getInput("ATLAN_API_TOKEN") || process.env.ATLAN_API_TOKEN;
+
+async function createResource(guid, name, link) {
+    var myHeaders = {
+        Authorization: `Bearer ${create_resource_ATLAN_API_TOKEN}`,
+        "Content-Type": "application/json",
+    };
+
+    var raw = JSON.stringify({
+        entities: [
+            {
+                typeName: "Link",
+                attributes: {
+                    qualifiedName: v4(),
+                    name,
+                    link,
+                    tenantId: "default",
+                },
+                relationshipAttributes: {
+                    asset: {
+                        guid,
+                    },
+                },
+            },
+        ],
+    });
+
+    var requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: raw,
+    };
+
+    var response = await fetch(
+        `${create_resource_ATLAN_INSTANCE_URL}/api/meta/entity/bulk`,
+        requestOptions
+    ).then((e) => e.json()).catch(err => {
+        console.log(err)
+        sendSegmentEvent("dbt_ci_action_failure", {
+            reason: 'failed_to_create_resource',
+            asset_name: name,
+            msg: err
+        });
+    })
+
+    return response;
+}
+
+;// CONCATENATED MODULE: ./src/api/segment.js
+
+
+
+
+
+main.config();
+
+const segment_ATLAN_INSTANCE_URL =
+    core.getInput("ATLAN_INSTANCE_URL") || process.env.ATLAN_INSTANCE_URL;
+const segment_ATLAN_API_TOKEN =
+    core.getInput("ATLAN_API_TOKEN") || process.env.ATLAN_API_TOKEN;
+
+async function sendSegmentEvent(action, properties) {
+    var myHeaders = {
+        authorization: `Bearer ${segment_ATLAN_API_TOKEN}`,
+        "content-type": "application/json",
+    };
+
+    var domain = new URL(segment_ATLAN_INSTANCE_URL).hostname;
+
+    var raw = JSON.stringify({
+        category: "integrations",
+        object: "github",
+        action,
+        properties: {
+            ...properties,
+            github_action_id: `https://github.com/${github.context.payload.repository.full_name}/actions/runs/${github.context.runId}`,
+            domain,
+        },
+    });
+
+    var requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: raw,
+    };
+
+    var response = await fetch(
+        `${segment_ATLAN_INSTANCE_URL}/api/service/segment/track`,
+        requestOptions
+    )
+        .then(() => {
+            console.log("send segment event", action, raw);
+        })
+        .catch((err) => {
+            console.log("couldn't send segment event", err);
+        });
+
+    return response;
+}
+
+;// CONCATENATED MODULE: ./src/api/index.js
 
 
 
@@ -18074,80 +18184,89 @@ async function getAssetName(octokit, context, fileName, filePath) {
 
 
 
-async function printDownstreamAssets({ octokit, context }) {
-  const changedFiles = await getChangedFiles(octokit, context);
+async function printDownstreamAssets({octokit, context}) {
+    const changedFiles = await getChangedFiles(octokit, context);
+    var totalChangedFiles = 0
 
-  if (changedFiles.length === 0) return;
+    if (changedFiles.length === 0) return;
 
-  for (const { name, filePath } of changedFiles) {
-    const assetName = await getAssetName(octokit, context, name, filePath);
-    const asset = await getAsset({ name: assetName });
+    for (const {fileName, filePath} of changedFiles) {
+        const assetName = await getAssetName({octokit, context, fileName, filePath});
+        const asset = await getAsset({name: assetName});
 
-    if (!asset) return;
+        if (!asset) return;
 
-    const { guid } = asset.attributes.sqlAsset;
-    const timeStart = Date.now();
-    const downstreamAssets = await getDownstreamAssets(guid);
+        const {guid} = asset.attributes.sqlAsset;
+        const timeStart = Date.now();
+        const downstreamAssets = await getDownstreamAssets(asset, guid, octokit, context);
 
-    sendSegmentEvent("dbt_ci_action_downstream_unfurl", {
-      asset_guid: asset.guid,
-      asset_type: asset.typeName,
-      downstream_count: downstreamAssets.length,
-      total_fetch_time: Date.now() - timeStart,
-    });
+        if (downstreamAssets.length === 0) continue;
 
-    const comment = await createComment(
-      octokit,
-      context,
-      asset,
-      downstreamAssets
-    );
-    console.log(comment);
-  }
+        sendSegmentEvent("dbt_ci_action_downstream_unfurl", {
+            asset_guid: asset.guid,
+            asset_type: asset.typeName,
+            downstream_count: downstreamAssets.length,
+            total_fetch_time: Date.now() - timeStart,
+        });
 
-  return changedFiles.length;
+        await createComment(
+            octokit,
+            context,
+            asset,
+            downstreamAssets
+        );
+
+        totalChangedFiles++
+    }
+
+    return totalChangedFiles;
 }
 
 ;// CONCATENATED MODULE: ./src/main/set-resource-on-asset.js
 
 
 
-async function setResourceOnAsset({ octokit, context }) {
-  const changedFiles = await getChangedFiles(octokit, context);
-  const { pull_request } = context.payload;
+async function setResourceOnAsset({octokit, context}) {
+    const changedFiles = await getChangedFiles(octokit, context);
+    const {pull_request} = context.payload;
+    var totalChangedFiles = 0
 
-  if (changedFiles.length === 0) return;
+    if (changedFiles.length === 0) return;
 
-  changedFiles.forEach(async ({ name, filePath }) => {
-    const assetName = await getAssetName(octokit, context, name, filePath);
-    const asset = await getAsset({ name: assetName });
+    changedFiles.forEach(async ({fileName, filePath}) => {
+        const assetName = await getAssetName(octokit, context, fileName, filePath);
+        const asset = await getAsset({name: assetName});
 
-    if (!asset) return;
+        if (!asset) return;
 
-    const { guid: modelGuid } = asset;
-    const { guid: tableAssetGuid } = asset.attributes.sqlAsset;
+        const {guid: modelGuid} = asset;
+        const {guid: tableAssetGuid} = asset.attributes.sqlAsset;
 
-    await createResource(
-      modelGuid,
-      "Pull Request on GitHub",
-      pull_request.html_url
-    );
-    await createResource(
-      tableAssetGuid,
-      "Pull Request on GitHub",
-      pull_request.html_url
-    );
-  });
+        await createResource(
+            modelGuid,
+            "Pull Request on GitHub",
+            pull_request.html_url
+        );
+        await createResource(
+            tableAssetGuid,
+            "Pull Request on GitHub",
+            pull_request.html_url
+        );
 
-  const comment = await createCustomComment(
-    octokit,
-    context,
-    `🎊 Congrats on the merge!
+        totalChangedFiles++
+    });
+
+    const comment = await createCustomComment(
+        octokit,
+        context,
+        `🎊 Congrats on the merge!
   
 This pull request has been added as a resource to all the assets modified. ✅
 `
-  );
-  console.log(comment);
+    );
+    console.log(comment);
+
+    return totalChangedFiles
 }
 
 ;// CONCATENATED MODULE: ./src/main/index.js
@@ -18162,33 +18281,42 @@ This pull request has been added as a resource to all the assets modified. ✅
 
 
 
+
 main.config();
 
 const GITHUB_TOKEN = core.getInput("GITHUB_TOKEN") || process.env.GITHUB_TOKEN;
 
 async function run() {
-  const timeStart = Date.now();
-  const { context } = github;
-  const octokit = github.getOctokit(GITHUB_TOKEN);
-  const { pull_request } = context.payload;
-  const { state, merged } = pull_request;
+    const timeStart = Date.now();
+    const {context} = github;
+    const octokit = github.getOctokit(GITHUB_TOKEN);
+    const {pull_request} = context.payload;
+    const {state, merged} = pull_request;
 
-  let total_assets = 0;
+    if (!await auth(octokit, context)) throw {message: 'Wrong API Token'}
 
-  if (state === "open") {
-    total_assets = await printDownstreamAssets({ octokit, context });
-  } else if (state === "closed") {
-    if (merged) await setResourceOnAsset({ octokit, context });
-  }
+    let total_assets = 0;
 
-  sendSegmentEvent("dbt_ci_action_run", {
-    asset_count: total_assets,
-    total_time: Date.now() - timeStart,
-  });
+    if (state === "open") {
+        total_assets = await printDownstreamAssets({octokit, context});
+    } else if (state === "closed") {
+        if (merged) total_assets = await setResourceOnAsset({octokit, context});
+    }
+
+    if (total_assets !== 0)
+        sendSegmentEvent("dbt_ci_action_run", {
+            asset_count: total_assets,
+            total_time: Date.now() - timeStart,
+        });
 }
 
-run().catch((e) => {
-  core.setFailed(e.message);
+run().catch((err) => {
+    sendSegmentEvent("dbt_ci_action_failure", {
+        reason: 'failed_to_run_action',
+        msg: err
+    });
+
+    core.setFailed(err.message);
 });
 
 })();
