@@ -1,5 +1,4 @@
-
-{{ config(materialized='table') }}
+-- Removed config
 
 with orders as (
 
