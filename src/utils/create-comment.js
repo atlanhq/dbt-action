@@ -33,17 +33,17 @@ export default async function createComment(
                     .toUpperCase();
 
             return [
-                `${connectorImage} [${displayText}](${ATLAN_INSTANCE_URL}/assets/${guid}?utm_source=github) ${certificationImage}`,
+                `${connectorImage} [${displayText}](${ATLAN_INSTANCE_URL}/assets/${guid}?utm_source=dbt_github_action) ${certificationImage}`,
                 `\`${readableTypeName}\``,
-                attributes?.userDescription || attributes?.description || "--",
-                attributes?.ownerUsers?.join(", ") || "--",
+                attributes?.userDescription || attributes?.description || " ",
+                attributes?.ownerUsers?.join(", ") || " ",
                 meanings
                     .map(
                         ({displayText, termGuid}) =>
-                            `[${displayText}](${ATLAN_INSTANCE_URL}/assets/${termGuid}?utm_source=github)`
+                            `[${displayText}](${ATLAN_INSTANCE_URL}/assets/${termGuid}?utm_source=dbt_github_action)`
                     )
-                    ?.join(", ") || "--",
-                attributes?.sourceURL || "--",
+                    ?.join(", ") || " ",
+                attributes?.sourceURL || " ",
             ];
         }
     );
@@ -51,24 +51,20 @@ export default async function createComment(
     const comment = `
   ## ${getConnectorImage(asset.attributes.connectorName)} [${
         asset.displayText
-    }](${ATLAN_INSTANCE_URL}/assets/${asset.guid}?utm_source=github) ${
+    }](${ATLAN_INSTANCE_URL}/assets/${asset.guid}?utm_source=dbt_github_action) ${
         asset.attributes?.certificateStatus
             ? getCertificationImage(asset.attributes.certificateStatus)
             : ""
     }
-  \`${asset.typeName
-        .toLowerCase()
-        .replace(asset.attributes.connectorName, "")
-        .toUpperCase()}\`
         
-  There are ${downstreamAssets.length} downstream asset(s).
+  There are ${downstreamAssets.length} downstream assets.
   Name | Type | Description | Owners | Terms | Source URL
   --- | --- | --- | --- | --- | ---
   ${rows.map((row) => row.join(" | ")).join("\n")}
   
   ${getImageURL(
         "atlan-logo"
-    )} [View asset on Atlan.](${ATLAN_INSTANCE_URL}/assets/${asset.guid}?utm_source=github)`;
+    )} [View asset on Atlan.](${ATLAN_INSTANCE_URL}/assets/${asset.guid}?utm_source=dbt_github_action)`;
 
     const commentObj = {
         ...context.repo,
