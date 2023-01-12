@@ -22,6 +22,7 @@ export default async function sendSegmentEvent(action, properties) {
         category: "integrations",
         object: "github",
         action,
+        userId: "atlan-annonymous-github",
         properties: {
             ...properties,
             github_action_id: `https://github.com/${context.payload.repository.full_name}/actions/runs/${context.runId}`,
