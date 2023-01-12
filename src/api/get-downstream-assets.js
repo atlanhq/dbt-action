@@ -54,19 +54,15 @@ export default async function getDownstreamAssets(asset, guid, octokit, context)
     var handleError = async (err) => {
         const comment = `## ${getConnectorImage(asset.attributes.connectorName)} [${
             asset.displayText
-        }](${ATLAN_INSTANCE_URL}/assets/${asset.guid}?utm_source=github) ${
+        }](${ATLAN_INSTANCE_URL}/assets/${asset.guid}?utm_source=dbt_github_action) ${
             asset.attributes?.certificateStatus
                 ? getCertificationImage(asset.attributes.certificateStatus)
                 : ""
         }
-\`${asset.typeName
-            .toLowerCase()
-            .replace(asset.attributes.connectorName, "")
-            .toUpperCase()}\`
             
 ❌ Failed to fetch downstream impacted assets.
             
-[See lineage on Atlan.](${ATLAN_INSTANCE_URL}/assets/${asset.guid}/lineage?utm_source=github)`;
+[See lineage on Atlan.](${ATLAN_INSTANCE_URL}/assets/${asset.guid}/lineage?utm_source=dbt_github_action)`;
 
         createCustomComment(octokit, context, comment)
 
