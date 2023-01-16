@@ -19,7 +19,7 @@ export default async function sendSegmentEvent(action, properties) {
     var domain = new URL(ATLAN_INSTANCE_URL).hostname;
 
     var raw = JSON.stringify({
-        category: "integrations",
+        category: "integration",
         object: "github",
         action,
         userId: "atlan-annonymous-github",
