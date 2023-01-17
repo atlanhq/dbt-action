@@ -17704,7 +17704,7 @@ async function createComment(
   There are ${downstreamAssets.length} downstream assets.
   Name | Type | Description | Owners | Terms | Source URL
   --- | --- | --- | --- | --- | ---
-  ${rows.map((row) => row.join(" | ")).join("\n")}
+  ${rows.map((row) => row.map(i => i.replace(/\|/g, "•")).join(" | ")).join("\n")}
   
   ${getImageURL(
         "atlan-logo"
@@ -17716,10 +17716,28 @@ async function createComment(
         body: comment,
     };
 
-    console.log(comment)
+    const existingComment = await checkCommentExists(octokit, context, asset);
 
     if (IS_DEV) return comment;
+
+    if (existingComment)
+        return octokit.rest.issues.updateComment({...commentObj, comment_id: existingComment.id});
     return octokit.rest.issues.createComment(commentObj);
+}
+
+async function checkCommentExists(octokit, context, asset) {
+    const {pull_request} = context.payload;
+
+    const comments = await octokit.rest.issues.listComments({
+        ...context.repo,
+        issue_number: pull_request.number,
+    });
+
+    const commentExists = comments.data.find(
+        (comment) => comment.body.includes(asset.guid) && comment.user.login === "github-actions[bot]"
+    );
+
+    return commentExists;
 }
 
 async function createCustomComment(octokit, context, content) {
@@ -18136,7 +18154,7 @@ async function sendSegmentEvent(action, properties) {
     var domain = new URL(segment_ATLAN_INSTANCE_URL).hostname;
 
     var raw = JSON.stringify({
-        category: "integrations",
+        category: "integration",
         object: "github",
         action,
         userId: "atlan-annonymous-github",
