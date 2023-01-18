@@ -4,16 +4,15 @@ import {
     sendSegmentEvent,
 } from "../api/index.js";
 import {
-    createComment,
+    renderDownstreamAssetsComment,
     getChangedFiles,
-    getAssetName,
+    getAssetName, createIssueComment, checkCommentExists, deleteComment
 } from "../utils/index.js";
 
 export default async function printDownstreamAssets({octokit, context}) {
     const changedFiles = await getChangedFiles(octokit, context);
-    var totalChangedFiles = 0
-
-    if (changedFiles.length === 0) return;
+    let comments = ``;
+    let totalChangedFiles = 0;
 
     for (const {fileName, filePath} of changedFiles) {
         const assetName = await getAssetName({octokit, context, fileName, filePath});
@@ -25,6 +24,9 @@ export default async function printDownstreamAssets({octokit, context}) {
         const timeStart = Date.now();
         const downstreamAssets = await getDownstreamAssets(asset, guid, octokit, context);
 
+        if (totalChangedFiles !== 0)
+            comments += '\n\n---\n\n';
+
         if (downstreamAssets.length === 0) continue;
 
         sendSegmentEvent("dbt_ci_action_downstream_unfurl", {
@@ -34,15 +36,23 @@ export default async function printDownstreamAssets({octokit, context}) {
             total_fetch_time: Date.now() - timeStart,
         });
 
-        await createComment(
+        const comment = await renderDownstreamAssetsComment(
             octokit,
             context,
             asset,
             downstreamAssets
-        );
+        )
+
+        comments += comment;
 
         totalChangedFiles++
     }
+
+    const existingComment = await checkCommentExists(octokit, context);
+    await createIssueComment(octokit, context, comments, existingComment?.id)
+
+    if (totalChangedFiles === 0 && existingComment)
+        await deleteComment(octokit, context, existingComment.id)
 
     return totalChangedFiles;
 }
