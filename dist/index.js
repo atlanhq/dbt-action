@@ -18230,7 +18230,9 @@ async function printDownstreamAssets({octokit, context}) {
     }
 
     const existingComment = await checkCommentExists(octokit, context);
-    await createIssueComment(octokit, context, comments, existingComment?.id)
+
+    if (totalChangedFiles > 0)
+        await createIssueComment(octokit, context, comments, existingComment?.id)
 
     if (totalChangedFiles === 0 && existingComment)
         await deleteComment(octokit, context, existingComment.id)
