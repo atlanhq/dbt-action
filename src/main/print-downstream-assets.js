@@ -12,9 +12,7 @@ import {
 export default async function printDownstreamAssets({octokit, context}) {
     const changedFiles = await getChangedFiles(octokit, context);
     let comments = ``;
-    var totalChangedFiles = 0
-
-    if (changedFiles.length === 0) return;
+    let totalChangedFiles = 0;
 
     for (const {fileName, filePath} of changedFiles) {
         const assetName = await getAssetName({octokit, context, fileName, filePath});
