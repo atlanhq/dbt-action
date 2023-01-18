@@ -88,7 +88,7 @@ export async function createIssueComment(octokit, context, content, comment_id =
     if (IS_DEV) return content;
 
     if (comment_id) return octokit.rest.issues.updateComment({...commentObj, comment_id});
-    return octokit.rest.issues.renderDownstreamAssetsComment(commentObj);
+    return octokit.rest.issues.createComment(commentObj);
 }
 
 export async function deleteComment(octokit, context, comment_id) {
