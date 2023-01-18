@@ -5,8 +5,8 @@ export {
 } from "./get-image-url.js";
 export {default as hostedImages} from "./hosted-images.js";
 export {
-    default as createComment,
-    createCustomComment,
+    default as renderDownstreamAssetsComment,
+    createIssueComment, checkCommentExists, deleteComment
 } from "./create-comment.js";
 export {
     getFileContents,

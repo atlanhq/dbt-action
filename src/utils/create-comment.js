@@ -1,11 +1,7 @@
 import dotenv from "dotenv";
 import core from "@actions/core";
 
-import {
-    getConnectorImage,
-    getCertificationImage,
-    getImageURL,
-} from "./index.js";
+import {getCertificationImage, getConnectorImage, getImageURL,} from "./index.js";
 
 dotenv.config();
 
@@ -13,14 +9,12 @@ const {IS_DEV} = process.env;
 const ATLAN_INSTANCE_URL =
     core.getInput("ATLAN_INSTANCE_URL") || process.env.ATLAN_INSTANCE_URL;
 
-export default async function createComment(
+export default async function renderDownstreamAssetsComment(
     octokit,
     context,
     asset,
     downstreamAssets
 ) {
-    const {pull_request} = context.payload;
-
     const rows = downstreamAssets.map(
         ({displayText, guid, typeName, attributes, meanings}) => {
             const connectorImage = getConnectorImage(attributes.connectorName),
@@ -48,8 +42,7 @@ export default async function createComment(
         }
     );
 
-    const comment = `
-  ## ${getConnectorImage(asset.attributes.connectorName)} [${
+    const comment = `## ${getConnectorImage(asset.attributes.connectorName)} [${
         asset.displayText
     }](${ATLAN_INSTANCE_URL}/assets/${asset.guid}?utm_source=dbt_github_action) ${
         asset.attributes?.certificateStatus
@@ -60,25 +53,29 @@ export default async function createComment(
   There are ${downstreamAssets.length} downstream assets.
   Name | Type | Description | Owners | Terms | Source URL
   --- | --- | --- | --- | --- | ---
-  ${rows.map((row) => row.join(" | ")).join("\n")}
+  ${rows.map((row) => row.map(i => i.replace(/\|/g, "•")).join(" | ")).join("\n")}
   
   ${getImageURL(
         "atlan-logo"
     )} [View asset on Atlan.](${ATLAN_INSTANCE_URL}/assets/${asset.guid}?utm_source=dbt_github_action)`;
 
-    const commentObj = {
-        ...context.repo,
-        issue_number: pull_request.number,
-        body: comment,
-    };
-
-    console.log(comment)
-
-    if (IS_DEV) return comment;
-    return octokit.rest.issues.createComment(commentObj);
+    return comment
 }
 
-export async function createCustomComment(octokit, context, content) {
+export async function checkCommentExists(octokit, context) {
+    const {pull_request} = context.payload;
+
+    const comments = await octokit.rest.issues.listComments({
+        ...context.repo,
+        issue_number: pull_request.number,
+    });
+
+    return comments.data.find(
+        (comment) => comment.user.login === "github-actions[bot]"
+    );
+}
+
+export async function createIssueComment(octokit, context, content, comment_id = null) {
     const {pull_request} = context.payload;
     const commentObj = {
         ...context.repo,
@@ -89,5 +86,17 @@ export async function createCustomComment(octokit, context, content) {
     console.log(content)
 
     if (IS_DEV) return content;
-    return octokit.rest.issues.createComment(commentObj);
+
+    if (comment_id) return octokit.rest.issues.updateComment({...commentObj, comment_id});
+    return octokit.rest.issues.renderDownstreamAssetsComment(commentObj);
+}
+
+export async function deleteComment(octokit, context, comment_id) {
+    const {pull_request} = context.payload;
+
+    return octokit.rest.issues.deleteComment({
+        ...context.repo,
+        issue_number: pull_request.number,
+        comment_id,
+    });
 }
