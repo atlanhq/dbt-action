@@ -1,3 +1,5 @@
+-- Important Comment
+
 
 {{ config(materialized='table') }}
 
