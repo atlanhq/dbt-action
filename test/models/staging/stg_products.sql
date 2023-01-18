@@ -1,6 +1,4 @@
 
--- {{ config(materialized='table') }}
-
 with source as (
 
     select * from fivetran.dbt_demo_data_dbt_demo_data.products
