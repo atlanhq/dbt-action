@@ -2,7 +2,7 @@ import fetch from "node-fetch";
 import core from "@actions/core";
 import dotenv from "dotenv";
 import {sendSegmentEvent} from "./index.js";
-import {createCustomComment, getConnectorImage, getCertificationImage} from "../utils/index.js";
+import {createIssueComment, getConnectorImage, getCertificationImage} from "../utils/index.js";
 
 dotenv.config();
 
@@ -64,7 +64,7 @@ export default async function getDownstreamAssets(asset, guid, octokit, context)
             
 [See lineage on Atlan.](${ATLAN_INSTANCE_URL}/assets/${asset.guid}/lineage?utm_source=dbt_github_action)`;
 
-        createCustomComment(octokit, context, comment)
+        createIssueComment(octokit, context, comment)
 
         sendSegmentEvent("dbt_ci_action_failure", {
             reason: 'failed_to_fetch_lineage',
