@@ -6,7 +6,7 @@ import {
 import {
     renderDownstreamAssetsComment,
     getChangedFiles,
-    getAssetName, createIssueComment, checkCommentExists, deleteComment
+    getAssetName, createIssueComment, checkCommentExists, deleteComment, getImageURL
 } from "../utils/index.js";
 
 export default async function printDownstreamAssets({octokit, context}) {
@@ -47,6 +47,11 @@ export default async function printDownstreamAssets({octokit, context}) {
 
         totalChangedFiles++
     }
+
+    comments = `### ${getImageURL("atlan-logo", 15, 15)} Atlan impact analysis
+Here is your downstream impact analysis for **${totalChangedFiles} models** you have edited.    
+    
+${comments}`
 
     const existingComment = await checkCommentExists(octokit, context);
 
