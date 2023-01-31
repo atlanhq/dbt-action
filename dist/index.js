@@ -17736,7 +17736,7 @@ async function renderDownstreamAssetsComment(
             : ""
     }
         
-  ${downstreamAssets.length} downstream assets 👇
+  **${downstreamAssets.length} downstream assets** 👇
   Name | Type | Description | Owners | Terms | Source URL
   --- | --- | --- | --- | --- | ---
   ${rows.map((row) => row.map(i => i.replace(/\|/g, "•")).join(" | ")).join("\n")}
@@ -17826,7 +17826,7 @@ async function getChangedFiles(octokit, context) {
     var changedFiles = res.data
         .map(({filename}) => {
             try {
-                const [modelName] = filename.match(/.*models\/.*\/(.*)\.sql/)[1].split('.');
+                const [modelName] = filename.match(/.*models\/(.*)\.sql/)[1].split('/').reverse()[0].split('.');
 
                 if (modelName) {
                     return {
@@ -17853,6 +17853,7 @@ async function getChangedFiles(octokit, context) {
 async function getAssetName({octokit, context, fileName, filePath}) {
     var regExp = /config\(.*alias=\'([^']+)\'.*\)/im;
     var fileContents = await getFileContents(octokit, context, filePath);
+
     var matches = regExp.exec(fileContents);
 
     if (matches) {
@@ -18259,7 +18260,7 @@ async function printDownstreamAssets({octokit, context}) {
         const assetName = await getAssetName({octokit, context, fileName, filePath});
         const asset = await getAsset({name: assetName});
 
-        if (!asset) return;
+        if (!asset) continue;
 
         const {guid} = asset.attributes.sqlAsset;
         const timeStart = Date.now();
