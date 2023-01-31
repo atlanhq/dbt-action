@@ -17513,136 +17513,140 @@ function fixResponseChunkedTransferBadEnding(request, errorCallback) {
 ;// CONCATENATED MODULE: ./src/utils/get-image-url.js
 
 
-function getImageURL(name) {
-  try {
-    return `![${hosted_images[name].alt}](${hosted_images[name].url})`;
-  } catch (e) {
-    console.log(name);
-  }
+function getImageURL(name, height = 20, width = 20) {
+    try {
+        return `<img src="${hosted_images[name].url}" alt="${hosted_images[name].alt}" height="${height}" width="${width}"/>`;
+    } catch (e) {
+        console.log(name);
+    }
 }
 
 function getConnectorImage(connectorName) {
-  return getImageURL(`connector-${connectorName.toLowerCase()}`);
+    return getImageURL(`connector-${connectorName.toLowerCase()}`, 15, 15);
 }
 
 function getCertificationImage(certificationStatus) {
-  return getImageURL(`certification-${certificationStatus.toLowerCase()}`);
+    return getImageURL(`certification-${certificationStatus.toLowerCase()}`, 15, 15);
 }
 
 ;// CONCATENATED MODULE: ./src/utils/hosted-images.js
 /* harmony default export */ const hosted_images = ({
-  "atlan-logo": {
-    alt: "Atlan Logo",
-    url: "https://iili.io/H2iiP44.png",
-  },
-  "certification-deprecated": {
-    alt: "Certificate Status Deprecated",
-    url: "https://iili.io/H2iiLa2.png",
-  },
-  "certification-draft": {
-    alt: "Certificate Status Drafted",
-    url: "https://iili.io/H2iiQvS.png",
-  },
-  "certification-verified": {
-    alt: "Certificate Status Verified",
-    url: "https://iili.io/H2iis3l.png",
-  },
-  "connector-airflow": {
-    alt: "Connector Airflow",
-    url: "https://iili.io/H2iibje.png",
-  },
-  "connector-athena": {
-    alt: "Connector Athena",
-    url: "https://iili.io/H2iiDu9.png",
-  },
-  "connector-aws-s3": {
-    alt: "Connector AWS S3",
-    url: "https://iili.io/H2iimZu.png",
-  },
-  "connector-azure-datalake": {
-    alt: "Connector Azure Datalake",
-    url: "https://iili.io/H2iiZy7.png",
-  },
-  "connector-bigquery": {
-    alt: "Connector BigQuery",
-    url: "https://iili.io/H2iiyCb.png",
-  },
-  "connector-databricks": {
-    alt: "Connector Databricks",
-    url: "https://iili.io/H2is9Gj.png",
-  },
-  "connector-dbt": {
-    alt: "Connector dbt",
-    url: "https://iili.io/H2isH6x.png",
-  },
-  "connector-gcp": {
-    alt: "Connector GCP",
-    url: "https://iili.io/H2isd3Q.png",
-  },
-  "connector-glue": {
-    alt: "Connector Glue",
-    url: "https://iili.io/H2isFyP.png",
-  },
-  "connector-grafana": {
-    alt: "Connector Grafana",
-    url: "https://iili.io/H2is38B.png",
-  },
-  "connector-looker": {
-    alt: "Connector Looker",
-    url: "https://iili.io/H2isfu1.png",
-  },
-  "connector-mocks": {
-    alt: "Connector Mocks",
-    url: "https://iili.io/H2isqwF.png",
-  },
-  "connector-mysql": {
-    alt: "Connector MySQL",
-    url: "https://iili.io/H2isnna.png",
-  },
-  "connector-oracle": {
-    alt: "Connector Oracle",
-    url: "https://iili.io/H2isoMJ.png",
-  },
-  "connector-postgres": {
-    alt: "Connector Postgres",
-    url: "https://iili.io/H2isx6v.png",
-  },
-  "connector-powerbi": {
-    alt: "Connector PowerBI",
-    url: "https://iili.io/H2isBZg.png",
-  },
-  "connector-presto": {
-    alt: "Connector Presto",
-    url: "https://iili.io/H2isIFR.png",
-  },
-  "connector-python": {
-    alt: "Connector Python",
-    url: "https://iili.io/H2isTap.png",
-  },
-  "connector-r": {
-    alt: "Connector R",
-    url: "https://iili.io/H2isu8N.png",
-  },
-  "connector-redash": {
-    alt: "Connector Redash",
-    url: "https://iili.io/H2isR9I.png",
-  },
-  "connector-redshift": {
-    alt: "Connector Redshift",
-    url: "https://iili.io/H2is5ut.png",
-  },
-  "connector-sisense": {
-    alt: "Connector Sisense",
-    url: "https://iili.io/H2is7wX.png",
-  },
-  "connector-snowflake": {
-    alt: "Connector Snowflake",
-    url: "https://iili.io/H2iscns.png",
-  },
-  "connector-tableau": {
-    alt: "Connector Tableau",
-    url: "https://iili.io/H2isYtn.png",
-  },
+    "atlan-logo": {
+        alt: "Atlan Logo",
+        url: "https://assets.atlan.com/assets/atlan-a-logo-blue-background.png",
+    },
+    "atlan-view-asset-button": {
+        alt: "Atlan View Asset Button",
+        url: "https://iili.io/HcVoh67.png",
+    },
+    "certification-deprecated": {
+        alt: "Certificate Status Deprecated",
+        url: "https://assets.atlan.com/assets/status-deprecated.svg",
+    },
+    "certification-draft": {
+        alt: "Certificate Status Drafted",
+        url: "https://assets.atlan.com/assets/status-draft.svg",
+    },
+    "certification-verified": {
+        alt: "Certificate Status Verified",
+        url: "https://assets.atlan.com/assets/status-verified.svg",
+    },
+    "connector-airflow": {
+        alt: "Connector Airflow",
+        url: "https://assets.atlan.com/assets/airflow.svg",
+    },
+    "connector-athena": {
+        alt: "Connector Athena",
+        url: "https://assets.atlan.com/assets/athena.svg",
+    },
+    "connector-aws-s3": {
+        alt: "Connector AWS S3",
+        url: "https://assets.atlan.com/assets/s3-logo.svg",
+    },
+    "connector-azure-datalake": {
+        alt: "Connector Azure Datalake",
+        url: "https://iili.io/H2iiZy7.png",
+    },
+    "connector-bigquery": {
+        alt: "Connector BigQuery",
+        url: "https://assets.atlan.com/assets/bigquery.svg",
+    },
+    "connector-databricks": {
+        alt: "Connector Databricks",
+        url: "https://assets.atlan.com/assets/databricks.svg",
+    },
+    "connector-dbt": {
+        alt: "Connector dbt",
+        url: "https://assets.atlan.com/assets/dbt-new.svg",
+    },
+    "connector-gcp": {
+        alt: "Connector GCP",
+        url: "https://assets.atlan.com/assets/gcp-logo.svg",
+    },
+    "connector-glue": {
+        alt: "Connector Glue",
+        url: "https://assets.atlan.com/assets/aws-glue.svg",
+    },
+    "connector-grafana": {
+        alt: "Connector Grafana",
+        url: "https://assets.atlan.com/assets/grafana.svg",
+    },
+    "connector-looker": {
+        alt: "Connector Looker",
+        url: "https://assets.atlan.com/assets/looker.svg",
+    },
+    "connector-mocks": {
+        alt: "Connector Mocks",
+        url: "https://iili.io/H2isqwF.png",
+    },
+    "connector-mysql": {
+        alt: "Connector MySQL",
+        url: "https://assets.atlan.com/assets/mysql.svg",
+    },
+    "connector-oracle": {
+        alt: "Connector Oracle",
+        url: "https://assets.atlan.com/assets/oracle.svg",
+    },
+    "connector-postgres": {
+        alt: "Connector Postgres",
+        url: "https://assets.atlan.com/assets/postgresql.svg",
+    },
+    "connector-powerbi": {
+        alt: "Connector PowerBI",
+        url: "https://assets.atlan.com/assets/powerbi.svg",
+    },
+    "connector-presto": {
+        alt: "Connector Presto",
+        url: "https://iili.io/H2isIFR.png",
+    },
+    "connector-python": {
+        alt: "Connector Python",
+        url: "https://iili.io/H2isTap.png",
+    },
+    "connector-r": {
+        alt: "Connector R",
+        url: "https://iili.io/H2isu8N.png",
+    },
+    "connector-redash": {
+        alt: "Connector Redash",
+        url: "https://assets.atlan.com/assets/redash-logo.svg",
+    },
+    "connector-redshift": {
+        alt: "Connector Redshift",
+        url: "https://assets.atlan.com/assets/redshift.svg",
+    },
+    "connector-sisense": {
+        alt: "Connector Sisense",
+        url: "https://assets.atlan.com/assets/sisense-logo.svg",
+    },
+    "connector-snowflake": {
+        alt: "Connector Snowflake",
+        url: "https://assets.atlan.com/assets/snowflake.svg",
+    },
+    "connector-tableau": {
+        alt: "Connector Tableau",
+        url: "https://assets.atlan.com/assets/tableau.svg",
+    },
 });
 
 ;// CONCATENATED MODULE: ./src/utils/create-comment.js
@@ -17690,7 +17694,7 @@ async function renderDownstreamAssetsComment(
         }
     );
 
-    const comment = `## ${getConnectorImage(asset.attributes.connectorName)} [${
+    const comment = `### ${getConnectorImage(asset.attributes.connectorName)} [${
         asset.displayText
     }](${ATLAN_INSTANCE_URL}/assets/${asset.guid}?utm_source=dbt_github_action) ${
         asset.attributes?.certificateStatus
@@ -17698,14 +17702,12 @@ async function renderDownstreamAssetsComment(
             : ""
     }
         
-  There are ${downstreamAssets.length} downstream assets.
+  ${downstreamAssets.length} downstream assets 👇
   Name | Type | Description | Owners | Terms | Source URL
   --- | --- | --- | --- | --- | ---
   ${rows.map((row) => row.map(i => i.replace(/\|/g, "•")).join(" | ")).join("\n")}
   
-  ${getImageURL(
-        "atlan-logo"
-    )} [View asset on Atlan.](${ATLAN_INSTANCE_URL}/assets/${asset.guid}?utm_source=dbt_github_action)`;
+  [${getImageURL("atlan-view-asset-button", 30, 135)}](${ATLAN_INSTANCE_URL}/assets/${asset.guid}?utm_source=dbt_github_action)`;
 
     return comment
 }
@@ -17719,12 +17721,16 @@ async function checkCommentExists(octokit, context) {
     });
 
     return comments.data.find(
-        (comment) => comment.user.login === "github-actions[bot]"
+        (comment) => comment.user.login === "github-actions[bot]" && comment.body.includes("<!-- ActionCommentIdentifier: atlan-dbt-action -->")
     );
 }
 
 async function createIssueComment(octokit, context, content, comment_id = null) {
     const {pull_request} = context.payload;
+
+    content = `<!-- ActionCommentIdentifier: atlan-dbt-action -->
+${content}`
+
     const commentObj = {
         ...context.repo,
         issue_number: pull_request.number,
@@ -18228,6 +18234,11 @@ async function printDownstreamAssets({octokit, context}) {
 
         totalChangedFiles++
     }
+
+    comments = `### ${getImageURL("atlan-logo", 15, 15)} Atlan impact analysis
+Here is your downstream impact analysis for **${totalChangedFiles} models** you have edited.    
+    
+${comments}`
 
     const existingComment = await checkCommentExists(octokit, context);
 
