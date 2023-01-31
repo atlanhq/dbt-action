@@ -7029,6 +7029,40 @@ exports.isPlainObject = isPlainObject;
 
 /***/ }),
 
+/***/ 7073:
+/***/ ((module, exports) => {
+
+exports = module.exports = stringify
+exports.getSerialize = serializer
+
+function stringify(obj, replacer, spaces, cycleReplacer) {
+  return JSON.stringify(obj, serializer(replacer, cycleReplacer), spaces)
+}
+
+function serializer(replacer, cycleReplacer) {
+  var stack = [], keys = []
+
+  if (cycleReplacer == null) cycleReplacer = function(key, value) {
+    if (stack[0] === value) return "[Circular ~]"
+    return "[Circular ~." + keys.slice(0, stack.indexOf(value)).join(".") + "]"
+  }
+
+  return function(key, value) {
+    if (stack.length > 0) {
+      var thisPos = stack.indexOf(this)
+      ~thisPos ? stack.splice(thisPos + 1) : stack.push(this)
+      ~thisPos ? keys.splice(thisPos, Infinity, key) : keys.push(key)
+      if (~stack.indexOf(value)) value = cycleReplacer.call(this, key, value)
+    }
+    else stack.push(value)
+
+    return replacer == null ? value : replacer.call(this, key, value)
+  }
+}
+
+
+/***/ }),
+
 /***/ 7760:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
@@ -17793,7 +17827,7 @@ async function getChangedFiles(octokit, context) {
         .map(({filename}) => {
             try {
                 const [modelName] = filename.match(/.*models\/.*\/(.*)\.sql/)[1].split('.');
-                console.log(modelName, filename)
+
                 if (modelName) {
                     return {
                         fileName: modelName,
@@ -17810,6 +17844,8 @@ async function getChangedFiles(octokit, context) {
         .filter((item, index) => {
             return changedFiles.findIndex(obj => obj.fileName === item.fileName) === index;
         })
+
+    console.log(changedFiles)
 
     return changedFiles
 }
@@ -17888,7 +17924,10 @@ Set your repository action secrets [here](https://github.com/${context.payload.r
 
 
 
+// EXTERNAL MODULE: ./node_modules/json-stringify-safe/stringify.js
+var stringify = __nccwpck_require__(7073);
 ;// CONCATENATED MODULE: ./src/api/get-downstream-assets.js
+
 
 
 
@@ -17908,7 +17947,7 @@ async function getDownstreamAssets(asset, guid, octokit, context) {
         "content-type": "application/json",
     };
 
-    var raw = JSON.stringify({
+    var raw = stringify({
         depth: 21,
         guid: guid,
         hideProcess: true,
@@ -17992,6 +18031,7 @@ async function getDownstreamAssets(asset, guid, octokit, context) {
 
 
 
+
 main.config();
 
 const get_asset_ATLAN_INSTANCE_URL =
@@ -18005,7 +18045,7 @@ async function getAsset({name}) {
         "Content-Type": "application/json",
     };
 
-    var raw = JSON.stringify({
+    var raw = stringify({
         dsl: {
             from: 0,
             size: 1,
@@ -18081,10 +18121,11 @@ const v5 = uuid_dist.v5;
 const NIL = uuid_dist/* NIL */.zR;
 const version = uuid_dist/* version */.i8;
 const validate = uuid_dist/* validate */.Gu;
-const stringify = uuid_dist/* stringify */.Pz;
+const wrapper_stringify = uuid_dist/* stringify */.Pz;
 const parse = uuid_dist/* parse */.Qc;
 
 ;// CONCATENATED MODULE: ./src/api/create-resource.js
+
 
 
 
@@ -18104,7 +18145,7 @@ async function createResource(guid, name, link) {
         "Content-Type": "application/json",
     };
 
-    var raw = JSON.stringify({
+    var raw = stringify({
         entities: [
             {
                 typeName: "Link",
@@ -18150,6 +18191,8 @@ async function createResource(guid, name, link) {
 
 
 
+
+
 main.config();
 
 const segment_ATLAN_INSTANCE_URL =
@@ -18165,7 +18208,7 @@ async function sendSegmentEvent(action, properties) {
 
     var domain = new URL(segment_ATLAN_INSTANCE_URL).hostname;
 
-    var raw = JSON.stringify({
+    var raw = stringify({
         category: "integration",
         object: "github",
         action,

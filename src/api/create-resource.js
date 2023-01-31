@@ -3,6 +3,7 @@ import fetch from "node-fetch";
 import core from "@actions/core";
 import dotenv from "dotenv";
 import {sendSegmentEvent} from "./index.js";
+import stringify from 'json-stringify-safe';
 
 dotenv.config();
 
@@ -17,7 +18,7 @@ export default async function createResource(guid, name, link) {
         "Content-Type": "application/json",
     };
 
-    var raw = JSON.stringify({
+    var raw = stringify({
         entities: [
             {
                 typeName: "Link",

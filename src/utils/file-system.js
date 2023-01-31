@@ -36,7 +36,7 @@ export async function getChangedFiles(octokit, context) {
         .map(({filename}) => {
             try {
                 const [modelName] = filename.match(/.*models\/.*\/(.*)\.sql/)[1].split('.');
-                console.log(modelName, filename)
+
                 if (modelName) {
                     return {
                         fileName: modelName,
@@ -53,6 +53,8 @@ export async function getChangedFiles(octokit, context) {
         .filter((item, index) => {
             return changedFiles.findIndex(obj => obj.fileName === item.fileName) === index;
         })
+
+    console.log(changedFiles)
 
     return changedFiles
 }
