@@ -17789,9 +17789,8 @@ async function getChangedFiles(octokit, context) {
         }
     );
 
-    return res.data
+    var changedFiles = res.data
         .map(({filename}) => {
-            console.log(filename)
             try {
                 const [modelName] = filename.match(/.*models\/.*\/(.*)\.sql/)[1].split('.');
                 if (modelName) {
@@ -17804,7 +17803,14 @@ async function getChangedFiles(octokit, context) {
 
             }
         })
-        .filter((i) => i !== undefined);
+        .filter((i) => i !== undefined)
+
+    changedFiles = changedFiles
+        .filter((item, index) => {
+            return changedFiles.findIndex(obj => obj.fileName === item.fileName) === index;
+        })
+
+    return changedFiles
 }
 
 async function getAssetName({octokit, context, fileName, filePath}) {
