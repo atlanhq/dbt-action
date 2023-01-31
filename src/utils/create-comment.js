@@ -42,7 +42,7 @@ export default async function renderDownstreamAssetsComment(
         }
     );
 
-    const comment = `## ${getConnectorImage(asset.attributes.connectorName)} [${
+    const comment = `### ${getConnectorImage(asset.attributes.connectorName)} [${
         asset.displayText
     }](${ATLAN_INSTANCE_URL}/assets/${asset.guid}?utm_source=dbt_github_action) ${
         asset.attributes?.certificateStatus
@@ -50,14 +50,12 @@ export default async function renderDownstreamAssetsComment(
             : ""
     }
         
-  There are ${downstreamAssets.length} downstream assets.
+  ${downstreamAssets.length} downstream assets 👇
   Name | Type | Description | Owners | Terms | Source URL
   --- | --- | --- | --- | --- | ---
   ${rows.map((row) => row.map(i => i.replace(/\|/g, "•")).join(" | ")).join("\n")}
   
-  ${getImageURL(
-        "atlan-logo"
-    )} [View asset on Atlan.](${ATLAN_INSTANCE_URL}/assets/${asset.guid}?utm_source=dbt_github_action)`;
+  [${getImageURL("atlan-view-asset-button", 30, 135)}](${ATLAN_INSTANCE_URL}/assets/${asset.guid}?utm_source=dbt_github_action)`;
 
     return comment
 }
@@ -71,12 +69,16 @@ export async function checkCommentExists(octokit, context) {
     });
 
     return comments.data.find(
-        (comment) => comment.user.login === "github-actions[bot]"
+        (comment) => comment.user.login === "github-actions[bot]" && comment.body.includes("<!-- ActionCommentIdentifier: atlan-dbt-action -->")
     );
 }
 
 export async function createIssueComment(octokit, context, content, comment_id = null) {
     const {pull_request} = context.payload;
+
+    content = `<!-- ActionCommentIdentifier: atlan-dbt-action -->
+${content}`
+
     const commentObj = {
         ...context.repo,
         issue_number: pull_request.number,
