@@ -3,6 +3,7 @@ import core from "@actions/core";
 import dotenv from "dotenv";
 import {sendSegmentEvent} from "./index.js";
 import {createIssueComment, getConnectorImage, getCertificationImage} from "../utils/index.js";
+import stringify from 'json-stringify-safe';
 
 dotenv.config();
 
@@ -17,7 +18,7 @@ export default async function getDownstreamAssets(asset, guid, octokit, context)
         "content-type": "application/json",
     };
 
-    var raw = JSON.stringify({
+    var raw = stringify({
         depth: 21,
         guid: guid,
         hideProcess: true,
