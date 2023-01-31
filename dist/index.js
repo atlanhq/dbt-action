@@ -17789,18 +17789,28 @@ async function getChangedFiles(octokit, context) {
         }
     );
 
-    return res.data
+    var changedFiles = res.data
         .map(({filename}) => {
-            const fileNameRegEx = /.*\/models\/.*\/(.*)\.sql/gm,
-                matches = fileNameRegEx.exec(filename);
-            if (matches) {
-                return {
-                    fileName: matches[1],
-                    filePath: filename,
-                };
+            try {
+                const [modelName] = filename.match(/.*models\/.*\/(.*)\.sql/)[1].split('.');
+                if (modelName) {
+                    return {
+                        fileName: modelName,
+                        filePath: filename,
+                    };
+                }
+            } catch (e) {
+
             }
         })
-        .filter((i) => i !== undefined);
+        .filter((i) => i !== undefined)
+
+    changedFiles = changedFiles
+        .filter((item, index) => {
+            return changedFiles.findIndex(obj => obj.fileName === item.fileName) === index;
+        })
+
+    return changedFiles
 }
 
 async function getAssetName({octokit, context, fileName, filePath}) {
