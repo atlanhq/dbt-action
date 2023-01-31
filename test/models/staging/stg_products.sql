@@ -1,5 +1,3 @@
--- This is a new comment
-
 
 with source as (
 
