@@ -35,7 +35,7 @@ export async function getChangedFiles(octokit, context) {
     var changedFiles = res.data
         .map(({filename}) => {
             try {
-                const [modelName] = filename.match(/.*models\/.*\/(.*)\.sql/)[1].split('.');
+                const [modelName] = filename.match(/.*models\/(.*)\.sql/)[1].split('/').reverse()[0].split('.');
 
                 if (modelName) {
                     return {
@@ -62,6 +62,7 @@ export async function getChangedFiles(octokit, context) {
 export async function getAssetName({octokit, context, fileName, filePath}) {
     var regExp = /config\(.*alias=\'([^']+)\'.*\)/im;
     var fileContents = await getFileContents(octokit, context, filePath);
+
     var matches = regExp.exec(fileContents);
 
     if (matches) {
