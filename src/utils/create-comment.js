@@ -50,7 +50,7 @@ export default async function renderDownstreamAssetsComment(
             : ""
     }
         
-  ${downstreamAssets.length} downstream assets 👇
+  **${downstreamAssets.length} downstream assets** 👇
   Name | Type | Description | Owners | Terms | Source URL
   --- | --- | --- | --- | --- | ---
   ${rows.map((row) => row.map(i => i.replace(/\|/g, "•")).join(" | ")).join("\n")}

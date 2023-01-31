@@ -18,7 +18,7 @@ export default async function printDownstreamAssets({octokit, context}) {
         const assetName = await getAssetName({octokit, context, fileName, filePath});
         const asset = await getAsset({name: assetName});
 
-        if (!asset) return;
+        if (!asset) continue;
 
         const {guid} = asset.attributes.sqlAsset;
         const timeStart = Date.now();
