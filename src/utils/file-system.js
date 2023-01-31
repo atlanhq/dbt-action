@@ -36,6 +36,7 @@ export async function getChangedFiles(octokit, context) {
         .map(({filename}) => {
             try {
                 const [modelName] = filename.match(/.*models\/.*\/(.*)\.sql/)[1].split('.');
+                console.log(modelName, filename)
                 if (modelName) {
                     return {
                         fileName: modelName,
