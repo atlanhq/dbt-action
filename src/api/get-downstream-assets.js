@@ -2,7 +2,7 @@ import fetch from "node-fetch";
 import core from "@actions/core";
 import dotenv from "dotenv";
 import {sendSegmentEvent} from "./index.js";
-import {createIssueComment, getConnectorImage, getCertificationImage} from "../utils/index.js";
+import {createIssueComment, getConnectorImage, getCertificationImage, getImageURL} from "../utils/index.js";
 import stringify from 'json-stringify-safe';
 
 dotenv.config();
@@ -52,8 +52,8 @@ export default async function getDownstreamAssets(asset, guid, octokit, context)
         body: raw,
     };
 
-    var handleError = async (err) => {
-        const comment = `## ${getConnectorImage(asset.attributes.connectorName)} [${
+    var handleError = (err) => {
+        const comment = `### ${getConnectorImage(asset.attributes.connectorName)} [${
             asset.displayText
         }](${ATLAN_INSTANCE_URL}/assets/${asset.guid}?utm_source=dbt_github_action) ${
             asset.attributes?.certificateStatus
@@ -61,11 +61,9 @@ export default async function getDownstreamAssets(asset, guid, octokit, context)
                 : ""
         }
             
-❌ Failed to fetch downstream impacted assets.
+❌ Failed to fetch impacted assets.
             
-[See lineage on Atlan.](${ATLAN_INSTANCE_URL}/assets/${asset.guid}/lineage?utm_source=dbt_github_action)`;
-
-        createIssueComment(octokit, context, comment)
+[${getImageURL('atlan-show-lineage-button', 30, 135)}](${ATLAN_INSTANCE_URL}/assets/${asset.guid}/lineage?utm_source=dbt_github_action)`;
 
         sendSegmentEvent("dbt_ci_action_failure", {
             reason: 'failed_to_fetch_lineage',
@@ -74,18 +72,26 @@ export default async function getDownstreamAssets(asset, guid, octokit, context)
             asset_typeName: asset.typeName,
             msg: err
         });
+
+        return comment
     }
 
     var response = await fetch(
         `${ATLAN_INSTANCE_URL}/api/meta/lineage/getlineage`,
         requestOptions
-    ).then((e) => e.json()).catch((err) => {
-        handleError(err)
+    ).then((e) => {
+        if (e.status === 200) {
+            return e.json();
+        } else {
+            throw e;
+        }
+    }).catch((err) => {
+        return {
+            error: handleError(err)
+        }
     });
 
-    if (!!response.error) {
-        handleError(response.error)
-    }
+    if (response.error) return response;
 
     if (!response?.relations) return [];
 

@@ -4,8 +4,12 @@ export default {
         url: "https://assets.atlan.com/assets/atlan-a-logo-blue-background.png",
     },
     "atlan-view-asset-button": {
-        alt: "Atlan View Asset Button",
-        url: "https://iili.io/HcVoh67.png",
+        alt: "View Asset in Atlan Button",
+        url: "https://iili.io/H11nfVe.png",
+    },
+    "atlan-show-lineage-button": {
+        alt: "View Lineage in Atlan Button",
+        url: "https://iili.io/H11hy1n.png",
     },
     "certification-deprecated": {
         alt: "Certificate Status Deprecated",
