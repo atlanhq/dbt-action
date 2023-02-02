@@ -38,8 +38,6 @@ export default async function printDownstreamAssets({octokit, context}) {
             continue;
         }
 
-        if (downstreamAssets.length === 0) continue;
-
         sendSegmentEvent("dbt_ci_action_downstream_unfurl", {
             asset_guid: asset.guid,
             asset_type: asset.typeName,
