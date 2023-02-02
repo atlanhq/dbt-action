@@ -41,8 +41,8 @@ export default async function renderDownstreamAssetsComment(
                 ? getCertificationImage(certificateStatus)
                 : "";
 
-        return [`[${displayText}](${ATLAN_INSTANCE_URL}/assets/${guid}?utm_source=dbt_github_action) ${certificationImage}`,
-            `${connectorImage} \`${typeName}\``,
+        return [`${connectorImage} [${displayText}](${ATLAN_INSTANCE_URL}/assets/${guid}?utm_source=dbt_github_action) ${certificationImage}`,
+            `\`${typeName}\``,
             description,
             owners.join(", ") || " ",
             meanings,
@@ -62,7 +62,7 @@ export default async function renderDownstreamAssetsComment(
   --- | --- | --- | --- | --- | ---
   ${rows.map((row) => row.map(i => i.replace(/\|/g, "•").replace(/\n/g, "")).join(" | ")).join("\n")}
   
-  [${getImageURL("atlan-view-asset-button", 30, 135)}](${ATLAN_INSTANCE_URL}/assets/${asset.guid}?utm_source=dbt_github_action)`;
+  ${getImageURL("atlan-logo", 15, 15)} [View asset in Atlan](${ATLAN_INSTANCE_URL}/assets/${asset.guid}?utm_source=dbt_github_action)`;
 
     return comment
 }

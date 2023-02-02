@@ -61,9 +61,9 @@ export default async function getDownstreamAssets(asset, guid, octokit, context)
                 : ""
         }
             
-❌ Failed to fetch impacted assets.
+_Failed to fetch impacted assets._
             
-[${getImageURL('atlan-show-lineage-button', 30, 135)}](${ATLAN_INSTANCE_URL}/assets/${asset.guid}/lineage?utm_source=dbt_github_action)`;
+${getImageURL("atlan-logo", 15, 15)} [View lineage in Atlan](${ATLAN_INSTANCE_URL}/assets/${asset.guid}/lineage?utm_source=dbt_github_action)`;
 
         sendSegmentEvent("dbt_ci_action_failure", {
             reason: 'failed_to_fetch_lineage',
