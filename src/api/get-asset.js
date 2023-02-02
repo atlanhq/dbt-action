@@ -79,5 +79,7 @@ export default async function getAsset({name}) {
     });
 
     if (response?.entities?.length > 0) return response.entities[0];
-    return null;
+    return {
+        error: `❌ Model with name ${name} not found <br><br>`,
+    };
 }

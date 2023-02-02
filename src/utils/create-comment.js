@@ -15,32 +15,39 @@ export default async function renderDownstreamAssetsComment(
     asset,
     downstreamAssets
 ) {
-    const rows = downstreamAssets.map(
+    let impactedData = downstreamAssets.map(
         ({displayText, guid, typeName, attributes, meanings}) => {
-            const connectorImage = getConnectorImage(attributes.connectorName),
-                certificationImage = attributes?.certificateStatus
-                    ? getCertificationImage(attributes?.certificateStatus)
-                    : "",
-                readableTypeName = typeName
-                    .toLowerCase()
-                    .replace(attributes.connectorName, "")
-                    .toUpperCase();
-
+            let readableTypeName = typeName
+                .toLowerCase()
+                .replace(attributes.connectorName, "")
+                .toUpperCase();
+            readableTypeName = readableTypeName.charAt(0).toUpperCase() + readableTypeName.slice(1).toLowerCase()
             return [
-                `${connectorImage} [${displayText}](${ATLAN_INSTANCE_URL}/assets/${guid}?utm_source=dbt_github_action) ${certificationImage}`,
-                `\`${readableTypeName}\``,
-                attributes?.userDescription || attributes?.description || " ",
-                attributes?.ownerUsers?.join(", ") || " ",
-                meanings
-                    .map(
-                        ({displayText, termGuid}) =>
-                            `[${displayText}](${ATLAN_INSTANCE_URL}/assets/${termGuid}?utm_source=dbt_github_action)`
-                    )
-                    ?.join(", ") || " ",
-                attributes?.sourceURL || " ",
+                guid, displayText, attributes.connectorName, readableTypeName, attributes?.userDescription || attributes?.description || "", attributes?.certificateStatus || "", [...attributes?.ownerUsers, ...attributes?.ownerGroups] || [], meanings.map(
+                    ({displayText, termGuid}) =>
+                        `[${displayText}](${ATLAN_INSTANCE_URL}/assets/${termGuid}?utm_source=dbt_github_action)`
+                )
+                    ?.join(", ") || " ", attributes?.sourceURL || ""
             ];
         }
     );
+
+    impactedData = impactedData.sort((a, b) => a[3].localeCompare(b[3])); // Sort by typeName
+    impactedData = impactedData.sort((a, b) => a[2].localeCompare(b[2])); // Sort by connectorName
+
+    let rows = impactedData.map(([guid, displayText, connectorName, typeName, description, certificateStatus, owners, meanings, sourceUrl]) => {
+        const connectorImage = getConnectorImage(connectorName),
+            certificationImage = certificateStatus
+                ? getCertificationImage(certificateStatus)
+                : "";
+
+        return [`${connectorImage} [${displayText}](${ATLAN_INSTANCE_URL}/assets/${guid}?utm_source=dbt_github_action) ${certificationImage}`,
+            `\`${typeName}\``,
+            description,
+            owners.join(", ") || " ",
+            meanings,
+            sourceUrl ? `[Open in ${connectorName}](${sourceUrl})` : " "]
+    })
 
     const comment = `### ${getConnectorImage(asset.attributes.connectorName)} [${
         asset.displayText
@@ -53,14 +60,16 @@ export default async function renderDownstreamAssetsComment(
   **${downstreamAssets.length} downstream assets** 👇
   Name | Type | Description | Owners | Terms | Source URL
   --- | --- | --- | --- | --- | ---
-  ${rows.map((row) => row.map(i => i.replace(/\|/g, "•")).join(" | ")).join("\n")}
+  ${rows.map((row) => row.map(i => i.replace(/\|/g, "•").replace(/\n/g, "")).join(" | ")).join("\n")}
   
-  [${getImageURL("atlan-view-asset-button", 30, 135)}](${ATLAN_INSTANCE_URL}/assets/${asset.guid}?utm_source=dbt_github_action)`;
+  ${getImageURL("atlan-logo", 15, 15)} [View asset in Atlan](${ATLAN_INSTANCE_URL}/assets/${asset.guid}?utm_source=dbt_github_action)`;
 
     return comment
 }
 
 export async function checkCommentExists(octokit, context) {
+    if (IS_DEV) return null;
+
     const {pull_request} = context.payload;
 
     const comments = await octokit.rest.issues.listComments({
