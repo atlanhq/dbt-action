@@ -17570,8 +17570,12 @@ function getCertificationImage(certificationStatus) {
         url: "https://assets.atlan.com/assets/atlan-a-logo-blue-background.png",
     },
     "atlan-view-asset-button": {
-        alt: "Atlan View Asset Button",
-        url: "https://iili.io/HcVoh67.png",
+        alt: "View Asset in Atlan Button",
+        url: "https://iili.io/H11nfVe.png",
+    },
+    "atlan-show-lineage-button": {
+        alt: "View Lineage in Atlan Button",
+        url: "https://iili.io/H11hy1n.png",
     },
     "certification-deprecated": {
         alt: "Certificate Status Deprecated",
@@ -17701,32 +17705,39 @@ async function renderDownstreamAssetsComment(
     asset,
     downstreamAssets
 ) {
-    const rows = downstreamAssets.map(
+    let impactedData = downstreamAssets.map(
         ({displayText, guid, typeName, attributes, meanings}) => {
-            const connectorImage = getConnectorImage(attributes.connectorName),
-                certificationImage = attributes?.certificateStatus
-                    ? getCertificationImage(attributes?.certificateStatus)
-                    : "",
-                readableTypeName = typeName
-                    .toLowerCase()
-                    .replace(attributes.connectorName, "")
-                    .toUpperCase();
-
+            let readableTypeName = typeName
+                .toLowerCase()
+                .replace(attributes.connectorName, "")
+                .toUpperCase();
+            readableTypeName = readableTypeName.charAt(0).toUpperCase() + readableTypeName.slice(1).toLowerCase()
             return [
-                `${connectorImage} [${displayText}](${ATLAN_INSTANCE_URL}/assets/${guid}?utm_source=dbt_github_action) ${certificationImage}`,
-                `\`${readableTypeName}\``,
-                attributes?.userDescription || attributes?.description || " ",
-                attributes?.ownerUsers?.join(", ") || " ",
-                meanings
-                    .map(
-                        ({displayText, termGuid}) =>
-                            `[${displayText}](${ATLAN_INSTANCE_URL}/assets/${termGuid}?utm_source=dbt_github_action)`
-                    )
-                    ?.join(", ") || " ",
-                attributes?.sourceURL || " ",
+                guid, displayText, attributes.connectorName, readableTypeName, attributes?.userDescription || attributes?.description || "", attributes?.certificateStatus || "", [...attributes?.ownerUsers, ...attributes?.ownerGroups] || [], meanings.map(
+                    ({displayText, termGuid}) =>
+                        `[${displayText}](${ATLAN_INSTANCE_URL}/assets/${termGuid}?utm_source=dbt_github_action)`
+                )
+                    ?.join(", ") || " ", attributes?.sourceURL || ""
             ];
         }
     );
+
+    impactedData = impactedData.sort((a, b) => a[3].localeCompare(b[3])); // Sort by typeName
+    impactedData = impactedData.sort((a, b) => a[2].localeCompare(b[2])); // Sort by connectorName
+
+    let rows = impactedData.map(([guid, displayText, connectorName, typeName, description, certificateStatus, owners, meanings, sourceUrl]) => {
+        const connectorImage = getConnectorImage(connectorName),
+            certificationImage = certificateStatus
+                ? getCertificationImage(certificateStatus)
+                : "";
+
+        return [`${connectorImage} [${displayText}](${ATLAN_INSTANCE_URL}/assets/${guid}?utm_source=dbt_github_action) ${certificationImage}`,
+            `\`${typeName}\``,
+            description,
+            owners.join(", ") || " ",
+            meanings,
+            sourceUrl ? `[Open in ${connectorName}](${sourceUrl})` : " "]
+    })
 
     const comment = `### ${getConnectorImage(asset.attributes.connectorName)} [${
         asset.displayText
@@ -17739,14 +17750,16 @@ async function renderDownstreamAssetsComment(
   **${downstreamAssets.length} downstream assets** 👇
   Name | Type | Description | Owners | Terms | Source URL
   --- | --- | --- | --- | --- | ---
-  ${rows.map((row) => row.map(i => i.replace(/\|/g, "•")).join(" | ")).join("\n")}
+  ${rows.map((row) => row.map(i => i.replace(/\|/g, "•").replace(/\n/g, "")).join(" | ")).join("\n")}
   
-  [${getImageURL("atlan-view-asset-button", 30, 135)}](${ATLAN_INSTANCE_URL}/assets/${asset.guid}?utm_source=dbt_github_action)`;
+  ${getImageURL("atlan-logo", 15, 15)} [View asset in Atlan](${ATLAN_INSTANCE_URL}/assets/${asset.guid}?utm_source=dbt_github_action)`;
 
     return comment
 }
 
 async function checkCommentExists(octokit, context) {
+    if (IS_DEV) return null;
+
     const {pull_request} = context.payload;
 
     const comments = await octokit.rest.issues.listComments({
@@ -17982,8 +17995,8 @@ async function getDownstreamAssets(asset, guid, octokit, context) {
         body: raw,
     };
 
-    var handleError = async (err) => {
-        const comment = `## ${getConnectorImage(asset.attributes.connectorName)} [${
+    var handleError = (err) => {
+        const comment = `### ${getConnectorImage(asset.attributes.connectorName)} [${
             asset.displayText
         }](${get_downstream_assets_ATLAN_INSTANCE_URL}/assets/${asset.guid}?utm_source=dbt_github_action) ${
             asset.attributes?.certificateStatus
@@ -17991,11 +18004,9 @@ async function getDownstreamAssets(asset, guid, octokit, context) {
                 : ""
         }
             
-❌ Failed to fetch downstream impacted assets.
+_Failed to fetch impacted assets._
             
-[See lineage on Atlan.](${get_downstream_assets_ATLAN_INSTANCE_URL}/assets/${asset.guid}/lineage?utm_source=dbt_github_action)`;
-
-        createIssueComment(octokit, context, comment)
+${getImageURL("atlan-logo", 15, 15)} [View lineage in Atlan](${get_downstream_assets_ATLAN_INSTANCE_URL}/assets/${asset.guid}/lineage?utm_source=dbt_github_action)`;
 
         sendSegmentEvent("dbt_ci_action_failure", {
             reason: 'failed_to_fetch_lineage',
@@ -18004,18 +18015,26 @@ async function getDownstreamAssets(asset, guid, octokit, context) {
             asset_typeName: asset.typeName,
             msg: err
         });
+
+        return comment
     }
 
     var response = await fetch(
         `${get_downstream_assets_ATLAN_INSTANCE_URL}/api/meta/lineage/getlineage`,
         requestOptions
-    ).then((e) => e.json()).catch((err) => {
-        handleError(err)
+    ).then((e) => {
+        if (e.status === 200) {
+            return e.json();
+        } else {
+            throw e;
+        }
+    }).catch((err) => {
+        return {
+            error: handleError(err)
+        }
     });
 
-    if (!!response.error) {
-        handleError(response.error)
-    }
+    if (response.error) return response;
 
     if (!response?.relations) return [];
 
@@ -18108,7 +18127,9 @@ async function getAsset({name}) {
     });
 
     if (response?.entities?.length > 0) return response.entities[0];
-    return null;
+    return {
+        error: `❌ Model with name ${name} not found <br><br>`,
+    };
 }
 
 // EXTERNAL MODULE: ./node_modules/uuid/dist/index.js
@@ -18253,6 +18274,7 @@ async function sendSegmentEvent(action, properties) {
 
 async function printDownstreamAssets({octokit, context}) {
     const changedFiles = await getChangedFiles(octokit, context);
+
     let comments = ``;
     let totalChangedFiles = 0;
 
@@ -18260,7 +18282,11 @@ async function printDownstreamAssets({octokit, context}) {
         const assetName = await getAssetName({octokit, context, fileName, filePath});
         const asset = await getAsset({name: assetName});
 
-        if (!asset) continue;
+        if (asset.error) {
+            comments += asset.error;
+            totalChangedFiles++
+            continue;
+        }
 
         const {guid} = asset.attributes.sqlAsset;
         const timeStart = Date.now();
@@ -18269,7 +18295,11 @@ async function printDownstreamAssets({octokit, context}) {
         if (totalChangedFiles !== 0)
             comments += '\n\n---\n\n';
 
-        if (downstreamAssets.length === 0) continue;
+        if (downstreamAssets.error) {
+            comments += downstreamAssets.error;
+            totalChangedFiles++
+            continue;
+        }
 
         sendSegmentEvent("dbt_ci_action_downstream_unfurl", {
             asset_guid: asset.guid,
@@ -18291,7 +18321,7 @@ async function printDownstreamAssets({octokit, context}) {
     }
 
     comments = `### ${getImageURL("atlan-logo", 15, 15)} Atlan impact analysis
-Here is your downstream impact analysis for **${totalChangedFiles} models** you have edited.    
+Here is your downstream impact analysis for **${totalChangedFiles} ${totalChangedFiles > 1 ? "models" : "model"}** you have edited.    
     
 ${comments}`
 
