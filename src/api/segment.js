@@ -2,6 +2,8 @@ import fetch from "node-fetch";
 import core from "@actions/core";
 import dotenv from "dotenv";
 import {context} from "@actions/github";
+import stringify from 'json-stringify-safe';
+
 
 dotenv.config();
 
@@ -18,7 +20,7 @@ export default async function sendSegmentEvent(action, properties) {
 
     var domain = new URL(ATLAN_INSTANCE_URL).hostname;
 
-    var raw = JSON.stringify({
+    var raw = stringify({
         category: "integration",
         object: "github",
         action,

@@ -1,6 +1,6 @@
 import {getAsset, createResource} from "../api/index.js";
 import {
-    createCustomComment,
+    createIssueComment,
     getChangedFiles,
     getAssetName,
 } from "../utils/index.js";
@@ -35,7 +35,7 @@ export default async function setResourceOnAsset({octokit, context}) {
         totalChangedFiles++
     });
 
-    const comment = await createCustomComment(
+    const comment = await createIssueComment(
         octokit,
         context,
         `🎊 Congrats on the merge!

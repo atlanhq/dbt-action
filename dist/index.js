@@ -7029,6 +7029,40 @@ exports.isPlainObject = isPlainObject;
 
 /***/ }),
 
+/***/ 7073:
+/***/ ((module, exports) => {
+
+exports = module.exports = stringify
+exports.getSerialize = serializer
+
+function stringify(obj, replacer, spaces, cycleReplacer) {
+  return JSON.stringify(obj, serializer(replacer, cycleReplacer), spaces)
+}
+
+function serializer(replacer, cycleReplacer) {
+  var stack = [], keys = []
+
+  if (cycleReplacer == null) cycleReplacer = function(key, value) {
+    if (stack[0] === value) return "[Circular ~]"
+    return "[Circular ~." + keys.slice(0, stack.indexOf(value)).join(".") + "]"
+  }
+
+  return function(key, value) {
+    if (stack.length > 0) {
+      var thisPos = stack.indexOf(this)
+      ~thisPos ? stack.splice(thisPos + 1) : stack.push(this)
+      ~thisPos ? keys.splice(thisPos, Infinity, key) : keys.push(key)
+      if (~stack.indexOf(value)) value = cycleReplacer.call(this, key, value)
+    }
+    else stack.push(value)
+
+    return replacer == null ? value : replacer.call(this, key, value)
+  }
+}
+
+
+/***/ }),
+
 /***/ 7760:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
@@ -17513,136 +17547,144 @@ function fixResponseChunkedTransferBadEnding(request, errorCallback) {
 ;// CONCATENATED MODULE: ./src/utils/get-image-url.js
 
 
-function getImageURL(name) {
-  try {
-    return `![${hosted_images[name].alt}](${hosted_images[name].url})`;
-  } catch (e) {
-    console.log(name);
-  }
+function getImageURL(name, height = 20, width = 20) {
+    try {
+        return `<img src="${hosted_images[name].url}" alt="${hosted_images[name].alt}" height="${height}" width="${width}"/>`;
+    } catch (e) {
+        console.log(name);
+    }
 }
 
 function getConnectorImage(connectorName) {
-  return getImageURL(`connector-${connectorName.toLowerCase()}`);
+    return getImageURL(`connector-${connectorName.toLowerCase()}`, 15, 15);
 }
 
 function getCertificationImage(certificationStatus) {
-  return getImageURL(`certification-${certificationStatus.toLowerCase()}`);
+    return getImageURL(`certification-${certificationStatus.toLowerCase()}`, 15, 15);
 }
 
 ;// CONCATENATED MODULE: ./src/utils/hosted-images.js
 /* harmony default export */ const hosted_images = ({
-  "atlan-logo": {
-    alt: "Atlan Logo",
-    url: "https://iili.io/H2iiP44.png",
-  },
-  "certification-deprecated": {
-    alt: "Certificate Status Deprecated",
-    url: "https://iili.io/H2iiLa2.png",
-  },
-  "certification-draft": {
-    alt: "Certificate Status Drafted",
-    url: "https://iili.io/H2iiQvS.png",
-  },
-  "certification-verified": {
-    alt: "Certificate Status Verified",
-    url: "https://iili.io/H2iis3l.png",
-  },
-  "connector-airflow": {
-    alt: "Connector Airflow",
-    url: "https://iili.io/H2iibje.png",
-  },
-  "connector-athena": {
-    alt: "Connector Athena",
-    url: "https://iili.io/H2iiDu9.png",
-  },
-  "connector-aws-s3": {
-    alt: "Connector AWS S3",
-    url: "https://iili.io/H2iimZu.png",
-  },
-  "connector-azure-datalake": {
-    alt: "Connector Azure Datalake",
-    url: "https://iili.io/H2iiZy7.png",
-  },
-  "connector-bigquery": {
-    alt: "Connector BigQuery",
-    url: "https://iili.io/H2iiyCb.png",
-  },
-  "connector-databricks": {
-    alt: "Connector Databricks",
-    url: "https://iili.io/H2is9Gj.png",
-  },
-  "connector-dbt": {
-    alt: "Connector dbt",
-    url: "https://iili.io/H2isH6x.png",
-  },
-  "connector-gcp": {
-    alt: "Connector GCP",
-    url: "https://iili.io/H2isd3Q.png",
-  },
-  "connector-glue": {
-    alt: "Connector Glue",
-    url: "https://iili.io/H2isFyP.png",
-  },
-  "connector-grafana": {
-    alt: "Connector Grafana",
-    url: "https://iili.io/H2is38B.png",
-  },
-  "connector-looker": {
-    alt: "Connector Looker",
-    url: "https://iili.io/H2isfu1.png",
-  },
-  "connector-mocks": {
-    alt: "Connector Mocks",
-    url: "https://iili.io/H2isqwF.png",
-  },
-  "connector-mysql": {
-    alt: "Connector MySQL",
-    url: "https://iili.io/H2isnna.png",
-  },
-  "connector-oracle": {
-    alt: "Connector Oracle",
-    url: "https://iili.io/H2isoMJ.png",
-  },
-  "connector-postgres": {
-    alt: "Connector Postgres",
-    url: "https://iili.io/H2isx6v.png",
-  },
-  "connector-powerbi": {
-    alt: "Connector PowerBI",
-    url: "https://iili.io/H2isBZg.png",
-  },
-  "connector-presto": {
-    alt: "Connector Presto",
-    url: "https://iili.io/H2isIFR.png",
-  },
-  "connector-python": {
-    alt: "Connector Python",
-    url: "https://iili.io/H2isTap.png",
-  },
-  "connector-r": {
-    alt: "Connector R",
-    url: "https://iili.io/H2isu8N.png",
-  },
-  "connector-redash": {
-    alt: "Connector Redash",
-    url: "https://iili.io/H2isR9I.png",
-  },
-  "connector-redshift": {
-    alt: "Connector Redshift",
-    url: "https://iili.io/H2is5ut.png",
-  },
-  "connector-sisense": {
-    alt: "Connector Sisense",
-    url: "https://iili.io/H2is7wX.png",
-  },
-  "connector-snowflake": {
-    alt: "Connector Snowflake",
-    url: "https://iili.io/H2iscns.png",
-  },
-  "connector-tableau": {
-    alt: "Connector Tableau",
-    url: "https://iili.io/H2isYtn.png",
-  },
+    "atlan-logo": {
+        alt: "Atlan Logo",
+        url: "https://assets.atlan.com/assets/atlan-a-logo-blue-background.png",
+    },
+    "atlan-view-asset-button": {
+        alt: "View Asset in Atlan Button",
+        url: "https://iili.io/H11nfVe.png",
+    },
+    "atlan-show-lineage-button": {
+        alt: "View Lineage in Atlan Button",
+        url: "https://iili.io/H11hy1n.png",
+    },
+    "certification-deprecated": {
+        alt: "Certificate Status Deprecated",
+        url: "https://assets.atlan.com/assets/status-deprecated.svg",
+    },
+    "certification-draft": {
+        alt: "Certificate Status Drafted",
+        url: "https://assets.atlan.com/assets/status-draft.svg",
+    },
+    "certification-verified": {
+        alt: "Certificate Status Verified",
+        url: "https://assets.atlan.com/assets/status-verified.svg",
+    },
+    "connector-airflow": {
+        alt: "Connector Airflow",
+        url: "https://assets.atlan.com/assets/airflow.svg",
+    },
+    "connector-athena": {
+        alt: "Connector Athena",
+        url: "https://assets.atlan.com/assets/athena.svg",
+    },
+    "connector-aws-s3": {
+        alt: "Connector AWS S3",
+        url: "https://assets.atlan.com/assets/s3-logo.svg",
+    },
+    "connector-azure-datalake": {
+        alt: "Connector Azure Datalake",
+        url: "https://iili.io/H2iiZy7.png",
+    },
+    "connector-bigquery": {
+        alt: "Connector BigQuery",
+        url: "https://assets.atlan.com/assets/bigquery.svg",
+    },
+    "connector-databricks": {
+        alt: "Connector Databricks",
+        url: "https://assets.atlan.com/assets/databricks.svg",
+    },
+    "connector-dbt": {
+        alt: "Connector dbt",
+        url: "https://assets.atlan.com/assets/dbt-new.svg",
+    },
+    "connector-gcp": {
+        alt: "Connector GCP",
+        url: "https://assets.atlan.com/assets/gcp-logo.svg",
+    },
+    "connector-glue": {
+        alt: "Connector Glue",
+        url: "https://assets.atlan.com/assets/aws-glue.svg",
+    },
+    "connector-grafana": {
+        alt: "Connector Grafana",
+        url: "https://assets.atlan.com/assets/grafana.svg",
+    },
+    "connector-looker": {
+        alt: "Connector Looker",
+        url: "https://assets.atlan.com/assets/looker.svg",
+    },
+    "connector-mocks": {
+        alt: "Connector Mocks",
+        url: "https://iili.io/H2isqwF.png",
+    },
+    "connector-mysql": {
+        alt: "Connector MySQL",
+        url: "https://assets.atlan.com/assets/mysql.svg",
+    },
+    "connector-oracle": {
+        alt: "Connector Oracle",
+        url: "https://assets.atlan.com/assets/oracle.svg",
+    },
+    "connector-postgres": {
+        alt: "Connector Postgres",
+        url: "https://assets.atlan.com/assets/postgresql.svg",
+    },
+    "connector-powerbi": {
+        alt: "Connector PowerBI",
+        url: "https://assets.atlan.com/assets/powerbi.svg",
+    },
+    "connector-presto": {
+        alt: "Connector Presto",
+        url: "https://iili.io/H2isIFR.png",
+    },
+    "connector-python": {
+        alt: "Connector Python",
+        url: "https://iili.io/H2isTap.png",
+    },
+    "connector-r": {
+        alt: "Connector R",
+        url: "https://iili.io/H2isu8N.png",
+    },
+    "connector-redash": {
+        alt: "Connector Redash",
+        url: "https://assets.atlan.com/assets/redash-logo.svg",
+    },
+    "connector-redshift": {
+        alt: "Connector Redshift",
+        url: "https://assets.atlan.com/assets/redshift.svg",
+    },
+    "connector-sisense": {
+        alt: "Connector Sisense",
+        url: "https://assets.atlan.com/assets/sisense-logo.svg",
+    },
+    "connector-snowflake": {
+        alt: "Connector Snowflake",
+        url: "https://assets.atlan.com/assets/snowflake.svg",
+    },
+    "connector-tableau": {
+        alt: "Connector Tableau",
+        url: "https://assets.atlan.com/assets/tableau.svg",
+    },
 });
 
 ;// CONCATENATED MODULE: ./src/utils/create-comment.js
@@ -17657,43 +17699,47 @@ const {IS_DEV} = process.env;
 const ATLAN_INSTANCE_URL =
     core.getInput("ATLAN_INSTANCE_URL") || process.env.ATLAN_INSTANCE_URL;
 
-async function createComment(
+async function renderDownstreamAssetsComment(
     octokit,
     context,
     asset,
     downstreamAssets
 ) {
-    const {pull_request} = context.payload;
-
-    const rows = downstreamAssets.map(
+    let impactedData = downstreamAssets.map(
         ({displayText, guid, typeName, attributes, meanings}) => {
-            const connectorImage = getConnectorImage(attributes.connectorName),
-                certificationImage = attributes?.certificateStatus
-                    ? getCertificationImage(attributes?.certificateStatus)
-                    : "",
-                readableTypeName = typeName
-                    .toLowerCase()
-                    .replace(attributes.connectorName, "")
-                    .toUpperCase();
-
+            let readableTypeName = typeName
+                .toLowerCase()
+                .replace(attributes.connectorName, "")
+                .toUpperCase();
+            readableTypeName = readableTypeName.charAt(0).toUpperCase() + readableTypeName.slice(1).toLowerCase()
             return [
-                `${connectorImage} [${displayText}](${ATLAN_INSTANCE_URL}/assets/${guid}?utm_source=dbt_github_action) ${certificationImage}`,
-                `\`${readableTypeName}\``,
-                attributes?.userDescription || attributes?.description || " ",
-                attributes?.ownerUsers?.join(", ") || " ",
-                meanings
-                    .map(
-                        ({displayText, termGuid}) =>
-                            `[${displayText}](${ATLAN_INSTANCE_URL}/assets/${termGuid}?utm_source=dbt_github_action)`
-                    )
-                    ?.join(", ") || " ",
-                attributes?.sourceURL || " ",
+                guid, displayText, attributes.connectorName, readableTypeName, attributes?.userDescription || attributes?.description || "", attributes?.certificateStatus || "", [...attributes?.ownerUsers, ...attributes?.ownerGroups] || [], meanings.map(
+                    ({displayText, termGuid}) =>
+                        `[${displayText}](${ATLAN_INSTANCE_URL}/assets/${termGuid}?utm_source=dbt_github_action)`
+                )
+                    ?.join(", ") || " ", attributes?.sourceURL || ""
             ];
         }
     );
 
-    const comment = `
-  ## ${getConnectorImage(asset.attributes.connectorName)} [${
+    impactedData = impactedData.sort((a, b) => a[3].localeCompare(b[3])); // Sort by typeName
+    impactedData = impactedData.sort((a, b) => a[2].localeCompare(b[2])); // Sort by connectorName
+
+    let rows = impactedData.map(([guid, displayText, connectorName, typeName, description, certificateStatus, owners, meanings, sourceUrl]) => {
+        const connectorImage = getConnectorImage(connectorName),
+            certificationImage = certificateStatus
+                ? getCertificationImage(certificateStatus)
+                : "";
+
+        return [`${connectorImage} [${displayText}](${ATLAN_INSTANCE_URL}/assets/${guid}?utm_source=dbt_github_action) ${certificationImage}`,
+            `\`${typeName}\``,
+            description,
+            owners.join(", ") || " ",
+            meanings,
+            sourceUrl ? `[Open in ${connectorName}](${sourceUrl})` : " "]
+    })
+
+    const comment = `### ${getConnectorImage(asset.attributes.connectorName)} [${
         asset.displayText
     }](${ATLAN_INSTANCE_URL}/assets/${asset.guid}?utm_source=dbt_github_action) ${
         asset.attributes?.certificateStatus
@@ -17701,29 +17747,37 @@ async function createComment(
             : ""
     }
         
-  There are ${downstreamAssets.length} downstream assets.
+  **${downstreamAssets.length} downstream assets** 👇
   Name | Type | Description | Owners | Terms | Source URL
   --- | --- | --- | --- | --- | ---
-  ${rows.map((row) => row.join(" | ")).join("\n")}
+  ${rows.map((row) => row.map(i => i.replace(/\|/g, "•").replace(/\n/g, "")).join(" | ")).join("\n")}
   
-  ${getImageURL(
-        "atlan-logo"
-    )} [View asset on Atlan.](${ATLAN_INSTANCE_URL}/assets/${asset.guid}?utm_source=dbt_github_action)`;
+  ${getImageURL("atlan-logo", 15, 15)} [View asset in Atlan](${ATLAN_INSTANCE_URL}/assets/${asset.guid}?utm_source=dbt_github_action)`;
 
-    const commentObj = {
-        ...context.repo,
-        issue_number: pull_request.number,
-        body: comment,
-    };
-
-    console.log(comment)
-
-    if (IS_DEV) return comment;
-    return octokit.rest.issues.createComment(commentObj);
+    return comment
 }
 
-async function createCustomComment(octokit, context, content) {
+async function checkCommentExists(octokit, context) {
+    if (IS_DEV) return null;
+
     const {pull_request} = context.payload;
+
+    const comments = await octokit.rest.issues.listComments({
+        ...context.repo,
+        issue_number: pull_request.number,
+    });
+
+    return comments.data.find(
+        (comment) => comment.user.login === "github-actions[bot]" && comment.body.includes("<!-- ActionCommentIdentifier: atlan-dbt-action -->")
+    );
+}
+
+async function createIssueComment(octokit, context, content, comment_id = null) {
+    const {pull_request} = context.payload;
+
+    content = `<!-- ActionCommentIdentifier: atlan-dbt-action -->
+${content}`
+
     const commentObj = {
         ...context.repo,
         issue_number: pull_request.number,
@@ -17733,7 +17787,19 @@ async function createCustomComment(octokit, context, content) {
     console.log(content)
 
     if (IS_DEV) return content;
+
+    if (comment_id) return octokit.rest.issues.updateComment({...commentObj, comment_id});
     return octokit.rest.issues.createComment(commentObj);
+}
+
+async function deleteComment(octokit, context, comment_id) {
+    const {pull_request} = context.payload;
+
+    return octokit.rest.issues.deleteComment({
+        ...context.repo,
+        issue_number: pull_request.number,
+        comment_id,
+    });
 }
 ;// CONCATENATED MODULE: ./src/utils/file-system.js
 async function getFileContents(octokit, context, filePath) {
@@ -17770,23 +17836,37 @@ async function getChangedFiles(octokit, context) {
         }
     );
 
-    return res.data
+    var changedFiles = res.data
         .map(({filename}) => {
-            const fileNameRegEx = /.*\/models\/.*\/(.*)\.sql/gm,
-                matches = fileNameRegEx.exec(filename);
-            if (matches) {
-                return {
-                    fileName: matches[1],
-                    filePath: filename,
-                };
+            try {
+                const [modelName] = filename.match(/.*models\/(.*)\.sql/)[1].split('/').reverse()[0].split('.');
+
+                if (modelName) {
+                    return {
+                        fileName: modelName,
+                        filePath: filename,
+                    };
+                }
+            } catch (e) {
+
             }
         })
-        .filter((i) => i !== undefined);
+        .filter((i) => i !== undefined)
+
+    changedFiles = changedFiles
+        .filter((item, index) => {
+            return changedFiles.findIndex(obj => obj.fileName === item.fileName) === index;
+        })
+
+    console.log(changedFiles)
+
+    return changedFiles
 }
 
 async function getAssetName({octokit, context, fileName, filePath}) {
     var regExp = /config\(.*alias=\'([^']+)\'.*\)/im;
     var fileContents = await getFileContents(octokit, context, filePath);
+
     var matches = regExp.exec(fileContents);
 
     if (matches) {
@@ -17828,7 +17908,7 @@ async function auth(octokit, context) {
 
     if (response?.status === 401) {
         await
-            createCustomComment(octokit, context, `We couldn't connect to your Atlan Instance, please make sure to set the valid Atlan Bearer Token as \`ATLAN_API_TOKEN\` as this repository's action secret. 
+            createIssueComment(octokit, context, `We couldn't connect to your Atlan Instance, please make sure to set the valid Atlan Bearer Token as \`ATLAN_API_TOKEN\` as this repository's action secret. 
 
 Atlan Instance URL: ${auth_ATLAN_INSTANCE_URL}
 
@@ -17838,7 +17918,7 @@ Set your repository action secrets [here](https://github.com/${context.payload.r
 
     if (response === undefined) {
         await
-            createCustomComment(octokit, context, `We couldn't connect to your Atlan Instance, please make sure to set the valid Atlan Instance URL as \`ATLAN_INSTANCE_URL\` as this repository's action secret. 
+            createIssueComment(octokit, context, `We couldn't connect to your Atlan Instance, please make sure to set the valid Atlan Instance URL as \`ATLAN_INSTANCE_URL\` as this repository's action secret. 
 
 Atlan Instance URL: ${auth_ATLAN_INSTANCE_URL}
 
@@ -17858,7 +17938,10 @@ Set your repository action secrets [here](https://github.com/${context.payload.r
 
 
 
+// EXTERNAL MODULE: ./node_modules/json-stringify-safe/stringify.js
+var stringify = __nccwpck_require__(7073);
 ;// CONCATENATED MODULE: ./src/api/get-downstream-assets.js
+
 
 
 
@@ -17878,7 +17961,7 @@ async function getDownstreamAssets(asset, guid, octokit, context) {
         "content-type": "application/json",
     };
 
-    var raw = JSON.stringify({
+    var raw = stringify({
         depth: 21,
         guid: guid,
         hideProcess: true,
@@ -17912,8 +17995,8 @@ async function getDownstreamAssets(asset, guid, octokit, context) {
         body: raw,
     };
 
-    var handleError = async (err) => {
-        const comment = `## ${getConnectorImage(asset.attributes.connectorName)} [${
+    var handleError = (err) => {
+        const comment = `### ${getConnectorImage(asset.attributes.connectorName)} [${
             asset.displayText
         }](${get_downstream_assets_ATLAN_INSTANCE_URL}/assets/${asset.guid}?utm_source=dbt_github_action) ${
             asset.attributes?.certificateStatus
@@ -17921,11 +18004,9 @@ async function getDownstreamAssets(asset, guid, octokit, context) {
                 : ""
         }
             
-❌ Failed to fetch downstream impacted assets.
+_Failed to fetch impacted assets._
             
-[See lineage on Atlan.](${get_downstream_assets_ATLAN_INSTANCE_URL}/assets/${asset.guid}/lineage?utm_source=dbt_github_action)`;
-
-        createCustomComment(octokit, context, comment)
+${getImageURL("atlan-logo", 15, 15)} [View lineage in Atlan](${get_downstream_assets_ATLAN_INSTANCE_URL}/assets/${asset.guid}/lineage?utm_source=dbt_github_action)`;
 
         sendSegmentEvent("dbt_ci_action_failure", {
             reason: 'failed_to_fetch_lineage',
@@ -17934,18 +18015,26 @@ async function getDownstreamAssets(asset, guid, octokit, context) {
             asset_typeName: asset.typeName,
             msg: err
         });
+
+        return comment
     }
 
     var response = await fetch(
         `${get_downstream_assets_ATLAN_INSTANCE_URL}/api/meta/lineage/getlineage`,
         requestOptions
-    ).then((e) => e.json()).catch((err) => {
-        handleError(err)
+    ).then((e) => {
+        if (e.status === 200) {
+            return e.json();
+        } else {
+            throw e;
+        }
+    }).catch((err) => {
+        return {
+            error: handleError(err)
+        }
     });
 
-    if (!!response.error) {
-        handleError(response.error)
-    }
+    if (response.error) return response;
 
     if (!response?.relations) return [];
 
@@ -17957,6 +18046,7 @@ async function getDownstreamAssets(asset, guid, octokit, context) {
 }
 
 ;// CONCATENATED MODULE: ./src/api/get-asset.js
+
 
 
 
@@ -17975,7 +18065,7 @@ async function getAsset({name}) {
         "Content-Type": "application/json",
     };
 
-    var raw = JSON.stringify({
+    var raw = stringify({
         dsl: {
             from: 0,
             size: 1,
@@ -18037,7 +18127,9 @@ async function getAsset({name}) {
     });
 
     if (response?.entities?.length > 0) return response.entities[0];
-    return null;
+    return {
+        error: `❌ Model with name ${name} not found <br><br>`,
+    };
 }
 
 // EXTERNAL MODULE: ./node_modules/uuid/dist/index.js
@@ -18051,10 +18143,11 @@ const v5 = uuid_dist.v5;
 const NIL = uuid_dist/* NIL */.zR;
 const version = uuid_dist/* version */.i8;
 const validate = uuid_dist/* validate */.Gu;
-const stringify = uuid_dist/* stringify */.Pz;
+const wrapper_stringify = uuid_dist/* stringify */.Pz;
 const parse = uuid_dist/* parse */.Qc;
 
 ;// CONCATENATED MODULE: ./src/api/create-resource.js
+
 
 
 
@@ -18074,7 +18167,7 @@ async function createResource(guid, name, link) {
         "Content-Type": "application/json",
     };
 
-    var raw = JSON.stringify({
+    var raw = stringify({
         entities: [
             {
                 typeName: "Link",
@@ -18120,6 +18213,8 @@ async function createResource(guid, name, link) {
 
 
 
+
+
 main.config();
 
 const segment_ATLAN_INSTANCE_URL =
@@ -18135,8 +18230,8 @@ async function sendSegmentEvent(action, properties) {
 
     var domain = new URL(segment_ATLAN_INSTANCE_URL).hostname;
 
-    var raw = JSON.stringify({
-        category: "integrations",
+    var raw = stringify({
+        category: "integration",
         object: "github",
         action,
         userId: "atlan-annonymous-github",
@@ -18179,21 +18274,32 @@ async function sendSegmentEvent(action, properties) {
 
 async function printDownstreamAssets({octokit, context}) {
     const changedFiles = await getChangedFiles(octokit, context);
-    var totalChangedFiles = 0
 
-    if (changedFiles.length === 0) return;
+    let comments = ``;
+    let totalChangedFiles = 0;
 
     for (const {fileName, filePath} of changedFiles) {
         const assetName = await getAssetName({octokit, context, fileName, filePath});
         const asset = await getAsset({name: assetName});
 
-        if (!asset) return;
+        if (asset.error) {
+            comments += asset.error;
+            totalChangedFiles++
+            continue;
+        }
 
         const {guid} = asset.attributes.sqlAsset;
         const timeStart = Date.now();
         const downstreamAssets = await getDownstreamAssets(asset, guid, octokit, context);
 
-        if (downstreamAssets.length === 0) continue;
+        if (totalChangedFiles !== 0)
+            comments += '\n\n---\n\n';
+
+        if (downstreamAssets.error) {
+            comments += downstreamAssets.error;
+            totalChangedFiles++
+            continue;
+        }
 
         sendSegmentEvent("dbt_ci_action_downstream_unfurl", {
             asset_guid: asset.guid,
@@ -18202,15 +18308,30 @@ async function printDownstreamAssets({octokit, context}) {
             total_fetch_time: Date.now() - timeStart,
         });
 
-        await createComment(
+        const comment = await renderDownstreamAssetsComment(
             octokit,
             context,
             asset,
             downstreamAssets
-        );
+        )
+
+        comments += comment;
 
         totalChangedFiles++
     }
+
+    comments = `### ${getImageURL("atlan-logo", 15, 15)} Atlan impact analysis
+Here is your downstream impact analysis for **${totalChangedFiles} ${totalChangedFiles > 1 ? "models" : "model"}** you have edited.    
+    
+${comments}`
+
+    const existingComment = await checkCommentExists(octokit, context);
+
+    if (totalChangedFiles > 0)
+        await createIssueComment(octokit, context, comments, existingComment?.id)
+
+    if (totalChangedFiles === 0 && existingComment)
+        await deleteComment(octokit, context, existingComment.id)
 
     return totalChangedFiles;
 }
@@ -18249,7 +18370,7 @@ async function setResourceOnAsset({octokit, context}) {
         totalChangedFiles++
     });
 
-    const comment = await createCustomComment(
+    const comment = await createIssueComment(
         octokit,
         context,
         `🎊 Congrats on the merge!

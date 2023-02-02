@@ -32,23 +32,37 @@ export async function getChangedFiles(octokit, context) {
         }
     );
 
-    return res.data
+    var changedFiles = res.data
         .map(({filename}) => {
-            const fileNameRegEx = /.*\/models\/.*\/(.*)\.sql/gm,
-                matches = fileNameRegEx.exec(filename);
-            if (matches) {
-                return {
-                    fileName: matches[1],
-                    filePath: filename,
-                };
+            try {
+                const [modelName] = filename.match(/.*models\/(.*)\.sql/)[1].split('/').reverse()[0].split('.');
+
+                if (modelName) {
+                    return {
+                        fileName: modelName,
+                        filePath: filename,
+                    };
+                }
+            } catch (e) {
+
             }
         })
-        .filter((i) => i !== undefined);
+        .filter((i) => i !== undefined)
+
+    changedFiles = changedFiles
+        .filter((item, index) => {
+            return changedFiles.findIndex(obj => obj.fileName === item.fileName) === index;
+        })
+
+    console.log(changedFiles)
+
+    return changedFiles
 }
 
 export async function getAssetName({octokit, context, fileName, filePath}) {
     var regExp = /config\(.*alias=\'([^']+)\'.*\)/im;
     var fileContents = await getFileContents(octokit, context, filePath);
+
     var matches = regExp.exec(fileContents);
 
     if (matches) {

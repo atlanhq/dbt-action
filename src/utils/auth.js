@@ -1,7 +1,7 @@
 import fetch from "node-fetch";
 import dotenv from "dotenv";
 import core from "@actions/core";
-import {createCustomComment} from "./create-comment.js";
+import {createIssueComment} from "./create-comment.js";
 
 dotenv.config();
 
@@ -29,7 +29,7 @@ export default async function auth(octokit, context) {
 
     if (response?.status === 401) {
         await
-            createCustomComment(octokit, context, `We couldn't connect to your Atlan Instance, please make sure to set the valid Atlan Bearer Token as \`ATLAN_API_TOKEN\` as this repository's action secret. 
+            createIssueComment(octokit, context, `We couldn't connect to your Atlan Instance, please make sure to set the valid Atlan Bearer Token as \`ATLAN_API_TOKEN\` as this repository's action secret. 
 
 Atlan Instance URL: ${ATLAN_INSTANCE_URL}
 
@@ -39,7 +39,7 @@ Set your repository action secrets [here](https://github.com/${context.payload.r
 
     if (response === undefined) {
         await
-            createCustomComment(octokit, context, `We couldn't connect to your Atlan Instance, please make sure to set the valid Atlan Instance URL as \`ATLAN_INSTANCE_URL\` as this repository's action secret. 
+            createIssueComment(octokit, context, `We couldn't connect to your Atlan Instance, please make sure to set the valid Atlan Instance URL as \`ATLAN_INSTANCE_URL\` as this repository's action secret. 
 
 Atlan Instance URL: ${ATLAN_INSTANCE_URL}
 
