@@ -7,6 +7,7 @@ import stringify from 'json-stringify-safe';
 
 dotenv.config();
 
+const {IS_DEV} = process.env;
 const ATLAN_INSTANCE_URL =
     core.getInput("ATLAN_INSTANCE_URL") || process.env.ATLAN_INSTANCE_URL;
 const ATLAN_API_TOKEN =
@@ -38,16 +39,20 @@ export default async function sendSegmentEvent(action, properties) {
         body: raw,
     };
 
-    var response = await fetch(
-        `${ATLAN_INSTANCE_URL}/api/service/segment/track`,
-        requestOptions
-    )
-        .then(() => {
-            console.log("send segment event", action, raw);
-        })
-        .catch((err) => {
-            console.log("couldn't send segment event", err);
-        });
+    var response = null
+
+    if (!IS_DEV) {
+        response = await fetch(
+            `${ATLAN_INSTANCE_URL}/api/service/segment/track`,
+            requestOptions
+        )
+            .then(() => {
+                console.log("send segment event", action, raw);
+            })
+            .catch((err) => {
+                console.log("couldn't send segment event", err);
+            });
+    }
 
     return response;
 }
