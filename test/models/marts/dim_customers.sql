@@ -18,7 +18,7 @@ order_summary as (
     select
         customer_id,
 
-        count(*) as count_lifetime_orders,
+        count(*) distinct as count_lifetime_orders,
         count(*) > 1 as is_repeat_buyer,
         min(ordered_at) as first_ordered_at,
         max(ordered_at) as last_ordered_at,
