@@ -18,7 +18,7 @@ renamed as (
         ---------- properties
         sku as product_id
 
-    from source
+    from sourcee
 
 )
 
