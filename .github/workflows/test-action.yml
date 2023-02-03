@@ -2,7 +2,7 @@ name: Test Action
 
 on:
   pull_request:
-    types: [opened, edited, synchronize, reopened, closed]
+    types: [ opened, edited, synchronize, reopened, closed ]
 
 jobs:
   get-downstream-assets:

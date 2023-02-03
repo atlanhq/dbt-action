@@ -17772,7 +17772,7 @@ async function checkCommentExists(octokit, context) {
     );
 }
 
-async function createIssueComment(octokit, context, content, comment_id = null) {
+async function createIssueComment(octokit, context, content, comment_id = null, forceNewComment = false) {
     const {pull_request} = context.payload;
 
     content = `<!-- ActionCommentIdentifier: atlan-dbt-action -->
@@ -17788,7 +17788,7 @@ ${content}`
 
     if (IS_DEV) return content;
 
-    if (comment_id) return octokit.rest.issues.updateComment({...commentObj, comment_id});
+    if (comment_id && !forceNewComment) return octokit.rest.issues.updateComment({...commentObj, comment_id});
     return octokit.rest.issues.createComment(commentObj);
 }
 
@@ -18217,6 +18217,7 @@ async function createResource(guid, name, link) {
 
 main.config();
 
+const {IS_DEV: segment_IS_DEV} = process.env;
 const segment_ATLAN_INSTANCE_URL =
     core.getInput("ATLAN_INSTANCE_URL") || process.env.ATLAN_INSTANCE_URL;
 const segment_ATLAN_API_TOKEN =
@@ -18248,16 +18249,20 @@ async function sendSegmentEvent(action, properties) {
         body: raw,
     };
 
-    var response = await fetch(
-        `${segment_ATLAN_INSTANCE_URL}/api/service/segment/track`,
-        requestOptions
-    )
-        .then(() => {
-            console.log("send segment event", action, raw);
-        })
-        .catch((err) => {
-            console.log("couldn't send segment event", err);
-        });
+    var response = null
+
+    if (!segment_IS_DEV) {
+        response = await fetch(
+            `${segment_ATLAN_INSTANCE_URL}/api/service/segment/track`,
+            requestOptions
+        )
+            .then(() => {
+                console.log("send segment event", action, raw);
+            })
+            .catch((err) => {
+                console.log("couldn't send segment event", err);
+            });
+    }
 
     return response;
 }
@@ -18347,11 +18352,11 @@ async function setResourceOnAsset({octokit, context}) {
 
     if (changedFiles.length === 0) return;
 
-    changedFiles.forEach(async ({fileName, filePath}) => {
-        const assetName = await getAssetName(octokit, context, fileName, filePath);
+    for (const {fileName, filePath} of changedFiles) {
+        const assetName = await getAssetName({octokit, context, fileName, filePath});
         const asset = await getAsset({name: assetName});
 
-        if (!asset) return;
+        if (!asset) continue;
 
         const {guid: modelGuid} = asset;
         const {guid: tableAssetGuid} = asset.attributes.sqlAsset;
@@ -18368,7 +18373,7 @@ async function setResourceOnAsset({octokit, context}) {
         );
 
         totalChangedFiles++
-    });
+    }
 
     const comment = await createIssueComment(
         octokit,
@@ -18376,9 +18381,10 @@ async function setResourceOnAsset({octokit, context}) {
         `🎊 Congrats on the merge!
   
 This pull request has been added as a resource to all the assets modified. ✅
-`
+`,
+        null,
+        true
     );
-    console.log(comment);
 
     return totalChangedFiles
 }
