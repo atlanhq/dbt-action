@@ -82,7 +82,7 @@ export async function checkCommentExists(octokit, context) {
     );
 }
 
-export async function createIssueComment(octokit, context, content, comment_id = null) {
+export async function createIssueComment(octokit, context, content, comment_id = null, forceNewComment = false) {
     const {pull_request} = context.payload;
 
     content = `<!-- ActionCommentIdentifier: atlan-dbt-action -->
@@ -98,7 +98,7 @@ ${content}`
 
     if (IS_DEV) return content;
 
-    if (comment_id) return octokit.rest.issues.updateComment({...commentObj, comment_id});
+    if (comment_id && !forceNewComment) return octokit.rest.issues.updateComment({...commentObj, comment_id});
     return octokit.rest.issues.createComment(commentObj);
 }
 
