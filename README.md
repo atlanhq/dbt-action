@@ -41,7 +41,7 @@ Here's what it looks like 👇
             runs-on: ubuntu-latest
             steps:
               - name: Run Action
-                uses: atlanhq/dbt-action@v1-beta
+                uses: atlanhq/dbt-action@v1
                 with:
                   GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
                   ATLAN_INSTANCE_URL: ${{secrets.ATLAN_INSTANCE_URL}}
