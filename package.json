@@ -17,7 +17,8 @@
   ],
   "scripts": {
     "build": "ncc build src/index.js -o dist",
-    "start": "npm run build && act pull_request --container-architecture linux/amd64 --secret-file .env -e event.json",
+    "start:github": "npm run build && act pull_request --container-architecture linux/amd64 --secret-file .env.github -e event.json",
+    "start:gitlab": "npm run build && node ./dist/index.js",
     "sync": "git pull && git push"
   },
   "author": "Jaagrav Seal <jaagrav.seal@atlan.com> (https://atlan.com/)",
@@ -29,10 +30,15 @@
   "dependencies": {
     "@actions/core": "^1.10.0",
     "@actions/github": "^5.1.1",
+    "@gitbeaker/browser": "^35.8.0",
+    "@gitbeaker/node": "^35.8.0",
     "@vercel/ncc": "^0.34.0",
     "dotenv": "^16.0.3",
+    "gitlab": "^14.2.2",
+    "gitlab-js": "^0.1.3",
     "json-stringify-safe": "^5.0.1",
     "node-fetch": "^3.3.0",
+    "node-gitlab": "^1.6.1",
     "uuid": "^9.0.0"
   }
 }

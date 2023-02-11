@@ -4,7 +4,6 @@ import dotenv from "dotenv";
 import {context} from "@actions/github";
 import stringify from 'json-stringify-safe';
 
-
 dotenv.config();
 
 const {IS_DEV} = process.env;
@@ -13,30 +12,16 @@ const ATLAN_INSTANCE_URL =
 const ATLAN_API_TOKEN =
     core.getInput("ATLAN_API_TOKEN") || process.env.ATLAN_API_TOKEN;
 
-export default async function sendSegmentEvent(action, properties) {
-    var myHeaders = {
+export async function sendSegmentEvent(body) {
+    const myHeaders = {
         authorization: `Bearer ${ATLAN_API_TOKEN}`,
         "content-type": "application/json",
     };
 
-    var domain = new URL(ATLAN_INSTANCE_URL).hostname;
-
-    var raw = stringify({
-        category: "integration",
-        object: "github",
-        action,
-        userId: "atlan-annonymous-github",
-        properties: {
-            ...properties,
-            github_action_id: `https://github.com/${context.payload.repository.full_name}/actions/runs/${context.runId}`,
-            domain,
-        },
-    });
-
-    var requestOptions = {
+    const requestOptions = {
         method: "POST",
         headers: myHeaders,
-        body: raw,
+        body: body,
     };
 
     var response = null
@@ -55,4 +40,41 @@ export default async function sendSegmentEvent(action, properties) {
     }
 
     return response;
+}
+
+export async function sendSegmentEventOnGithub(action, properties) {
+    const domain = new URL(ATLAN_INSTANCE_URL).hostname;
+
+    const raw = stringify({
+        category: "integration",
+        object: "github",
+        action,
+        userId: "atlan-annonymous-github",
+        properties: {
+            ...properties,
+            github_action_id: `https://github.com/${context.payload.repository.full_name}/actions/runs/${context.runId}`,
+            domain,
+        },
+    });
+
+    return sendSegmentEvent(raw)
+}
+
+export async function sendSegmentEventOnGitlab(action, properties) {
+    const domain = new URL(ATLAN_INSTANCE_URL).hostname;
+    const {CI_PROJECT_ID, CI_PIPELINE_ID} = process.env;
+
+    const raw = stringify({
+        category: "integration",
+        object: "gitlab",
+        action,
+        userId: "atlan-annonymous-github",
+        properties: {
+            ...properties,
+            gitlab_action_id: `https://gitlab.com/${CI_PROJECT_ID}/pipelines/${CI_PIPELINE_ID}`,
+            domain,
+        },
+    });
+
+    return sendSegmentEvent(raw)
 }

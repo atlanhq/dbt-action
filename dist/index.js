@@ -5331,6 +5331,4776 @@ exports.checkBypass = checkBypass;
 
 /***/ }),
 
+/***/ 7756:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+
+var FormData = __nccwpck_require__(6093);
+var li = __nccwpck_require__(4186);
+var queryString = __nccwpck_require__(391);
+var xcase = __nccwpck_require__(7020);
+var requesterUtils = __nccwpck_require__(77);
+var Mime = __nccwpck_require__(531);
+
+function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
+
+function _interopNamespace(e) {
+    if (e && e.__esModule) return e;
+    var n = Object.create(null);
+    if (e) {
+        Object.keys(e).forEach(function (k) {
+            if (k !== 'default') {
+                var d = Object.getOwnPropertyDescriptor(e, k);
+                Object.defineProperty(n, k, d.get ? d : {
+                    enumerable: true,
+                    get: function () { return e[k]; }
+                });
+            }
+        });
+    }
+    n["default"] = e;
+    return Object.freeze(n);
+}
+
+var FormData__default = /*#__PURE__*/_interopDefaultLegacy(FormData);
+var Mime__namespace = /*#__PURE__*/_interopNamespace(Mime);
+
+/*! *****************************************************************************
+Copyright (c) Microsoft Corporation.
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.
+***************************************************************************** */
+/* global Reflect, Promise */
+
+var extendStatics = function(d, b) {
+    extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+    return extendStatics(d, b);
+};
+
+function __extends(d, b) {
+    if (typeof b !== "function" && b !== null)
+        throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+    extendStatics(d, b);
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+}
+
+var __assign = function() {
+    __assign = Object.assign || function __assign(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+
+function __rest(s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+}
+
+function __awaiter(thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+}
+
+function __generator(thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+}
+
+function __read(o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+}
+
+function __spreadArray(to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+}
+
+function __makeTemplateObject(cooked, raw) {
+    if (Object.defineProperty) { Object.defineProperty(cooked, "raw", { value: raw }); } else { cooked.raw = raw; }
+    return cooked;
+}
+
+function appendFormFromObject(object) {
+    /* eslint @typescript-eslint/ban-ts-comment: 0 */
+    // @ts-ignore
+    var form = new FormData__default["default"]();
+    Object.entries(object).forEach(function (_a) {
+        var _b = __read(_a, 2), k = _b[0], v = _b[1];
+        if (Array.isArray(v))
+            form.append(k, v[0], v[1]);
+        else
+            form.append(k, v);
+    });
+    return form;
+}
+function getAPIMap() {
+    try {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires, global-require, import/no-unresolved
+        return __nccwpck_require__(8111);
+    }
+    catch (e) {
+        throw new Error('This function is only available in the distributed code');
+    }
+}
+function endpoint(strings) {
+    var values = [];
+    for (var _i = 1; _i < arguments.length; _i++) {
+        values[_i - 1] = arguments[_i];
+    }
+    return values.reduce(function (string, value, index) { return string + encodeURIComponent(value) + strings[index + 1]; }, strings[0]);
+}
+
+function getHelper(service, endpoint, _a, acc) {
+    if (_a === void 0) { _a = {}; }
+    if (acc === void 0) { acc = []; }
+    var sudo = _a.sudo, showExpanded = _a.showExpanded, maxPages = _a.maxPages, query = __rest(_a, ["sudo", "showExpanded", "maxPages"]);
+    return __awaiter(this, void 0, void 0, function () {
+        var response, headers, status, body, newAcc, next, _b, qs, withinBounds;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
+                case 0: return [4 /*yield*/, service.requester.get(endpoint, { query: query, sudo: sudo })];
+                case 1:
+                    response = _c.sent();
+                    headers = response.headers, status = response.status;
+                    body = response.body;
+                    // Camelize response body if specified
+                    if (service.camelize)
+                        body = xcase.camelizeKeys(body);
+                    // Handle object responses
+                    if (!Array.isArray(body)) {
+                        if (!showExpanded)
+                            return [2 /*return*/, body];
+                        return [2 /*return*/, {
+                                data: body,
+                                headers: headers,
+                                status: status,
+                            }];
+                    }
+                    newAcc = __spreadArray(__spreadArray([], __read(acc), false), __read(body), false);
+                    next = li.parse(headers.link).next;
+                    _b = (next
+                        ? queryString.parseUrl(next, { parseNumbers: true, arrayFormat: 'bracket' })
+                        : {}).query, qs = _b === void 0 ? {} : _b;
+                    withinBounds = maxPages
+                        ? newAcc.length / (qs.per_page || 20) < maxPages
+                        : true;
+                    // Recurse through pagination results
+                    if (!(query.page && acc.length === 0) && next && withinBounds) {
+                        return [2 /*return*/, getHelper(service, endpoint, __assign(__assign({}, qs), { maxPages: maxPages, sudo: sudo }), newAcc)];
+                    }
+                    if (!showExpanded || query.pagination === 'keyset')
+                        return [2 /*return*/, newAcc];
+                    return [2 /*return*/, {
+                            data: newAcc,
+                            paginationInfo: {
+                                total: parseInt(headers['x-total'], 10),
+                                next: parseInt(headers['x-next-page'], 10) || null,
+                                current: parseInt(headers['x-page'], 10) || 1,
+                                previous: parseInt(headers['x-prev-page'], 10) || null,
+                                perPage: parseInt(headers['x-per-page'], 10),
+                                totalPages: parseInt(headers['x-total-pages'], 10),
+                            },
+                        }];
+            }
+        });
+    });
+}
+function get() {
+    return function (service, endpoint, options) { return getHelper(service, endpoint, options); };
+}
+function post() {
+    var _this = this;
+    return function (service, endpoint, _a) {
+        if (_a === void 0) { _a = {}; }
+        return __awaiter(_this, void 0, void 0, function () {
+            var body, r;
+            var query = _a.query, isForm = _a.isForm, sudo = _a.sudo, showExpanded = _a.showExpanded, options = __rest(_a, ["query", "isForm", "sudo", "showExpanded"]);
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        body = isForm ? appendFormFromObject(options) : options;
+                        return [4 /*yield*/, service.requester.post(endpoint, {
+                                query: query,
+                                body: body,
+                                sudo: sudo,
+                            })];
+                    case 1:
+                        r = _b.sent();
+                        return [2 /*return*/, showExpanded
+                                ? {
+                                    data: r.body,
+                                    status: r.status,
+                                    headers: r.headers,
+                                }
+                                : r.body];
+                }
+            });
+        });
+    };
+}
+function put() {
+    var _this = this;
+    return function (service, endpoint, _a) {
+        if (_a === void 0) { _a = {}; }
+        return __awaiter(_this, void 0, void 0, function () {
+            var body, r;
+            var query = _a.query, isForm = _a.isForm, sudo = _a.sudo, showExpanded = _a.showExpanded, options = __rest(_a, ["query", "isForm", "sudo", "showExpanded"]);
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        body = isForm ? appendFormFromObject(options) : options;
+                        return [4 /*yield*/, service.requester.put(endpoint, {
+                                body: body,
+                                query: query,
+                                sudo: sudo,
+                            })];
+                    case 1:
+                        r = _b.sent();
+                        return [2 /*return*/, showExpanded
+                                ? {
+                                    data: r.body,
+                                    status: r.status,
+                                    headers: r.headers,
+                                }
+                                : r.body];
+                }
+            });
+        });
+    };
+}
+function del() {
+    var _this = this;
+    return function (service, endpoint, _a) {
+        if (_a === void 0) { _a = {}; }
+        return __awaiter(_this, void 0, void 0, function () {
+            var body, r;
+            var sudo = _a.sudo, showExpanded = _a.showExpanded, query = _a.query, options = __rest(_a, ["sudo", "showExpanded", "query"]);
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        body = options;
+                        return [4 /*yield*/, service.requester.delete(endpoint, {
+                                body: body,
+                                query: query,
+                                sudo: sudo,
+                            })];
+                    case 1:
+                        r = _b.sent();
+                        return [2 /*return*/, showExpanded
+                                ? {
+                                    data: r.body,
+                                    status: r.status,
+                                    headers: r.headers,
+                                }
+                                : r.body];
+                }
+            });
+        });
+    };
+}
+function stream(service, endpoint, options) {
+    if (typeof service.requester.stream !== 'function') {
+        throw new Error('Stream method is not implementated in requester!');
+    }
+    return service.requester.stream(endpoint, {
+        query: options,
+    });
+}
+var RequestHelper = {
+    post: post,
+    put: put,
+    get: get,
+    del: del,
+    stream: stream,
+};
+
+var Groups = /** @class */ (function (_super) {
+    __extends(Groups, _super);
+    function Groups() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Groups.prototype.all = function (options) {
+        return RequestHelper.get()(this, 'groups', options);
+    };
+    Groups.prototype.create = function (name, path, options) {
+        return RequestHelper.post()(this, 'groups', __assign({ name: name, path: path }, options));
+    };
+    Groups.prototype.createLDAPLink = function (groupId, cn, groupAccess, provider, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_1$V || (templateObject_1$V = __makeTemplateObject(["groups/", "/ldap_group_links"], ["groups/", "/ldap_group_links"])), groupId), __assign({ cn: cn, groupAccess: groupAccess, provider: provider }, options));
+    };
+    Groups.prototype.edit = function (groupId, options) {
+        return RequestHelper.put()(this, endpoint(templateObject_2$N || (templateObject_2$N = __makeTemplateObject(["groups/", ""], ["groups/", ""])), groupId), options);
+    };
+    Groups.prototype.projects = function (groupId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_3$K || (templateObject_3$K = __makeTemplateObject(["groups/", "/projects"], ["groups/", "/projects"])), groupId), options);
+    };
+    Groups.prototype.remove = function (groupId, options) {
+        return RequestHelper.del()(this, endpoint(templateObject_4$H || (templateObject_4$H = __makeTemplateObject(["groups/", ""], ["groups/", ""])), groupId), options);
+    };
+    Groups.prototype.removeLDAPLink = function (groupId, cn, _a) {
+        if (_a === void 0) { _a = {}; }
+        var provider = _a.provider, options = __rest(_a, ["provider"]);
+        var gId = encodeURIComponent(groupId);
+        var url = provider ? "".concat(provider, "/").concat(cn) : "".concat(cn);
+        return RequestHelper.del()(this, "groups/".concat(gId, "/ldap_group_links/").concat(url), options);
+    };
+    Groups.prototype.search = function (nameOrPath, options) {
+        return RequestHelper.get()(this, 'groups', __assign({ search: nameOrPath }, options));
+    };
+    Groups.prototype.show = function (groupId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_5$x || (templateObject_5$x = __makeTemplateObject(["groups/", ""], ["groups/", ""])), groupId), options);
+    };
+    Groups.prototype.subgroups = function (groupId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_6$l || (templateObject_6$l = __makeTemplateObject(["groups/", "/subgroups"], ["groups/", "/subgroups"])), groupId), options);
+    };
+    Groups.prototype.syncLDAP = function (groupId, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_7$b || (templateObject_7$b = __makeTemplateObject(["groups/", "/ldap_sync"], ["groups/", "/ldap_sync"])), groupId), options);
+    };
+    Groups.prototype.transferProject = function (groupId, projectId, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_8$8 || (templateObject_8$8 = __makeTemplateObject(["groups/", "/projects/", ""], ["groups/", "/projects/", ""])), groupId, projectId), options);
+    };
+    return Groups;
+}(requesterUtils.BaseResource));
+var templateObject_1$V, templateObject_2$N, templateObject_3$K, templateObject_4$H, templateObject_5$x, templateObject_6$l, templateObject_7$b, templateObject_8$8;
+
+var ResourceAccessRequests = /** @class */ (function (_super) {
+    __extends(ResourceAccessRequests, _super);
+    function ResourceAccessRequests(resourceType, options) {
+        return _super.call(this, __assign({ prefixUrl: resourceType }, options)) || this;
+    }
+    ResourceAccessRequests.prototype.all = function (resourceId) {
+        return RequestHelper.get()(this, endpoint(templateObject_1$U || (templateObject_1$U = __makeTemplateObject(["", "/access_requests"], ["", "/access_requests"])), resourceId));
+    };
+    ResourceAccessRequests.prototype.request = function (resourceId) {
+        return RequestHelper.post()(this, endpoint(templateObject_2$M || (templateObject_2$M = __makeTemplateObject(["", "/access_requests"], ["", "/access_requests"])), resourceId));
+    };
+    ResourceAccessRequests.prototype.approve = function (resourceId, userId, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_3$J || (templateObject_3$J = __makeTemplateObject(["", "/access_requests/", "/approve"], ["", "/access_requests/", "/approve"])), resourceId, userId), options);
+    };
+    ResourceAccessRequests.prototype.deny = function (resourceId, userId) {
+        return RequestHelper.del()(this, endpoint(templateObject_4$G || (templateObject_4$G = __makeTemplateObject(["", "/access_requests/", ""], ["", "/access_requests/", ""])), resourceId, userId));
+    };
+    return ResourceAccessRequests;
+}(requesterUtils.BaseResource));
+var templateObject_1$U, templateObject_2$M, templateObject_3$J, templateObject_4$G;
+
+function url$4(projectId, resourceType, resourceId, awardId, noteId) {
+    var _a = __read([projectId, resourceId].map(encodeURIComponent), 2), pId = _a[0], rId = _a[1];
+    var output = [pId, resourceType, rId];
+    if (noteId)
+        output.push('notes', encodeURIComponent(noteId));
+    output.push('award_emoji');
+    if (awardId)
+        output.push(encodeURIComponent(awardId));
+    return output.join('/');
+}
+var ResourceAwardEmojis = /** @class */ (function (_super) {
+    __extends(ResourceAwardEmojis, _super);
+    function ResourceAwardEmojis(resourceType, options) {
+        var _this = _super.call(this, __assign({ prefixUrl: 'projects' }, options)) || this;
+        _this.resourceType = resourceType;
+        return _this;
+    }
+    ResourceAwardEmojis.prototype.all = function (projectId, resourceIId, options) {
+        return RequestHelper.get()(this, url$4(projectId, this.resourceType, resourceIId), options);
+    };
+    ResourceAwardEmojis.prototype.award = function (projectId, resourceIId, name, options) {
+        return RequestHelper.post()(this, url$4(projectId, this.resourceType, resourceIId), __assign({ name: name }, options));
+    };
+    ResourceAwardEmojis.prototype.remove = function (projectId, resourceIId, awardId, options) {
+        return RequestHelper.del()(this, url$4(projectId, this.resourceType, resourceIId, awardId), options);
+    };
+    ResourceAwardEmojis.prototype.show = function (projectId, resourceIId, awardId, options) {
+        return RequestHelper.get()(this, url$4(projectId, this.resourceType, resourceIId, awardId), options);
+    };
+    return ResourceAwardEmojis;
+}(requesterUtils.BaseResource));
+
+var ResourceNoteAwardEmojis = /** @class */ (function (_super) {
+    __extends(ResourceNoteAwardEmojis, _super);
+    function ResourceNoteAwardEmojis(resourceType, options) {
+        var _this = _super.call(this, __assign({ prefixUrl: 'projects' }, options)) || this;
+        _this.resourceType = resourceType;
+        return _this;
+    }
+    ResourceNoteAwardEmojis.prototype.all = function (projectId, resourceIId, noteId, options) {
+        return RequestHelper.get()(this, url$4(projectId, this.resourceType, resourceIId, null, noteId), options);
+    };
+    ResourceNoteAwardEmojis.prototype.award = function (projectId, resourceIId, noteId, name, options) {
+        return RequestHelper.post()(this, url$4(projectId, this.resourceType, resourceIId, null, noteId), __assign({ name: name }, options));
+    };
+    ResourceNoteAwardEmojis.prototype.remove = function (projectId, resourceIId, noteId, awardId, options) {
+        return RequestHelper.del()(this, url$4(projectId, this.resourceType, resourceIId, awardId, noteId), options);
+    };
+    ResourceNoteAwardEmojis.prototype.show = function (projectId, resourceIId, noteId, awardId, options) {
+        return RequestHelper.get()(this, url$4(projectId, this.resourceType, resourceIId, awardId, noteId), options);
+    };
+    return ResourceNoteAwardEmojis;
+}(requesterUtils.BaseResource));
+
+var ResourceBadges = /** @class */ (function (_super) {
+    __extends(ResourceBadges, _super);
+    function ResourceBadges(resourceType, options) {
+        return _super.call(this, __assign({ prefixUrl: resourceType }, options)) || this;
+    }
+    ResourceBadges.prototype.add = function (resourceId, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_1$T || (templateObject_1$T = __makeTemplateObject(["", "/badges"], ["", "/badges"])), resourceId), options);
+    };
+    ResourceBadges.prototype.all = function (resourceId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_2$L || (templateObject_2$L = __makeTemplateObject(["", "/badges"], ["", "/badges"])), resourceId), options);
+    };
+    ResourceBadges.prototype.edit = function (resourceId, badgeId, options) {
+        return RequestHelper.put()(this, endpoint(templateObject_3$I || (templateObject_3$I = __makeTemplateObject(["", "/badges/", ""], ["", "/badges/", ""])), resourceId, badgeId), options);
+    };
+    ResourceBadges.prototype.preview = function (resourceId, linkUrl, imageUrl, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_4$F || (templateObject_4$F = __makeTemplateObject(["", "/badges/render"], ["", "/badges/render"])), resourceId), __assign({ linkUrl: linkUrl, imageUrl: imageUrl }, options));
+    };
+    ResourceBadges.prototype.remove = function (resourceId, badgeId, options) {
+        return RequestHelper.del()(this, endpoint(templateObject_5$w || (templateObject_5$w = __makeTemplateObject(["", "/badges/", ""], ["", "/badges/", ""])), resourceId, badgeId), options);
+    };
+    ResourceBadges.prototype.show = function (resourceId, badgeId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_6$k || (templateObject_6$k = __makeTemplateObject(["", "/badges/", ""], ["", "/badges/", ""])), resourceId, badgeId), options);
+    };
+    return ResourceBadges;
+}(requesterUtils.BaseResource));
+var templateObject_1$T, templateObject_2$L, templateObject_3$I, templateObject_4$F, templateObject_5$w, templateObject_6$k;
+
+var ResourceCustomAttributes = /** @class */ (function (_super) {
+    __extends(ResourceCustomAttributes, _super);
+    function ResourceCustomAttributes(resourceType, options) {
+        return _super.call(this, __assign({ prefixUrl: resourceType }, options)) || this;
+    }
+    ResourceCustomAttributes.prototype.all = function (resourceId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_1$S || (templateObject_1$S = __makeTemplateObject(["", "/custom_attributes"], ["", "/custom_attributes"])), resourceId), options);
+    };
+    ResourceCustomAttributes.prototype.set = function (resourceId, customAttributeId, value, options) {
+        return RequestHelper.put()(this, endpoint(templateObject_2$K || (templateObject_2$K = __makeTemplateObject(["", "/custom_attributes/", ""], ["", "/custom_attributes/", ""])), resourceId, customAttributeId), __assign({ value: value }, options));
+    };
+    ResourceCustomAttributes.prototype.remove = function (resourceId, customAttributeId, options) {
+        return RequestHelper.del()(this, endpoint(templateObject_3$H || (templateObject_3$H = __makeTemplateObject(["", "/custom_attributes/", ""], ["", "/custom_attributes/", ""])), resourceId, customAttributeId), options);
+    };
+    ResourceCustomAttributes.prototype.show = function (resourceId, customAttributeId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_4$E || (templateObject_4$E = __makeTemplateObject(["", "/custom_attributes/", ""], ["", "/custom_attributes/", ""])), resourceId, customAttributeId), options);
+    };
+    return ResourceCustomAttributes;
+}(requesterUtils.BaseResource));
+var templateObject_1$S, templateObject_2$K, templateObject_3$H, templateObject_4$E;
+
+// https://docs.gitlab.com/ee/api/deploy_tokens.html
+var ResourceDeployTokens = /** @class */ (function (_super) {
+    __extends(ResourceDeployTokens, _super);
+    function ResourceDeployTokens(resourceType, options) {
+        return _super.call(this, __assign({ prefixUrl: resourceType }, options)) || this;
+    }
+    ResourceDeployTokens.prototype.add = function (resourceId, tokenName, tokenScopes, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_1$R || (templateObject_1$R = __makeTemplateObject(["", "/deploy_tokens"], ["", "/deploy_tokens"])), resourceId), __assign({ name: tokenName, scopes: tokenScopes }, options));
+    };
+    ResourceDeployTokens.prototype.all = function (_a) {
+        if (_a === void 0) { _a = {}; }
+        var resourceId = _a.resourceId, projectId = _a.projectId, groupId = _a.groupId, options = __rest(_a, ["resourceId", "projectId", "groupId"]);
+        var prefix = resourceId || projectId || groupId
+            ? endpoint(templateObject_2$J || (templateObject_2$J = __makeTemplateObject(["", "/"], ["", "/"])), (resourceId || projectId || groupId)) : '';
+        return RequestHelper.get()(this, "".concat(prefix, "deploy_tokens"), options);
+    };
+    ResourceDeployTokens.prototype.remove = function (resourceId, tokenId, options) {
+        return RequestHelper.del()(this, endpoint(templateObject_3$G || (templateObject_3$G = __makeTemplateObject(["", "/deploy_tokens/", ""], ["", "/deploy_tokens/", ""])), resourceId, tokenId), options);
+    };
+    return ResourceDeployTokens;
+}(requesterUtils.BaseResource));
+var templateObject_1$R, templateObject_2$J, templateObject_3$G;
+
+var ResourceDiscussions = /** @class */ (function (_super) {
+    __extends(ResourceDiscussions, _super);
+    function ResourceDiscussions(resourceType, resource2Type, options) {
+        var _this = _super.call(this, __assign({ prefixUrl: resourceType }, options)) || this;
+        _this.resource2Type = resource2Type;
+        return _this;
+    }
+    ResourceDiscussions.prototype.addNote = function (resourceId, resource2Id, discussionId, noteId, body, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_1$Q || (templateObject_1$Q = __makeTemplateObject(["", "/", "/", "/discussions/", "/notes"], ["", "/", "/", "/discussions/", "/notes"])), resourceId, this.resource2Type, resource2Id, discussionId), __assign({ query: { body: body }, noteId: noteId }, options));
+    };
+    ResourceDiscussions.prototype.all = function (resourceId, resource2Id, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_2$I || (templateObject_2$I = __makeTemplateObject(["", "/", "/", "/discussions"], ["", "/", "/", "/discussions"])), resourceId, this.resource2Type, resource2Id), options);
+    };
+    ResourceDiscussions.prototype.create = function (resourceId, resource2Id, body, _a) {
+        if (_a === void 0) { _a = {}; }
+        var position = _a.position, options = __rest(_a, ["position"]);
+        var opts = __assign({}, options);
+        if (position) {
+            var p = xcase.decamelizeKeys(position);
+            opts.isForm = true;
+            opts.body = body;
+            Object.entries(p).forEach(function (_a) {
+                var _b = __read(_a, 2), k = _b[0], v = _b[1];
+                opts["position[".concat(k, "]")] = v;
+            });
+        }
+        else {
+            opts.query = { body: body };
+        }
+        return RequestHelper.post()(this, endpoint(templateObject_3$F || (templateObject_3$F = __makeTemplateObject(["", "/", "/", "/discussions"], ["", "/", "/", "/discussions"])), resourceId, this.resource2Type, resource2Id), opts);
+    };
+    ResourceDiscussions.prototype.editNote = function (resourceId, resource2Id, discussionId, noteId, _a) {
+        if (_a === void 0) { _a = {}; }
+        var body = _a.body, options = __rest(_a, ["body"]);
+        return RequestHelper.put()(this, endpoint(templateObject_4$D || (templateObject_4$D = __makeTemplateObject(["", "/", "/", "/discussions/", "/notes/", ""], ["", "/", "/", "/discussions/", "/notes/", ""])), resourceId, this.resource2Type, resource2Id, discussionId, noteId), __assign({ query: { body: body } }, options));
+    };
+    ResourceDiscussions.prototype.removeNote = function (resourceId, resource2Id, discussionId, noteId, options) {
+        return RequestHelper.del()(this, endpoint(templateObject_5$v || (templateObject_5$v = __makeTemplateObject(["", "/", "/", "/discussions/", "/notes/", ""], ["", "/", "/", "/discussions/", "/notes/", ""])), resourceId, this.resource2Type, resource2Id, discussionId, noteId), options);
+    };
+    ResourceDiscussions.prototype.show = function (resourceId, resource2Id, discussionId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_6$j || (templateObject_6$j = __makeTemplateObject(["", "/", "/", "/discussions/", ""], ["", "/", "/", "/discussions/", ""])), resourceId, this.resource2Type, resource2Id, discussionId), options);
+    };
+    return ResourceDiscussions;
+}(requesterUtils.BaseResource));
+var templateObject_1$Q, templateObject_2$I, templateObject_3$F, templateObject_4$D, templateObject_5$v, templateObject_6$j;
+
+var ResourceIssueBoards = /** @class */ (function (_super) {
+    __extends(ResourceIssueBoards, _super);
+    function ResourceIssueBoards(resourceType, options) {
+        return _super.call(this, __assign({ prefixUrl: resourceType }, options)) || this;
+    }
+    ResourceIssueBoards.prototype.all = function (resourceId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_1$P || (templateObject_1$P = __makeTemplateObject(["", "/boards"], ["", "/boards"])), resourceId), options);
+    };
+    ResourceIssueBoards.prototype.create = function (resourceId, name, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_2$H || (templateObject_2$H = __makeTemplateObject(["", "/boards"], ["", "/boards"])), resourceId), __assign({ name: name }, options));
+    };
+    ResourceIssueBoards.prototype.createList = function (resourceId, boardId, labelId, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_3$E || (templateObject_3$E = __makeTemplateObject(["", "/boards/", "/lists"], ["", "/boards/", "/lists"])), resourceId, boardId), __assign({ labelId: labelId }, options));
+    };
+    ResourceIssueBoards.prototype.edit = function (resourceId, boardId, options) {
+        return RequestHelper.put()(this, endpoint(templateObject_4$C || (templateObject_4$C = __makeTemplateObject(["", "/boards/", ""], ["", "/boards/", ""])), resourceId, boardId), options);
+    };
+    ResourceIssueBoards.prototype.editList = function (resourceId, boardId, listId, position, options) {
+        return RequestHelper.put()(this, endpoint(templateObject_5$u || (templateObject_5$u = __makeTemplateObject(["", "/boards/", "/lists/", ""], ["", "/boards/", "/lists/", ""])), resourceId, boardId, listId), __assign({ position: position }, options));
+    };
+    ResourceIssueBoards.prototype.lists = function (resourceId, boardId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_6$i || (templateObject_6$i = __makeTemplateObject(["", "/boards/", "/lists"], ["", "/boards/", "/lists"])), resourceId, boardId), options);
+    };
+    ResourceIssueBoards.prototype.remove = function (resourceId, boardId, options) {
+        return RequestHelper.del()(this, endpoint(templateObject_7$a || (templateObject_7$a = __makeTemplateObject(["", "/boards/", ""], ["", "/boards/", ""])), resourceId, boardId), options);
+    };
+    ResourceIssueBoards.prototype.removeList = function (resourceId, boardId, listId, options) {
+        return RequestHelper.del()(this, endpoint(templateObject_8$7 || (templateObject_8$7 = __makeTemplateObject(["", "/boards/", "/lists/", ""], ["", "/boards/", "/lists/", ""])), resourceId, boardId, listId), options);
+    };
+    ResourceIssueBoards.prototype.show = function (resourceId, boardId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_9$6 || (templateObject_9$6 = __makeTemplateObject(["", "/boards/", ""], ["", "/boards/", ""])), resourceId, boardId), options);
+    };
+    ResourceIssueBoards.prototype.showList = function (resourceId, boardId, listId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_10$5 || (templateObject_10$5 = __makeTemplateObject(["", "/boards/", "/lists/", ""], ["", "/boards/", "/lists/", ""])), resourceId, boardId, listId), options);
+    };
+    return ResourceIssueBoards;
+}(requesterUtils.BaseResource));
+var templateObject_1$P, templateObject_2$H, templateObject_3$E, templateObject_4$C, templateObject_5$u, templateObject_6$i, templateObject_7$a, templateObject_8$7, templateObject_9$6, templateObject_10$5;
+
+var ResourceLabels = /** @class */ (function (_super) {
+    __extends(ResourceLabels, _super);
+    function ResourceLabels(resourceType, options) {
+        return _super.call(this, __assign({ prefixUrl: resourceType }, options)) || this;
+    }
+    ResourceLabels.prototype.all = function (resourceId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_1$O || (templateObject_1$O = __makeTemplateObject(["", "/labels"], ["", "/labels"])), resourceId), options);
+    };
+    ResourceLabels.prototype.create = function (resourceId, labelName, color, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_2$G || (templateObject_2$G = __makeTemplateObject(["", "/labels"], ["", "/labels"])), resourceId), __assign({ name: labelName, color: color }, options));
+    };
+    ResourceLabels.prototype.edit = function (resourceId, labelId, options) {
+        return RequestHelper.put()(this, endpoint(templateObject_3$D || (templateObject_3$D = __makeTemplateObject(["", "/labels/", ""], ["", "/labels/", ""])), resourceId, labelId), options);
+    };
+    ResourceLabels.prototype.remove = function (resourceId, labelId, options) {
+        return RequestHelper.del()(this, endpoint(templateObject_4$B || (templateObject_4$B = __makeTemplateObject(["", "/labels/", ""], ["", "/labels/", ""])), resourceId, labelId), options);
+    };
+    ResourceLabels.prototype.subscribe = function (resourceId, labelId, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_5$t || (templateObject_5$t = __makeTemplateObject(["", "/issues/", "/subscribe"], ["", "/issues/", "/subscribe"])), resourceId, labelId), options);
+    };
+    ResourceLabels.prototype.unsubscribe = function (resourceId, labelId, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_6$h || (templateObject_6$h = __makeTemplateObject(["", "/issues/", "/unsubscribe"], ["", "/issues/", "/unsubscribe"])), resourceId, labelId), options);
+    };
+    return ResourceLabels;
+}(requesterUtils.BaseResource));
+var templateObject_1$O, templateObject_2$G, templateObject_3$D, templateObject_4$B, templateObject_5$t, templateObject_6$h;
+
+var ResourceMembers = /** @class */ (function (_super) {
+    __extends(ResourceMembers, _super);
+    function ResourceMembers(resourceType, options) {
+        return _super.call(this, __assign({ prefixUrl: resourceType }, options)) || this;
+    }
+    ResourceMembers.prototype.add = function (resourceId, userId, accessLevel, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_1$N || (templateObject_1$N = __makeTemplateObject(["", "/members"], ["", "/members"])), resourceId), __assign({ userId: String(userId), accessLevel: accessLevel }, options));
+    };
+    ResourceMembers.prototype.all = function (resourceId, _a) {
+        if (_a === void 0) { _a = {}; }
+        var includeInherited = _a.includeInherited, options = __rest(_a, ["includeInherited"]);
+        var rId = encodeURIComponent(resourceId);
+        var url = [rId, 'members'];
+        if (includeInherited)
+            url.push('all');
+        return RequestHelper.get()(this, url.join('/'), options);
+    };
+    ResourceMembers.prototype.edit = function (resourceId, userId, accessLevel, options) {
+        return RequestHelper.put()(this, endpoint(templateObject_2$F || (templateObject_2$F = __makeTemplateObject(["", "/members/", ""], ["", "/members/", ""])), resourceId, userId), __assign({ accessLevel: accessLevel }, options));
+    };
+    ResourceMembers.prototype.show = function (resourceId, userId, _a) {
+        if (_a === void 0) { _a = {}; }
+        var includeInherited = _a.includeInherited, options = __rest(_a, ["includeInherited"]);
+        var _b = __read([resourceId, userId].map(encodeURIComponent), 2), rId = _b[0], uId = _b[1];
+        var url = [rId, 'members'];
+        if (includeInherited)
+            url.push('all');
+        url.push(uId);
+        return RequestHelper.get()(this, url.join('/'), options);
+    };
+    ResourceMembers.prototype.remove = function (resourceId, userId, options) {
+        return RequestHelper.del()(this, endpoint(templateObject_3$C || (templateObject_3$C = __makeTemplateObject(["", "/members/", ""], ["", "/members/", ""])), resourceId, userId), options);
+    };
+    return ResourceMembers;
+}(requesterUtils.BaseResource));
+var templateObject_1$N, templateObject_2$F, templateObject_3$C;
+
+var ResourceMilestones = /** @class */ (function (_super) {
+    __extends(ResourceMilestones, _super);
+    function ResourceMilestones(resourceType, options) {
+        return _super.call(this, __assign({ prefixUrl: resourceType }, options)) || this;
+    }
+    ResourceMilestones.prototype.all = function (resourceId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_1$M || (templateObject_1$M = __makeTemplateObject(["", "/milestones"], ["", "/milestones"])), resourceId), options);
+    };
+    ResourceMilestones.prototype.create = function (resourceId, title, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_2$E || (templateObject_2$E = __makeTemplateObject(["", "/milestones"], ["", "/milestones"])), resourceId), __assign({ title: title }, options));
+    };
+    ResourceMilestones.prototype.edit = function (resourceId, milestoneId, options) {
+        return RequestHelper.put()(this, endpoint(templateObject_3$B || (templateObject_3$B = __makeTemplateObject(["", "/milestones/", ""], ["", "/milestones/", ""])), resourceId, milestoneId), options);
+    };
+    ResourceMilestones.prototype.issues = function (resourceId, milestoneId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_4$A || (templateObject_4$A = __makeTemplateObject(["", "/milestones/", "/issues"], ["", "/milestones/", "/issues"])), resourceId, milestoneId), options);
+    };
+    ResourceMilestones.prototype.mergeRequests = function (resourceId, milestoneId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_5$s || (templateObject_5$s = __makeTemplateObject(["", "/milestones/", "/merge_requests"], ["", "/milestones/", "/merge_requests"])), resourceId, milestoneId), options);
+    };
+    ResourceMilestones.prototype.show = function (resourceId, milestoneId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_6$g || (templateObject_6$g = __makeTemplateObject(["", "/milestones/", ""], ["", "/milestones/", ""])), resourceId, milestoneId), options);
+    };
+    return ResourceMilestones;
+}(requesterUtils.BaseResource));
+var templateObject_1$M, templateObject_2$E, templateObject_3$B, templateObject_4$A, templateObject_5$s, templateObject_6$g;
+
+var ResourceNotes = /** @class */ (function (_super) {
+    __extends(ResourceNotes, _super);
+    function ResourceNotes(resourceType, resource2Type, options) {
+        var _this = _super.call(this, __assign({ prefixUrl: resourceType }, options)) || this;
+        _this.resource2Type = resource2Type;
+        return _this;
+    }
+    ResourceNotes.prototype.all = function (resourceId, resource2Id, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_1$L || (templateObject_1$L = __makeTemplateObject(["", "/", "/", "/notes"], ["", "/", "/", "/notes"])), resourceId, this.resource2Type, resource2Id), options);
+    };
+    ResourceNotes.prototype.create = function (resourceId, resource2Id, body, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_2$D || (templateObject_2$D = __makeTemplateObject(["", "/", "/", "/notes"], ["", "/", "/", "/notes"])), resourceId, this.resource2Type, resource2Id), __assign({ body: body }, options));
+    };
+    ResourceNotes.prototype.edit = function (resourceId, resource2Id, noteId, body, options) {
+        return RequestHelper.put()(this, endpoint(templateObject_3$A || (templateObject_3$A = __makeTemplateObject(["", "/", "/", "/notes/", ""], ["", "/", "/", "/notes/", ""])), resourceId, this.resource2Type, resource2Id, noteId), __assign({ body: body }, options));
+    };
+    ResourceNotes.prototype.remove = function (resourceId, resource2Id, noteId, options) {
+        return RequestHelper.del()(this, endpoint(templateObject_4$z || (templateObject_4$z = __makeTemplateObject(["", "/", "/", "/notes/", ""], ["", "/", "/", "/notes/", ""])), resourceId, this.resource2Type, resource2Id, noteId), options);
+    };
+    ResourceNotes.prototype.show = function (resourceId, resource2Id, noteId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_5$r || (templateObject_5$r = __makeTemplateObject(["", "/", "/", "/notes/", ""], ["", "/", "/", "/notes/", ""])), resourceId, this.resource2Type, resource2Id, noteId), options);
+    };
+    return ResourceNotes;
+}(requesterUtils.BaseResource));
+var templateObject_1$L, templateObject_2$D, templateObject_3$A, templateObject_4$z, templateObject_5$r;
+
+var ResourceTemplates = /** @class */ (function (_super) {
+    __extends(ResourceTemplates, _super);
+    function ResourceTemplates(resourceType, options) {
+        return _super.call(this, __assign({ prefixUrl: ['templates', resourceType].join('/') }, options)) || this;
+    }
+    ResourceTemplates.prototype.all = function (options) {
+        return RequestHelper.get()(this, '', options);
+    };
+    ResourceTemplates.prototype.show = function (key, options) {
+        return RequestHelper.get()(this, encodeURIComponent(key), options);
+    };
+    return ResourceTemplates;
+}(requesterUtils.BaseResource));
+
+var ResourceVariables = /** @class */ (function (_super) {
+    __extends(ResourceVariables, _super);
+    function ResourceVariables(resourceType, options) {
+        return _super.call(this, __assign({ prefixUrl: resourceType }, options)) || this;
+    }
+    ResourceVariables.prototype.all = function (resourceId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_1$K || (templateObject_1$K = __makeTemplateObject(["", "/variables"], ["", "/variables"])), resourceId), options);
+    };
+    ResourceVariables.prototype.create = function (resourceId, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_2$C || (templateObject_2$C = __makeTemplateObject(["", "/variables"], ["", "/variables"])), resourceId), options);
+    };
+    ResourceVariables.prototype.edit = function (resourceId, keyId, options) {
+        return RequestHelper.put()(this, endpoint(templateObject_3$z || (templateObject_3$z = __makeTemplateObject(["", "/variables/", ""], ["", "/variables/", ""])), resourceId, keyId), options);
+    };
+    ResourceVariables.prototype.show = function (resourceId, keyId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_4$y || (templateObject_4$y = __makeTemplateObject(["", "/variables/", ""], ["", "/variables/", ""])), resourceId, keyId), options);
+    };
+    ResourceVariables.prototype.remove = function (resourceId, keyId, options) {
+        return RequestHelper.del()(this, endpoint(templateObject_5$q || (templateObject_5$q = __makeTemplateObject(["", "/variables/", ""], ["", "/variables/", ""])), resourceId, keyId), options);
+    };
+    return ResourceVariables;
+}(requesterUtils.BaseResource));
+var templateObject_1$K, templateObject_2$C, templateObject_3$z, templateObject_4$y, templateObject_5$q;
+
+var GroupAccessRequests = /** @class */ (function (_super) {
+    __extends(GroupAccessRequests, _super);
+    function GroupAccessRequests(options) {
+        /* istanbul ignore next */
+        return _super.call(this, 'groups', options) || this;
+    }
+    return GroupAccessRequests;
+}(ResourceAccessRequests));
+
+var GroupBadges = /** @class */ (function (_super) {
+    __extends(GroupBadges, _super);
+    function GroupBadges(options) {
+        /* istanbul ignore next */
+        return _super.call(this, 'groups', options) || this;
+    }
+    return GroupBadges;
+}(ResourceBadges));
+
+var GroupCustomAttributes = /** @class */ (function (_super) {
+    __extends(GroupCustomAttributes, _super);
+    function GroupCustomAttributes(options) {
+        /* istanbul ignore next */
+        return _super.call(this, 'groups', options) || this;
+    }
+    return GroupCustomAttributes;
+}(ResourceCustomAttributes));
+
+var GroupIssueBoards = /** @class */ (function (_super) {
+    __extends(GroupIssueBoards, _super);
+    function GroupIssueBoards(options) {
+        /* istanbul ignore next */
+        return _super.call(this, 'groups', options) || this;
+    }
+    return GroupIssueBoards;
+}(ResourceIssueBoards));
+
+var GroupMembers = /** @class */ (function (_super) {
+    __extends(GroupMembers, _super);
+    function GroupMembers(options) {
+        /* istanbul ignore next */
+        return _super.call(this, 'groups', options) || this;
+    }
+    return GroupMembers;
+}(ResourceMembers));
+
+var GroupMilestones = /** @class */ (function (_super) {
+    __extends(GroupMilestones, _super);
+    function GroupMilestones(options) {
+        /* istanbul ignore next */
+        return _super.call(this, 'groups', options) || this;
+    }
+    return GroupMilestones;
+}(ResourceMilestones));
+
+var GroupRunners = /** @class */ (function (_super) {
+    __extends(GroupRunners, _super);
+    function GroupRunners() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    GroupRunners.prototype.all = function (groupId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_1$J || (templateObject_1$J = __makeTemplateObject(["groups/", "/runners"], ["groups/", "/runners"])), groupId), options);
+    };
+    return GroupRunners;
+}(requesterUtils.BaseResource));
+var templateObject_1$J;
+
+var GroupVariables = /** @class */ (function (_super) {
+    __extends(GroupVariables, _super);
+    function GroupVariables(options) {
+        /* istanbul ignore next */
+        return _super.call(this, 'groups', options) || this;
+    }
+    return GroupVariables;
+}(ResourceVariables));
+
+var GroupLabels = /** @class */ (function (_super) {
+    __extends(GroupLabels, _super);
+    function GroupLabels(options) {
+        /* istanbul ignore next */
+        return _super.call(this, 'groups', options) || this;
+    }
+    return GroupLabels;
+}(ResourceLabels));
+
+var GroupDeployTokens = /** @class */ (function (_super) {
+    __extends(GroupDeployTokens, _super);
+    function GroupDeployTokens(options) {
+        /* istanbul ignore next */
+        return _super.call(this, 'groups', options) || this;
+    }
+    return GroupDeployTokens;
+}(ResourceDeployTokens));
+
+var Epics = /** @class */ (function (_super) {
+    __extends(Epics, _super);
+    function Epics() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Epics.prototype.all = function (groupId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_1$I || (templateObject_1$I = __makeTemplateObject(["groups/", "/epics"], ["groups/", "/epics"])), groupId), options);
+    };
+    Epics.prototype.create = function (groupId, title, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_2$B || (templateObject_2$B = __makeTemplateObject(["groups/", "/epics"], ["groups/", "/epics"])), groupId), __assign({ title: title }, options));
+    };
+    Epics.prototype.edit = function (groupId, epicId, options) {
+        return RequestHelper.put()(this, endpoint(templateObject_3$y || (templateObject_3$y = __makeTemplateObject(["groups/", "/epics/", ""], ["groups/", "/epics/", ""])), groupId, epicId), options);
+    };
+    Epics.prototype.remove = function (groupId, epicId, options) {
+        return RequestHelper.del()(this, endpoint(templateObject_4$x || (templateObject_4$x = __makeTemplateObject(["groups/", "/epics/", ""], ["groups/", "/epics/", ""])), groupId, epicId), options);
+    };
+    Epics.prototype.show = function (groupId, epicId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_5$p || (templateObject_5$p = __makeTemplateObject(["groups/", "/epics/", ""], ["groups/", "/epics/", ""])), groupId, epicId), options);
+    };
+    return Epics;
+}(requesterUtils.BaseResource));
+var templateObject_1$I, templateObject_2$B, templateObject_3$y, templateObject_4$x, templateObject_5$p;
+
+var EpicIssues = /** @class */ (function (_super) {
+    __extends(EpicIssues, _super);
+    function EpicIssues() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    EpicIssues.prototype.all = function (groupId, epicIId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_1$H || (templateObject_1$H = __makeTemplateObject(["groups/", "/epics/", "/issues"], ["groups/", "/epics/", "/issues"])), groupId, epicIId), options);
+    };
+    EpicIssues.prototype.assign = function (groupId, epicIId, epicIssueId, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_2$A || (templateObject_2$A = __makeTemplateObject(["groups/", "/epics/", "/issues/", ""], ["groups/", "/epics/", "/issues/", ""])), groupId, epicIId, epicIssueId), options);
+    };
+    EpicIssues.prototype.edit = function (groupId, epicIId, epicIssueId, options) {
+        return RequestHelper.put()(this, endpoint(templateObject_3$x || (templateObject_3$x = __makeTemplateObject(["groups/", "/epics/", "/issues/", ""], ["groups/", "/epics/", "/issues/", ""])), groupId, epicIId, epicIssueId), options);
+    };
+    EpicIssues.prototype.remove = function (groupId, epicIId, epicIssueId, options) {
+        return RequestHelper.del()(this, endpoint(templateObject_4$w || (templateObject_4$w = __makeTemplateObject(["groups/", "/epics/", "/issues/", ""], ["groups/", "/epics/", "/issues/", ""])), groupId, epicIId, epicIssueId), options);
+    };
+    return EpicIssues;
+}(requesterUtils.BaseResource));
+var templateObject_1$H, templateObject_2$A, templateObject_3$x, templateObject_4$w;
+
+var EpicNotes = /** @class */ (function (_super) {
+    __extends(EpicNotes, _super);
+    function EpicNotes(options) {
+        /* istanbul ignore next */
+        return _super.call(this, 'groups', 'epics', options) || this;
+    }
+    return EpicNotes;
+}(ResourceNotes));
+
+var EpicDiscussions = /** @class */ (function (_super) {
+    __extends(EpicDiscussions, _super);
+    function EpicDiscussions(options) {
+        /* istanbul ignore next */
+        return _super.call(this, 'groups', 'epics', options) || this;
+    }
+    return EpicDiscussions;
+}(ResourceDiscussions));
+
+var Users = /** @class */ (function (_super) {
+    __extends(Users, _super);
+    function Users() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Users.prototype.all = function (options) {
+        return RequestHelper.get()(this, 'users', options);
+    };
+    Users.prototype.activities = function (options) {
+        return RequestHelper.get()(this, 'users/activities', options);
+    };
+    Users.prototype.projects = function (userId, options) {
+        return RequestHelper.get()(this, "users/".concat(userId, "/projects"), options);
+    };
+    Users.prototype.block = function (userId, options) {
+        return RequestHelper.post()(this, "users/".concat(userId, "/block"), options);
+    };
+    Users.prototype.create = function (options) {
+        return RequestHelper.post()(this, 'users', options);
+    };
+    Users.prototype.current = function (options) {
+        return RequestHelper.get()(this, 'user', options);
+    };
+    Users.prototype.edit = function (userId, options) {
+        return RequestHelper.put()(this, "users/".concat(userId), options);
+    };
+    Users.prototype.events = function (userId, options) {
+        return RequestHelper.get()(this, "users/".concat(userId, "/events"), options);
+    };
+    Users.prototype.search = function (emailOrUsername, options) {
+        return RequestHelper.get()(this, 'users', __assign({ search: emailOrUsername }, options));
+    };
+    Users.prototype.show = function (userId, options) {
+        return RequestHelper.get()(this, "users/".concat(userId), options);
+    };
+    Users.prototype.remove = function (userId, options) {
+        return RequestHelper.del()(this, "users/".concat(userId), options);
+    };
+    Users.prototype.unblock = function (userId, options) {
+        return RequestHelper.post()(this, "users/".concat(userId, "/unblock"), options);
+    };
+    Users.prototype.username = function (username, options) {
+        return RequestHelper.get()(this, 'users', __assign({ username: username }, options));
+    };
+    return Users;
+}(requesterUtils.BaseResource));
+
+var UserCustomAttributes = /** @class */ (function (_super) {
+    __extends(UserCustomAttributes, _super);
+    function UserCustomAttributes(options) {
+        /* istanbul ignore next */
+        return _super.call(this, 'users', options) || this;
+    }
+    return UserCustomAttributes;
+}(ResourceCustomAttributes));
+
+var url$3 = function (userId) { return (userId ? "users/".concat(userId, "/emails") : 'user/emails'); };
+var UserEmails = /** @class */ (function (_super) {
+    __extends(UserEmails, _super);
+    function UserEmails() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    UserEmails.prototype.all = function (_a) {
+        if (_a === void 0) { _a = {}; }
+        var userId = _a.userId, options = __rest(_a, ["userId"]);
+        return RequestHelper.get()(this, url$3(userId), options);
+    };
+    UserEmails.prototype.add = function (email, _a) {
+        if (_a === void 0) { _a = {}; }
+        var userId = _a.userId, options = __rest(_a, ["userId"]);
+        return RequestHelper.post()(this, url$3(userId), __assign({ email: email }, options));
+    };
+    UserEmails.prototype.show = function (emailId, options) {
+        return RequestHelper.get()(this, "user/emails/".concat(emailId), options);
+    };
+    UserEmails.prototype.remove = function (emailId, _a) {
+        if (_a === void 0) { _a = {}; }
+        var userId = _a.userId, options = __rest(_a, ["userId"]);
+        var eId = encodeURIComponent(emailId);
+        return RequestHelper.del()(this, "".concat(url$3(userId), "/").concat(eId), options);
+    };
+    return UserEmails;
+}(requesterUtils.BaseResource));
+
+var UserImpersonationTokens = /** @class */ (function (_super) {
+    __extends(UserImpersonationTokens, _super);
+    function UserImpersonationTokens() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    UserImpersonationTokens.prototype.all = function (userId, options) {
+        return RequestHelper.get()(this, "users/".concat(userId, "/impersonation_tokens"), options);
+    };
+    // TODO: change required params
+    UserImpersonationTokens.prototype.add = function (userId, name, scopes, expiresAt, options) {
+        return RequestHelper.post()(this, "users/".concat(userId, "/impersonation_tokens"), __assign({ name: name, expiresAt: expiresAt, scopes: scopes }, options));
+    };
+    UserImpersonationTokens.prototype.show = function (userId, tokenId, options) {
+        return RequestHelper.get()(this, "users/".concat(userId, "/impersonation_tokens/").concat(tokenId), options);
+    };
+    UserImpersonationTokens.prototype.revoke = function (userId, tokenId, options) {
+        return RequestHelper.del()(this, "users/".concat(userId, "/impersonation_tokens/").concat(tokenId), options);
+    };
+    return UserImpersonationTokens;
+}(requesterUtils.BaseResource));
+
+var url$2 = function (userId) { return (userId ? "users/".concat(userId, "/keys") : 'user/keys'); };
+var UserSSHKeys = /** @class */ (function (_super) {
+    __extends(UserSSHKeys, _super);
+    function UserSSHKeys() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    UserSSHKeys.prototype.all = function (_a) {
+        if (_a === void 0) { _a = {}; }
+        var userId = _a.userId, options = __rest(_a, ["userId"]);
+        return RequestHelper.get()(this, url$2(userId), options);
+    };
+    UserSSHKeys.prototype.create = function (title, key, _a) {
+        if (_a === void 0) { _a = {}; }
+        var userId = _a.userId, options = __rest(_a, ["userId"]);
+        return RequestHelper.post()(this, url$2(userId), __assign({ title: title, key: key }, options));
+    };
+    UserSSHKeys.prototype.show = function (keyId, _a) {
+        if (_a === void 0) { _a = {}; }
+        var userId = _a.userId, options = __rest(_a, ["userId"]);
+        var kId = encodeURIComponent(keyId);
+        return RequestHelper.get()(this, "".concat(url$2(userId), "/").concat(kId), options);
+    };
+    UserSSHKeys.prototype.remove = function (keyId, _a) {
+        if (_a === void 0) { _a = {}; }
+        var userId = _a.userId, options = __rest(_a, ["userId"]);
+        var kId = encodeURIComponent(keyId);
+        return RequestHelper.del()(this, "".concat(url$2(userId), "/").concat(kId), options);
+    };
+    return UserSSHKeys;
+}(requesterUtils.BaseResource));
+
+var url$1 = function (userId) { return (userId ? "users/".concat(userId, "/gpg_keys") : 'user/gpg_keys'); };
+var UserGPGKeys = /** @class */ (function (_super) {
+    __extends(UserGPGKeys, _super);
+    function UserGPGKeys() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    UserGPGKeys.prototype.all = function (_a) {
+        if (_a === void 0) { _a = {}; }
+        var userId = _a.userId, options = __rest(_a, ["userId"]);
+        return RequestHelper.get()(this, url$1(userId), options);
+    };
+    UserGPGKeys.prototype.add = function (key, _a) {
+        if (_a === void 0) { _a = {}; }
+        var userId = _a.userId, options = __rest(_a, ["userId"]);
+        return RequestHelper.post()(this, url$1(userId), __assign({ key: key }, options));
+    };
+    UserGPGKeys.prototype.show = function (keyId, _a) {
+        if (_a === void 0) { _a = {}; }
+        var userId = _a.userId, options = __rest(_a, ["userId"]);
+        var kId = encodeURIComponent(keyId);
+        return RequestHelper.get()(this, "".concat(url$1(userId), "/").concat(kId), options);
+    };
+    UserGPGKeys.prototype.remove = function (keyId, _a) {
+        if (_a === void 0) { _a = {}; }
+        var userId = _a.userId, options = __rest(_a, ["userId"]);
+        var kId = encodeURIComponent(keyId);
+        return RequestHelper.del()(this, "".concat(url$1(userId), "/").concat(kId), options);
+    };
+    return UserGPGKeys;
+}(requesterUtils.BaseResource));
+
+var Branches = /** @class */ (function (_super) {
+    __extends(Branches, _super);
+    function Branches() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Branches.prototype.all = function (projectId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_1$G || (templateObject_1$G = __makeTemplateObject(["projects/", "/repository/branches"], ["projects/", "/repository/branches"])), projectId), options);
+    };
+    Branches.prototype.create = function (projectId, branchName, ref, options) {
+        var _a;
+        var branchKey = this.url.includes('v3') ? 'branchName' : 'branch';
+        return RequestHelper.post()(this, endpoint(templateObject_2$z || (templateObject_2$z = __makeTemplateObject(["projects/", "/repository/branches"], ["projects/", "/repository/branches"])), projectId), __assign((_a = {}, _a[branchKey] = branchName, _a.ref = ref, _a), options));
+    };
+    Branches.prototype.remove = function (projectId, branchName, options) {
+        return RequestHelper.del()(this, endpoint(templateObject_3$w || (templateObject_3$w = __makeTemplateObject(["projects/", "/repository/branches/", ""], ["projects/", "/repository/branches/", ""])), projectId, branchName), options);
+    };
+    Branches.prototype.show = function (projectId, branchName, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_4$v || (templateObject_4$v = __makeTemplateObject(["projects/", "/repository/branches/", ""], ["projects/", "/repository/branches/", ""])), projectId, branchName), options);
+    };
+    return Branches;
+}(requesterUtils.BaseResource));
+var templateObject_1$G, templateObject_2$z, templateObject_3$w, templateObject_4$v;
+
+var Commits = /** @class */ (function (_super) {
+    __extends(Commits, _super);
+    function Commits() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Commits.prototype.all = function (projectId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_1$F || (templateObject_1$F = __makeTemplateObject(["projects/", "/repository/commits"], ["projects/", "/repository/commits"])), projectId), options);
+    };
+    Commits.prototype.cherryPick = function (projectId, sha, branch, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_2$y || (templateObject_2$y = __makeTemplateObject(["projects/", "/repository/commits/", "/cherry_pick"], ["projects/", "/repository/commits/", "/cherry_pick"])), projectId, sha), __assign({ branch: branch }, options));
+    };
+    Commits.prototype.comments = function (projectId, sha, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_3$v || (templateObject_3$v = __makeTemplateObject(["projects/", "/repository/commits/", "/comments"], ["projects/", "/repository/commits/", "/comments"])), projectId, sha), options);
+    };
+    Commits.prototype.create = function (projectId, branch, message, actions, options) {
+        if (actions === void 0) { actions = []; }
+        if (options === void 0) { options = {}; }
+        return RequestHelper.post()(this, endpoint(templateObject_4$u || (templateObject_4$u = __makeTemplateObject(["projects/", "/repository/commits"], ["projects/", "/repository/commits"])), projectId), __assign({ branch: branch, commitMessage: message, actions: actions }, options));
+    };
+    Commits.prototype.createComment = function (projectId, sha, note, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_5$o || (templateObject_5$o = __makeTemplateObject(["projects/", "/repository/commits/", "/comments"], ["projects/", "/repository/commits/", "/comments"])), projectId, sha), __assign({ note: note }, options));
+    };
+    Commits.prototype.diff = function (projectId, sha, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_6$f || (templateObject_6$f = __makeTemplateObject(["projects/", "/repository/commits/", "/diff"], ["projects/", "/repository/commits/", "/diff"])), projectId, sha), options);
+    };
+    Commits.prototype.editStatus = function (projectId, sha, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_7$9 || (templateObject_7$9 = __makeTemplateObject(["projects/", "/statuses/", ""], ["projects/", "/statuses/", ""])), projectId, sha), options);
+    };
+    Commits.prototype.references = function (projectId, sha, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_8$6 || (templateObject_8$6 = __makeTemplateObject(["projects/", "/repository/commits/", "/refs"], ["projects/", "/repository/commits/", "/refs"])), projectId, sha), options);
+    };
+    Commits.prototype.revert = function (projectId, sha, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_9$5 || (templateObject_9$5 = __makeTemplateObject(["projects/", "/repository/commits/", "/revert"], ["projects/", "/repository/commits/", "/revert"])), projectId, sha), options);
+    };
+    Commits.prototype.show = function (projectId, sha, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_10$4 || (templateObject_10$4 = __makeTemplateObject(["projects/", "/repository/commits/", ""], ["projects/", "/repository/commits/", ""])), projectId, sha), options);
+    };
+    Commits.prototype.statuses = function (projectId, sha, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_11$4 || (templateObject_11$4 = __makeTemplateObject(["projects/", "/repository/commits/", "/statuses"], ["projects/", "/repository/commits/", "/statuses"])), projectId, sha), options);
+    };
+    Commits.prototype.mergeRequests = function (projectId, sha, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_12$4 || (templateObject_12$4 = __makeTemplateObject(["projects/", "/repository/commits/", "/merge_requests"], ["projects/", "/repository/commits/", "/merge_requests"])), projectId, sha), options);
+    };
+    Commits.prototype.signature = function (projectId, sha, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_13$4 || (templateObject_13$4 = __makeTemplateObject(["projects/", "/repository/commits/", "/signature"], ["projects/", "/repository/commits/", "/signature"])), projectId, sha), options);
+    };
+    return Commits;
+}(requesterUtils.BaseResource));
+var templateObject_1$F, templateObject_2$y, templateObject_3$v, templateObject_4$u, templateObject_5$o, templateObject_6$f, templateObject_7$9, templateObject_8$6, templateObject_9$5, templateObject_10$4, templateObject_11$4, templateObject_12$4, templateObject_13$4;
+
+var CommitDiscussions = /** @class */ (function (_super) {
+    __extends(CommitDiscussions, _super);
+    function CommitDiscussions(options) {
+        /* istanbul ignore next */
+        return _super.call(this, 'projects', 'repository/commits', options) || this;
+    }
+    return CommitDiscussions;
+}(ResourceDiscussions));
+
+var ContainerRegistry = /** @class */ (function (_super) {
+    __extends(ContainerRegistry, _super);
+    function ContainerRegistry() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    ContainerRegistry.prototype.projectRepositories = function (projectId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_1$E || (templateObject_1$E = __makeTemplateObject(["projects/", "/registry/repositories"], ["projects/", "/registry/repositories"])), projectId), options);
+    };
+    ContainerRegistry.prototype.groupRepositories = function (projectId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_2$x || (templateObject_2$x = __makeTemplateObject(["groups/", "/registry/repositories"], ["groups/", "/registry/repositories"])), projectId), options);
+    };
+    ContainerRegistry.prototype.showRepository = function (projectId, repositoryId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_3$u || (templateObject_3$u = __makeTemplateObject(["projects/", "/registry/repositories/", ""], ["projects/", "/registry/repositories/", ""])), projectId, repositoryId), options);
+    };
+    ContainerRegistry.prototype.tags = function (projectId, repositoryId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_4$t || (templateObject_4$t = __makeTemplateObject(["projects/", "/registry/repositories/", "/tags"], ["projects/", "/registry/repositories/", "/tags"])), projectId, repositoryId), options);
+    };
+    ContainerRegistry.prototype.removeRepository = function (projectId, repositoryId, options) {
+        return RequestHelper.del()(this, endpoint(templateObject_5$n || (templateObject_5$n = __makeTemplateObject(["projects/", "/registry/repositories/", ""], ["projects/", "/registry/repositories/", ""])), projectId, repositoryId), options);
+    };
+    ContainerRegistry.prototype.removeTag = function (projectId, repositoryId, tagName, options) {
+        return RequestHelper.del()(this, endpoint(templateObject_6$e || (templateObject_6$e = __makeTemplateObject(["projects/", "/registry/repositories/", "/tags/", ""], ["projects/", "/registry/repositories/", "/tags/", ""])), projectId, repositoryId, tagName), options);
+    };
+    ContainerRegistry.prototype.removeTags = function (projectId, repositoryId, nameRegexDelete, options) {
+        return RequestHelper.del()(this, endpoint(templateObject_7$8 || (templateObject_7$8 = __makeTemplateObject(["projects/", "/registry/repositories/", "/tags"], ["projects/", "/registry/repositories/", "/tags"])), projectId, repositoryId), __assign({ nameRegexDelete: nameRegexDelete }, options));
+    };
+    ContainerRegistry.prototype.showTag = function (projectId, repositoryId, tagName, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_8$5 || (templateObject_8$5 = __makeTemplateObject(["projects/", "/registry/repositories/", "/tags/", ""], ["projects/", "/registry/repositories/", "/tags/", ""])), projectId, repositoryId, tagName), options);
+    };
+    return ContainerRegistry;
+}(requesterUtils.BaseResource));
+var templateObject_1$E, templateObject_2$x, templateObject_3$u, templateObject_4$t, templateObject_5$n, templateObject_6$e, templateObject_7$8, templateObject_8$5;
+
+var Deployments = /** @class */ (function (_super) {
+    __extends(Deployments, _super);
+    function Deployments() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Deployments.prototype.all = function (projectId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_1$D || (templateObject_1$D = __makeTemplateObject(["projects/", "/deployments"], ["projects/", "/deployments"])), projectId), options);
+    };
+    Deployments.prototype.create = function (projectId, environment, sha, ref, tag, status, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_2$w || (templateObject_2$w = __makeTemplateObject(["projects/", "/deployments"], ["projects/", "/deployments"])), projectId), __assign({ environment: environment, sha: sha, ref: ref, tag: tag, status: status }, options));
+    };
+    Deployments.prototype.edit = function (projectId, deploymentId, status, options) {
+        return RequestHelper.put()(this, endpoint(templateObject_3$t || (templateObject_3$t = __makeTemplateObject(["projects/", "/deployments/", ""], ["projects/", "/deployments/", ""])), projectId, deploymentId), __assign({ status: status }, options));
+    };
+    Deployments.prototype.show = function (projectId, deploymentId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_4$s || (templateObject_4$s = __makeTemplateObject(["projects/", "/deployments/", ""], ["projects/", "/deployments/", ""])), projectId, deploymentId), options);
+    };
+    Deployments.prototype.mergeRequests = function (projectId, deploymentId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_5$m || (templateObject_5$m = __makeTemplateObject(["projects/", "/deployments/", "/merge_requests"], ["projects/", "/deployments/", "/merge_requests"])), projectId, deploymentId), options);
+    };
+    return Deployments;
+}(requesterUtils.BaseResource));
+var templateObject_1$D, templateObject_2$w, templateObject_3$t, templateObject_4$s, templateObject_5$m;
+
+var DeployKeys = /** @class */ (function (_super) {
+    __extends(DeployKeys, _super);
+    function DeployKeys() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    DeployKeys.prototype.add = function (projectId, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_1$C || (templateObject_1$C = __makeTemplateObject(["projects/", "/deploy_keys"], ["projects/", "/deploy_keys"])), projectId), options);
+    };
+    DeployKeys.prototype.all = function (_a) {
+        if (_a === void 0) { _a = {}; }
+        var projectId = _a.projectId, options = __rest(_a, ["projectId"]);
+        var url;
+        if (projectId) {
+            url = endpoint(templateObject_2$v || (templateObject_2$v = __makeTemplateObject(["projects/", "/deploy_keys"], ["projects/", "/deploy_keys"])), projectId);
+        }
+        else {
+            url = 'deploy_keys';
+        }
+        return RequestHelper.get()(this, url, options);
+    };
+    DeployKeys.prototype.edit = function (projectId, keyId, options) {
+        return RequestHelper.put()(this, endpoint(templateObject_3$s || (templateObject_3$s = __makeTemplateObject(["projects/", "/deploy_keys/", ""], ["projects/", "/deploy_keys/", ""])), projectId, keyId), options);
+    };
+    DeployKeys.prototype.enable = function (projectId, keyId, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_4$r || (templateObject_4$r = __makeTemplateObject(["projects/", "/deploy_keys/", "/enable"], ["projects/", "/deploy_keys/", "/enable"])), projectId, keyId), options);
+    };
+    DeployKeys.prototype.remove = function (projectId, keyId, options) {
+        return RequestHelper.del()(this, endpoint(templateObject_5$l || (templateObject_5$l = __makeTemplateObject(["projects/", "/deploy_keys/", ""], ["projects/", "/deploy_keys/", ""])), projectId, keyId), options);
+    };
+    DeployKeys.prototype.show = function (projectId, keyId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_6$d || (templateObject_6$d = __makeTemplateObject(["projects/", "/deploy_keys/", ""], ["projects/", "/deploy_keys/", ""])), projectId, keyId), options);
+    };
+    return DeployKeys;
+}(requesterUtils.BaseResource));
+var templateObject_1$C, templateObject_2$v, templateObject_3$s, templateObject_4$r, templateObject_5$l, templateObject_6$d;
+
+var Environments = /** @class */ (function (_super) {
+    __extends(Environments, _super);
+    function Environments() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Environments.prototype.all = function (projectId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_1$B || (templateObject_1$B = __makeTemplateObject(["projects/", "/environments"], ["projects/", "/environments"])), projectId), options);
+    };
+    Environments.prototype.show = function (projectId, environmentId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_2$u || (templateObject_2$u = __makeTemplateObject(["projects/", "/environments/", ""], ["projects/", "/environments/", ""])), projectId, environmentId), options);
+    };
+    Environments.prototype.create = function (projectId, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_3$r || (templateObject_3$r = __makeTemplateObject(["projects/", "/environments"], ["projects/", "/environments"])), projectId), options);
+    };
+    Environments.prototype.edit = function (projectId, environmentId, options) {
+        return RequestHelper.put()(this, endpoint(templateObject_4$q || (templateObject_4$q = __makeTemplateObject(["projects/", "/environments/", ""], ["projects/", "/environments/", ""])), projectId, environmentId), options);
+    };
+    Environments.prototype.remove = function (projectId, environmentId, options) {
+        return RequestHelper.del()(this, endpoint(templateObject_5$k || (templateObject_5$k = __makeTemplateObject(["projects/", "/environments/", ""], ["projects/", "/environments/", ""])), projectId, environmentId), options);
+    };
+    Environments.prototype.stop = function (projectId, environmentId, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_6$c || (templateObject_6$c = __makeTemplateObject(["projects/", "/environments/", "/stop"], ["projects/", "/environments/", "/stop"])), projectId, environmentId), options);
+    };
+    return Environments;
+}(requesterUtils.BaseResource));
+var templateObject_1$B, templateObject_2$u, templateObject_3$r, templateObject_4$q, templateObject_5$k, templateObject_6$c;
+
+var FreezePeriods = /** @class */ (function (_super) {
+    __extends(FreezePeriods, _super);
+    function FreezePeriods() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    FreezePeriods.prototype.all = function (projectId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_1$A || (templateObject_1$A = __makeTemplateObject(["projects/", "/freeze_periods"], ["projects/", "/freeze_periods"])), projectId), options);
+    };
+    FreezePeriods.prototype.show = function (projectId, freezePeriodId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_2$t || (templateObject_2$t = __makeTemplateObject(["projects/", "/freeze_periods/", ""], ["projects/", "/freeze_periods/", ""])), projectId, freezePeriodId), options);
+    };
+    FreezePeriods.prototype.create = function (projectId, freezeStart, freezeEnd, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_3$q || (templateObject_3$q = __makeTemplateObject(["projects/", "/freeze_periods"], ["projects/", "/freeze_periods"])), projectId), __assign({ freezeStart: freezeStart, freezeEnd: freezeEnd }, options));
+    };
+    FreezePeriods.prototype.edit = function (projectId, freezePeriodId, options) {
+        return RequestHelper.put()(this, endpoint(templateObject_4$p || (templateObject_4$p = __makeTemplateObject(["projects/", "/freeze_periods/", ""], ["projects/", "/freeze_periods/", ""])), projectId, freezePeriodId), options);
+    };
+    FreezePeriods.prototype.delete = function (projectId, freezePeriodId, options) {
+        return RequestHelper.del()(this, endpoint(templateObject_5$j || (templateObject_5$j = __makeTemplateObject(["projects/", "/freeze_periods/", ""], ["projects/", "/freeze_periods/", ""])), projectId, freezePeriodId), options);
+    };
+    return FreezePeriods;
+}(requesterUtils.BaseResource));
+var templateObject_1$A, templateObject_2$t, templateObject_3$q, templateObject_4$p, templateObject_5$j;
+
+var Issues = /** @class */ (function (_super) {
+    __extends(Issues, _super);
+    function Issues() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Issues.prototype.addSpentTime = function (projectId, issueIid, duration, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_1$z || (templateObject_1$z = __makeTemplateObject(["projects/", "/issues/", "/add_spent_time"], ["projects/", "/issues/", "/add_spent_time"])), projectId, issueIid), __assign({ duration: duration }, options));
+    };
+    Issues.prototype.addTimeEstimate = function (projectId, issueIid, duration, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_2$s || (templateObject_2$s = __makeTemplateObject(["projects/", "/issues/", "/time_estimate"], ["projects/", "/issues/", "/time_estimate"])), projectId, issueIid), __assign({ duration: duration }, options));
+    };
+    Issues.prototype.all = function (_a) {
+        if (_a === void 0) { _a = {}; }
+        var projectId = _a.projectId, groupId = _a.groupId, options = __rest(_a, ["projectId", "groupId"]);
+        var url;
+        if (projectId) {
+            url = endpoint(templateObject_3$p || (templateObject_3$p = __makeTemplateObject(["projects/", "/issues"], ["projects/", "/issues"])), projectId);
+        }
+        else if (groupId) {
+            url = endpoint(templateObject_4$o || (templateObject_4$o = __makeTemplateObject(["groups/", "/issues"], ["groups/", "/issues"])), groupId);
+        }
+        else {
+            url = 'issues';
+        }
+        return RequestHelper.get()(this, url, options);
+    };
+    Issues.prototype.create = function (projectId, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_5$i || (templateObject_5$i = __makeTemplateObject(["projects/", "/issues"], ["projects/", "/issues"])), projectId), options);
+    };
+    Issues.prototype.closedBy = function (projectId, issueIid, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_6$b || (templateObject_6$b = __makeTemplateObject(["projects/", "/issues/", "/closed_by"], ["projects/", "/issues/", "/closed_by"])), projectId, issueIid), options);
+    };
+    Issues.prototype.edit = function (projectId, issueIid, options) {
+        return RequestHelper.put()(this, endpoint(templateObject_7$7 || (templateObject_7$7 = __makeTemplateObject(["projects/", "/issues/", ""], ["projects/", "/issues/", ""])), projectId, issueIid), options);
+    };
+    // TODO move
+    Issues.prototype.link = function (projectId, issueIId, targetProjectId, targetIssueIId, options) {
+        var _a = __read([targetProjectId, targetIssueIId].map(encodeURIComponent), 2), targetPId = _a[0], targetIId = _a[1];
+        return RequestHelper.post()(this, endpoint(templateObject_8$4 || (templateObject_8$4 = __makeTemplateObject(["projects/", "/issues/", "/links"], ["projects/", "/issues/", "/links"])), projectId, issueIId), __assign({ targetProjectId: targetPId, targetIssueIid: targetIId }, options));
+    };
+    // TODO move
+    Issues.prototype.links = function (projectId, issueIid) {
+        return RequestHelper.get()(this, endpoint(templateObject_9$4 || (templateObject_9$4 = __makeTemplateObject(["projects/", "/issues/", "/links"], ["projects/", "/issues/", "/links"])), projectId, issueIid));
+    };
+    Issues.prototype.participants = function (projectId, issueIid, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_10$3 || (templateObject_10$3 = __makeTemplateObject(["projects/", "/issues/", "/participants"], ["projects/", "/issues/", "/participants"])), projectId, issueIid), options);
+    };
+    Issues.prototype.relatedMergeRequests = function (projectId, issueIid, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_11$3 || (templateObject_11$3 = __makeTemplateObject(["projects/", "/issues/", "/related_merge_requests"], ["projects/", "/issues/", "/related_merge_requests"])), projectId, issueIid), options);
+    };
+    // TODO move
+    Issues.prototype.removeLink = function (projectId, issueIid, issueLinkId, options) {
+        return RequestHelper.del()(this, endpoint(templateObject_12$3 || (templateObject_12$3 = __makeTemplateObject(["projects/", "/issues/", "/links/", ""], ["projects/", "/issues/", "/links/", ""])), projectId, issueIid, issueLinkId), options);
+    };
+    Issues.prototype.remove = function (projectId, issueIid, options) {
+        return RequestHelper.del()(this, endpoint(templateObject_13$3 || (templateObject_13$3 = __makeTemplateObject(["projects/", "/issues/", ""], ["projects/", "/issues/", ""])), projectId, issueIid), options);
+    };
+    Issues.prototype.resetSpentTime = function (projectId, issueIid, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_14$3 || (templateObject_14$3 = __makeTemplateObject(["projects/", "/issues/", "/reset_spent_time"], ["projects/", "/issues/", "/reset_spent_time"])), projectId, issueIid), options);
+    };
+    Issues.prototype.resetTimeEstimate = function (projectId, issueIid, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_15$3 || (templateObject_15$3 = __makeTemplateObject(["projects/", "/issues/", "/reset_time_estimate"], ["projects/", "/issues/", "/reset_time_estimate"])), projectId, issueIid), options);
+    };
+    Issues.prototype.show = function (projectId, issueIid, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_16$3 || (templateObject_16$3 = __makeTemplateObject(["projects/", "/issues/", ""], ["projects/", "/issues/", ""])), projectId, issueIid), options);
+    };
+    Issues.prototype.subscribe = function (projectId, issueIid, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_17$1 || (templateObject_17$1 = __makeTemplateObject(["projects/", "/issues/", "/subscribe"], ["projects/", "/issues/", "/subscribe"])), projectId, issueIid), options);
+    };
+    Issues.prototype.timeStats = function (projectId, issueIid, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_18$1 || (templateObject_18$1 = __makeTemplateObject(["projects/", "/issues/", "/time_stats"], ["projects/", "/issues/", "/time_stats"])), projectId, issueIid), options);
+    };
+    Issues.prototype.unsubscribe = function (projectId, issueIid, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_19$1 || (templateObject_19$1 = __makeTemplateObject(["projects/", "/issues/", "/unsubscribe"], ["projects/", "/issues/", "/unsubscribe"])), projectId, issueIid), options);
+    };
+    return Issues;
+}(requesterUtils.BaseResource));
+var templateObject_1$z, templateObject_2$s, templateObject_3$p, templateObject_4$o, templateObject_5$i, templateObject_6$b, templateObject_7$7, templateObject_8$4, templateObject_9$4, templateObject_10$3, templateObject_11$3, templateObject_12$3, templateObject_13$3, templateObject_14$3, templateObject_15$3, templateObject_16$3, templateObject_17$1, templateObject_18$1, templateObject_19$1;
+
+var IssuesStatistics = /** @class */ (function (_super) {
+    __extends(IssuesStatistics, _super);
+    function IssuesStatistics() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    IssuesStatistics.prototype.all = function (_a) {
+        if (_a === void 0) { _a = {}; }
+        var projectId = _a.projectId, groupId = _a.groupId, options = __rest(_a, ["projectId", "groupId"]);
+        var url;
+        if (projectId) {
+            url = endpoint(templateObject_1$y || (templateObject_1$y = __makeTemplateObject(["projects/", "/issues_statistics"], ["projects/", "/issues_statistics"])), projectId);
+        }
+        else if (groupId) {
+            url = endpoint(templateObject_2$r || (templateObject_2$r = __makeTemplateObject(["groups/", "/issues_statistics"], ["groups/", "/issues_statistics"])), groupId);
+        }
+        else {
+            url = 'issues_statistics';
+        }
+        return RequestHelper.get()(this, url, options);
+    };
+    return IssuesStatistics;
+}(requesterUtils.BaseResource));
+var templateObject_1$y, templateObject_2$r;
+
+var IssueNotes = /** @class */ (function (_super) {
+    __extends(IssueNotes, _super);
+    function IssueNotes(options) {
+        /* istanbul ignore next */
+        return _super.call(this, 'projects', 'issues', options) || this;
+    }
+    return IssueNotes;
+}(ResourceNotes));
+
+var IssueNoteAwardEmojis = /** @class */ (function (_super) {
+    __extends(IssueNoteAwardEmojis, _super);
+    function IssueNoteAwardEmojis(options) {
+        /* istanbul ignore next */
+        return _super.call(this, 'issues', options) || this;
+    }
+    return IssueNoteAwardEmojis;
+}(ResourceNoteAwardEmojis));
+
+var IssueDiscussions = /** @class */ (function (_super) {
+    __extends(IssueDiscussions, _super);
+    function IssueDiscussions(options) {
+        /* istanbul ignore next */
+        return _super.call(this, 'projects', 'issues', options) || this;
+    }
+    return IssueDiscussions;
+}(ResourceDiscussions));
+
+var IssueAwardEmojis = /** @class */ (function (_super) {
+    __extends(IssueAwardEmojis, _super);
+    function IssueAwardEmojis(options) {
+        /* istanbul ignore next */
+        return _super.call(this, 'issues', options) || this;
+    }
+    return IssueAwardEmojis;
+}(ResourceAwardEmojis));
+
+var Jobs = /** @class */ (function (_super) {
+    __extends(Jobs, _super);
+    function Jobs() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Jobs.prototype.all = function (projectId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_1$x || (templateObject_1$x = __makeTemplateObject(["projects/", "/jobs"], ["projects/", "/jobs"])), projectId), options);
+    };
+    Jobs.prototype.cancel = function (projectId, jobId, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_2$q || (templateObject_2$q = __makeTemplateObject(["projects/", "/jobs/", "/cancel"], ["projects/", "/jobs/", "/cancel"])), projectId, jobId), options);
+    };
+    // TODO move
+    Jobs.prototype.downloadSingleArtifactFile = function (projectId, jobId, artifactPath, _a) {
+        if (_a === void 0) { _a = {}; }
+        var _b = _a.stream, stream = _b === void 0 ? false : _b, options = __rest(_a, ["stream"]);
+        var _c = __read([projectId, jobId].map(encodeURIComponent), 2), pId = _c[0], jId = _c[1];
+        var url = "projects/".concat(pId, "/jobs/").concat(jId, "/artifacts/").concat(artifactPath);
+        if (stream) {
+            return RequestHelper.stream(this, url, options);
+        }
+        return RequestHelper.get()(this, url, options);
+    };
+    // TODO move
+    Jobs.prototype.downloadSingleArtifactFileFromRef = function (projectId, ref, artifactPath, jobName, _a) {
+        if (_a === void 0) { _a = {}; }
+        var _b = _a.stream, stream = _b === void 0 ? false : _b, options = __rest(_a, ["stream"]);
+        var _c = __read([projectId, ref, jobName].map(encodeURIComponent), 3), pId = _c[0], rId = _c[1], name = _c[2];
+        var url = "projects/".concat(pId, "/jobs/artifacts/").concat(rId, "/raw/").concat(artifactPath, "?job=").concat(name);
+        if (stream) {
+            return RequestHelper.stream(this, url, options);
+        }
+        return RequestHelper.get()(this, url, options);
+    };
+    // TODO move
+    Jobs.prototype.downloadLatestArtifactFile = function (projectId, ref, jobName, _a) {
+        if (_a === void 0) { _a = {}; }
+        var _b = _a.stream, stream = _b === void 0 ? false : _b, options = __rest(_a, ["stream"]);
+        var _c = __read([projectId, ref, jobName].map(encodeURIComponent), 3), pId = _c[0], rId = _c[1], name = _c[2];
+        var url = "projects/".concat(pId, "/jobs/artifacts/").concat(rId, "/download?job=").concat(name);
+        if (stream) {
+            return RequestHelper.stream(this, url, options);
+        }
+        return RequestHelper.get()(this, url, options);
+    };
+    Jobs.prototype.downloadTraceFile = function (projectId, jobId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_3$o || (templateObject_3$o = __makeTemplateObject(["projects/", "/jobs/", "/trace"], ["projects/", "/jobs/", "/trace"])), projectId, jobId), options);
+    };
+    Jobs.prototype.erase = function (projectId, jobId, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_4$n || (templateObject_4$n = __makeTemplateObject(["projects/", "/jobs/", "/erase"], ["projects/", "/jobs/", "/erase"])), projectId, jobId), options);
+    };
+    // TODO move
+    Jobs.prototype.eraseArtifacts = function (projectId, jobId, options) {
+        var _a = __read([projectId, jobId].map(encodeURIComponent), 2), pId = _a[0], jId = _a[1];
+        return RequestHelper.del()(this, "projects/".concat(pId, "/jobs/").concat(jId, "/artifacts"), options);
+    };
+    // TODO move
+    Jobs.prototype.keepArtifacts = function (projectId, jobId, options) {
+        var _a = __read([projectId, jobId].map(encodeURIComponent), 2), pId = _a[0], jId = _a[1];
+        return RequestHelper.post()(this, "projects/".concat(pId, "/jobs/").concat(jId, "/artifacts/keep"), options);
+    };
+    Jobs.prototype.play = function (projectId, jobId, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_5$h || (templateObject_5$h = __makeTemplateObject(["projects/", "/jobs/", "/play"], ["projects/", "/jobs/", "/play"])), projectId, jobId), options);
+    };
+    Jobs.prototype.retry = function (projectId, jobId, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_6$a || (templateObject_6$a = __makeTemplateObject(["projects/", "/jobs/", "/retry"], ["projects/", "/jobs/", "/retry"])), projectId, jobId), options);
+    };
+    Jobs.prototype.show = function (projectId, jobId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_7$6 || (templateObject_7$6 = __makeTemplateObject(["projects/", "/jobs/", ""], ["projects/", "/jobs/", ""])), projectId, jobId), options);
+    };
+    Jobs.prototype.showPipelineJobs = function (projectId, pipelineId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_8$3 || (templateObject_8$3 = __makeTemplateObject(["projects/", "/pipelines/", "/jobs"], ["projects/", "/pipelines/", "/jobs"])), projectId, pipelineId), options);
+    };
+    Jobs.prototype.showPipelineBridges = function (projectId, pipelineId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_9$3 || (templateObject_9$3 = __makeTemplateObject(["projects/", "/pipelines/", "/bridges"], ["projects/", "/pipelines/", "/bridges"])), projectId, pipelineId), options);
+    };
+    return Jobs;
+}(requesterUtils.BaseResource));
+var templateObject_1$x, templateObject_2$q, templateObject_3$o, templateObject_4$n, templateObject_5$h, templateObject_6$a, templateObject_7$6, templateObject_8$3, templateObject_9$3;
+
+var Labels = /** @class */ (function (_super) {
+    __extends(Labels, _super);
+    function Labels(options) {
+        /* istanbul ignore next */
+        return _super.call(this, 'projects', options) || this;
+    }
+    return Labels;
+}(ResourceLabels));
+
+var MergeRequests = /** @class */ (function (_super) {
+    __extends(MergeRequests, _super);
+    function MergeRequests() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    MergeRequests.prototype.accept = function (projectId, mergerequestIid, options) {
+        return RequestHelper.put()(this, endpoint(templateObject_1$w || (templateObject_1$w = __makeTemplateObject(["projects/", "/merge_requests/", "/merge"], ["projects/", "/merge_requests/", "/merge"])), projectId, mergerequestIid), options);
+    };
+    MergeRequests.prototype.addSpentTime = function (projectId, mergerequestIid, duration, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_2$p || (templateObject_2$p = __makeTemplateObject(["projects/", "/merge_requests/", "/add_spent_time"], ["projects/", "/merge_requests/", "/add_spent_time"])), projectId, mergerequestIid), __assign({ duration: duration }, options));
+    };
+    MergeRequests.prototype.addTimeEstimate = function (projectId, mergerequestIid, duration, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_3$n || (templateObject_3$n = __makeTemplateObject(["projects/", "/merge_requests/", "/time_estimate"], ["projects/", "/merge_requests/", "/time_estimate"])), projectId, mergerequestIid), __assign({ duration: duration }, options));
+    };
+    MergeRequests.prototype.all = function (_a) {
+        if (_a === void 0) { _a = {}; }
+        var projectId = _a.projectId, groupId = _a.groupId, options = __rest(_a, ["projectId", "groupId"]);
+        var url;
+        if (projectId) {
+            url = endpoint(templateObject_4$m || (templateObject_4$m = __makeTemplateObject(["projects/", "/merge_requests"], ["projects/", "/merge_requests"])), projectId);
+        }
+        else if (groupId) {
+            url = endpoint(templateObject_5$g || (templateObject_5$g = __makeTemplateObject(["groups/", "/merge_requests"], ["groups/", "/merge_requests"])), groupId);
+        }
+        else {
+            url = 'merge_requests';
+        }
+        return RequestHelper.get()(this, url, options);
+    };
+    MergeRequests.prototype.cancelOnPipelineSucess = function (projectId, mergerequestIid, options) {
+        return RequestHelper.put()(this, endpoint(templateObject_6$9 || (templateObject_6$9 = __makeTemplateObject(["projects/", "/merge_requests/", "/cancel_merge_when_pipeline_succeeds"], ["projects/", "/merge_requests/", "/cancel_merge_when_pipeline_succeeds"])), projectId, mergerequestIid), options);
+    };
+    MergeRequests.prototype.changes = function (projectId, mergerequestIid, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_7$5 || (templateObject_7$5 = __makeTemplateObject(["projects/", "/merge_requests/", "/changes"], ["projects/", "/merge_requests/", "/changes"])), projectId, mergerequestIid), options);
+    };
+    MergeRequests.prototype.closesIssues = function (projectId, mergerequestIid, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_8$2 || (templateObject_8$2 = __makeTemplateObject(["projects/", "/merge_requests/", "/closes_issues"], ["projects/", "/merge_requests/", "/closes_issues"])), projectId, mergerequestIid), options);
+    };
+    MergeRequests.prototype.commits = function (projectId, mergerequestIid, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_9$2 || (templateObject_9$2 = __makeTemplateObject(["projects/", "/merge_requests/", "/commits"], ["projects/", "/merge_requests/", "/commits"])), projectId, mergerequestIid), options);
+    };
+    MergeRequests.prototype.create = function (projectId, sourceBranch, targetBranch, title, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_10$2 || (templateObject_10$2 = __makeTemplateObject(["projects/", "/merge_requests"], ["projects/", "/merge_requests"])), projectId), __assign({ sourceBranch: sourceBranch, targetBranch: targetBranch, title: title }, options));
+    };
+    MergeRequests.prototype.edit = function (projectId, mergerequestIid, options) {
+        return RequestHelper.put()(this, endpoint(templateObject_11$2 || (templateObject_11$2 = __makeTemplateObject(["projects/", "/merge_requests/", ""], ["projects/", "/merge_requests/", ""])), projectId, mergerequestIid), options);
+    };
+    MergeRequests.prototype.participants = function (projectId, mergerequestIid, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_12$2 || (templateObject_12$2 = __makeTemplateObject(["projects/", "/merge_requests/", "/participants"], ["projects/", "/merge_requests/", "/participants"])), projectId, mergerequestIid), options);
+    };
+    MergeRequests.prototype.pipelines = function (projectId, mergerequestIid, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_13$2 || (templateObject_13$2 = __makeTemplateObject(["projects/", "/merge_requests/", "/pipelines"], ["projects/", "/merge_requests/", "/pipelines"])), projectId, mergerequestIid), options);
+    };
+    MergeRequests.prototype.rebase = function (projectId, mergerequestIid, options) {
+        return RequestHelper.put()(this, endpoint(templateObject_14$2 || (templateObject_14$2 = __makeTemplateObject(["projects/", "/merge_requests/", "/rebase"], ["projects/", "/merge_requests/", "/rebase"])), projectId, mergerequestIid), options);
+    };
+    MergeRequests.prototype.remove = function (projectId, mergerequestIid, options) {
+        return RequestHelper.del()(this, endpoint(templateObject_15$2 || (templateObject_15$2 = __makeTemplateObject(["projects/", "/merge_requests/", ""], ["projects/", "/merge_requests/", ""])), projectId, mergerequestIid), options);
+    };
+    MergeRequests.prototype.resetSpentTime = function (projectId, mergerequestIid, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_16$2 || (templateObject_16$2 = __makeTemplateObject(["projects/", "/merge_requests/", "/reset_spent_time"], ["projects/", "/merge_requests/", "/reset_spent_time"])), projectId, mergerequestIid), options);
+    };
+    MergeRequests.prototype.resetTimeEstimate = function (projectId, mergerequestIid, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_17 || (templateObject_17 = __makeTemplateObject(["projects/", "/merge_requests/", "/reset_time_estimate"], ["projects/", "/merge_requests/", "/reset_time_estimate"])), projectId, mergerequestIid), options);
+    };
+    MergeRequests.prototype.show = function (projectId, mergerequestIid, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_18 || (templateObject_18 = __makeTemplateObject(["projects/", "/merge_requests/", ""], ["projects/", "/merge_requests/", ""])), projectId, mergerequestIid), options);
+    };
+    MergeRequests.prototype.subscribe = function (projectId, mergerequestIid, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_19 || (templateObject_19 = __makeTemplateObject(["projects/", "/merge_requests/", "/subscribe"], ["projects/", "/merge_requests/", "/subscribe"])), projectId, mergerequestIid), options);
+    };
+    MergeRequests.prototype.timeStats = function (projectId, mergerequestIid, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_20 || (templateObject_20 = __makeTemplateObject(["projects/", "/merge_requests/", "/time_stats"], ["projects/", "/merge_requests/", "/time_stats"])), projectId, mergerequestIid), options);
+    };
+    MergeRequests.prototype.version = function (projectId, mergerequestIid, versionId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_21 || (templateObject_21 = __makeTemplateObject(["projects/", "/merge_requests/", "/versions/", ""], ["projects/", "/merge_requests/", "/versions/", ""])), projectId, mergerequestIid, versionId), options);
+    };
+    MergeRequests.prototype.versions = function (projectId, mergerequestIid, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_22 || (templateObject_22 = __makeTemplateObject(["projects/", "/merge_requests/", "/versions"], ["projects/", "/merge_requests/", "/versions"])), projectId, mergerequestIid), options);
+    };
+    MergeRequests.prototype.unsubscribe = function (projectId, mergerequestIid, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_23 || (templateObject_23 = __makeTemplateObject(["projects/", "/merge_requests/", "/unsubscribe"], ["projects/", "/merge_requests/", "/unsubscribe"])), projectId, mergerequestIid), options);
+    };
+    return MergeRequests;
+}(requesterUtils.BaseResource));
+var templateObject_1$w, templateObject_2$p, templateObject_3$n, templateObject_4$m, templateObject_5$g, templateObject_6$9, templateObject_7$5, templateObject_8$2, templateObject_9$2, templateObject_10$2, templateObject_11$2, templateObject_12$2, templateObject_13$2, templateObject_14$2, templateObject_15$2, templateObject_16$2, templateObject_17, templateObject_18, templateObject_19, templateObject_20, templateObject_21, templateObject_22, templateObject_23;
+
+var MergeRequestApprovals = /** @class */ (function (_super) {
+    __extends(MergeRequestApprovals, _super);
+    function MergeRequestApprovals() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    MergeRequestApprovals.prototype.configuration = function (projectId, _a) {
+        if (_a === void 0) { _a = {}; }
+        var mergerequestIid = _a.mergerequestIid, options = __rest(_a, ["mergerequestIid"]);
+        var url;
+        if (mergerequestIid) {
+            url = endpoint(templateObject_1$v || (templateObject_1$v = __makeTemplateObject(["projects/", "/merge_requests/", "/approvals"], ["projects/", "/merge_requests/", "/approvals"])), projectId, mergerequestIid);
+        }
+        else {
+            url = endpoint(templateObject_2$o || (templateObject_2$o = __makeTemplateObject(["projects/", "/approvals"], ["projects/", "/approvals"])), projectId);
+        }
+        return RequestHelper.get()(this, url, options);
+    };
+    MergeRequestApprovals.prototype.editConfiguration = function (projectId, _a) {
+        if (_a === void 0) { _a = {}; }
+        var mergerequestIid = _a.mergerequestIid, options = __rest(_a, ["mergerequestIid"]);
+        var url;
+        if (mergerequestIid) {
+            url = endpoint(templateObject_3$m || (templateObject_3$m = __makeTemplateObject(["projects/", "/merge_requests/", "/approvals"], ["projects/", "/merge_requests/", "/approvals"])), projectId, mergerequestIid);
+        }
+        else {
+            url = endpoint(templateObject_4$l || (templateObject_4$l = __makeTemplateObject(["projects/", "/approvals"], ["projects/", "/approvals"])), projectId);
+        }
+        return RequestHelper.post()(this, url, options);
+    };
+    MergeRequestApprovals.prototype.approvalRule = function (projectId, approvalRuleId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_5$f || (templateObject_5$f = __makeTemplateObject(["projects/", "/approval_rules/", ""], ["projects/", "/approval_rules/", ""])), projectId, approvalRuleId), options);
+    };
+    MergeRequestApprovals.prototype.approvalRules = function (projectId, _a) {
+        if (_a === void 0) { _a = {}; }
+        var mergerequestIid = _a.mergerequestIid, options = __rest(_a, ["mergerequestIid"]);
+        var url;
+        if (mergerequestIid) {
+            url = endpoint(templateObject_6$8 || (templateObject_6$8 = __makeTemplateObject(["projects/", "/merge_requests/", "/approval_rules"], ["projects/", "/merge_requests/", "/approval_rules"])), projectId, mergerequestIid);
+        }
+        else {
+            url = endpoint(templateObject_7$4 || (templateObject_7$4 = __makeTemplateObject(["projects/", "/approval_rules"], ["projects/", "/approval_rules"])), projectId);
+        }
+        return RequestHelper.get()(this, url, options);
+    };
+    MergeRequestApprovals.prototype.addApprovalRule = function (projectId, name, approvalsRequired, _a) {
+        if (_a === void 0) { _a = {}; }
+        var mergerequestIid = _a.mergerequestIid, options = __rest(_a, ["mergerequestIid"]);
+        var url;
+        if (mergerequestIid) {
+            url = endpoint(templateObject_8$1 || (templateObject_8$1 = __makeTemplateObject(["projects/", "/merge_requests/", "/approval_rules"], ["projects/", "/merge_requests/", "/approval_rules"])), projectId, mergerequestIid);
+        }
+        else {
+            url = endpoint(templateObject_9$1 || (templateObject_9$1 = __makeTemplateObject(["projects/", "/approval_rules"], ["projects/", "/approval_rules"])), projectId);
+        }
+        return RequestHelper.post()(this, url, __assign({ name: name, approvalsRequired: approvalsRequired }, options));
+    };
+    MergeRequestApprovals.prototype.approvalState = function (projectId, mergerequestIid, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_10$1 || (templateObject_10$1 = __makeTemplateObject(["projects/", "/merge_requests/", "/approval_state"], ["projects/", "/merge_requests/", "/approval_state"])), projectId, mergerequestIid), options);
+    };
+    MergeRequestApprovals.prototype.editApprovalRule = function (projectId, approvalRuleId, name, approvalsRequired, _a) {
+        if (_a === void 0) { _a = {}; }
+        var mergerequestIid = _a.mergerequestIid, options = __rest(_a, ["mergerequestIid"]);
+        var url;
+        if (mergerequestIid) {
+            url = endpoint(templateObject_11$1 || (templateObject_11$1 = __makeTemplateObject(["projects/", "/merge_requests/", "/approval_rules/", ""], ["projects/", "/merge_requests/", "/approval_rules/", ""])), projectId, mergerequestIid, approvalRuleId);
+        }
+        else {
+            url = endpoint(templateObject_12$1 || (templateObject_12$1 = __makeTemplateObject(["projects/", "/approval_rules/", ""], ["projects/", "/approval_rules/", ""])), projectId, approvalRuleId);
+        }
+        return RequestHelper.put()(this, url, __assign({ name: name, approvalsRequired: approvalsRequired }, options));
+    };
+    MergeRequestApprovals.prototype.removeApprovalRule = function (projectId, approvalRuleId, _a) {
+        if (_a === void 0) { _a = {}; }
+        var mergerequestIid = _a.mergerequestIid, options = __rest(_a, ["mergerequestIid"]);
+        var url;
+        if (mergerequestIid) {
+            url = endpoint(templateObject_13$1 || (templateObject_13$1 = __makeTemplateObject(["projects/", "/merge_requests/", "/approval_rules/", ""], ["projects/", "/merge_requests/", "/approval_rules/", ""])), projectId, mergerequestIid, approvalRuleId);
+        }
+        else {
+            url = endpoint(templateObject_14$1 || (templateObject_14$1 = __makeTemplateObject(["projects/", "/approval_rules/", ""], ["projects/", "/approval_rules/", ""])), projectId, approvalRuleId);
+        }
+        return RequestHelper.del()(this, url, __assign({}, options));
+    };
+    MergeRequestApprovals.prototype.approve = function (projectId, mergerequestIid, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_15$1 || (templateObject_15$1 = __makeTemplateObject(["projects/", "/merge_requests/", "/approve"], ["projects/", "/merge_requests/", "/approve"])), projectId, mergerequestIid), options);
+    };
+    MergeRequestApprovals.prototype.unapprove = function (projectId, mergerequestIid, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_16$1 || (templateObject_16$1 = __makeTemplateObject(["projects/", "/merge_requests/", "/unapprove"], ["projects/", "/merge_requests/", "/unapprove"])), projectId, mergerequestIid), options);
+    };
+    return MergeRequestApprovals;
+}(requesterUtils.BaseResource));
+var templateObject_1$v, templateObject_2$o, templateObject_3$m, templateObject_4$l, templateObject_5$f, templateObject_6$8, templateObject_7$4, templateObject_8$1, templateObject_9$1, templateObject_10$1, templateObject_11$1, templateObject_12$1, templateObject_13$1, templateObject_14$1, templateObject_15$1, templateObject_16$1;
+
+var MergeRequestAwardEmojis = /** @class */ (function (_super) {
+    __extends(MergeRequestAwardEmojis, _super);
+    function MergeRequestAwardEmojis(options) {
+        /* istanbul ignore next */
+        return _super.call(this, 'merge_requests', options) || this;
+    }
+    return MergeRequestAwardEmojis;
+}(ResourceAwardEmojis));
+
+var MergeRequestDiscussions = /** @class */ (function (_super) {
+    __extends(MergeRequestDiscussions, _super);
+    function MergeRequestDiscussions(options) {
+        /* istanbul ignore next */
+        return _super.call(this, 'projects', 'merge_requests', options) || this;
+    }
+    MergeRequestDiscussions.prototype.resolve = function (projectId, mergerequestId, discussionId, resolved) {
+        return RequestHelper.put()(this, endpoint(templateObject_1$u || (templateObject_1$u = __makeTemplateObject(["", "/", "/", "/discussions/", ""], ["", "/", "/", "/discussions/", ""])), projectId, this.resource2Type, mergerequestId, discussionId), {
+            resolved: resolved,
+        });
+    };
+    return MergeRequestDiscussions;
+}(ResourceDiscussions));
+var templateObject_1$u;
+
+var MergeRequestNotes = /** @class */ (function (_super) {
+    __extends(MergeRequestNotes, _super);
+    function MergeRequestNotes(options) {
+        /* istanbul ignore next */
+        return _super.call(this, 'projects', 'merge_requests', options) || this;
+    }
+    return MergeRequestNotes;
+}(ResourceNotes));
+
+var Packages = /** @class */ (function (_super) {
+    __extends(Packages, _super);
+    function Packages() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Packages.prototype.all = function (_a) {
+        if (_a === void 0) { _a = {}; }
+        var projectId = _a.projectId, groupId = _a.groupId, options = __rest(_a, ["projectId", "groupId"]);
+        var url;
+        if (projectId) {
+            url = endpoint(templateObject_1$t || (templateObject_1$t = __makeTemplateObject(["projects/", "/packages"], ["projects/", "/packages"])), projectId);
+        }
+        else if (groupId) {
+            url = endpoint(templateObject_2$n || (templateObject_2$n = __makeTemplateObject(["groups/", "/packages"], ["groups/", "/packages"])), groupId);
+        }
+        else {
+            throw new Error('projectId or groupId must be passed');
+        }
+        return RequestHelper.get()(this, url, options);
+    };
+    Packages.prototype.remove = function (projectId, packageId, options) {
+        return RequestHelper.del()(this, endpoint(templateObject_3$l || (templateObject_3$l = __makeTemplateObject(["projects/", "/packages/", ""], ["projects/", "/packages/", ""])), projectId, packageId), options);
+    };
+    Packages.prototype.removeFile = function (projectId, packageId, projectFileId, options) {
+        return RequestHelper.del()(this, endpoint(templateObject_4$k || (templateObject_4$k = __makeTemplateObject(["projects/", "/packages/", "/package_files/", ""], ["projects/", "/packages/", "/package_files/", ""])), projectId, packageId, projectFileId), options);
+    };
+    Packages.prototype.show = function (projectId, packageId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_5$e || (templateObject_5$e = __makeTemplateObject(["projects/", "/packages/", ""], ["projects/", "/packages/", ""])), projectId, packageId), options);
+    };
+    Packages.prototype.showFiles = function (projectId, packageId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_6$7 || (templateObject_6$7 = __makeTemplateObject(["projects/", "/packages/", "/package_files"], ["projects/", "/packages/", "/package_files"])), projectId, packageId), options);
+    };
+    return Packages;
+}(requesterUtils.BaseResource));
+var templateObject_1$t, templateObject_2$n, templateObject_3$l, templateObject_4$k, templateObject_5$e, templateObject_6$7;
+
+var PackageRegistry = /** @class */ (function (_super) {
+    __extends(PackageRegistry, _super);
+    function PackageRegistry() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    PackageRegistry.prototype.publish = function (projectId, packageName, packageVersion, filename, content, _a) {
+        if (_a === void 0) { _a = {}; }
+        var contentType = _a.contentType, options = __rest(_a, ["contentType"]);
+        var pId = encodeURIComponent(projectId);
+        var meta = { filename: filename, contentType: contentType };
+        if (!meta.contentType)
+            meta.contentType = Mime__namespace.getType(meta.filename) || undefined;
+        return RequestHelper.put()(this, "projects/".concat(pId, "/packages/generic/").concat(packageName, "/").concat(packageVersion, "/").concat(filename), __assign({ isForm: true, file: [content, meta] }, options));
+    };
+    PackageRegistry.prototype.download = function (projectId, packageName, packageVersion, filename, options) {
+        var pId = encodeURIComponent(projectId);
+        return RequestHelper.get()(this, "projects/".concat(pId, "/packages/generic/").concat(packageName, "/").concat(packageVersion, "/").concat(filename), options);
+    };
+    return PackageRegistry;
+}(requesterUtils.BaseResource));
+
+// TODO: Add missing function
+var Pipelines = /** @class */ (function (_super) {
+    __extends(Pipelines, _super);
+    function Pipelines() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Pipelines.prototype.all = function (projectId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_1$s || (templateObject_1$s = __makeTemplateObject(["projects/", "/pipelines"], ["projects/", "/pipelines"])), projectId), options);
+    };
+    Pipelines.prototype.create = function (projectId, ref, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_2$m || (templateObject_2$m = __makeTemplateObject(["projects/", "/pipeline"], ["projects/", "/pipeline"])), projectId), __assign({ ref: ref }, options));
+    };
+    Pipelines.prototype.delete = function (projectId, pipelineId, options) {
+        return RequestHelper.del()(this, endpoint(templateObject_3$k || (templateObject_3$k = __makeTemplateObject(["projects/", "/pipelines/", ""], ["projects/", "/pipelines/", ""])), projectId, pipelineId), options);
+    };
+    Pipelines.prototype.show = function (projectId, pipelineId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_4$j || (templateObject_4$j = __makeTemplateObject(["projects/", "/pipelines/", ""], ["projects/", "/pipelines/", ""])), projectId, pipelineId), options);
+    };
+    Pipelines.prototype.retry = function (projectId, pipelineId, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_5$d || (templateObject_5$d = __makeTemplateObject(["projects/", "/pipelines/", "/retry"], ["projects/", "/pipelines/", "/retry"])), projectId, pipelineId), options);
+    };
+    Pipelines.prototype.cancel = function (projectId, pipelineId, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_6$6 || (templateObject_6$6 = __makeTemplateObject(["projects/", "/pipelines/", "/cancel"], ["projects/", "/pipelines/", "/cancel"])), projectId, pipelineId), options);
+    };
+    Pipelines.prototype.allVariables = function (projectId, pipelineId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_7$3 || (templateObject_7$3 = __makeTemplateObject(["projects/", "/pipelines/", "/variables"], ["projects/", "/pipelines/", "/variables"])), projectId, pipelineId), options);
+    };
+    return Pipelines;
+}(requesterUtils.BaseResource));
+var templateObject_1$s, templateObject_2$m, templateObject_3$k, templateObject_4$j, templateObject_5$d, templateObject_6$6, templateObject_7$3;
+
+var PipelineSchedules = /** @class */ (function (_super) {
+    __extends(PipelineSchedules, _super);
+    function PipelineSchedules() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    PipelineSchedules.prototype.all = function (projectId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_1$r || (templateObject_1$r = __makeTemplateObject(["projects/", "/pipeline_schedules"], ["projects/", "/pipeline_schedules"])), projectId), options);
+    };
+    PipelineSchedules.prototype.create = function (projectId, description, ref, cron, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_2$l || (templateObject_2$l = __makeTemplateObject(["projects/", "/pipeline_schedules"], ["projects/", "/pipeline_schedules"])), projectId), __assign({ description: description, ref: ref, cron: cron }, options));
+    };
+    PipelineSchedules.prototype.edit = function (projectId, scheduleId, options) {
+        return RequestHelper.put()(this, endpoint(templateObject_3$j || (templateObject_3$j = __makeTemplateObject(["projects/", "/pipeline_schedules/", ""], ["projects/", "/pipeline_schedules/", ""])), projectId, scheduleId), options);
+    };
+    PipelineSchedules.prototype.remove = function (projectId, scheduleId, options) {
+        return RequestHelper.del()(this, endpoint(templateObject_4$i || (templateObject_4$i = __makeTemplateObject(["projects/", "/pipeline_schedules/", ""], ["projects/", "/pipeline_schedules/", ""])), projectId, scheduleId), options);
+    };
+    PipelineSchedules.prototype.show = function (projectId, scheduleId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_5$c || (templateObject_5$c = __makeTemplateObject(["projects/", "/pipeline_schedules/", ""], ["projects/", "/pipeline_schedules/", ""])), projectId, scheduleId), options);
+    };
+    PipelineSchedules.prototype.takeOwnership = function (projectId, scheduleId, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_6$5 || (templateObject_6$5 = __makeTemplateObject(["projects/", "/pipeline_schedules/", "/take_ownership"], ["projects/", "/pipeline_schedules/", "/take_ownership"])), projectId, scheduleId), options);
+    };
+    return PipelineSchedules;
+}(requesterUtils.BaseResource));
+var templateObject_1$r, templateObject_2$l, templateObject_3$j, templateObject_4$i, templateObject_5$c, templateObject_6$5;
+
+var PipelineScheduleVariables = /** @class */ (function (_super) {
+    __extends(PipelineScheduleVariables, _super);
+    function PipelineScheduleVariables() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    PipelineScheduleVariables.prototype.all = function (projectId, pipelineScheduleId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_1$q || (templateObject_1$q = __makeTemplateObject(["projects/", "/pipeline_schedules/", "/variables"], ["projects/", "/pipeline_schedules/", "/variables"])), projectId, pipelineScheduleId), options);
+    };
+    PipelineScheduleVariables.prototype.create = function (projectId, pipelineScheduleId, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_2$k || (templateObject_2$k = __makeTemplateObject(["projects/", "/pipeline_schedules/", "/variables"], ["projects/", "/pipeline_schedules/", "/variables"])), projectId, pipelineScheduleId), options);
+    };
+    PipelineScheduleVariables.prototype.edit = function (projectId, pipelineScheduleId, keyId, options) {
+        return RequestHelper.put()(this, endpoint(templateObject_3$i || (templateObject_3$i = __makeTemplateObject(["projects/", "/pipeline_schedules/", "/variables/", ""], ["projects/", "/pipeline_schedules/", "/variables/", ""])), projectId, pipelineScheduleId, keyId), options);
+    };
+    PipelineScheduleVariables.prototype.show = function (projectId, pipelineScheduleId, keyId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_4$h || (templateObject_4$h = __makeTemplateObject(["projects/", "/pipeline_schedules/", "/variables/", ""], ["projects/", "/pipeline_schedules/", "/variables/", ""])), projectId, pipelineScheduleId, keyId), options);
+    };
+    PipelineScheduleVariables.prototype.remove = function (projectId, pipelineScheduleId, keyId, options) {
+        return RequestHelper.del()(this, endpoint(templateObject_5$b || (templateObject_5$b = __makeTemplateObject(["projects/", "/pipeline_schedules/", "/variables/", ""], ["projects/", "/pipeline_schedules/", "/variables/", ""])), projectId, pipelineScheduleId, keyId), options);
+    };
+    return PipelineScheduleVariables;
+}(requesterUtils.BaseResource));
+var templateObject_1$q, templateObject_2$k, templateObject_3$i, templateObject_4$h, templateObject_5$b;
+
+var defaultMetadata = {
+    filename: "".concat(Date.now().toString(), ".tar.gz"),
+};
+var ProjectImportExport = /** @class */ (function (_super) {
+    __extends(ProjectImportExport, _super);
+    function ProjectImportExport() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    ProjectImportExport.prototype.download = function (projectId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_1$p || (templateObject_1$p = __makeTemplateObject(["projects/", "/export/download"], ["projects/", "/export/download"])), projectId), options);
+    };
+    ProjectImportExport.prototype.exportStatus = function (projectId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_2$j || (templateObject_2$j = __makeTemplateObject(["projects/", "/export"], ["projects/", "/export"])), projectId), options);
+    };
+    ProjectImportExport.prototype.import = function (content, path, _a) {
+        if (_a === void 0) { _a = {}; }
+        var metadata = _a.metadata, options = __rest(_a, ["metadata"]);
+        var meta = __assign(__assign({}, defaultMetadata), metadata);
+        if (!meta.contentType)
+            meta.contentType = Mime__namespace.getType(meta.filename) || undefined;
+        return RequestHelper.post()(this, 'projects/import', __assign(__assign({ isForm: true }, options), { file: [content, meta], path: path }));
+    };
+    ProjectImportExport.prototype.importStatus = function (projectId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_3$h || (templateObject_3$h = __makeTemplateObject(["projects/", "/import"], ["projects/", "/import"])), projectId), options);
+    };
+    ProjectImportExport.prototype.schedule = function (projectId, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_4$g || (templateObject_4$g = __makeTemplateObject(["projects/", "/export"], ["projects/", "/export"])), projectId), options);
+    };
+    return ProjectImportExport;
+}(requesterUtils.BaseResource));
+var templateObject_1$p, templateObject_2$j, templateObject_3$h, templateObject_4$g;
+
+var Projects = /** @class */ (function (_super) {
+    __extends(Projects, _super);
+    function Projects() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Projects.prototype.all = function (options) {
+        return RequestHelper.get()(this, 'projects', options);
+    };
+    Projects.prototype.archive = function (projectId, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_1$o || (templateObject_1$o = __makeTemplateObject(["projects/", "/archive"], ["projects/", "/archive"])), projectId), options);
+    };
+    Projects.prototype.create = function (_a) {
+        var userId = _a.userId, options = __rest(_a, ["userId"]);
+        var url = userId ? "projects/user/".concat(userId) : 'projects';
+        return RequestHelper.post()(this, url, options);
+    };
+    Projects.prototype.edit = function (projectId, options) {
+        return RequestHelper.put()(this, endpoint(templateObject_2$i || (templateObject_2$i = __makeTemplateObject(["projects/", ""], ["projects/", ""])), projectId), options);
+    };
+    Projects.prototype.fork = function (projectId, _a) {
+        if (_a === void 0) { _a = {}; }
+        var forkedFromId = _a.forkedFromId, options = __rest(_a, ["forkedFromId"]);
+        var url = endpoint(templateObject_3$g || (templateObject_3$g = __makeTemplateObject(["projects/", "/fork"], ["projects/", "/fork"])), projectId);
+        if (forkedFromId)
+            url += "/".concat(encodeURIComponent(forkedFromId));
+        return RequestHelper.post()(this, url, options);
+    };
+    Projects.prototype.forks = function (projectId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_4$f || (templateObject_4$f = __makeTemplateObject(["projects/", "/forks"], ["projects/", "/forks"])), projectId), options);
+    };
+    Projects.prototype.languages = function (projectId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_5$a || (templateObject_5$a = __makeTemplateObject(["projects/", "/languages"], ["projects/", "/languages"])), projectId), options);
+    };
+    Projects.prototype.mirrorPull = function (projectId, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_6$4 || (templateObject_6$4 = __makeTemplateObject(["projects/", "/mirror/pull"], ["projects/", "/mirror/pull"])), projectId), options);
+    };
+    Projects.prototype.remove = function (projectId, options) {
+        return RequestHelper.del()(this, endpoint(templateObject_7$2 || (templateObject_7$2 = __makeTemplateObject(["projects/", ""], ["projects/", ""])), projectId), options);
+    };
+    Projects.prototype.removeFork = function (projectId, options) {
+        return RequestHelper.del()(this, endpoint(templateObject_8 || (templateObject_8 = __makeTemplateObject(["projects/", "/fork"], ["projects/", "/fork"])), projectId), options);
+    };
+    Projects.prototype.search = function (projectName, options) {
+        return RequestHelper.get()(this, 'projects', __assign({ search: projectName }, options));
+    };
+    Projects.prototype.share = function (projectId, groupId, groupAccess, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_9 || (templateObject_9 = __makeTemplateObject(["projects/", "/share"], ["projects/", "/share"])), projectId), __assign({ groupId: groupId, groupAccess: groupAccess }, options));
+    };
+    Projects.prototype.show = function (projectId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_10 || (templateObject_10 = __makeTemplateObject(["projects/", ""], ["projects/", ""])), projectId), options);
+    };
+    Projects.prototype.star = function (projectId, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_11 || (templateObject_11 = __makeTemplateObject(["projects/", "/star"], ["projects/", "/star"])), projectId), options);
+    };
+    Projects.prototype.transfer = function (projectId, namespaceId) {
+        return RequestHelper.put()(this, endpoint(templateObject_12 || (templateObject_12 = __makeTemplateObject(["projects/", "/transfer"], ["projects/", "/transfer"])), projectId), {
+            namespace: namespaceId,
+        });
+    };
+    Projects.prototype.unarchive = function (projectId, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_13 || (templateObject_13 = __makeTemplateObject(["projects/", "/unarchive"], ["projects/", "/unarchive"])), projectId), options);
+    };
+    Projects.prototype.unshare = function (projectId, groupId, options) {
+        return RequestHelper.del()(this, endpoint(templateObject_14 || (templateObject_14 = __makeTemplateObject(["projects/", "/share/", ""], ["projects/", "/share/", ""])), projectId, groupId), options);
+    };
+    Projects.prototype.unstar = function (projectId, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_15 || (templateObject_15 = __makeTemplateObject(["projects/", "/unstar"], ["projects/", "/unstar"])), projectId), options);
+    };
+    Projects.prototype.upload = function (projectId, content, _a) {
+        if (_a === void 0) { _a = {}; }
+        var metadata = _a.metadata, options = __rest(_a, ["metadata"]);
+        var meta = __assign(__assign({}, defaultMetadata), metadata);
+        if (!meta.contentType)
+            meta.contentType = Mime__namespace.getType(meta.filename) || undefined;
+        return RequestHelper.post()(this, endpoint(templateObject_16 || (templateObject_16 = __makeTemplateObject(["projects/", "/uploads"], ["projects/", "/uploads"])), projectId), __assign({ isForm: true, file: [content, meta] }, options));
+    };
+    return Projects;
+}(requesterUtils.BaseResource));
+var templateObject_1$o, templateObject_2$i, templateObject_3$g, templateObject_4$f, templateObject_5$a, templateObject_6$4, templateObject_7$2, templateObject_8, templateObject_9, templateObject_10, templateObject_11, templateObject_12, templateObject_13, templateObject_14, templateObject_15, templateObject_16;
+
+var ProjectAccessRequests = /** @class */ (function (_super) {
+    __extends(ProjectAccessRequests, _super);
+    function ProjectAccessRequests(options) {
+        /* istanbul ignore next */
+        return _super.call(this, 'projects', options) || this;
+    }
+    return ProjectAccessRequests;
+}(ResourceAccessRequests));
+
+var ProjectBadges = /** @class */ (function (_super) {
+    __extends(ProjectBadges, _super);
+    function ProjectBadges(options) {
+        /* istanbul ignore next */
+        return _super.call(this, 'projects', options) || this;
+    }
+    return ProjectBadges;
+}(ResourceBadges));
+
+var ProjectCustomAttributes = /** @class */ (function (_super) {
+    __extends(ProjectCustomAttributes, _super);
+    function ProjectCustomAttributes(options) {
+        /* istanbul ignore next */
+        return _super.call(this, 'projects', options) || this;
+    }
+    return ProjectCustomAttributes;
+}(ResourceCustomAttributes));
+
+var ProjectIssueBoards = /** @class */ (function (_super) {
+    __extends(ProjectIssueBoards, _super);
+    function ProjectIssueBoards(options) {
+        /* istanbul ignore next */
+        return _super.call(this, 'projects', options) || this;
+    }
+    return ProjectIssueBoards;
+}(ResourceIssueBoards));
+
+var ProjectHooks = /** @class */ (function (_super) {
+    __extends(ProjectHooks, _super);
+    function ProjectHooks() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    ProjectHooks.prototype.all = function (projectId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_1$n || (templateObject_1$n = __makeTemplateObject(["projects/", "/hooks"], ["projects/", "/hooks"])), projectId), options);
+    };
+    ProjectHooks.prototype.show = function (projectId, hookId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_2$h || (templateObject_2$h = __makeTemplateObject(["projects/", "/hooks/", ""], ["projects/", "/hooks/", ""])), projectId, hookId), options);
+    };
+    ProjectHooks.prototype.add = function (projectId, url, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_3$f || (templateObject_3$f = __makeTemplateObject(["projects/", "/hooks"], ["projects/", "/hooks"])), projectId), __assign({ url: url }, options));
+    };
+    ProjectHooks.prototype.edit = function (projectId, hookId, url, options) {
+        return RequestHelper.put()(this, endpoint(templateObject_4$e || (templateObject_4$e = __makeTemplateObject(["projects/", "/hooks/", ""], ["projects/", "/hooks/", ""])), projectId, hookId), __assign({ url: url }, options));
+    };
+    ProjectHooks.prototype.remove = function (projectId, hookId, options) {
+        return RequestHelper.del()(this, endpoint(templateObject_5$9 || (templateObject_5$9 = __makeTemplateObject(["projects/", "/hooks/", ""], ["projects/", "/hooks/", ""])), projectId, hookId), options);
+    };
+    return ProjectHooks;
+}(requesterUtils.BaseResource));
+var templateObject_1$n, templateObject_2$h, templateObject_3$f, templateObject_4$e, templateObject_5$9;
+
+var ProjectMembers = /** @class */ (function (_super) {
+    __extends(ProjectMembers, _super);
+    function ProjectMembers(options) {
+        /* istanbul ignore next */
+        return _super.call(this, 'projects', options) || this;
+    }
+    return ProjectMembers;
+}(ResourceMembers));
+
+var ProjectMilestones = /** @class */ (function (_super) {
+    __extends(ProjectMilestones, _super);
+    function ProjectMilestones(options) {
+        /* istanbul ignore next */
+        return _super.call(this, 'projects', options) || this;
+    }
+    return ProjectMilestones;
+}(ResourceMilestones));
+
+var ProjectSnippets = /** @class */ (function (_super) {
+    __extends(ProjectSnippets, _super);
+    function ProjectSnippets() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    ProjectSnippets.prototype.all = function (projectId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_1$m || (templateObject_1$m = __makeTemplateObject(["projects/", "/snippets"], ["projects/", "/snippets"])), projectId), options);
+    };
+    ProjectSnippets.prototype.content = function (projectId, snippetId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_2$g || (templateObject_2$g = __makeTemplateObject(["projects/", "/snippets/", "/raw"], ["projects/", "/snippets/", "/raw"])), projectId, snippetId), options);
+    };
+    ProjectSnippets.prototype.create = function (projectId, title, fileName, code, visibility, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_3$e || (templateObject_3$e = __makeTemplateObject(["projects/", "/snippets"], ["projects/", "/snippets"])), projectId), __assign({ title: title, fileName: fileName, code: code, visibility: visibility }, options));
+    };
+    ProjectSnippets.prototype.edit = function (projectId, snippetId, options) {
+        return RequestHelper.put()(this, endpoint(templateObject_4$d || (templateObject_4$d = __makeTemplateObject(["projects/", "/snippets/", ""], ["projects/", "/snippets/", ""])), projectId, snippetId), options);
+    };
+    ProjectSnippets.prototype.remove = function (projectId, snippetId, options) {
+        return RequestHelper.del()(this, endpoint(templateObject_5$8 || (templateObject_5$8 = __makeTemplateObject(["projects/", "/snippets/", ""], ["projects/", "/snippets/", ""])), projectId, snippetId), options);
+    };
+    ProjectSnippets.prototype.show = function (projectId, snippetId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_6$3 || (templateObject_6$3 = __makeTemplateObject(["projects/", "/snippets/", ""], ["projects/", "/snippets/", ""])), projectId, snippetId), options);
+    };
+    ProjectSnippets.prototype.userAgentDetails = function (projectId, snippetId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_7$1 || (templateObject_7$1 = __makeTemplateObject(["projects/", "/snippets/", "/user_agent_detail"], ["projects/", "/snippets/", "/user_agent_detail"])), projectId, snippetId), options);
+    };
+    return ProjectSnippets;
+}(requesterUtils.BaseResource));
+var templateObject_1$m, templateObject_2$g, templateObject_3$e, templateObject_4$d, templateObject_5$8, templateObject_6$3, templateObject_7$1;
+
+var ProjectSnippetNotes = /** @class */ (function (_super) {
+    __extends(ProjectSnippetNotes, _super);
+    function ProjectSnippetNotes(options) {
+        /* istanbul ignore next */
+        return _super.call(this, 'projects', 'snippets', options) || this;
+    }
+    return ProjectSnippetNotes;
+}(ResourceNotes));
+
+var ProjectSnippetDiscussions = /** @class */ (function (_super) {
+    __extends(ProjectSnippetDiscussions, _super);
+    function ProjectSnippetDiscussions(options) {
+        /* istanbul ignore next */
+        return _super.call(this, 'projects', 'snippets', options) || this;
+    }
+    return ProjectSnippetDiscussions;
+}(ResourceDiscussions));
+
+var ProjectSnippetAwardEmojis = /** @class */ (function (_super) {
+    __extends(ProjectSnippetAwardEmojis, _super);
+    function ProjectSnippetAwardEmojis(options) {
+        /* istanbul ignore next */
+        return _super.call(this, 'snippets', options) || this;
+    }
+    return ProjectSnippetAwardEmojis;
+}(ResourceAwardEmojis));
+
+var ProtectedBranches = /** @class */ (function (_super) {
+    __extends(ProtectedBranches, _super);
+    function ProtectedBranches() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    ProtectedBranches.prototype.all = function (projectId, options) {
+        if (options === void 0) { options = {}; }
+        return RequestHelper.get()(this, endpoint(templateObject_1$l || (templateObject_1$l = __makeTemplateObject(["projects/", "/protected_branches"], ["projects/", "/protected_branches"])), projectId), options);
+    };
+    ProtectedBranches.prototype.protect = function (projectId, branchName, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_2$f || (templateObject_2$f = __makeTemplateObject(["projects/", "/protected_branches"], ["projects/", "/protected_branches"])), projectId), {
+            query: __assign({ name: branchName }, options),
+        });
+    };
+    ProtectedBranches.prototype.show = function (projectId, branchName, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_3$d || (templateObject_3$d = __makeTemplateObject(["projects/", "/protected_branches/", ""], ["projects/", "/protected_branches/", ""])), projectId, branchName), options);
+    };
+    ProtectedBranches.prototype.unprotect = function (projectId, branchName, options) {
+        return RequestHelper.del()(this, endpoint(templateObject_4$c || (templateObject_4$c = __makeTemplateObject(["projects/", "/protected_branches/", ""], ["projects/", "/protected_branches/", ""])), projectId, branchName), options);
+    };
+    return ProtectedBranches;
+}(requesterUtils.BaseResource));
+var templateObject_1$l, templateObject_2$f, templateObject_3$d, templateObject_4$c;
+
+var ProtectedTags = /** @class */ (function (_super) {
+    __extends(ProtectedTags, _super);
+    function ProtectedTags() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    ProtectedTags.prototype.all = function (projectId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_1$k || (templateObject_1$k = __makeTemplateObject(["projects/", "/protected_tags"], ["projects/", "/protected_tags"])), projectId), options);
+    };
+    ProtectedTags.prototype.protect = function (projectId, tagName, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_2$e || (templateObject_2$e = __makeTemplateObject(["projects/", "/protected_tags"], ["projects/", "/protected_tags"])), projectId), __assign({ name: tagName }, options));
+    };
+    ProtectedTags.prototype.show = function (projectId, tagName, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_3$c || (templateObject_3$c = __makeTemplateObject(["projects/", "/protected_tags/", ""], ["projects/", "/protected_tags/", ""])), projectId, tagName), options);
+    };
+    ProtectedTags.prototype.unprotect = function (projectId, tagName, options) {
+        return RequestHelper.del()(this, endpoint(templateObject_4$b || (templateObject_4$b = __makeTemplateObject(["projects/", "/protected_tags/", ""], ["projects/", "/protected_tags/", ""])), projectId, tagName), options);
+    };
+    return ProtectedTags;
+}(requesterUtils.BaseResource));
+var templateObject_1$k, templateObject_2$e, templateObject_3$c, templateObject_4$b;
+
+var ProjectVariables = /** @class */ (function (_super) {
+    __extends(ProjectVariables, _super);
+    function ProjectVariables(options) {
+        /* istanbul ignore next */
+        return _super.call(this, 'projects', options) || this;
+    }
+    return ProjectVariables;
+}(ResourceVariables));
+
+var ProjectDeployTokens = /** @class */ (function (_super) {
+    __extends(ProjectDeployTokens, _super);
+    function ProjectDeployTokens(options) {
+        /* istanbul ignore next */
+        return _super.call(this, 'projects', options) || this;
+    }
+    return ProjectDeployTokens;
+}(ResourceDeployTokens));
+
+var PushRules = /** @class */ (function (_super) {
+    __extends(PushRules, _super);
+    function PushRules() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    PushRules.prototype.create = function (projectId, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_1$j || (templateObject_1$j = __makeTemplateObject(["projects/", "/push_rule"], ["projects/", "/push_rule"])), projectId), options);
+    };
+    PushRules.prototype.edit = function (projectId, options) {
+        return RequestHelper.put()(this, endpoint(templateObject_2$d || (templateObject_2$d = __makeTemplateObject(["projects/", "/push_rule"], ["projects/", "/push_rule"])), projectId), options);
+    };
+    PushRules.prototype.remove = function (projectId, options) {
+        return RequestHelper.del()(this, endpoint(templateObject_3$b || (templateObject_3$b = __makeTemplateObject(["projects/", "/push_rule"], ["projects/", "/push_rule"])), projectId), options);
+    };
+    PushRules.prototype.show = function (projectId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_4$a || (templateObject_4$a = __makeTemplateObject(["projects/", "/push_rule"], ["projects/", "/push_rule"])), projectId), options);
+    };
+    return PushRules;
+}(requesterUtils.BaseResource));
+var templateObject_1$j, templateObject_2$d, templateObject_3$b, templateObject_4$a;
+
+// TODO: Add missing functions
+var Releases = /** @class */ (function (_super) {
+    __extends(Releases, _super);
+    function Releases() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Releases.prototype.all = function (projectId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_1$i || (templateObject_1$i = __makeTemplateObject(["projects/", "/releases"], ["projects/", "/releases"])), projectId), options);
+    };
+    Releases.prototype.create = function (projectId, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_2$c || (templateObject_2$c = __makeTemplateObject(["projects/", "/releases"], ["projects/", "/releases"])), projectId), options);
+    };
+    Releases.prototype.edit = function (projectId, tagName, options) {
+        return RequestHelper.put()(this, endpoint(templateObject_3$a || (templateObject_3$a = __makeTemplateObject(["projects/", "/releases/", ""], ["projects/", "/releases/", ""])), projectId, tagName), options);
+    };
+    Releases.prototype.remove = function (projectId, tagName, options) {
+        return RequestHelper.del()(this, endpoint(templateObject_4$9 || (templateObject_4$9 = __makeTemplateObject(["projects/", "/releases/", ""], ["projects/", "/releases/", ""])), projectId, tagName), options);
+    };
+    Releases.prototype.show = function (projectId, tagName, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_5$7 || (templateObject_5$7 = __makeTemplateObject(["projects/", "/releases/", ""], ["projects/", "/releases/", ""])), projectId, tagName), options);
+    };
+    return Releases;
+}(requesterUtils.BaseResource));
+var templateObject_1$i, templateObject_2$c, templateObject_3$a, templateObject_4$9, templateObject_5$7;
+
+var ReleaseLinks = /** @class */ (function (_super) {
+    __extends(ReleaseLinks, _super);
+    function ReleaseLinks() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    ReleaseLinks.prototype.all = function (projectId, tagName, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_1$h || (templateObject_1$h = __makeTemplateObject(["projects/", "/releases/", "/assets/links"], ["projects/", "/releases/", "/assets/links"])), projectId, tagName), options);
+    };
+    ReleaseLinks.prototype.create = function (projectId, tagName, name, url, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_2$b || (templateObject_2$b = __makeTemplateObject(["projects/", "/releases/", "/assets/links"], ["projects/", "/releases/", "/assets/links"])), projectId, tagName), __assign({ name: name, url: url }, options));
+    };
+    ReleaseLinks.prototype.edit = function (projectId, tagName, linkId, options) {
+        return RequestHelper.put()(this, endpoint(templateObject_3$9 || (templateObject_3$9 = __makeTemplateObject(["projects/", "/releases/", "/assets/links/", ""], ["projects/", "/releases/", "/assets/links/", ""])), projectId, tagName, linkId), options);
+    };
+    ReleaseLinks.prototype.remove = function (projectId, tagName, linkId, options) {
+        return RequestHelper.del()(this, endpoint(templateObject_4$8 || (templateObject_4$8 = __makeTemplateObject(["projects/", "/releases/", "/assets/links/", ""], ["projects/", "/releases/", "/assets/links/", ""])), projectId, tagName, linkId), options);
+    };
+    ReleaseLinks.prototype.show = function (projectId, tagName, linkId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_5$6 || (templateObject_5$6 = __makeTemplateObject(["projects/", "/releases/", "/assets/links/", ""], ["projects/", "/releases/", "/assets/links/", ""])), projectId, tagName, linkId), options);
+    };
+    return ReleaseLinks;
+}(requesterUtils.BaseResource));
+var templateObject_1$h, templateObject_2$b, templateObject_3$9, templateObject_4$8, templateObject_5$6;
+
+var Repositories = /** @class */ (function (_super) {
+    __extends(Repositories, _super);
+    function Repositories() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Repositories.prototype.compare = function (projectId, from, to, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_1$g || (templateObject_1$g = __makeTemplateObject(["projects/", "/repository/compare"], ["projects/", "/repository/compare"])), projectId), __assign({ from: from, to: to }, options));
+    };
+    Repositories.prototype.contributors = function (projectId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_2$a || (templateObject_2$a = __makeTemplateObject(["projects/", "/repository/contributors"], ["projects/", "/repository/contributors"])), projectId), options);
+    };
+    Repositories.prototype.mergeBase = function (projectId, refs, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_3$8 || (templateObject_3$8 = __makeTemplateObject(["projects/", "/repository/merge_base"], ["projects/", "/repository/merge_base"])), projectId), __assign({ refs: refs }, options));
+    };
+    Repositories.prototype.showArchive = function (projectId, _a) {
+        if (_a === void 0) { _a = {}; }
+        var _b = _a.fileType, fileType = _b === void 0 ? 'tar.gz' : _b, options = __rest(_a, ["fileType"]);
+        return RequestHelper.get()(this, endpoint(templateObject_4$7 || (templateObject_4$7 = __makeTemplateObject(["projects/", "/repository/archive.", ""], ["projects/", "/repository/archive.", ""])), projectId, fileType), options);
+    };
+    Repositories.prototype.showBlob = function (projectId, sha, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_5$5 || (templateObject_5$5 = __makeTemplateObject(["projects/", "/repository/blobs/", ""], ["projects/", "/repository/blobs/", ""])), projectId, sha), options);
+    };
+    Repositories.prototype.showBlobRaw = function (projectId, sha, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_6$2 || (templateObject_6$2 = __makeTemplateObject(["projects/", "/repository/blobs/", "/raw"], ["projects/", "/repository/blobs/", "/raw"])), projectId, sha), options);
+    };
+    Repositories.prototype.tree = function (projectId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_7 || (templateObject_7 = __makeTemplateObject(["projects/", "/repository/tree"], ["projects/", "/repository/tree"])), projectId), options);
+    };
+    return Repositories;
+}(requesterUtils.BaseResource));
+var templateObject_1$g, templateObject_2$a, templateObject_3$8, templateObject_4$7, templateObject_5$5, templateObject_6$2, templateObject_7;
+
+var RepositoryFiles = /** @class */ (function (_super) {
+    __extends(RepositoryFiles, _super);
+    function RepositoryFiles() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    RepositoryFiles.prototype.create = function (projectId, filePath, branch, content, commitMessage, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_1$f || (templateObject_1$f = __makeTemplateObject(["projects/", "/repository/files/", ""], ["projects/", "/repository/files/", ""])), projectId, filePath), __assign({ branch: branch, content: content, commitMessage: commitMessage }, options));
+    };
+    RepositoryFiles.prototype.edit = function (projectId, filePath, branch, content, commitMessage, options) {
+        return RequestHelper.put()(this, endpoint(templateObject_2$9 || (templateObject_2$9 = __makeTemplateObject(["projects/", "/repository/files/", ""], ["projects/", "/repository/files/", ""])), projectId, filePath), __assign({ branch: branch, content: content, commitMessage: commitMessage }, options));
+    };
+    RepositoryFiles.prototype.remove = function (projectId, filePath, branch, commitMessage, options) {
+        return RequestHelper.del()(this, endpoint(templateObject_3$7 || (templateObject_3$7 = __makeTemplateObject(["projects/", "/repository/files/", ""], ["projects/", "/repository/files/", ""])), projectId, filePath), __assign({ branch: branch, commitMessage: commitMessage }, options));
+    };
+    RepositoryFiles.prototype.show = function (projectId, filePath, ref, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_4$6 || (templateObject_4$6 = __makeTemplateObject(["projects/", "/repository/files/", ""], ["projects/", "/repository/files/", ""])), projectId, filePath), __assign({ ref: ref }, options));
+    };
+    RepositoryFiles.prototype.showBlame = function (projectId, filePath, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_5$4 || (templateObject_5$4 = __makeTemplateObject(["projects/", "/repository/files/", "/blame"], ["projects/", "/repository/files/", "/blame"])), projectId, filePath), options);
+    };
+    RepositoryFiles.prototype.showRaw = function (projectId, filePath, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_6$1 || (templateObject_6$1 = __makeTemplateObject(["projects/", "/repository/files/", "/raw"], ["projects/", "/repository/files/", "/raw"])), projectId, filePath), options);
+    };
+    return RepositoryFiles;
+}(requesterUtils.BaseResource));
+var templateObject_1$f, templateObject_2$9, templateObject_3$7, templateObject_4$6, templateObject_5$4, templateObject_6$1;
+
+var RepositorySubmodules = /** @class */ (function (_super) {
+    __extends(RepositorySubmodules, _super);
+    function RepositorySubmodules() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    RepositorySubmodules.prototype.edit = function (projectId, submodule, branch, commit_sha, options) {
+        return RequestHelper.put()(this, endpoint(templateObject_1$e || (templateObject_1$e = __makeTemplateObject(["projects/", "/repository/submodules/", ""], ["projects/", "/repository/submodules/", ""])), projectId, submodule), __assign({ branch: branch, commit_sha: commit_sha }, options));
+    };
+    return RepositorySubmodules;
+}(requesterUtils.BaseResource));
+var templateObject_1$e;
+
+var Runners = /** @class */ (function (_super) {
+    __extends(Runners, _super);
+    function Runners() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Runners.prototype.all = function (_a) {
+        if (_a === void 0) { _a = {}; }
+        var projectId = _a.projectId, options = __rest(_a, ["projectId"]);
+        var url = projectId ? endpoint(templateObject_1$d || (templateObject_1$d = __makeTemplateObject(["projects/", "/runners"], ["projects/", "/runners"])), projectId) : 'runners/all';
+        return RequestHelper.get()(this, url, options);
+    };
+    Runners.prototype.allOwned = function (options) {
+        return RequestHelper.get()(this, 'runners', options);
+    };
+    Runners.prototype.edit = function (runnerId, options) {
+        return RequestHelper.put()(this, "runners/".concat(runnerId), options);
+    };
+    Runners.prototype.enable = function (projectId, runnerId, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_2$8 || (templateObject_2$8 = __makeTemplateObject(["projects/", "/runners"], ["projects/", "/runners"])), projectId), __assign({ runnerId: runnerId }, options));
+    };
+    Runners.prototype.disable = function (projectId, runnerId, options) {
+        return RequestHelper.del()(this, endpoint(templateObject_3$6 || (templateObject_3$6 = __makeTemplateObject(["projects/", "/runners/", ""], ["projects/", "/runners/", ""])), projectId, runnerId), options);
+    };
+    Runners.prototype.jobs = function (runnerId, options) {
+        return RequestHelper.get()(this, "runners/".concat(runnerId, "/jobs"), options);
+    };
+    Runners.prototype.remove = function (runnerId, options) {
+        return RequestHelper.del()(this, "runners/".concat(runnerId), options);
+    };
+    Runners.prototype.show = function (runnerId, options) {
+        return RequestHelper.get()(this, "runners/".concat(runnerId), options);
+    };
+    return Runners;
+}(requesterUtils.BaseResource));
+var templateObject_1$d, templateObject_2$8, templateObject_3$6;
+
+var Services = /** @class */ (function (_super) {
+    __extends(Services, _super);
+    function Services() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Services.prototype.all = function (projectId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_1$c || (templateObject_1$c = __makeTemplateObject(["projects/", "/services"], ["projects/", "/services"])), projectId), options);
+    };
+    Services.prototype.edit = function (projectId, serviceName, options) {
+        return RequestHelper.put()(this, endpoint(templateObject_2$7 || (templateObject_2$7 = __makeTemplateObject(["projects/", "/services/", ""], ["projects/", "/services/", ""])), projectId, serviceName), options);
+    };
+    Services.prototype.remove = function (projectId, serviceName, options) {
+        return RequestHelper.del()(this, endpoint(templateObject_3$5 || (templateObject_3$5 = __makeTemplateObject(["projects/", "/services/", ""], ["projects/", "/services/", ""])), projectId, serviceName), options);
+    };
+    Services.prototype.show = function (projectId, serviceName, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_4$5 || (templateObject_4$5 = __makeTemplateObject(["projects/", "/services/", ""], ["projects/", "/services/", ""])), projectId, serviceName), options);
+    };
+    return Services;
+}(requesterUtils.BaseResource));
+var templateObject_1$c, templateObject_2$7, templateObject_3$5, templateObject_4$5;
+
+var Tags = /** @class */ (function (_super) {
+    __extends(Tags, _super);
+    function Tags() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Tags.prototype.all = function (projectId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_1$b || (templateObject_1$b = __makeTemplateObject(["projects/", "/repository/tags"], ["projects/", "/repository/tags"])), projectId), options);
+    };
+    Tags.prototype.create = function (projectId, tagName, ref, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_2$6 || (templateObject_2$6 = __makeTemplateObject(["projects/", "/repository/tags"], ["projects/", "/repository/tags"])), projectId), __assign({ query: {
+                tagName: tagName,
+                ref: ref,
+            } }, options));
+    };
+    Tags.prototype.remove = function (projectId, tagName, options) {
+        return RequestHelper.del()(this, endpoint(templateObject_3$4 || (templateObject_3$4 = __makeTemplateObject(["projects/", "/repository/tags/", ""], ["projects/", "/repository/tags/", ""])), projectId, tagName), options);
+    };
+    Tags.prototype.show = function (projectId, tagName, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_4$4 || (templateObject_4$4 = __makeTemplateObject(["projects/", "/repository/tags/", ""], ["projects/", "/repository/tags/", ""])), projectId, tagName), options);
+    };
+    return Tags;
+}(requesterUtils.BaseResource));
+var templateObject_1$b, templateObject_2$6, templateObject_3$4, templateObject_4$4;
+
+var Todos = /** @class */ (function (_super) {
+    __extends(Todos, _super);
+    function Todos() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Todos.prototype.all = function (options) {
+        return RequestHelper.get()(this, 'todos', options);
+    };
+    Todos.prototype.create = function (projectId, resourceId, resourceName, options) {
+        var resourceAPI = resourceName === 'issue' ? 'issues' : 'merge_requests';
+        return RequestHelper.post()(this, endpoint(templateObject_1$a || (templateObject_1$a = __makeTemplateObject(["projects/", "/", "/", "/todo"], ["projects/", "/", "/", "/todo"])), projectId, resourceAPI, resourceId), options);
+    };
+    Todos.prototype.done = function (_a) {
+        if (_a === void 0) { _a = {}; }
+        var todoId = _a.todoId, options = __rest(_a, ["todoId"]);
+        var url = ['todos'];
+        if (todoId)
+            url.push(todoId.toString());
+        url.push('mark_as_done');
+        // Fixme: Rewrite this to make better use of proper typing
+        if (todoId) {
+            return RequestHelper.post()(this, url.join('/'), options);
+        }
+        return RequestHelper.post()(this, url.join('/'), options);
+    };
+    return Todos;
+}(requesterUtils.BaseResource));
+var templateObject_1$a;
+
+// TODO: Rename PipelineTriggers
+var Triggers = /** @class */ (function (_super) {
+    __extends(Triggers, _super);
+    function Triggers() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Triggers.prototype.add = function (projectId, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_1$9 || (templateObject_1$9 = __makeTemplateObject(["projects/", "/triggers"], ["projects/", "/triggers"])), projectId), options);
+    };
+    Triggers.prototype.all = function (projectId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_2$5 || (templateObject_2$5 = __makeTemplateObject(["projects/", "/triggers"], ["projects/", "/triggers"])), projectId), options);
+    };
+    Triggers.prototype.edit = function (projectId, triggerId, options) {
+        return RequestHelper.put()(this, endpoint(templateObject_3$3 || (templateObject_3$3 = __makeTemplateObject(["projects/", "/triggers/", ""], ["projects/", "/triggers/", ""])), projectId, triggerId), options);
+    };
+    Triggers.prototype.pipeline = function (projectId, ref, token, _a) {
+        var _b = _a === void 0 ? {} : _a, variables = _b.variables;
+        var hapiVariables = {};
+        if (variables) {
+            Object.entries(variables).forEach(function (_a) {
+                var _b = __read(_a, 2), k = _b[0], v = _b[1];
+                hapiVariables["variables[".concat(k, "]")] = v;
+            });
+        }
+        return RequestHelper.post()(this, endpoint(templateObject_4$3 || (templateObject_4$3 = __makeTemplateObject(["projects/", "/trigger/pipeline"], ["projects/", "/trigger/pipeline"])), projectId), __assign({ isForm: true, ref: ref, token: token }, hapiVariables));
+    };
+    Triggers.prototype.remove = function (projectId, triggerId, options) {
+        return RequestHelper.del()(this, endpoint(templateObject_5$3 || (templateObject_5$3 = __makeTemplateObject(["projects/", "/triggers/", ""], ["projects/", "/triggers/", ""])), projectId, triggerId), options);
+    };
+    Triggers.prototype.show = function (projectId, triggerId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_6 || (templateObject_6 = __makeTemplateObject(["projects/", "/triggers/", ""], ["projects/", "/triggers/", ""])), projectId, triggerId), options);
+    };
+    return Triggers;
+}(requesterUtils.BaseResource));
+var templateObject_1$9, templateObject_2$5, templateObject_3$3, templateObject_4$3, templateObject_5$3, templateObject_6;
+
+var VulnerabilityFindings = /** @class */ (function (_super) {
+    __extends(VulnerabilityFindings, _super);
+    function VulnerabilityFindings() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    VulnerabilityFindings.prototype.all = function (projectId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_1$8 || (templateObject_1$8 = __makeTemplateObject(["projects/", "/vulnerability_findings"], ["projects/", "/vulnerability_findings"])), projectId), options);
+    };
+    return VulnerabilityFindings;
+}(requesterUtils.BaseResource));
+var templateObject_1$8;
+
+var ApplicationSettings = /** @class */ (function (_super) {
+    __extends(ApplicationSettings, _super);
+    function ApplicationSettings() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    ApplicationSettings.prototype.all = function (options) {
+        return RequestHelper.get()(this, 'application/settings', options);
+    };
+    ApplicationSettings.prototype.edit = function (options) {
+        return RequestHelper.put()(this, 'application/settings', options);
+    };
+    return ApplicationSettings;
+}(requesterUtils.BaseResource));
+
+var BroadcastMessages = /** @class */ (function (_super) {
+    __extends(BroadcastMessages, _super);
+    function BroadcastMessages() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    BroadcastMessages.prototype.all = function (options) {
+        return RequestHelper.get()(this, 'broadcast_messages', options);
+    };
+    BroadcastMessages.prototype.create = function (options) {
+        return RequestHelper.post()(this, 'broadcast_messages', options);
+    };
+    BroadcastMessages.prototype.edit = function (broadcastMessageId, options) {
+        return RequestHelper.put()(this, "broadcast_messages/".concat(broadcastMessageId), options);
+    };
+    BroadcastMessages.prototype.remove = function (broadcastMessageId, options) {
+        return RequestHelper.del()(this, "broadcast_messages/".concat(broadcastMessageId), options);
+    };
+    BroadcastMessages.prototype.show = function (broadcastMessageId, options) {
+        return RequestHelper.get()(this, "broadcast_messages/".concat(broadcastMessageId), options);
+    };
+    return BroadcastMessages;
+}(requesterUtils.BaseResource));
+
+var Events = /** @class */ (function (_super) {
+    __extends(Events, _super);
+    function Events() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Events.prototype.all = function (_a) {
+        if (_a === void 0) { _a = {}; }
+        var projectId = _a.projectId, options = __rest(_a, ["projectId"]);
+        var url;
+        if (projectId) {
+            url = endpoint(templateObject_1$7 || (templateObject_1$7 = __makeTemplateObject(["projects/", "/events"], ["projects/", "/events"])), projectId);
+        }
+        else {
+            url = 'events';
+        }
+        return RequestHelper.get()(this, url, options);
+    };
+    return Events;
+}(requesterUtils.BaseResource));
+var templateObject_1$7;
+
+var FeatureFlags = /** @class */ (function (_super) {
+    __extends(FeatureFlags, _super);
+    function FeatureFlags() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    FeatureFlags.prototype.all = function (projectId, options) {
+        if (options === void 0) { options = {}; }
+        return RequestHelper.get()(this, endpoint(templateObject_1$6 || (templateObject_1$6 = __makeTemplateObject(["projects/", "/feature_flags"], ["projects/", "/feature_flags"])), projectId), options);
+    };
+    FeatureFlags.prototype.create = function (projectId, flagName, version, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_2$4 || (templateObject_2$4 = __makeTemplateObject(["projects/", "/feature_flags"], ["projects/", "/feature_flags"])), projectId), __assign({ name: flagName, version: version }, options));
+    };
+    FeatureFlags.prototype.edit = function (projectId, flagName, options) {
+        return RequestHelper.put()(this, endpoint(templateObject_3$2 || (templateObject_3$2 = __makeTemplateObject(["projects/", "/feature_flags/", ""], ["projects/", "/feature_flags/", ""])), projectId, flagName), options);
+    };
+    FeatureFlags.prototype.remove = function (projectId, flagName, options) {
+        return RequestHelper.del()(this, endpoint(templateObject_4$2 || (templateObject_4$2 = __makeTemplateObject(["projects/", "/feature_flags/", ""], ["projects/", "/feature_flags/", ""])), projectId, flagName), options);
+    };
+    FeatureFlags.prototype.show = function (projectId, flagName, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_5$2 || (templateObject_5$2 = __makeTemplateObject(["projects/", "/feature_flags/", ""], ["projects/", "/feature_flags/", ""])), projectId, flagName), options);
+    };
+    return FeatureFlags;
+}(requesterUtils.BaseResource));
+var templateObject_1$6, templateObject_2$4, templateObject_3$2, templateObject_4$2, templateObject_5$2;
+
+var GeoNodes = /** @class */ (function (_super) {
+    __extends(GeoNodes, _super);
+    function GeoNodes() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    GeoNodes.prototype.all = function (options) {
+        return RequestHelper.get()(this, 'geo_nodes', options);
+    };
+    GeoNodes.prototype.create = function (geonodeId, options) {
+        return RequestHelper.post()(this, "geo_nodes/".concat(geonodeId), options);
+    };
+    GeoNodes.prototype.edit = function (geonodeId, options) {
+        return RequestHelper.put()(this, "geo_nodes/".concat(geonodeId), options);
+    };
+    GeoNodes.prototype.failures = function (options) {
+        return RequestHelper.get()(this, 'geo_nodes/current/failures', options);
+    };
+    GeoNodes.prototype.repair = function (geonodeId, options) {
+        return RequestHelper.post()(this, "geo_nodes/".concat(geonodeId, "/repair"), options);
+    };
+    GeoNodes.prototype.remove = function (geonodeId, options) {
+        return RequestHelper.del()(this, "geo_nodes/".concat(geonodeId), options);
+    };
+    GeoNodes.prototype.show = function (geonodeId, options) {
+        return RequestHelper.get()(this, "geo_nodes/".concat(geonodeId), options);
+    };
+    GeoNodes.prototype.status = function (geonodeId, options) {
+        return RequestHelper.get()(this, "geo_nodes/".concat(geonodeId, "/status"), options);
+    };
+    GeoNodes.prototype.statuses = function (options) {
+        return RequestHelper.get()(this, 'geo_nodes/statuses', options);
+    };
+    return GeoNodes;
+}(requesterUtils.BaseResource));
+
+var GitignoreTemplates = /** @class */ (function (_super) {
+    __extends(GitignoreTemplates, _super);
+    function GitignoreTemplates(options) {
+        /* istanbul ignore next */
+        return _super.call(this, 'gitignores', options) || this;
+    }
+    return GitignoreTemplates;
+}(ResourceTemplates));
+
+var GitLabCIYMLTemplates = /** @class */ (function (_super) {
+    __extends(GitLabCIYMLTemplates, _super);
+    function GitLabCIYMLTemplates(options) {
+        /* istanbul ignore next */
+        return _super.call(this, 'gitlab_ci_ymls', options) || this;
+    }
+    return GitLabCIYMLTemplates;
+}(ResourceTemplates));
+
+var Keys = /** @class */ (function (_super) {
+    __extends(Keys, _super);
+    function Keys() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Keys.prototype.show = function (keyId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_1$5 || (templateObject_1$5 = __makeTemplateObject(["keys/", ""], ["keys/", ""])), keyId), options);
+    };
+    return Keys;
+}(requesterUtils.BaseResource));
+var templateObject_1$5;
+
+var License = /** @class */ (function (_super) {
+    __extends(License, _super);
+    function License() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    License.prototype.add = function (license, options) {
+        return RequestHelper.post()(this, 'license', __assign({ license: license }, options));
+    };
+    License.prototype.all = function (options) {
+        return RequestHelper.get()(this, 'licenses', options);
+    };
+    License.prototype.show = function (options) {
+        return RequestHelper.get()(this, 'license', options);
+    };
+    License.prototype.remove = function (licenceId, options) {
+        return RequestHelper.del()(this, "license/".concat(licenceId), options);
+    };
+    return License;
+}(requesterUtils.BaseResource));
+
+var LicenseTemplates = /** @class */ (function (_super) {
+    __extends(LicenseTemplates, _super);
+    function LicenseTemplates(options) {
+        /* istanbul ignore next */
+        return _super.call(this, 'Licenses', options) || this;
+    }
+    return LicenseTemplates;
+}(ResourceTemplates));
+
+var Lint = /** @class */ (function (_super) {
+    __extends(Lint, _super);
+    function Lint() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Lint.prototype.lint = function (content, options) {
+        // Perform CI file linting without context.
+        // See https://docs.gitlab.com/ee/api/lint.html#validate-the-ci-yaml-configuration
+        // This API doesn't work for CI files that contain `local` includes. Use `lintWithNamespace` instead.
+        return RequestHelper.post()(this, 'ci/lint', __assign({ content: content }, options));
+    };
+    // TODO: Figure out a better way of writing this to not be limited by the typing.
+    Lint.prototype.lintWithNamespace = function (projectId, content, options) {
+        // Perform CI file linting in the context of a specific project namespace.
+        // See https://docs.gitlab.com/ee/api/lint.html#validate-a-ci-yaml-configuration-with-a-namespace
+        // This API is useful when the CI file being linted has `local` includes, which requires project
+        // context to be understood.
+        return RequestHelper.post()(this, "projects/".concat(projectId, "/ci/lint"), __assign({ content: content }, options));
+    };
+    return Lint;
+}(requesterUtils.BaseResource));
+
+// TODO: Add missing functions
+var Namespaces = /** @class */ (function (_super) {
+    __extends(Namespaces, _super);
+    function Namespaces() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Namespaces.prototype.all = function (options) {
+        return RequestHelper.get()(this, 'namespaces', options);
+    };
+    Namespaces.prototype.show = function (namespaceId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_1$4 || (templateObject_1$4 = __makeTemplateObject(["namespaces/", ""], ["namespaces/", ""])), namespaceId), options);
+    };
+    return Namespaces;
+}(requesterUtils.BaseResource));
+var templateObject_1$4;
+
+function url(_a) {
+    var projectId = _a.projectId, groupId = _a.groupId;
+    var uri;
+    if (projectId) {
+        uri = endpoint(templateObject_1$3 || (templateObject_1$3 = __makeTemplateObject(["projects/", "/"], ["projects/", "/"])), projectId);
+    }
+    else if (groupId) {
+        uri = endpoint(templateObject_2$3 || (templateObject_2$3 = __makeTemplateObject(["groups/", "/"], ["groups/", "/"])), groupId);
+    }
+    else {
+        uri = '';
+    }
+    return "".concat(uri, "notification_settings");
+}
+var NotificationSettings = /** @class */ (function (_super) {
+    __extends(NotificationSettings, _super);
+    function NotificationSettings() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    NotificationSettings.prototype.all = function (_a) {
+        if (_a === void 0) { _a = {}; }
+        var projectId = _a.projectId, groupId = _a.groupId, options = __rest(_a, ["projectId", "groupId"]);
+        return RequestHelper.get()(this, url({ groupId: groupId, projectId: projectId }), options);
+    };
+    NotificationSettings.prototype.edit = function (_a) {
+        if (_a === void 0) { _a = {}; }
+        var projectId = _a.projectId, groupId = _a.groupId, options = __rest(_a, ["projectId", "groupId"]);
+        return RequestHelper.put()(this, url({ groupId: groupId, projectId: projectId }), options);
+    };
+    return NotificationSettings;
+}(requesterUtils.BaseResource));
+var templateObject_1$3, templateObject_2$3;
+
+var Markdown = /** @class */ (function (_super) {
+    __extends(Markdown, _super);
+    function Markdown() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Markdown.prototype.render = function (text, options) {
+        return RequestHelper.post()(this, 'markdown', __assign({ text: text }, options));
+    };
+    return Markdown;
+}(requesterUtils.BaseResource));
+
+// TODO: Add missing functions
+var PagesDomains = /** @class */ (function (_super) {
+    __extends(PagesDomains, _super);
+    function PagesDomains() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    PagesDomains.prototype.all = function (_a) {
+        if (_a === void 0) { _a = {}; }
+        var projectId = _a.projectId, options = __rest(_a, ["projectId"]);
+        var url = projectId ? endpoint(templateObject_1$2 || (templateObject_1$2 = __makeTemplateObject(["projects/", "/"], ["projects/", "/"])), projectId) : '';
+        return RequestHelper.get()(this, "".concat(url, "pages/domains"), options);
+    };
+    PagesDomains.prototype.create = function (projectId, domain, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_2$2 || (templateObject_2$2 = __makeTemplateObject(["projects/", "/pages/domains"], ["projects/", "/pages/domains"])), projectId), __assign({ domain: domain }, options));
+    };
+    PagesDomains.prototype.edit = function (projectId, domain, options) {
+        return RequestHelper.put()(this, endpoint(templateObject_3$1 || (templateObject_3$1 = __makeTemplateObject(["projects/", "/pages/domains/", ""], ["projects/", "/pages/domains/", ""])), projectId, domain), options);
+    };
+    PagesDomains.prototype.show = function (projectId, domain, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_4$1 || (templateObject_4$1 = __makeTemplateObject(["projects/", "/pages/domains/", ""], ["projects/", "/pages/domains/", ""])), projectId, domain), options);
+    };
+    PagesDomains.prototype.remove = function (projectId, domain, options) {
+        return RequestHelper.del()(this, endpoint(templateObject_5$1 || (templateObject_5$1 = __makeTemplateObject(["projects/", "/pages/domains/", ""], ["projects/", "/pages/domains/", ""])), projectId, domain), options);
+    };
+    return PagesDomains;
+}(requesterUtils.BaseResource));
+var templateObject_1$2, templateObject_2$2, templateObject_3$1, templateObject_4$1, templateObject_5$1;
+
+var Search = /** @class */ (function (_super) {
+    __extends(Search, _super);
+    function Search() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Search.prototype.all = function (scope, search, _a) {
+        if (_a === void 0) { _a = {}; }
+        var projectId = _a.projectId, groupId = _a.groupId, options = __rest(_a, ["projectId", "groupId"]);
+        var url;
+        if (projectId) {
+            url = endpoint(templateObject_1$1 || (templateObject_1$1 = __makeTemplateObject(["projects/", "/"], ["projects/", "/"])), projectId);
+        }
+        else if (groupId) {
+            url = endpoint(templateObject_2$1 || (templateObject_2$1 = __makeTemplateObject(["groups/", "/"], ["groups/", "/"])), groupId);
+        }
+        else {
+            url = '';
+        }
+        return RequestHelper.get()(this, "".concat(url, "search"), __assign({ scope: scope, search: search }, options));
+    };
+    return Search;
+}(requesterUtils.BaseResource));
+var templateObject_1$1, templateObject_2$1;
+
+var SidekiqMetrics = /** @class */ (function (_super) {
+    __extends(SidekiqMetrics, _super);
+    function SidekiqMetrics() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    SidekiqMetrics.prototype.queueMetrics = function () {
+        return RequestHelper.get()(this, 'sidekiq/queue_metrics');
+    };
+    SidekiqMetrics.prototype.processMetrics = function () {
+        return RequestHelper.get()(this, 'sidekiq/process_metrics');
+    };
+    SidekiqMetrics.prototype.jobStats = function () {
+        return RequestHelper.get()(this, 'sidekiq/job_stats');
+    };
+    SidekiqMetrics.prototype.compoundMetrics = function () {
+        return RequestHelper.get()(this, 'sidekiq/compound_metrics');
+    };
+    return SidekiqMetrics;
+}(requesterUtils.BaseResource));
+
+var Snippets = /** @class */ (function (_super) {
+    __extends(Snippets, _super);
+    function Snippets() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Snippets.prototype.all = function (_a) {
+        if (_a === void 0) { _a = {}; }
+        var p = _a.public, options = __rest(_a, ["public"]);
+        var url = p ? 'snippets/public' : 'snippets';
+        return RequestHelper.get()(this, url, options);
+    };
+    Snippets.prototype.content = function (snippetId, options) {
+        return RequestHelper.get()(this, "snippets/".concat(snippetId, "/raw"), options);
+    };
+    Snippets.prototype.create = function (title, fileName, content, visibility, options) {
+        return RequestHelper.post()(this, 'snippets', __assign({ title: title, fileName: fileName, content: content, visibility: visibility }, options));
+    };
+    Snippets.prototype.edit = function (snippetId, options) {
+        return RequestHelper.put()(this, "snippets/".concat(snippetId), options);
+    };
+    Snippets.prototype.remove = function (snippetId, options) {
+        return RequestHelper.del()(this, "snippets/".concat(snippetId), options);
+    };
+    Snippets.prototype.show = function (snippetId, options) {
+        return RequestHelper.get()(this, "snippets/".concat(snippetId), options);
+    };
+    Snippets.prototype.userAgentDetails = function (snippetId, options) {
+        return RequestHelper.get()(this, "snippets/".concat(snippetId, "/user_agent_detail"), options);
+    };
+    return Snippets;
+}(requesterUtils.BaseResource));
+
+var SystemHooks = /** @class */ (function (_super) {
+    __extends(SystemHooks, _super);
+    function SystemHooks() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    SystemHooks.prototype.add = function (url, options) {
+        return RequestHelper.post()(this, 'hooks', __assign({ url: url }, options));
+    };
+    SystemHooks.prototype.all = function (options) {
+        return RequestHelper.get()(this, 'hooks', options);
+    };
+    SystemHooks.prototype.edit = function (hookId, url, options) {
+        return RequestHelper.put()(this, "hooks/".concat(hookId), __assign({ url: url }, options));
+    };
+    SystemHooks.prototype.remove = function (hookId, options) {
+        return RequestHelper.del()(this, "hooks/".concat(hookId), options);
+    };
+    return SystemHooks;
+}(requesterUtils.BaseResource));
+
+var Version = /** @class */ (function (_super) {
+    __extends(Version, _super);
+    function Version() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Version.prototype.show = function (options) {
+        return RequestHelper.get()(this, 'version', options);
+    };
+    return Version;
+}(requesterUtils.BaseResource));
+
+var Wikis = /** @class */ (function (_super) {
+    __extends(Wikis, _super);
+    function Wikis() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Wikis.prototype.all = function (projectId, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_1 || (templateObject_1 = __makeTemplateObject(["projects/", "/wikis"], ["projects/", "/wikis"])), projectId), options);
+    };
+    Wikis.prototype.create = function (projectId, options) {
+        return RequestHelper.post()(this, endpoint(templateObject_2 || (templateObject_2 = __makeTemplateObject(["projects/", "/wikis"], ["projects/", "/wikis"])), projectId), options);
+    };
+    Wikis.prototype.edit = function (projectId, slug, options) {
+        return RequestHelper.put()(this, endpoint(templateObject_3 || (templateObject_3 = __makeTemplateObject(["projects/", "/wikis/", ""], ["projects/", "/wikis/", ""])), projectId, slug), options);
+    };
+    Wikis.prototype.show = function (projectId, slug, options) {
+        return RequestHelper.get()(this, endpoint(templateObject_4 || (templateObject_4 = __makeTemplateObject(["projects/", "/wikis/", ""], ["projects/", "/wikis/", ""])), projectId, slug), options);
+    };
+    Wikis.prototype.remove = function (projectId, slug, options) {
+        return RequestHelper.del()(this, endpoint(templateObject_5 || (templateObject_5 = __makeTemplateObject(["projects/", "/wikis/", ""], ["projects/", "/wikis/", ""])), projectId, slug), options);
+    };
+    return Wikis;
+}(requesterUtils.BaseResource));
+var templateObject_1, templateObject_2, templateObject_3, templateObject_4, templateObject_5;
+
+/* eslint-disable  max-classes-per-file */
+var resources = {
+    Groups: Groups,
+    GroupAccessRequests: GroupAccessRequests,
+    GroupBadges: GroupBadges,
+    GroupCustomAttributes: GroupCustomAttributes,
+    GroupIssueBoards: GroupIssueBoards,
+    GroupMembers: GroupMembers,
+    GroupMilestones: GroupMilestones,
+    GroupRunners: GroupRunners,
+    GroupVariables: GroupVariables,
+    GroupLabels: GroupLabels,
+    GroupDeployTokens: GroupDeployTokens,
+    Epics: Epics,
+    EpicIssues: EpicIssues,
+    EpicNotes: EpicNotes,
+    EpicDiscussions: EpicDiscussions,
+    Users: Users,
+    UserCustomAttributes: UserCustomAttributes,
+    UserEmails: UserEmails,
+    UserImpersonationTokens: UserImpersonationTokens,
+    UserSSHKeys: UserSSHKeys,
+    UserGPGKeys: UserGPGKeys,
+    Branches: Branches,
+    Commits: Commits,
+    CommitDiscussions: CommitDiscussions,
+    ContainerRegistry: ContainerRegistry,
+    Deployments: Deployments,
+    DeployKeys: DeployKeys,
+    Environments: Environments,
+    FreezePeriods: FreezePeriods,
+    Issues: Issues,
+    IssuesStatistics: IssuesStatistics,
+    IssueNotes: IssueNotes,
+    IssueNoteAwardEmojis: IssueNoteAwardEmojis,
+    IssueDiscussions: IssueDiscussions,
+    IssueAwardEmojis: IssueAwardEmojis,
+    Jobs: Jobs,
+    Labels: Labels,
+    MergeRequests: MergeRequests,
+    MergeRequestApprovals: MergeRequestApprovals,
+    MergeRequestAwardEmojis: MergeRequestAwardEmojis,
+    MergeRequestDiscussions: MergeRequestDiscussions,
+    MergeRequestNotes: MergeRequestNotes,
+    Packages: Packages,
+    PackageRegistry: PackageRegistry,
+    Pipelines: Pipelines,
+    PipelineSchedules: PipelineSchedules,
+    PipelineScheduleVariables: PipelineScheduleVariables,
+    Projects: Projects,
+    ProjectAccessRequests: ProjectAccessRequests,
+    ProjectBadges: ProjectBadges,
+    ProjectCustomAttributes: ProjectCustomAttributes,
+    ProjectImportExport: ProjectImportExport,
+    ProjectIssueBoards: ProjectIssueBoards,
+    ProjectHooks: ProjectHooks,
+    ProjectMembers: ProjectMembers,
+    ProjectMilestones: ProjectMilestones,
+    ProjectSnippets: ProjectSnippets,
+    ProjectSnippetNotes: ProjectSnippetNotes,
+    ProjectSnippetDiscussions: ProjectSnippetDiscussions,
+    ProjectSnippetAwardEmojis: ProjectSnippetAwardEmojis,
+    ProtectedBranches: ProtectedBranches,
+    ProtectedTags: ProtectedTags,
+    ProjectVariables: ProjectVariables,
+    ProjectDeployTokens: ProjectDeployTokens,
+    PushRules: PushRules,
+    Releases: Releases,
+    ReleaseLinks: ReleaseLinks,
+    Repositories: Repositories,
+    RepositoryFiles: RepositoryFiles,
+    RepositorySubmodules: RepositorySubmodules,
+    Runners: Runners,
+    Services: Services,
+    Tags: Tags,
+    Todos: Todos,
+    Triggers: Triggers,
+    VulnerabilityFindings: VulnerabilityFindings,
+    ApplicationSettings: ApplicationSettings,
+    BroadcastMessages: BroadcastMessages,
+    Events: Events,
+    FeatureFlags: FeatureFlags,
+    GeoNodes: GeoNodes,
+    GitignoreTemplates: GitignoreTemplates,
+    GitLabCIYMLTemplates: GitLabCIYMLTemplates,
+    Keys: Keys,
+    License: License,
+    LicenseTemplates: LicenseTemplates,
+    Lint: Lint,
+    Namespaces: Namespaces,
+    NotificationSettings: NotificationSettings,
+    Markdown: Markdown,
+    PagesDomains: PagesDomains,
+    Search: Search,
+    SidekiqMetrics: SidekiqMetrics,
+    Snippets: Snippets,
+    SystemHooks: SystemHooks,
+    Version: Version,
+    Wikis: Wikis,
+};
+var Gitlab = /** @class */ (function (_super) {
+    __extends(Gitlab, _super);
+    function Gitlab(options) {
+        var _this = _super.call(this) || this;
+        Object.keys(resources).forEach(function (s) {
+            _this[s] = new resources[s](options);
+        });
+        return _this;
+    }
+    return Gitlab;
+}(/** @class */ (function () {
+    function class_1() {
+    }
+    return class_1;
+}())));
+
+// Groups
+
+var index = /*#__PURE__*/Object.freeze({
+    __proto__: null,
+    Groups: Groups,
+    GroupAccessRequests: GroupAccessRequests,
+    GroupBadges: GroupBadges,
+    GroupCustomAttributes: GroupCustomAttributes,
+    GroupIssueBoards: GroupIssueBoards,
+    GroupMembers: GroupMembers,
+    GroupMilestones: GroupMilestones,
+    GroupRunners: GroupRunners,
+    GroupVariables: GroupVariables,
+    GroupLabels: GroupLabels,
+    GroupDeployTokens: GroupDeployTokens,
+    Epics: Epics,
+    EpicIssues: EpicIssues,
+    EpicNotes: EpicNotes,
+    EpicDiscussions: EpicDiscussions,
+    Users: Users,
+    UserCustomAttributes: UserCustomAttributes,
+    UserEmails: UserEmails,
+    UserImpersonationTokens: UserImpersonationTokens,
+    UserSSHKeys: UserSSHKeys,
+    UserGPGKeys: UserGPGKeys,
+    Branches: Branches,
+    Commits: Commits,
+    CommitDiscussions: CommitDiscussions,
+    ContainerRegistry: ContainerRegistry,
+    Deployments: Deployments,
+    DeployKeys: DeployKeys,
+    Environments: Environments,
+    FreezePeriods: FreezePeriods,
+    Issues: Issues,
+    IssuesStatistics: IssuesStatistics,
+    IssueNotes: IssueNotes,
+    IssueNoteAwardEmojis: IssueNoteAwardEmojis,
+    IssueDiscussions: IssueDiscussions,
+    IssueAwardEmojis: IssueAwardEmojis,
+    Jobs: Jobs,
+    Labels: Labels,
+    MergeRequests: MergeRequests,
+    MergeRequestApprovals: MergeRequestApprovals,
+    MergeRequestAwardEmojis: MergeRequestAwardEmojis,
+    MergeRequestDiscussions: MergeRequestDiscussions,
+    MergeRequestNotes: MergeRequestNotes,
+    Packages: Packages,
+    PackageRegistry: PackageRegistry,
+    Pipelines: Pipelines,
+    PipelineSchedules: PipelineSchedules,
+    PipelineScheduleVariables: PipelineScheduleVariables,
+    Projects: Projects,
+    ProjectAccessRequests: ProjectAccessRequests,
+    ProjectBadges: ProjectBadges,
+    ProjectCustomAttributes: ProjectCustomAttributes,
+    ProjectImportExport: ProjectImportExport,
+    ProjectIssueBoards: ProjectIssueBoards,
+    ProjectHooks: ProjectHooks,
+    ProjectMembers: ProjectMembers,
+    ProjectMilestones: ProjectMilestones,
+    ProjectSnippets: ProjectSnippets,
+    ProjectSnippetNotes: ProjectSnippetNotes,
+    ProjectSnippetDiscussions: ProjectSnippetDiscussions,
+    ProjectSnippetAwardEmojis: ProjectSnippetAwardEmojis,
+    ProtectedBranches: ProtectedBranches,
+    ProtectedTags: ProtectedTags,
+    ProjectVariables: ProjectVariables,
+    ProjectDeployTokens: ProjectDeployTokens,
+    PushRules: PushRules,
+    Releases: Releases,
+    ReleaseLinks: ReleaseLinks,
+    Repositories: Repositories,
+    RepositoryFiles: RepositoryFiles,
+    RepositorySubmodules: RepositorySubmodules,
+    Runners: Runners,
+    Services: Services,
+    Tags: Tags,
+    Todos: Todos,
+    Triggers: Triggers,
+    VulnerabilityFindings: VulnerabilityFindings,
+    ApplicationSettings: ApplicationSettings,
+    BroadcastMessages: BroadcastMessages,
+    Events: Events,
+    FeatureFlags: FeatureFlags,
+    GeoNodes: GeoNodes,
+    GitignoreTemplates: GitignoreTemplates,
+    GitLabCIYMLTemplates: GitLabCIYMLTemplates,
+    Keys: Keys,
+    License: License,
+    LicenseTemplates: LicenseTemplates,
+    Lint: Lint,
+    Namespaces: Namespaces,
+    NotificationSettings: NotificationSettings,
+    Markdown: Markdown,
+    PagesDomains: PagesDomains,
+    Search: Search,
+    SidekiqMetrics: SidekiqMetrics,
+    Snippets: Snippets,
+    SystemHooks: SystemHooks,
+    Version: Version,
+    Wikis: Wikis,
+    Gitlab: Gitlab
+});
+
+var types = /*#__PURE__*/Object.freeze({
+    __proto__: null
+});
+
+exports.ApplicationSettings = ApplicationSettings;
+exports.Branches = Branches;
+exports.BroadcastMessages = BroadcastMessages;
+exports.CommitDiscussions = CommitDiscussions;
+exports.Commits = Commits;
+exports.ContainerRegistry = ContainerRegistry;
+exports.DeployKeys = DeployKeys;
+exports.Deployments = Deployments;
+exports.Environments = Environments;
+exports.EpicDiscussions = EpicDiscussions;
+exports.EpicIssues = EpicIssues;
+exports.EpicNotes = EpicNotes;
+exports.Epics = Epics;
+exports.Events = Events;
+exports.FeatureFlags = FeatureFlags;
+exports.FreezePeriods = FreezePeriods;
+exports.GeoNodes = GeoNodes;
+exports.GitLabCIYMLTemplates = GitLabCIYMLTemplates;
+exports.GitignoreTemplates = GitignoreTemplates;
+exports.Gitlab = Gitlab;
+exports.GroupAccessRequests = GroupAccessRequests;
+exports.GroupBadges = GroupBadges;
+exports.GroupCustomAttributes = GroupCustomAttributes;
+exports.GroupDeployTokens = GroupDeployTokens;
+exports.GroupIssueBoards = GroupIssueBoards;
+exports.GroupLabels = GroupLabels;
+exports.GroupMembers = GroupMembers;
+exports.GroupMilestones = GroupMilestones;
+exports.GroupRunners = GroupRunners;
+exports.GroupVariables = GroupVariables;
+exports.Groups = Groups;
+exports.IssueAwardEmojis = IssueAwardEmojis;
+exports.IssueDiscussions = IssueDiscussions;
+exports.IssueNoteAwardEmojis = IssueNoteAwardEmojis;
+exports.IssueNotes = IssueNotes;
+exports.Issues = Issues;
+exports.IssuesStatistics = IssuesStatistics;
+exports.Jobs = Jobs;
+exports.Keys = Keys;
+exports.Labels = Labels;
+exports.License = License;
+exports.LicenseTemplates = LicenseTemplates;
+exports.Lint = Lint;
+exports.Markdown = Markdown;
+exports.MergeRequestApprovals = MergeRequestApprovals;
+exports.MergeRequestAwardEmojis = MergeRequestAwardEmojis;
+exports.MergeRequestDiscussions = MergeRequestDiscussions;
+exports.MergeRequestNotes = MergeRequestNotes;
+exports.MergeRequests = MergeRequests;
+exports.Namespaces = Namespaces;
+exports.NotificationSettings = NotificationSettings;
+exports.PackageRegistry = PackageRegistry;
+exports.Packages = Packages;
+exports.PagesDomains = PagesDomains;
+exports.PipelineScheduleVariables = PipelineScheduleVariables;
+exports.PipelineSchedules = PipelineSchedules;
+exports.Pipelines = Pipelines;
+exports.ProjectAccessRequests = ProjectAccessRequests;
+exports.ProjectBadges = ProjectBadges;
+exports.ProjectCustomAttributes = ProjectCustomAttributes;
+exports.ProjectDeployTokens = ProjectDeployTokens;
+exports.ProjectHooks = ProjectHooks;
+exports.ProjectImportExport = ProjectImportExport;
+exports.ProjectIssueBoards = ProjectIssueBoards;
+exports.ProjectMembers = ProjectMembers;
+exports.ProjectMilestones = ProjectMilestones;
+exports.ProjectSnippetAwardEmojis = ProjectSnippetAwardEmojis;
+exports.ProjectSnippetDiscussions = ProjectSnippetDiscussions;
+exports.ProjectSnippetNotes = ProjectSnippetNotes;
+exports.ProjectSnippets = ProjectSnippets;
+exports.ProjectVariables = ProjectVariables;
+exports.Projects = Projects;
+exports.ProtectedBranches = ProtectedBranches;
+exports.ProtectedTags = ProtectedTags;
+exports.PushRules = PushRules;
+exports.ReleaseLinks = ReleaseLinks;
+exports.Releases = Releases;
+exports.Repositories = Repositories;
+exports.RepositoryFiles = RepositoryFiles;
+exports.RepositorySubmodules = RepositorySubmodules;
+exports.Resources = index;
+exports.Runners = Runners;
+exports.Search = Search;
+exports.Services = Services;
+exports.SidekiqMetrics = SidekiqMetrics;
+exports.Snippets = Snippets;
+exports.SystemHooks = SystemHooks;
+exports.Tags = Tags;
+exports.Todos = Todos;
+exports.Triggers = Triggers;
+exports.Types = types;
+exports.UserCustomAttributes = UserCustomAttributes;
+exports.UserEmails = UserEmails;
+exports.UserGPGKeys = UserGPGKeys;
+exports.UserImpersonationTokens = UserImpersonationTokens;
+exports.UserSSHKeys = UserSSHKeys;
+exports.Users = Users;
+exports.Version = Version;
+exports.VulnerabilityFindings = VulnerabilityFindings;
+exports.Wikis = Wikis;
+exports.getAPIMap = getAPIMap;
+//# sourceMappingURL=index.js.map
+
+
+/***/ }),
+
+/***/ 6093:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+var CombinedStream = __nccwpck_require__(5443);
+var util = __nccwpck_require__(3837);
+var path = __nccwpck_require__(1017);
+var http = __nccwpck_require__(3685);
+var https = __nccwpck_require__(5687);
+var parseUrl = (__nccwpck_require__(7310).parse);
+var fs = __nccwpck_require__(7147);
+var Stream = (__nccwpck_require__(2781).Stream);
+var mime = __nccwpck_require__(3583);
+var asynckit = __nccwpck_require__(4812);
+var populate = __nccwpck_require__(9584);
+
+// Public API
+module.exports = FormData;
+
+// make it a Stream
+util.inherits(FormData, CombinedStream);
+
+/**
+ * Create readable "multipart/form-data" streams.
+ * Can be used to submit forms
+ * and file uploads to other web applications.
+ *
+ * @constructor
+ * @param {Object} options - Properties to be added/overriden for FormData and CombinedStream
+ */
+function FormData(options) {
+  if (!(this instanceof FormData)) {
+    return new FormData(options);
+  }
+
+  this._overheadLength = 0;
+  this._valueLength = 0;
+  this._valuesToMeasure = [];
+
+  CombinedStream.call(this);
+
+  options = options || {};
+  for (var option in options) {
+    this[option] = options[option];
+  }
+}
+
+FormData.LINE_BREAK = '\r\n';
+FormData.DEFAULT_CONTENT_TYPE = 'application/octet-stream';
+
+FormData.prototype.append = function(field, value, options) {
+
+  options = options || {};
+
+  // allow filename as single option
+  if (typeof options == 'string') {
+    options = {filename: options};
+  }
+
+  var append = CombinedStream.prototype.append.bind(this);
+
+  // all that streamy business can't handle numbers
+  if (typeof value == 'number') {
+    value = '' + value;
+  }
+
+  // https://github.com/felixge/node-form-data/issues/38
+  if (util.isArray(value)) {
+    // Please convert your array into string
+    // the way web server expects it
+    this._error(new Error('Arrays are not supported.'));
+    return;
+  }
+
+  var header = this._multiPartHeader(field, value, options);
+  var footer = this._multiPartFooter();
+
+  append(header);
+  append(value);
+  append(footer);
+
+  // pass along options.knownLength
+  this._trackLength(header, value, options);
+};
+
+FormData.prototype._trackLength = function(header, value, options) {
+  var valueLength = 0;
+
+  // used w/ getLengthSync(), when length is known.
+  // e.g. for streaming directly from a remote server,
+  // w/ a known file a size, and not wanting to wait for
+  // incoming file to finish to get its size.
+  if (options.knownLength != null) {
+    valueLength += +options.knownLength;
+  } else if (Buffer.isBuffer(value)) {
+    valueLength = value.length;
+  } else if (typeof value === 'string') {
+    valueLength = Buffer.byteLength(value);
+  }
+
+  this._valueLength += valueLength;
+
+  // @check why add CRLF? does this account for custom/multiple CRLFs?
+  this._overheadLength +=
+    Buffer.byteLength(header) +
+    FormData.LINE_BREAK.length;
+
+  // empty or either doesn't have path or not an http response or not a stream
+  if (!value || ( !value.path && !(value.readable && value.hasOwnProperty('httpVersion')) && !(value instanceof Stream))) {
+    return;
+  }
+
+  // no need to bother with the length
+  if (!options.knownLength) {
+    this._valuesToMeasure.push(value);
+  }
+};
+
+FormData.prototype._lengthRetriever = function(value, callback) {
+
+  if (value.hasOwnProperty('fd')) {
+
+    // take read range into a account
+    // `end` = Infinity –> read file till the end
+    //
+    // TODO: Looks like there is bug in Node fs.createReadStream
+    // it doesn't respect `end` options without `start` options
+    // Fix it when node fixes it.
+    // https://github.com/joyent/node/issues/7819
+    if (value.end != undefined && value.end != Infinity && value.start != undefined) {
+
+      // when end specified
+      // no need to calculate range
+      // inclusive, starts with 0
+      callback(null, value.end + 1 - (value.start ? value.start : 0));
+
+    // not that fast snoopy
+    } else {
+      // still need to fetch file size from fs
+      fs.stat(value.path, function(err, stat) {
+
+        var fileSize;
+
+        if (err) {
+          callback(err);
+          return;
+        }
+
+        // update final size based on the range options
+        fileSize = stat.size - (value.start ? value.start : 0);
+        callback(null, fileSize);
+      });
+    }
+
+  // or http response
+  } else if (value.hasOwnProperty('httpVersion')) {
+    callback(null, +value.headers['content-length']);
+
+  // or request stream http://github.com/mikeal/request
+  } else if (value.hasOwnProperty('httpModule')) {
+    // wait till response come back
+    value.on('response', function(response) {
+      value.pause();
+      callback(null, +response.headers['content-length']);
+    });
+    value.resume();
+
+  // something else
+  } else {
+    callback('Unknown stream');
+  }
+};
+
+FormData.prototype._multiPartHeader = function(field, value, options) {
+  // custom header specified (as string)?
+  // it becomes responsible for boundary
+  // (e.g. to handle extra CRLFs on .NET servers)
+  if (typeof options.header == 'string') {
+    return options.header;
+  }
+
+  var contentDisposition = this._getContentDisposition(value, options);
+  var contentType = this._getContentType(value, options);
+
+  var contents = '';
+  var headers  = {
+    // add custom disposition as third element or keep it two elements if not
+    'Content-Disposition': ['form-data', 'name="' + field + '"'].concat(contentDisposition || []),
+    // if no content type. allow it to be empty array
+    'Content-Type': [].concat(contentType || [])
+  };
+
+  // allow custom headers.
+  if (typeof options.header == 'object') {
+    populate(headers, options.header);
+  }
+
+  var header;
+  for (var prop in headers) {
+    if (!headers.hasOwnProperty(prop)) continue;
+    header = headers[prop];
+
+    // skip nullish headers.
+    if (header == null) {
+      continue;
+    }
+
+    // convert all headers to arrays.
+    if (!Array.isArray(header)) {
+      header = [header];
+    }
+
+    // add non-empty headers.
+    if (header.length) {
+      contents += prop + ': ' + header.join('; ') + FormData.LINE_BREAK;
+    }
+  }
+
+  return '--' + this.getBoundary() + FormData.LINE_BREAK + contents + FormData.LINE_BREAK;
+};
+
+FormData.prototype._getContentDisposition = function(value, options) {
+
+  var filename
+    , contentDisposition
+    ;
+
+  if (typeof options.filepath === 'string') {
+    // custom filepath for relative paths
+    filename = path.normalize(options.filepath).replace(/\\/g, '/');
+  } else if (options.filename || value.name || value.path) {
+    // custom filename take precedence
+    // formidable and the browser add a name property
+    // fs- and request- streams have path property
+    filename = path.basename(options.filename || value.name || value.path);
+  } else if (value.readable && value.hasOwnProperty('httpVersion')) {
+    // or try http response
+    filename = path.basename(value.client._httpMessage.path || '');
+  }
+
+  if (filename) {
+    contentDisposition = 'filename="' + filename + '"';
+  }
+
+  return contentDisposition;
+};
+
+FormData.prototype._getContentType = function(value, options) {
+
+  // use custom content-type above all
+  var contentType = options.contentType;
+
+  // or try `name` from formidable, browser
+  if (!contentType && value.name) {
+    contentType = mime.lookup(value.name);
+  }
+
+  // or try `path` from fs-, request- streams
+  if (!contentType && value.path) {
+    contentType = mime.lookup(value.path);
+  }
+
+  // or if it's http-reponse
+  if (!contentType && value.readable && value.hasOwnProperty('httpVersion')) {
+    contentType = value.headers['content-type'];
+  }
+
+  // or guess it from the filepath or filename
+  if (!contentType && (options.filepath || options.filename)) {
+    contentType = mime.lookup(options.filepath || options.filename);
+  }
+
+  // fallback to the default content type if `value` is not simple value
+  if (!contentType && typeof value == 'object') {
+    contentType = FormData.DEFAULT_CONTENT_TYPE;
+  }
+
+  return contentType;
+};
+
+FormData.prototype._multiPartFooter = function() {
+  return function(next) {
+    var footer = FormData.LINE_BREAK;
+
+    var lastPart = (this._streams.length === 0);
+    if (lastPart) {
+      footer += this._lastBoundary();
+    }
+
+    next(footer);
+  }.bind(this);
+};
+
+FormData.prototype._lastBoundary = function() {
+  return '--' + this.getBoundary() + '--' + FormData.LINE_BREAK;
+};
+
+FormData.prototype.getHeaders = function(userHeaders) {
+  var header;
+  var formHeaders = {
+    'content-type': 'multipart/form-data; boundary=' + this.getBoundary()
+  };
+
+  for (header in userHeaders) {
+    if (userHeaders.hasOwnProperty(header)) {
+      formHeaders[header.toLowerCase()] = userHeaders[header];
+    }
+  }
+
+  return formHeaders;
+};
+
+FormData.prototype.setBoundary = function(boundary) {
+  this._boundary = boundary;
+};
+
+FormData.prototype.getBoundary = function() {
+  if (!this._boundary) {
+    this._generateBoundary();
+  }
+
+  return this._boundary;
+};
+
+FormData.prototype.getBuffer = function() {
+  var dataBuffer = new Buffer.alloc( 0 );
+  var boundary = this.getBoundary();
+
+  // Create the form content. Add Line breaks to the end of data.
+  for (var i = 0, len = this._streams.length; i < len; i++) {
+    if (typeof this._streams[i] !== 'function') {
+
+      // Add content to the buffer.
+      if(Buffer.isBuffer(this._streams[i])) {
+        dataBuffer = Buffer.concat( [dataBuffer, this._streams[i]]);
+      }else {
+        dataBuffer = Buffer.concat( [dataBuffer, Buffer.from(this._streams[i])]);
+      }
+
+      // Add break after content.
+      if (typeof this._streams[i] !== 'string' || this._streams[i].substring( 2, boundary.length + 2 ) !== boundary) {
+        dataBuffer = Buffer.concat( [dataBuffer, Buffer.from(FormData.LINE_BREAK)] );
+      }
+    }
+  }
+
+  // Add the footer and return the Buffer object.
+  return Buffer.concat( [dataBuffer, Buffer.from(this._lastBoundary())] );
+};
+
+FormData.prototype._generateBoundary = function() {
+  // This generates a 50 character boundary similar to those used by Firefox.
+  // They are optimized for boyer-moore parsing.
+  var boundary = '--------------------------';
+  for (var i = 0; i < 24; i++) {
+    boundary += Math.floor(Math.random() * 10).toString(16);
+  }
+
+  this._boundary = boundary;
+};
+
+// Note: getLengthSync DOESN'T calculate streams length
+// As workaround one can calculate file size manually
+// and add it as knownLength option
+FormData.prototype.getLengthSync = function() {
+  var knownLength = this._overheadLength + this._valueLength;
+
+  // Don't get confused, there are 3 "internal" streams for each keyval pair
+  // so it basically checks if there is any value added to the form
+  if (this._streams.length) {
+    knownLength += this._lastBoundary().length;
+  }
+
+  // https://github.com/form-data/form-data/issues/40
+  if (!this.hasKnownLength()) {
+    // Some async length retrievers are present
+    // therefore synchronous length calculation is false.
+    // Please use getLength(callback) to get proper length
+    this._error(new Error('Cannot calculate proper length in synchronous way.'));
+  }
+
+  return knownLength;
+};
+
+// Public API to check if length of added values is known
+// https://github.com/form-data/form-data/issues/196
+// https://github.com/form-data/form-data/issues/262
+FormData.prototype.hasKnownLength = function() {
+  var hasKnownLength = true;
+
+  if (this._valuesToMeasure.length) {
+    hasKnownLength = false;
+  }
+
+  return hasKnownLength;
+};
+
+FormData.prototype.getLength = function(cb) {
+  var knownLength = this._overheadLength + this._valueLength;
+
+  if (this._streams.length) {
+    knownLength += this._lastBoundary().length;
+  }
+
+  if (!this._valuesToMeasure.length) {
+    process.nextTick(cb.bind(this, null, knownLength));
+    return;
+  }
+
+  asynckit.parallel(this._valuesToMeasure, this._lengthRetriever, function(err, values) {
+    if (err) {
+      cb(err);
+      return;
+    }
+
+    values.forEach(function(length) {
+      knownLength += length;
+    });
+
+    cb(null, knownLength);
+  });
+};
+
+FormData.prototype.submit = function(params, cb) {
+  var request
+    , options
+    , defaults = {method: 'post'}
+    ;
+
+  // parse provided url if it's string
+  // or treat it as options object
+  if (typeof params == 'string') {
+
+    params = parseUrl(params);
+    options = populate({
+      port: params.port,
+      path: params.pathname,
+      host: params.hostname,
+      protocol: params.protocol
+    }, defaults);
+
+  // use custom params
+  } else {
+
+    options = populate(params, defaults);
+    // if no port provided use default one
+    if (!options.port) {
+      options.port = options.protocol == 'https:' ? 443 : 80;
+    }
+  }
+
+  // put that good code in getHeaders to some use
+  options.headers = this.getHeaders(params.headers);
+
+  // https if specified, fallback to http in any other case
+  if (options.protocol == 'https:') {
+    request = https.request(options);
+  } else {
+    request = http.request(options);
+  }
+
+  // get content length and fire away
+  this.getLength(function(err, length) {
+    if (err && err !== 'Unknown stream') {
+      this._error(err);
+      return;
+    }
+
+    // add content length
+    if (length) {
+      request.setHeader('Content-Length', length);
+    }
+
+    this.pipe(request);
+    if (cb) {
+      var onResponse;
+
+      var callback = function (error, responce) {
+        request.removeListener('error', callback);
+        request.removeListener('response', onResponse);
+
+        return cb.call(this, error, responce);
+      };
+
+      onResponse = callback.bind(this, null);
+
+      request.on('error', callback);
+      request.on('response', onResponse);
+    }
+  }.bind(this));
+
+  return request;
+};
+
+FormData.prototype._error = function(err) {
+  if (!this.error) {
+    this.error = err;
+    this.pause();
+    this.emit('error', err);
+  }
+};
+
+FormData.prototype.toString = function () {
+  return '[object FormData]';
+};
+
+
+/***/ }),
+
+/***/ 9584:
+/***/ ((module) => {
+
+// populates missing values
+module.exports = function(dst, src) {
+
+  Object.keys(src).forEach(function(prop)
+  {
+    dst[prop] = dst[prop] || src[prop];
+  });
+
+  return dst;
+};
+
+
+/***/ }),
+
+/***/ 391:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+const strictUriEncode = __nccwpck_require__(3605);
+const decodeComponent = __nccwpck_require__(3186);
+const splitOnFirst = __nccwpck_require__(4878);
+const filterObject = __nccwpck_require__(4940);
+
+const isNullOrUndefined = value => value === null || value === undefined;
+
+const encodeFragmentIdentifier = Symbol('encodeFragmentIdentifier');
+
+function encoderForArrayFormat(options) {
+	switch (options.arrayFormat) {
+		case 'index':
+			return key => (result, value) => {
+				const index = result.length;
+
+				if (
+					value === undefined ||
+					(options.skipNull && value === null) ||
+					(options.skipEmptyString && value === '')
+				) {
+					return result;
+				}
+
+				if (value === null) {
+					return [...result, [encode(key, options), '[', index, ']'].join('')];
+				}
+
+				return [
+					...result,
+					[encode(key, options), '[', encode(index, options), ']=', encode(value, options)].join('')
+				];
+			};
+
+		case 'bracket':
+			return key => (result, value) => {
+				if (
+					value === undefined ||
+					(options.skipNull && value === null) ||
+					(options.skipEmptyString && value === '')
+				) {
+					return result;
+				}
+
+				if (value === null) {
+					return [...result, [encode(key, options), '[]'].join('')];
+				}
+
+				return [...result, [encode(key, options), '[]=', encode(value, options)].join('')];
+			};
+
+		case 'colon-list-separator':
+			return key => (result, value) => {
+				if (
+					value === undefined ||
+					(options.skipNull && value === null) ||
+					(options.skipEmptyString && value === '')
+				) {
+					return result;
+				}
+
+				if (value === null) {
+					return [...result, [encode(key, options), ':list='].join('')];
+				}
+
+				return [...result, [encode(key, options), ':list=', encode(value, options)].join('')];
+			};
+
+		case 'comma':
+		case 'separator':
+		case 'bracket-separator': {
+			const keyValueSep = options.arrayFormat === 'bracket-separator' ?
+				'[]=' :
+				'=';
+
+			return key => (result, value) => {
+				if (
+					value === undefined ||
+					(options.skipNull && value === null) ||
+					(options.skipEmptyString && value === '')
+				) {
+					return result;
+				}
+
+				// Translate null to an empty string so that it doesn't serialize as 'null'
+				value = value === null ? '' : value;
+
+				if (result.length === 0) {
+					return [[encode(key, options), keyValueSep, encode(value, options)].join('')];
+				}
+
+				return [[result, encode(value, options)].join(options.arrayFormatSeparator)];
+			};
+		}
+
+		default:
+			return key => (result, value) => {
+				if (
+					value === undefined ||
+					(options.skipNull && value === null) ||
+					(options.skipEmptyString && value === '')
+				) {
+					return result;
+				}
+
+				if (value === null) {
+					return [...result, encode(key, options)];
+				}
+
+				return [...result, [encode(key, options), '=', encode(value, options)].join('')];
+			};
+	}
+}
+
+function parserForArrayFormat(options) {
+	let result;
+
+	switch (options.arrayFormat) {
+		case 'index':
+			return (key, value, accumulator) => {
+				result = /\[(\d*)\]$/.exec(key);
+
+				key = key.replace(/\[\d*\]$/, '');
+
+				if (!result) {
+					accumulator[key] = value;
+					return;
+				}
+
+				if (accumulator[key] === undefined) {
+					accumulator[key] = {};
+				}
+
+				accumulator[key][result[1]] = value;
+			};
+
+		case 'bracket':
+			return (key, value, accumulator) => {
+				result = /(\[\])$/.exec(key);
+				key = key.replace(/\[\]$/, '');
+
+				if (!result) {
+					accumulator[key] = value;
+					return;
+				}
+
+				if (accumulator[key] === undefined) {
+					accumulator[key] = [value];
+					return;
+				}
+
+				accumulator[key] = [].concat(accumulator[key], value);
+			};
+
+		case 'colon-list-separator':
+			return (key, value, accumulator) => {
+				result = /(:list)$/.exec(key);
+				key = key.replace(/:list$/, '');
+
+				if (!result) {
+					accumulator[key] = value;
+					return;
+				}
+
+				if (accumulator[key] === undefined) {
+					accumulator[key] = [value];
+					return;
+				}
+
+				accumulator[key] = [].concat(accumulator[key], value);
+			};
+
+		case 'comma':
+		case 'separator':
+			return (key, value, accumulator) => {
+				const isArray = typeof value === 'string' && value.includes(options.arrayFormatSeparator);
+				const isEncodedArray = (typeof value === 'string' && !isArray && decode(value, options).includes(options.arrayFormatSeparator));
+				value = isEncodedArray ? decode(value, options) : value;
+				const newValue = isArray || isEncodedArray ? value.split(options.arrayFormatSeparator).map(item => decode(item, options)) : value === null ? value : decode(value, options);
+				accumulator[key] = newValue;
+			};
+
+		case 'bracket-separator':
+			return (key, value, accumulator) => {
+				const isArray = /(\[\])$/.test(key);
+				key = key.replace(/\[\]$/, '');
+
+				if (!isArray) {
+					accumulator[key] = value ? decode(value, options) : value;
+					return;
+				}
+
+				const arrayValue = value === null ?
+					[] :
+					value.split(options.arrayFormatSeparator).map(item => decode(item, options));
+
+				if (accumulator[key] === undefined) {
+					accumulator[key] = arrayValue;
+					return;
+				}
+
+				accumulator[key] = [].concat(accumulator[key], arrayValue);
+			};
+
+		default:
+			return (key, value, accumulator) => {
+				if (accumulator[key] === undefined) {
+					accumulator[key] = value;
+					return;
+				}
+
+				accumulator[key] = [].concat(accumulator[key], value);
+			};
+	}
+}
+
+function validateArrayFormatSeparator(value) {
+	if (typeof value !== 'string' || value.length !== 1) {
+		throw new TypeError('arrayFormatSeparator must be single character string');
+	}
+}
+
+function encode(value, options) {
+	if (options.encode) {
+		return options.strict ? strictUriEncode(value) : encodeURIComponent(value);
+	}
+
+	return value;
+}
+
+function decode(value, options) {
+	if (options.decode) {
+		return decodeComponent(value);
+	}
+
+	return value;
+}
+
+function keysSorter(input) {
+	if (Array.isArray(input)) {
+		return input.sort();
+	}
+
+	if (typeof input === 'object') {
+		return keysSorter(Object.keys(input))
+			.sort((a, b) => Number(a) - Number(b))
+			.map(key => input[key]);
+	}
+
+	return input;
+}
+
+function removeHash(input) {
+	const hashStart = input.indexOf('#');
+	if (hashStart !== -1) {
+		input = input.slice(0, hashStart);
+	}
+
+	return input;
+}
+
+function getHash(url) {
+	let hash = '';
+	const hashStart = url.indexOf('#');
+	if (hashStart !== -1) {
+		hash = url.slice(hashStart);
+	}
+
+	return hash;
+}
+
+function extract(input) {
+	input = removeHash(input);
+	const queryStart = input.indexOf('?');
+	if (queryStart === -1) {
+		return '';
+	}
+
+	return input.slice(queryStart + 1);
+}
+
+function parseValue(value, options) {
+	if (options.parseNumbers && !Number.isNaN(Number(value)) && (typeof value === 'string' && value.trim() !== '')) {
+		value = Number(value);
+	} else if (options.parseBooleans && value !== null && (value.toLowerCase() === 'true' || value.toLowerCase() === 'false')) {
+		value = value.toLowerCase() === 'true';
+	}
+
+	return value;
+}
+
+function parse(query, options) {
+	options = Object.assign({
+		decode: true,
+		sort: true,
+		arrayFormat: 'none',
+		arrayFormatSeparator: ',',
+		parseNumbers: false,
+		parseBooleans: false
+	}, options);
+
+	validateArrayFormatSeparator(options.arrayFormatSeparator);
+
+	const formatter = parserForArrayFormat(options);
+
+	// Create an object with no prototype
+	const ret = Object.create(null);
+
+	if (typeof query !== 'string') {
+		return ret;
+	}
+
+	query = query.trim().replace(/^[?#&]/, '');
+
+	if (!query) {
+		return ret;
+	}
+
+	for (const param of query.split('&')) {
+		if (param === '') {
+			continue;
+		}
+
+		let [key, value] = splitOnFirst(options.decode ? param.replace(/\+/g, ' ') : param, '=');
+
+		// Missing `=` should be `null`:
+		// http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
+		value = value === undefined ? null : ['comma', 'separator', 'bracket-separator'].includes(options.arrayFormat) ? value : decode(value, options);
+		formatter(decode(key, options), value, ret);
+	}
+
+	for (const key of Object.keys(ret)) {
+		const value = ret[key];
+		if (typeof value === 'object' && value !== null) {
+			for (const k of Object.keys(value)) {
+				value[k] = parseValue(value[k], options);
+			}
+		} else {
+			ret[key] = parseValue(value, options);
+		}
+	}
+
+	if (options.sort === false) {
+		return ret;
+	}
+
+	return (options.sort === true ? Object.keys(ret).sort() : Object.keys(ret).sort(options.sort)).reduce((result, key) => {
+		const value = ret[key];
+		if (Boolean(value) && typeof value === 'object' && !Array.isArray(value)) {
+			// Sort object keys, not values
+			result[key] = keysSorter(value);
+		} else {
+			result[key] = value;
+		}
+
+		return result;
+	}, Object.create(null));
+}
+
+exports.extract = extract;
+exports.parse = parse;
+
+exports.stringify = (object, options) => {
+	if (!object) {
+		return '';
+	}
+
+	options = Object.assign({
+		encode: true,
+		strict: true,
+		arrayFormat: 'none',
+		arrayFormatSeparator: ','
+	}, options);
+
+	validateArrayFormatSeparator(options.arrayFormatSeparator);
+
+	const shouldFilter = key => (
+		(options.skipNull && isNullOrUndefined(object[key])) ||
+		(options.skipEmptyString && object[key] === '')
+	);
+
+	const formatter = encoderForArrayFormat(options);
+
+	const objectCopy = {};
+
+	for (const key of Object.keys(object)) {
+		if (!shouldFilter(key)) {
+			objectCopy[key] = object[key];
+		}
+	}
+
+	const keys = Object.keys(objectCopy);
+
+	if (options.sort !== false) {
+		keys.sort(options.sort);
+	}
+
+	return keys.map(key => {
+		const value = object[key];
+
+		if (value === undefined) {
+			return '';
+		}
+
+		if (value === null) {
+			return encode(key, options);
+		}
+
+		if (Array.isArray(value)) {
+			if (value.length === 0 && options.arrayFormat === 'bracket-separator') {
+				return encode(key, options) + '[]';
+			}
+
+			return value
+				.reduce(formatter(key), [])
+				.join('&');
+		}
+
+		return encode(key, options) + '=' + encode(value, options);
+	}).filter(x => x.length > 0).join('&');
+};
+
+exports.parseUrl = (url, options) => {
+	options = Object.assign({
+		decode: true
+	}, options);
+
+	const [url_, hash] = splitOnFirst(url, '#');
+
+	return Object.assign(
+		{
+			url: url_.split('?')[0] || '',
+			query: parse(extract(url), options)
+		},
+		options && options.parseFragmentIdentifier && hash ? {fragmentIdentifier: decode(hash, options)} : {}
+	);
+};
+
+exports.stringifyUrl = (object, options) => {
+	options = Object.assign({
+		encode: true,
+		strict: true,
+		[encodeFragmentIdentifier]: true
+	}, options);
+
+	const url = removeHash(object.url).split('?')[0] || '';
+	const queryFromUrl = exports.extract(object.url);
+	const parsedQueryFromUrl = exports.parse(queryFromUrl, {sort: false});
+
+	const query = Object.assign(parsedQueryFromUrl, object.query);
+	let queryString = exports.stringify(query, options);
+	if (queryString) {
+		queryString = `?${queryString}`;
+	}
+
+	let hash = getHash(object.url);
+	if (object.fragmentIdentifier) {
+		hash = `#${options[encodeFragmentIdentifier] ? encode(object.fragmentIdentifier, options) : object.fragmentIdentifier}`;
+	}
+
+	return `${url}${queryString}${hash}`;
+};
+
+exports.pick = (input, filter, options) => {
+	options = Object.assign({
+		parseFragmentIdentifier: true,
+		[encodeFragmentIdentifier]: false
+	}, options);
+
+	const {url, query, fragmentIdentifier} = exports.parseUrl(input, options);
+	return exports.stringifyUrl({
+		url,
+		query: filterObject(query, filter),
+		fragmentIdentifier
+	}, options);
+};
+
+exports.exclude = (input, filter, options) => {
+	const exclusionFilter = Array.isArray(filter) ? key => !filter.includes(key) : (key, value) => !filter(key, value);
+
+	return exports.pick(input, exclusionFilter, options);
+};
+
+
+/***/ }),
+
+/***/ 5849:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+var __webpack_unused_export__;
+
+
+__webpack_unused_export__ = ({ value: true });
+
+var core = __nccwpck_require__(7756);
+var requesterUtils = __nccwpck_require__(77);
+var Got = __nccwpck_require__(3061);
+var xcase = __nccwpck_require__(7020);
+var delay = __nccwpck_require__(86);
+
+function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
+
+var Got__default = /*#__PURE__*/_interopDefaultLegacy(Got);
+var delay__default = /*#__PURE__*/_interopDefaultLegacy(delay);
+
+/*! *****************************************************************************
+Copyright (c) Microsoft Corporation.
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.
+***************************************************************************** */
+
+var __assign = function() {
+    __assign = Object.assign || function __assign(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+
+function __awaiter(thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+}
+
+function __generator(thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+}
+
+function defaultOptionsHandler(resourceOptions, _a) {
+    var _b = _a === void 0 ? {} : _a, body = _b.body, query = _b.query, sudo = _b.sudo, method = _b.method;
+    var options = requesterUtils.defaultOptionsHandler(resourceOptions, { body: body, query: query, sudo: sudo, method: method });
+    // FIXME: Not the best comparison, but...it will have to do for now.
+    if (typeof body === 'object' && body.constructor.name !== 'FormData') {
+        options.json = xcase.decamelizeKeys(body);
+        delete options.body;
+    }
+    if (resourceOptions.url.includes('https') &&
+        resourceOptions.rejectUnauthorized != null &&
+        resourceOptions.rejectUnauthorized === false) {
+        options.https = {
+            rejectUnauthorized: resourceOptions.rejectUnauthorized,
+        };
+    }
+    return options;
+}
+function processBody(_a) {
+    var rawBody = _a.rawBody, headers = _a.headers;
+    // Split to remove potential charset info from the content type
+    var contentType = (headers['content-type'] || '').split(';')[0].trim();
+    if (contentType === 'application/json') {
+        return rawBody.length === 0 ? {} : JSON.parse(rawBody.toString());
+    }
+    if (contentType.startsWith('text/')) {
+        return rawBody.toString();
+    }
+    return Buffer.from(rawBody);
+}
+function handler(endpoint, options) {
+    return __awaiter(this, void 0, void 0, function () {
+        var retryCodes, maxRetries, response, i, waitTime, e_1, output, statusCode, headers, body;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    retryCodes = [429, 502];
+                    maxRetries = 10;
+                    i = 0;
+                    _a.label = 1;
+                case 1:
+                    if (!(i < maxRetries)) return [3 /*break*/, 9];
+                    waitTime = Math.pow(2, i) * 0.1;
+                    _a.label = 2;
+                case 2:
+                    _a.trys.push([2, 4, , 8]);
+                    if (options.method === 'stream') {
+                        return [2 /*return*/, Got__default["default"](endpoint, __assign(__assign({}, options), { method: 'get', isStream: true }))];
+                    }
+                    return [4 /*yield*/, Got__default["default"](endpoint, options)];
+                case 3:
+                    response = _a.sent(); // eslint-disable-line
+                    return [3 /*break*/, 9];
+                case 4:
+                    e_1 = _a.sent();
+                    if (!e_1.response) return [3 /*break*/, 7];
+                    if (!retryCodes.includes(e_1.response.statusCode)) return [3 /*break*/, 6];
+                    return [4 /*yield*/, delay__default["default"](waitTime)];
+                case 5:
+                    _a.sent(); // eslint-disable-line
+                    return [3 /*break*/, 8]; // eslint-disable-line
+                case 6:
+                    if (typeof e_1.response.body === 'string' && e_1.response.body.length > 0) {
+                        try {
+                            output = JSON.parse(e_1.response.body);
+                            e_1.description = output.error || output.message;
+                        }
+                        catch (err) {
+                            e_1.description = e_1.response.body;
+                        }
+                    }
+                    _a.label = 7;
+                case 7: throw e_1;
+                case 8:
+                    i += 1;
+                    return [3 /*break*/, 1];
+                case 9:
+                    statusCode = response.statusCode, headers = response.headers;
+                    body = processBody(response);
+                    return [2 /*return*/, { body: body, headers: headers, status: statusCode }];
+            }
+        });
+    });
+}
+var requesterFn = requesterUtils.createRequesterFn(defaultOptionsHandler, handler);
+
+var API = requesterUtils.presetResourceArguments(core.Resources, { requesterFn: requesterFn });
+var // Groups
+Groups = API.Groups, GroupAccessRequests = API.GroupAccessRequests, GroupBadges = API.GroupBadges, GroupCustomAttributes = API.GroupCustomAttributes, GroupIssueBoards = API.GroupIssueBoards, GroupMembers = API.GroupMembers, GroupMilestones = API.GroupMilestones, GroupRunners = API.GroupRunners, GroupVariables = API.GroupVariables, GroupLabels = API.GroupLabels, GroupDeployTokens = API.GroupDeployTokens, Epics = API.Epics, EpicIssues = API.EpicIssues, EpicNotes = API.EpicNotes, EpicDiscussions = API.EpicDiscussions, 
+// Users
+Users = API.Users, UserCustomAttributes = API.UserCustomAttributes, UserEmails = API.UserEmails, UserImpersonationTokens = API.UserImpersonationTokens, UserSSHKeys = API.UserSSHKeys, UserGPGKeys = API.UserGPGKeys, 
+// Projects
+Branches = API.Branches, Commits = API.Commits, CommitDiscussions = API.CommitDiscussions, ContainerRegistry = API.ContainerRegistry, Deployments = API.Deployments, DeployKeys = API.DeployKeys, Environments = API.Environments, FreezePeriods = API.FreezePeriods, Issues = API.Issues, IssuesStatistics = API.IssuesStatistics, IssueNotes = API.IssueNotes, IssueNoteAwardEmojis = API.IssueNoteAwardEmojis, IssueDiscussions = API.IssueDiscussions, IssueAwardEmojis = API.IssueAwardEmojis, Jobs = API.Jobs, Labels = API.Labels, MergeRequests = API.MergeRequests, MergeRequestApprovals = API.MergeRequestApprovals, MergeRequestAwardEmojis = API.MergeRequestAwardEmojis, MergeRequestDiscussions = API.MergeRequestDiscussions, MergeRequestNotes = API.MergeRequestNotes, Packages = API.Packages, PackageRegistry = API.PackageRegistry, Pipelines = API.Pipelines, PipelineSchedules = API.PipelineSchedules, PipelineScheduleVariables = API.PipelineScheduleVariables, Projects = API.Projects, ProjectAccessRequests = API.ProjectAccessRequests, ProjectBadges = API.ProjectBadges, ProjectCustomAttributes = API.ProjectCustomAttributes, ProjectImportExport = API.ProjectImportExport, ProjectIssueBoards = API.ProjectIssueBoards, ProjectHooks = API.ProjectHooks, ProjectMembers = API.ProjectMembers, ProjectMilestones = API.ProjectMilestones, ProjectSnippets = API.ProjectSnippets, ProjectSnippetNotes = API.ProjectSnippetNotes, ProjectSnippetDiscussions = API.ProjectSnippetDiscussions, ProjectSnippetAwardEmojis = API.ProjectSnippetAwardEmojis, ProtectedBranches = API.ProtectedBranches, ProtectedTags = API.ProtectedTags, ProjectVariables = API.ProjectVariables, ProjectDeployTokens = API.ProjectDeployTokens, PushRules = API.PushRules, Releases = API.Releases, ReleaseLinks = API.ReleaseLinks, Repositories = API.Repositories, RepositoryFiles = API.RepositoryFiles, RepositorySubmodules = API.RepositorySubmodules, Runners = API.Runners, Services = API.Services, Tags = API.Tags, Todos = API.Todos, Triggers = API.Triggers, VulnerabilityFindings = API.VulnerabilityFindings, 
+// Genral
+ApplicationSettings = API.ApplicationSettings, BroadcastMessages = API.BroadcastMessages, Events = API.Events, FeatureFlags = API.FeatureFlags, GeoNodes = API.GeoNodes, GitignoreTemplates = API.GitignoreTemplates, GitLabCIYMLTemplates = API.GitLabCIYMLTemplates, Keys = API.Keys, License = API.License, LicenseTemplates = API.LicenseTemplates, Lint = API.Lint, Namespaces = API.Namespaces, NotificationSettings = API.NotificationSettings, Markdown = API.Markdown, PagesDomains = API.PagesDomains, Search = API.Search, SidekiqMetrics = API.SidekiqMetrics, Snippets = API.Snippets, SystemHooks = API.SystemHooks, Version = API.Version, Wikis = API.Wikis, Gitlab = API.Gitlab;
+
+__webpack_unused_export__ = ({
+    enumerable: true,
+    get: function () { return core.Types; }
+});
+__webpack_unused_export__ = ApplicationSettings;
+__webpack_unused_export__ = Branches;
+__webpack_unused_export__ = BroadcastMessages;
+__webpack_unused_export__ = CommitDiscussions;
+__webpack_unused_export__ = Commits;
+__webpack_unused_export__ = ContainerRegistry;
+__webpack_unused_export__ = DeployKeys;
+__webpack_unused_export__ = Deployments;
+__webpack_unused_export__ = Environments;
+__webpack_unused_export__ = EpicDiscussions;
+__webpack_unused_export__ = EpicIssues;
+__webpack_unused_export__ = EpicNotes;
+__webpack_unused_export__ = Epics;
+__webpack_unused_export__ = Events;
+__webpack_unused_export__ = FeatureFlags;
+__webpack_unused_export__ = FreezePeriods;
+__webpack_unused_export__ = GeoNodes;
+__webpack_unused_export__ = GitLabCIYMLTemplates;
+__webpack_unused_export__ = GitignoreTemplates;
+exports.YU = Gitlab;
+__webpack_unused_export__ = GroupAccessRequests;
+__webpack_unused_export__ = GroupBadges;
+__webpack_unused_export__ = GroupCustomAttributes;
+__webpack_unused_export__ = GroupDeployTokens;
+__webpack_unused_export__ = GroupIssueBoards;
+__webpack_unused_export__ = GroupLabels;
+__webpack_unused_export__ = GroupMembers;
+__webpack_unused_export__ = GroupMilestones;
+__webpack_unused_export__ = GroupRunners;
+__webpack_unused_export__ = GroupVariables;
+__webpack_unused_export__ = Groups;
+__webpack_unused_export__ = IssueAwardEmojis;
+__webpack_unused_export__ = IssueDiscussions;
+__webpack_unused_export__ = IssueNoteAwardEmojis;
+__webpack_unused_export__ = IssueNotes;
+__webpack_unused_export__ = Issues;
+__webpack_unused_export__ = IssuesStatistics;
+__webpack_unused_export__ = Jobs;
+__webpack_unused_export__ = Keys;
+__webpack_unused_export__ = Labels;
+__webpack_unused_export__ = License;
+__webpack_unused_export__ = LicenseTemplates;
+__webpack_unused_export__ = Lint;
+__webpack_unused_export__ = Markdown;
+__webpack_unused_export__ = MergeRequestApprovals;
+__webpack_unused_export__ = MergeRequestAwardEmojis;
+__webpack_unused_export__ = MergeRequestDiscussions;
+__webpack_unused_export__ = MergeRequestNotes;
+__webpack_unused_export__ = MergeRequests;
+__webpack_unused_export__ = Namespaces;
+__webpack_unused_export__ = NotificationSettings;
+__webpack_unused_export__ = PackageRegistry;
+__webpack_unused_export__ = Packages;
+__webpack_unused_export__ = PagesDomains;
+__webpack_unused_export__ = PipelineScheduleVariables;
+__webpack_unused_export__ = PipelineSchedules;
+__webpack_unused_export__ = Pipelines;
+__webpack_unused_export__ = ProjectAccessRequests;
+__webpack_unused_export__ = ProjectBadges;
+__webpack_unused_export__ = ProjectCustomAttributes;
+__webpack_unused_export__ = ProjectDeployTokens;
+__webpack_unused_export__ = ProjectHooks;
+__webpack_unused_export__ = ProjectImportExport;
+__webpack_unused_export__ = ProjectIssueBoards;
+__webpack_unused_export__ = ProjectMembers;
+__webpack_unused_export__ = ProjectMilestones;
+__webpack_unused_export__ = ProjectSnippetAwardEmojis;
+__webpack_unused_export__ = ProjectSnippetDiscussions;
+__webpack_unused_export__ = ProjectSnippetNotes;
+__webpack_unused_export__ = ProjectSnippets;
+__webpack_unused_export__ = ProjectVariables;
+__webpack_unused_export__ = Projects;
+__webpack_unused_export__ = ProtectedBranches;
+__webpack_unused_export__ = ProtectedTags;
+__webpack_unused_export__ = PushRules;
+__webpack_unused_export__ = ReleaseLinks;
+__webpack_unused_export__ = Releases;
+__webpack_unused_export__ = Repositories;
+__webpack_unused_export__ = RepositoryFiles;
+__webpack_unused_export__ = RepositorySubmodules;
+__webpack_unused_export__ = Runners;
+__webpack_unused_export__ = Search;
+__webpack_unused_export__ = Services;
+__webpack_unused_export__ = SidekiqMetrics;
+__webpack_unused_export__ = Snippets;
+__webpack_unused_export__ = SystemHooks;
+__webpack_unused_export__ = Tags;
+__webpack_unused_export__ = Todos;
+__webpack_unused_export__ = Triggers;
+__webpack_unused_export__ = UserCustomAttributes;
+__webpack_unused_export__ = UserEmails;
+__webpack_unused_export__ = UserGPGKeys;
+__webpack_unused_export__ = UserImpersonationTokens;
+__webpack_unused_export__ = UserSSHKeys;
+__webpack_unused_export__ = Users;
+__webpack_unused_export__ = Version;
+__webpack_unused_export__ = VulnerabilityFindings;
+__webpack_unused_export__ = Wikis;
+//# sourceMappingURL=index.js.map
+
+
+/***/ }),
+
+/***/ 77:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+
+var xcase = __nccwpck_require__(7020);
+var qs = __nccwpck_require__(2760);
+
+/*! *****************************************************************************
+Copyright (c) Microsoft Corporation.
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.
+***************************************************************************** */
+/* global Reflect, Promise */
+
+var extendStatics = function(d, b) {
+    extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+    return extendStatics(d, b);
+};
+
+function __extends(d, b) {
+    if (typeof b !== "function" && b !== null)
+        throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+    extendStatics(d, b);
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+}
+
+var __assign = function() {
+    __assign = Object.assign || function __assign(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+
+function __read(o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+}
+
+function __spreadArray(to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+}
+
+// Utility methods
+function formatQuery(params) {
+    if (params === void 0) { params = {}; }
+    var decamelized = xcase.decamelizeKeys(params);
+    return qs.stringify(decamelized, { arrayFormat: 'brackets' });
+}
+function defaultOptionsHandler(resourceOptions, _a) {
+    var _b = _a === void 0 ? {} : _a, body = _b.body, query = _b.query, sudo = _b.sudo, _c = _b.method, method = _c === void 0 ? 'get' : _c;
+    var preconfiguredHeaders = resourceOptions.headers, requestTimeout = resourceOptions.requestTimeout, url = resourceOptions.url;
+    var headers = __assign({}, preconfiguredHeaders);
+    var bod;
+    if (sudo)
+        headers.sudo = sudo;
+    // FIXME: Not the best comparison, but...it will have to do for now.
+    if (typeof body === 'object' && body.constructor.name !== 'FormData') {
+        bod = JSON.stringify(xcase.decamelizeKeys(body));
+        headers['content-type'] = 'application/json';
+    }
+    else {
+        bod = body;
+    }
+    return {
+        headers: headers,
+        timeout: requestTimeout,
+        method: method,
+        searchParams: formatQuery(query),
+        prefixUrl: url,
+        body: bod,
+    };
+}
+function createRequesterFn(optionsHandler, requestHandler) {
+    var methods = ['get', 'post', 'put', 'delete', 'stream'];
+    return function (serviceOptions) {
+        var requester = {};
+        methods.forEach(function (m) {
+            requester[m] = function (endpoint, options) {
+                var requestOptions = optionsHandler(serviceOptions, __assign(__assign({}, options), { method: m }));
+                return requestHandler(endpoint, requestOptions);
+            };
+        });
+        return requester;
+    };
+}
+function extendClass(Base, customConfig) {
+    return /** @class */ (function (_super) {
+        __extends(class_1, _super);
+        function class_1() {
+            var options = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                options[_i] = arguments[_i];
+            }
+            var _this = this;
+            var _a = __read(options), config = _a[0], opts = _a.slice(1);
+            _this = _super.apply(this, __spreadArray([__assign(__assign({}, customConfig), config)], __read(opts), false)) || this;
+            return _this;
+        }
+        return class_1;
+    }(Base));
+}
+function presetResourceArguments(resources, customConfig) {
+    if (customConfig === void 0) { customConfig = {}; }
+    var updated = {};
+    Object.entries(resources)
+        .filter(function (_a) {
+        var _b = __read(_a, 2), s = _b[1];
+        return typeof s === 'function';
+    }) // FIXME: Odd default artifact included in this list during testing
+        .forEach(function (_a) {
+        var _b = __read(_a, 2), k = _b[0], r = _b[1];
+        updated[k] = extendClass(r, customConfig);
+    });
+    return updated;
+}
+
+var BaseResource = /** @class */ (function () {
+    function BaseResource(_a) {
+        var _b = _a === void 0 ? {} : _a, token = _b.token, jobToken = _b.jobToken, oauthToken = _b.oauthToken, sudo = _b.sudo, profileToken = _b.profileToken, requesterFn = _b.requesterFn, camelize = _b.camelize, _c = _b.profileMode, profileMode = _c === void 0 ? 'execution' : _c, _d = _b.host, host = _d === void 0 ? 'https://gitlab.com' : _d, _e = _b.prefixUrl, prefixUrl = _e === void 0 ? '' : _e, _f = _b.version, version = _f === void 0 ? 4 : _f, _g = _b.rejectUnauthorized, rejectUnauthorized = _g === void 0 ? true : _g, _h = _b.requestTimeout, requestTimeout = _h === void 0 ? 300000 : _h;
+        if (!requesterFn)
+            throw new ReferenceError('requesterFn must be passed');
+        this.url = [host, 'api', "v".concat(version), prefixUrl].join('/');
+        this.headers = {
+            'user-agent': 'gitbeaker',
+        };
+        this.rejectUnauthorized = rejectUnauthorized;
+        this.camelize = camelize;
+        this.requestTimeout = requestTimeout;
+        // Handle auth tokens
+        if (oauthToken)
+            this.headers.authorization = "Bearer ".concat(oauthToken);
+        else if (jobToken)
+            this.headers['job-token'] = jobToken;
+        else if (token)
+            this.headers['private-token'] = token;
+        // Profiling
+        if (profileToken) {
+            this.headers['X-Profile-Token'] = profileToken;
+            this.headers['X-Profile-Mode'] = profileMode;
+        }
+        // Set sudo
+        if (sudo)
+            this.headers.Sudo = "".concat(sudo);
+        // Set requester instance using this information
+        this.requester = requesterFn(__assign({}, this));
+    }
+    return BaseResource;
+}());
+
+exports.BaseResource = BaseResource;
+exports.createRequesterFn = createRequesterFn;
+exports.defaultOptionsHandler = defaultOptionsHandler;
+exports.formatQuery = formatQuery;
+exports.presetResourceArguments = presetResourceArguments;
+//# sourceMappingURL=index.js.map
+
+
+/***/ }),
+
 /***/ 4193:
 /***/ ((__unused_webpack_module, exports) => {
 
@@ -6657,6 +11427,1021 @@ exports.restEndpointMethods = restEndpointMethods;
 
 /***/ }),
 
+/***/ 7678:
+/***/ ((module, exports) => {
+
+
+/// <reference lib="es2018"/>
+/// <reference lib="dom"/>
+/// <reference types="node"/>
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const typedArrayTypeNames = [
+    'Int8Array',
+    'Uint8Array',
+    'Uint8ClampedArray',
+    'Int16Array',
+    'Uint16Array',
+    'Int32Array',
+    'Uint32Array',
+    'Float32Array',
+    'Float64Array',
+    'BigInt64Array',
+    'BigUint64Array'
+];
+function isTypedArrayName(name) {
+    return typedArrayTypeNames.includes(name);
+}
+const objectTypeNames = [
+    'Function',
+    'Generator',
+    'AsyncGenerator',
+    'GeneratorFunction',
+    'AsyncGeneratorFunction',
+    'AsyncFunction',
+    'Observable',
+    'Array',
+    'Buffer',
+    'Blob',
+    'Object',
+    'RegExp',
+    'Date',
+    'Error',
+    'Map',
+    'Set',
+    'WeakMap',
+    'WeakSet',
+    'ArrayBuffer',
+    'SharedArrayBuffer',
+    'DataView',
+    'Promise',
+    'URL',
+    'FormData',
+    'URLSearchParams',
+    'HTMLElement',
+    ...typedArrayTypeNames
+];
+function isObjectTypeName(name) {
+    return objectTypeNames.includes(name);
+}
+const primitiveTypeNames = [
+    'null',
+    'undefined',
+    'string',
+    'number',
+    'bigint',
+    'boolean',
+    'symbol'
+];
+function isPrimitiveTypeName(name) {
+    return primitiveTypeNames.includes(name);
+}
+// eslint-disable-next-line @typescript-eslint/ban-types
+function isOfType(type) {
+    return (value) => typeof value === type;
+}
+const { toString } = Object.prototype;
+const getObjectType = (value) => {
+    const objectTypeName = toString.call(value).slice(8, -1);
+    if (/HTML\w+Element/.test(objectTypeName) && is.domElement(value)) {
+        return 'HTMLElement';
+    }
+    if (isObjectTypeName(objectTypeName)) {
+        return objectTypeName;
+    }
+    return undefined;
+};
+const isObjectOfType = (type) => (value) => getObjectType(value) === type;
+function is(value) {
+    if (value === null) {
+        return 'null';
+    }
+    switch (typeof value) {
+        case 'undefined':
+            return 'undefined';
+        case 'string':
+            return 'string';
+        case 'number':
+            return 'number';
+        case 'boolean':
+            return 'boolean';
+        case 'function':
+            return 'Function';
+        case 'bigint':
+            return 'bigint';
+        case 'symbol':
+            return 'symbol';
+        default:
+    }
+    if (is.observable(value)) {
+        return 'Observable';
+    }
+    if (is.array(value)) {
+        return 'Array';
+    }
+    if (is.buffer(value)) {
+        return 'Buffer';
+    }
+    const tagType = getObjectType(value);
+    if (tagType) {
+        return tagType;
+    }
+    if (value instanceof String || value instanceof Boolean || value instanceof Number) {
+        throw new TypeError('Please don\'t use object wrappers for primitive types');
+    }
+    return 'Object';
+}
+is.undefined = isOfType('undefined');
+is.string = isOfType('string');
+const isNumberType = isOfType('number');
+is.number = (value) => isNumberType(value) && !is.nan(value);
+is.bigint = isOfType('bigint');
+// eslint-disable-next-line @typescript-eslint/ban-types
+is.function_ = isOfType('function');
+is.null_ = (value) => value === null;
+is.class_ = (value) => is.function_(value) && value.toString().startsWith('class ');
+is.boolean = (value) => value === true || value === false;
+is.symbol = isOfType('symbol');
+is.numericString = (value) => is.string(value) && !is.emptyStringOrWhitespace(value) && !Number.isNaN(Number(value));
+is.array = (value, assertion) => {
+    if (!Array.isArray(value)) {
+        return false;
+    }
+    if (!is.function_(assertion)) {
+        return true;
+    }
+    return value.every(assertion);
+};
+is.buffer = (value) => { var _a, _b, _c, _d; return (_d = (_c = (_b = (_a = value) === null || _a === void 0 ? void 0 : _a.constructor) === null || _b === void 0 ? void 0 : _b.isBuffer) === null || _c === void 0 ? void 0 : _c.call(_b, value)) !== null && _d !== void 0 ? _d : false; };
+is.blob = (value) => isObjectOfType('Blob')(value);
+is.nullOrUndefined = (value) => is.null_(value) || is.undefined(value);
+is.object = (value) => !is.null_(value) && (typeof value === 'object' || is.function_(value));
+is.iterable = (value) => { var _a; return is.function_((_a = value) === null || _a === void 0 ? void 0 : _a[Symbol.iterator]); };
+is.asyncIterable = (value) => { var _a; return is.function_((_a = value) === null || _a === void 0 ? void 0 : _a[Symbol.asyncIterator]); };
+is.generator = (value) => { var _a, _b; return is.iterable(value) && is.function_((_a = value) === null || _a === void 0 ? void 0 : _a.next) && is.function_((_b = value) === null || _b === void 0 ? void 0 : _b.throw); };
+is.asyncGenerator = (value) => is.asyncIterable(value) && is.function_(value.next) && is.function_(value.throw);
+is.nativePromise = (value) => isObjectOfType('Promise')(value);
+const hasPromiseAPI = (value) => {
+    var _a, _b;
+    return is.function_((_a = value) === null || _a === void 0 ? void 0 : _a.then) &&
+        is.function_((_b = value) === null || _b === void 0 ? void 0 : _b.catch);
+};
+is.promise = (value) => is.nativePromise(value) || hasPromiseAPI(value);
+is.generatorFunction = isObjectOfType('GeneratorFunction');
+is.asyncGeneratorFunction = (value) => getObjectType(value) === 'AsyncGeneratorFunction';
+is.asyncFunction = (value) => getObjectType(value) === 'AsyncFunction';
+// eslint-disable-next-line no-prototype-builtins, @typescript-eslint/ban-types
+is.boundFunction = (value) => is.function_(value) && !value.hasOwnProperty('prototype');
+is.regExp = isObjectOfType('RegExp');
+is.date = isObjectOfType('Date');
+is.error = isObjectOfType('Error');
+is.map = (value) => isObjectOfType('Map')(value);
+is.set = (value) => isObjectOfType('Set')(value);
+is.weakMap = (value) => isObjectOfType('WeakMap')(value);
+is.weakSet = (value) => isObjectOfType('WeakSet')(value);
+is.int8Array = isObjectOfType('Int8Array');
+is.uint8Array = isObjectOfType('Uint8Array');
+is.uint8ClampedArray = isObjectOfType('Uint8ClampedArray');
+is.int16Array = isObjectOfType('Int16Array');
+is.uint16Array = isObjectOfType('Uint16Array');
+is.int32Array = isObjectOfType('Int32Array');
+is.uint32Array = isObjectOfType('Uint32Array');
+is.float32Array = isObjectOfType('Float32Array');
+is.float64Array = isObjectOfType('Float64Array');
+is.bigInt64Array = isObjectOfType('BigInt64Array');
+is.bigUint64Array = isObjectOfType('BigUint64Array');
+is.arrayBuffer = isObjectOfType('ArrayBuffer');
+is.sharedArrayBuffer = isObjectOfType('SharedArrayBuffer');
+is.dataView = isObjectOfType('DataView');
+is.enumCase = (value, targetEnum) => Object.values(targetEnum).includes(value);
+is.directInstanceOf = (instance, class_) => Object.getPrototypeOf(instance) === class_.prototype;
+is.urlInstance = (value) => isObjectOfType('URL')(value);
+is.urlString = (value) => {
+    if (!is.string(value)) {
+        return false;
+    }
+    try {
+        new URL(value); // eslint-disable-line no-new
+        return true;
+    }
+    catch (_a) {
+        return false;
+    }
+};
+// Example: `is.truthy = (value: unknown): value is (not false | not 0 | not '' | not undefined | not null) => Boolean(value);`
+is.truthy = (value) => Boolean(value);
+// Example: `is.falsy = (value: unknown): value is (not true | 0 | '' | undefined | null) => Boolean(value);`
+is.falsy = (value) => !value;
+is.nan = (value) => Number.isNaN(value);
+is.primitive = (value) => is.null_(value) || isPrimitiveTypeName(typeof value);
+is.integer = (value) => Number.isInteger(value);
+is.safeInteger = (value) => Number.isSafeInteger(value);
+is.plainObject = (value) => {
+    // From: https://github.com/sindresorhus/is-plain-obj/blob/main/index.js
+    if (toString.call(value) !== '[object Object]') {
+        return false;
+    }
+    const prototype = Object.getPrototypeOf(value);
+    return prototype === null || prototype === Object.getPrototypeOf({});
+};
+is.typedArray = (value) => isTypedArrayName(getObjectType(value));
+const isValidLength = (value) => is.safeInteger(value) && value >= 0;
+is.arrayLike = (value) => !is.nullOrUndefined(value) && !is.function_(value) && isValidLength(value.length);
+is.inRange = (value, range) => {
+    if (is.number(range)) {
+        return value >= Math.min(0, range) && value <= Math.max(range, 0);
+    }
+    if (is.array(range) && range.length === 2) {
+        return value >= Math.min(...range) && value <= Math.max(...range);
+    }
+    throw new TypeError(`Invalid range: ${JSON.stringify(range)}`);
+};
+const NODE_TYPE_ELEMENT = 1;
+const DOM_PROPERTIES_TO_CHECK = [
+    'innerHTML',
+    'ownerDocument',
+    'style',
+    'attributes',
+    'nodeValue'
+];
+is.domElement = (value) => {
+    return is.object(value) &&
+        value.nodeType === NODE_TYPE_ELEMENT &&
+        is.string(value.nodeName) &&
+        !is.plainObject(value) &&
+        DOM_PROPERTIES_TO_CHECK.every(property => property in value);
+};
+is.observable = (value) => {
+    var _a, _b, _c, _d;
+    if (!value) {
+        return false;
+    }
+    // eslint-disable-next-line no-use-extend-native/no-use-extend-native
+    if (value === ((_b = (_a = value)[Symbol.observable]) === null || _b === void 0 ? void 0 : _b.call(_a))) {
+        return true;
+    }
+    if (value === ((_d = (_c = value)['@@observable']) === null || _d === void 0 ? void 0 : _d.call(_c))) {
+        return true;
+    }
+    return false;
+};
+is.nodeStream = (value) => is.object(value) && is.function_(value.pipe) && !is.observable(value);
+is.infinite = (value) => value === Infinity || value === -Infinity;
+const isAbsoluteMod2 = (remainder) => (value) => is.integer(value) && Math.abs(value % 2) === remainder;
+is.evenInteger = isAbsoluteMod2(0);
+is.oddInteger = isAbsoluteMod2(1);
+is.emptyArray = (value) => is.array(value) && value.length === 0;
+is.nonEmptyArray = (value) => is.array(value) && value.length > 0;
+is.emptyString = (value) => is.string(value) && value.length === 0;
+const isWhiteSpaceString = (value) => is.string(value) && !/\S/.test(value);
+is.emptyStringOrWhitespace = (value) => is.emptyString(value) || isWhiteSpaceString(value);
+// TODO: Use `not ''` when the `not` operator is available.
+is.nonEmptyString = (value) => is.string(value) && value.length > 0;
+// TODO: Use `not ''` when the `not` operator is available.
+is.nonEmptyStringAndNotWhitespace = (value) => is.string(value) && !is.emptyStringOrWhitespace(value);
+is.emptyObject = (value) => is.object(value) && !is.map(value) && !is.set(value) && Object.keys(value).length === 0;
+// TODO: Use `not` operator here to remove `Map` and `Set` from type guard:
+// - https://github.com/Microsoft/TypeScript/pull/29317
+is.nonEmptyObject = (value) => is.object(value) && !is.map(value) && !is.set(value) && Object.keys(value).length > 0;
+is.emptySet = (value) => is.set(value) && value.size === 0;
+is.nonEmptySet = (value) => is.set(value) && value.size > 0;
+is.emptyMap = (value) => is.map(value) && value.size === 0;
+is.nonEmptyMap = (value) => is.map(value) && value.size > 0;
+// `PropertyKey` is any value that can be used as an object key (string, number, or symbol)
+is.propertyKey = (value) => is.any([is.string, is.number, is.symbol], value);
+is.formData = (value) => isObjectOfType('FormData')(value);
+is.urlSearchParams = (value) => isObjectOfType('URLSearchParams')(value);
+const predicateOnArray = (method, predicate, values) => {
+    if (!is.function_(predicate)) {
+        throw new TypeError(`Invalid predicate: ${JSON.stringify(predicate)}`);
+    }
+    if (values.length === 0) {
+        throw new TypeError('Invalid number of values');
+    }
+    return method.call(values, predicate);
+};
+is.any = (predicate, ...values) => {
+    const predicates = is.array(predicate) ? predicate : [predicate];
+    return predicates.some(singlePredicate => predicateOnArray(Array.prototype.some, singlePredicate, values));
+};
+is.all = (predicate, ...values) => predicateOnArray(Array.prototype.every, predicate, values);
+const assertType = (condition, description, value, options = {}) => {
+    if (!condition) {
+        const { multipleValues } = options;
+        const valuesMessage = multipleValues ?
+            `received values of types ${[
+                ...new Set(value.map(singleValue => `\`${is(singleValue)}\``))
+            ].join(', ')}` :
+            `received value of type \`${is(value)}\``;
+        throw new TypeError(`Expected value which is \`${description}\`, ${valuesMessage}.`);
+    }
+};
+exports.assert = {
+    // Unknowns.
+    undefined: (value) => assertType(is.undefined(value), 'undefined', value),
+    string: (value) => assertType(is.string(value), 'string', value),
+    number: (value) => assertType(is.number(value), 'number', value),
+    bigint: (value) => assertType(is.bigint(value), 'bigint', value),
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    function_: (value) => assertType(is.function_(value), 'Function', value),
+    null_: (value) => assertType(is.null_(value), 'null', value),
+    class_: (value) => assertType(is.class_(value), "Class" /* class_ */, value),
+    boolean: (value) => assertType(is.boolean(value), 'boolean', value),
+    symbol: (value) => assertType(is.symbol(value), 'symbol', value),
+    numericString: (value) => assertType(is.numericString(value), "string with a number" /* numericString */, value),
+    array: (value, assertion) => {
+        const assert = assertType;
+        assert(is.array(value), 'Array', value);
+        if (assertion) {
+            value.forEach(assertion);
+        }
+    },
+    buffer: (value) => assertType(is.buffer(value), 'Buffer', value),
+    blob: (value) => assertType(is.blob(value), 'Blob', value),
+    nullOrUndefined: (value) => assertType(is.nullOrUndefined(value), "null or undefined" /* nullOrUndefined */, value),
+    object: (value) => assertType(is.object(value), 'Object', value),
+    iterable: (value) => assertType(is.iterable(value), "Iterable" /* iterable */, value),
+    asyncIterable: (value) => assertType(is.asyncIterable(value), "AsyncIterable" /* asyncIterable */, value),
+    generator: (value) => assertType(is.generator(value), 'Generator', value),
+    asyncGenerator: (value) => assertType(is.asyncGenerator(value), 'AsyncGenerator', value),
+    nativePromise: (value) => assertType(is.nativePromise(value), "native Promise" /* nativePromise */, value),
+    promise: (value) => assertType(is.promise(value), 'Promise', value),
+    generatorFunction: (value) => assertType(is.generatorFunction(value), 'GeneratorFunction', value),
+    asyncGeneratorFunction: (value) => assertType(is.asyncGeneratorFunction(value), 'AsyncGeneratorFunction', value),
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    asyncFunction: (value) => assertType(is.asyncFunction(value), 'AsyncFunction', value),
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    boundFunction: (value) => assertType(is.boundFunction(value), 'Function', value),
+    regExp: (value) => assertType(is.regExp(value), 'RegExp', value),
+    date: (value) => assertType(is.date(value), 'Date', value),
+    error: (value) => assertType(is.error(value), 'Error', value),
+    map: (value) => assertType(is.map(value), 'Map', value),
+    set: (value) => assertType(is.set(value), 'Set', value),
+    weakMap: (value) => assertType(is.weakMap(value), 'WeakMap', value),
+    weakSet: (value) => assertType(is.weakSet(value), 'WeakSet', value),
+    int8Array: (value) => assertType(is.int8Array(value), 'Int8Array', value),
+    uint8Array: (value) => assertType(is.uint8Array(value), 'Uint8Array', value),
+    uint8ClampedArray: (value) => assertType(is.uint8ClampedArray(value), 'Uint8ClampedArray', value),
+    int16Array: (value) => assertType(is.int16Array(value), 'Int16Array', value),
+    uint16Array: (value) => assertType(is.uint16Array(value), 'Uint16Array', value),
+    int32Array: (value) => assertType(is.int32Array(value), 'Int32Array', value),
+    uint32Array: (value) => assertType(is.uint32Array(value), 'Uint32Array', value),
+    float32Array: (value) => assertType(is.float32Array(value), 'Float32Array', value),
+    float64Array: (value) => assertType(is.float64Array(value), 'Float64Array', value),
+    bigInt64Array: (value) => assertType(is.bigInt64Array(value), 'BigInt64Array', value),
+    bigUint64Array: (value) => assertType(is.bigUint64Array(value), 'BigUint64Array', value),
+    arrayBuffer: (value) => assertType(is.arrayBuffer(value), 'ArrayBuffer', value),
+    sharedArrayBuffer: (value) => assertType(is.sharedArrayBuffer(value), 'SharedArrayBuffer', value),
+    dataView: (value) => assertType(is.dataView(value), 'DataView', value),
+    enumCase: (value, targetEnum) => assertType(is.enumCase(value, targetEnum), 'EnumCase', value),
+    urlInstance: (value) => assertType(is.urlInstance(value), 'URL', value),
+    urlString: (value) => assertType(is.urlString(value), "string with a URL" /* urlString */, value),
+    truthy: (value) => assertType(is.truthy(value), "truthy" /* truthy */, value),
+    falsy: (value) => assertType(is.falsy(value), "falsy" /* falsy */, value),
+    nan: (value) => assertType(is.nan(value), "NaN" /* nan */, value),
+    primitive: (value) => assertType(is.primitive(value), "primitive" /* primitive */, value),
+    integer: (value) => assertType(is.integer(value), "integer" /* integer */, value),
+    safeInteger: (value) => assertType(is.safeInteger(value), "integer" /* safeInteger */, value),
+    plainObject: (value) => assertType(is.plainObject(value), "plain object" /* plainObject */, value),
+    typedArray: (value) => assertType(is.typedArray(value), "TypedArray" /* typedArray */, value),
+    arrayLike: (value) => assertType(is.arrayLike(value), "array-like" /* arrayLike */, value),
+    domElement: (value) => assertType(is.domElement(value), "HTMLElement" /* domElement */, value),
+    observable: (value) => assertType(is.observable(value), 'Observable', value),
+    nodeStream: (value) => assertType(is.nodeStream(value), "Node.js Stream" /* nodeStream */, value),
+    infinite: (value) => assertType(is.infinite(value), "infinite number" /* infinite */, value),
+    emptyArray: (value) => assertType(is.emptyArray(value), "empty array" /* emptyArray */, value),
+    nonEmptyArray: (value) => assertType(is.nonEmptyArray(value), "non-empty array" /* nonEmptyArray */, value),
+    emptyString: (value) => assertType(is.emptyString(value), "empty string" /* emptyString */, value),
+    emptyStringOrWhitespace: (value) => assertType(is.emptyStringOrWhitespace(value), "empty string or whitespace" /* emptyStringOrWhitespace */, value),
+    nonEmptyString: (value) => assertType(is.nonEmptyString(value), "non-empty string" /* nonEmptyString */, value),
+    nonEmptyStringAndNotWhitespace: (value) => assertType(is.nonEmptyStringAndNotWhitespace(value), "non-empty string and not whitespace" /* nonEmptyStringAndNotWhitespace */, value),
+    emptyObject: (value) => assertType(is.emptyObject(value), "empty object" /* emptyObject */, value),
+    nonEmptyObject: (value) => assertType(is.nonEmptyObject(value), "non-empty object" /* nonEmptyObject */, value),
+    emptySet: (value) => assertType(is.emptySet(value), "empty set" /* emptySet */, value),
+    nonEmptySet: (value) => assertType(is.nonEmptySet(value), "non-empty set" /* nonEmptySet */, value),
+    emptyMap: (value) => assertType(is.emptyMap(value), "empty map" /* emptyMap */, value),
+    nonEmptyMap: (value) => assertType(is.nonEmptyMap(value), "non-empty map" /* nonEmptyMap */, value),
+    propertyKey: (value) => assertType(is.propertyKey(value), 'PropertyKey', value),
+    formData: (value) => assertType(is.formData(value), 'FormData', value),
+    urlSearchParams: (value) => assertType(is.urlSearchParams(value), 'URLSearchParams', value),
+    // Numbers.
+    evenInteger: (value) => assertType(is.evenInteger(value), "even integer" /* evenInteger */, value),
+    oddInteger: (value) => assertType(is.oddInteger(value), "odd integer" /* oddInteger */, value),
+    // Two arguments.
+    directInstanceOf: (instance, class_) => assertType(is.directInstanceOf(instance, class_), "T" /* directInstanceOf */, instance),
+    inRange: (value, range) => assertType(is.inRange(value, range), "in range" /* inRange */, value),
+    // Variadic functions.
+    any: (predicate, ...values) => {
+        return assertType(is.any(predicate, ...values), "predicate returns truthy for any value" /* any */, values, { multipleValues: true });
+    },
+    all: (predicate, ...values) => assertType(is.all(predicate, ...values), "predicate returns truthy for all values" /* all */, values, { multipleValues: true })
+};
+// Some few keywords are reserved, but we'll populate them for Node.js users
+// See https://github.com/Microsoft/TypeScript/issues/2536
+Object.defineProperties(is, {
+    class: {
+        value: is.class_
+    },
+    function: {
+        value: is.function_
+    },
+    null: {
+        value: is.null_
+    }
+});
+Object.defineProperties(exports.assert, {
+    class: {
+        value: exports.assert.class_
+    },
+    function: {
+        value: exports.assert.function_
+    },
+    null: {
+        value: exports.assert.null_
+    }
+});
+exports["default"] = is;
+// For CommonJS default export support
+module.exports = is;
+module.exports["default"] = is;
+module.exports.assert = exports.assert;
+
+
+/***/ }),
+
+/***/ 8097:
+/***/ ((module, exports, __nccwpck_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const defer_to_connect_1 = __nccwpck_require__(6214);
+const util_1 = __nccwpck_require__(3837);
+const nodejsMajorVersion = Number(process.versions.node.split('.')[0]);
+const timer = (request) => {
+    if (request.timings) {
+        return request.timings;
+    }
+    const timings = {
+        start: Date.now(),
+        socket: undefined,
+        lookup: undefined,
+        connect: undefined,
+        secureConnect: undefined,
+        upload: undefined,
+        response: undefined,
+        end: undefined,
+        error: undefined,
+        abort: undefined,
+        phases: {
+            wait: undefined,
+            dns: undefined,
+            tcp: undefined,
+            tls: undefined,
+            request: undefined,
+            firstByte: undefined,
+            download: undefined,
+            total: undefined
+        }
+    };
+    request.timings = timings;
+    const handleError = (origin) => {
+        const emit = origin.emit.bind(origin);
+        origin.emit = (event, ...args) => {
+            // Catches the `error` event
+            if (event === 'error') {
+                timings.error = Date.now();
+                timings.phases.total = timings.error - timings.start;
+                origin.emit = emit;
+            }
+            // Saves the original behavior
+            return emit(event, ...args);
+        };
+    };
+    handleError(request);
+    const onAbort = () => {
+        timings.abort = Date.now();
+        // Let the `end` response event be responsible for setting the total phase,
+        // unless the Node.js major version is >= 13.
+        if (!timings.response || nodejsMajorVersion >= 13) {
+            timings.phases.total = Date.now() - timings.start;
+        }
+    };
+    request.prependOnceListener('abort', onAbort);
+    const onSocket = (socket) => {
+        timings.socket = Date.now();
+        timings.phases.wait = timings.socket - timings.start;
+        if (util_1.types.isProxy(socket)) {
+            return;
+        }
+        const lookupListener = () => {
+            timings.lookup = Date.now();
+            timings.phases.dns = timings.lookup - timings.socket;
+        };
+        socket.prependOnceListener('lookup', lookupListener);
+        defer_to_connect_1.default(socket, {
+            connect: () => {
+                timings.connect = Date.now();
+                if (timings.lookup === undefined) {
+                    socket.removeListener('lookup', lookupListener);
+                    timings.lookup = timings.connect;
+                    timings.phases.dns = timings.lookup - timings.socket;
+                }
+                timings.phases.tcp = timings.connect - timings.lookup;
+                // This callback is called before flushing any data,
+                // so we don't need to set `timings.phases.request` here.
+            },
+            secureConnect: () => {
+                timings.secureConnect = Date.now();
+                timings.phases.tls = timings.secureConnect - timings.connect;
+            }
+        });
+    };
+    if (request.socket) {
+        onSocket(request.socket);
+    }
+    else {
+        request.prependOnceListener('socket', onSocket);
+    }
+    const onUpload = () => {
+        var _a;
+        timings.upload = Date.now();
+        timings.phases.request = timings.upload - ((_a = timings.secureConnect) !== null && _a !== void 0 ? _a : timings.connect);
+    };
+    const writableFinished = () => {
+        if (typeof request.writableFinished === 'boolean') {
+            return request.writableFinished;
+        }
+        // Node.js doesn't have `request.writableFinished` property
+        return request.finished && request.outputSize === 0 && (!request.socket || request.socket.writableLength === 0);
+    };
+    if (writableFinished()) {
+        onUpload();
+    }
+    else {
+        request.prependOnceListener('finish', onUpload);
+    }
+    request.prependOnceListener('response', (response) => {
+        timings.response = Date.now();
+        timings.phases.firstByte = timings.response - timings.upload;
+        response.timings = timings;
+        handleError(response);
+        response.prependOnceListener('end', () => {
+            timings.end = Date.now();
+            timings.phases.download = timings.end - timings.response;
+            timings.phases.total = timings.end - timings.start;
+        });
+        response.prependOnceListener('aborted', onAbort);
+    });
+    return timings;
+};
+exports["default"] = timer;
+// For CommonJS default export support
+module.exports = timer;
+module.exports["default"] = timer;
+
+
+/***/ }),
+
+/***/ 4812:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+module.exports =
+{
+  parallel      : __nccwpck_require__(8210),
+  serial        : __nccwpck_require__(445),
+  serialOrdered : __nccwpck_require__(3578)
+};
+
+
+/***/ }),
+
+/***/ 1700:
+/***/ ((module) => {
+
+// API
+module.exports = abort;
+
+/**
+ * Aborts leftover active jobs
+ *
+ * @param {object} state - current state object
+ */
+function abort(state)
+{
+  Object.keys(state.jobs).forEach(clean.bind(state));
+
+  // reset leftover jobs
+  state.jobs = {};
+}
+
+/**
+ * Cleans up leftover job by invoking abort function for the provided job id
+ *
+ * @this  state
+ * @param {string|number} key - job id to abort
+ */
+function clean(key)
+{
+  if (typeof this.jobs[key] == 'function')
+  {
+    this.jobs[key]();
+  }
+}
+
+
+/***/ }),
+
+/***/ 2794:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+var defer = __nccwpck_require__(5295);
+
+// API
+module.exports = async;
+
+/**
+ * Runs provided callback asynchronously
+ * even if callback itself is not
+ *
+ * @param   {function} callback - callback to invoke
+ * @returns {function} - augmented callback
+ */
+function async(callback)
+{
+  var isAsync = false;
+
+  // check if async happened
+  defer(function() { isAsync = true; });
+
+  return function async_callback(err, result)
+  {
+    if (isAsync)
+    {
+      callback(err, result);
+    }
+    else
+    {
+      defer(function nextTick_callback()
+      {
+        callback(err, result);
+      });
+    }
+  };
+}
+
+
+/***/ }),
+
+/***/ 5295:
+/***/ ((module) => {
+
+module.exports = defer;
+
+/**
+ * Runs provided function on next iteration of the event loop
+ *
+ * @param {function} fn - function to run
+ */
+function defer(fn)
+{
+  var nextTick = typeof setImmediate == 'function'
+    ? setImmediate
+    : (
+      typeof process == 'object' && typeof process.nextTick == 'function'
+      ? process.nextTick
+      : null
+    );
+
+  if (nextTick)
+  {
+    nextTick(fn);
+  }
+  else
+  {
+    setTimeout(fn, 0);
+  }
+}
+
+
+/***/ }),
+
+/***/ 9023:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+var async = __nccwpck_require__(2794)
+  , abort = __nccwpck_require__(1700)
+  ;
+
+// API
+module.exports = iterate;
+
+/**
+ * Iterates over each job object
+ *
+ * @param {array|object} list - array or object (named list) to iterate over
+ * @param {function} iterator - iterator to run
+ * @param {object} state - current job status
+ * @param {function} callback - invoked when all elements processed
+ */
+function iterate(list, iterator, state, callback)
+{
+  // store current index
+  var key = state['keyedList'] ? state['keyedList'][state.index] : state.index;
+
+  state.jobs[key] = runJob(iterator, key, list[key], function(error, output)
+  {
+    // don't repeat yourself
+    // skip secondary callbacks
+    if (!(key in state.jobs))
+    {
+      return;
+    }
+
+    // clean up jobs
+    delete state.jobs[key];
+
+    if (error)
+    {
+      // don't process rest of the results
+      // stop still active jobs
+      // and reset the list
+      abort(state);
+    }
+    else
+    {
+      state.results[key] = output;
+    }
+
+    // return salvaged results
+    callback(error, state.results);
+  });
+}
+
+/**
+ * Runs iterator over provided job element
+ *
+ * @param   {function} iterator - iterator to invoke
+ * @param   {string|number} key - key/index of the element in the list of jobs
+ * @param   {mixed} item - job description
+ * @param   {function} callback - invoked after iterator is done with the job
+ * @returns {function|mixed} - job abort function or something else
+ */
+function runJob(iterator, key, item, callback)
+{
+  var aborter;
+
+  // allow shortcut if iterator expects only two arguments
+  if (iterator.length == 2)
+  {
+    aborter = iterator(item, async(callback));
+  }
+  // otherwise go with full three arguments
+  else
+  {
+    aborter = iterator(item, key, async(callback));
+  }
+
+  return aborter;
+}
+
+
+/***/ }),
+
+/***/ 2474:
+/***/ ((module) => {
+
+// API
+module.exports = state;
+
+/**
+ * Creates initial state object
+ * for iteration over list
+ *
+ * @param   {array|object} list - list to iterate over
+ * @param   {function|null} sortMethod - function to use for keys sort,
+ *                                     or `null` to keep them as is
+ * @returns {object} - initial state object
+ */
+function state(list, sortMethod)
+{
+  var isNamedList = !Array.isArray(list)
+    , initState =
+    {
+      index    : 0,
+      keyedList: isNamedList || sortMethod ? Object.keys(list) : null,
+      jobs     : {},
+      results  : isNamedList ? {} : [],
+      size     : isNamedList ? Object.keys(list).length : list.length
+    }
+    ;
+
+  if (sortMethod)
+  {
+    // sort array keys based on it's values
+    // sort object's keys just on own merit
+    initState.keyedList.sort(isNamedList ? sortMethod : function(a, b)
+    {
+      return sortMethod(list[a], list[b]);
+    });
+  }
+
+  return initState;
+}
+
+
+/***/ }),
+
+/***/ 7942:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+var abort = __nccwpck_require__(1700)
+  , async = __nccwpck_require__(2794)
+  ;
+
+// API
+module.exports = terminator;
+
+/**
+ * Terminates jobs in the attached state context
+ *
+ * @this  AsyncKitState#
+ * @param {function} callback - final callback to invoke after termination
+ */
+function terminator(callback)
+{
+  if (!Object.keys(this.jobs).length)
+  {
+    return;
+  }
+
+  // fast forward iteration index
+  this.index = this.size;
+
+  // abort jobs
+  abort(this);
+
+  // send back results we have so far
+  async(callback)(null, this.results);
+}
+
+
+/***/ }),
+
+/***/ 8210:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+var iterate    = __nccwpck_require__(9023)
+  , initState  = __nccwpck_require__(2474)
+  , terminator = __nccwpck_require__(7942)
+  ;
+
+// Public API
+module.exports = parallel;
+
+/**
+ * Runs iterator over provided array elements in parallel
+ *
+ * @param   {array|object} list - array or object (named list) to iterate over
+ * @param   {function} iterator - iterator to run
+ * @param   {function} callback - invoked when all elements processed
+ * @returns {function} - jobs terminator
+ */
+function parallel(list, iterator, callback)
+{
+  var state = initState(list);
+
+  while (state.index < (state['keyedList'] || list).length)
+  {
+    iterate(list, iterator, state, function(error, result)
+    {
+      if (error)
+      {
+        callback(error, result);
+        return;
+      }
+
+      // looks like it's the last one
+      if (Object.keys(state.jobs).length === 0)
+      {
+        callback(null, state.results);
+        return;
+      }
+    });
+
+    state.index++;
+  }
+
+  return terminator.bind(state, callback);
+}
+
+
+/***/ }),
+
+/***/ 445:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+var serialOrdered = __nccwpck_require__(3578);
+
+// Public API
+module.exports = serial;
+
+/**
+ * Runs iterator over provided array elements in series
+ *
+ * @param   {array|object} list - array or object (named list) to iterate over
+ * @param   {function} iterator - iterator to run
+ * @param   {function} callback - invoked when all elements processed
+ * @returns {function} - jobs terminator
+ */
+function serial(list, iterator, callback)
+{
+  return serialOrdered(list, iterator, null, callback);
+}
+
+
+/***/ }),
+
+/***/ 3578:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+var iterate    = __nccwpck_require__(9023)
+  , initState  = __nccwpck_require__(2474)
+  , terminator = __nccwpck_require__(7942)
+  ;
+
+// Public API
+module.exports = serialOrdered;
+// sorting helpers
+module.exports.ascending  = ascending;
+module.exports.descending = descending;
+
+/**
+ * Runs iterator over provided sorted array elements in series
+ *
+ * @param   {array|object} list - array or object (named list) to iterate over
+ * @param   {function} iterator - iterator to run
+ * @param   {function} sortMethod - custom sort function
+ * @param   {function} callback - invoked when all elements processed
+ * @returns {function} - jobs terminator
+ */
+function serialOrdered(list, iterator, sortMethod, callback)
+{
+  var state = initState(list, sortMethod);
+
+  iterate(list, iterator, state, function iteratorHandler(error, result)
+  {
+    if (error)
+    {
+      callback(error, result);
+      return;
+    }
+
+    state.index++;
+
+    // are we there yet?
+    if (state.index < (state['keyedList'] || list).length)
+    {
+      iterate(list, iterator, state, iteratorHandler);
+      return;
+    }
+
+    // done here
+    callback(null, state.results);
+  });
+
+  return terminator.bind(state, callback);
+}
+
+/*
+ * -- Sort methods
+ */
+
+/**
+ * sort helper to sort array elements in ascending order
+ *
+ * @param   {mixed} a - an item to compare
+ * @param   {mixed} b - an item to compare
+ * @returns {number} - comparison result
+ */
+function ascending(a, b)
+{
+  return a < b ? -1 : a > b ? 1 : 0;
+}
+
+/**
+ * sort helper to sort array elements in descending order
+ *
+ * @param   {mixed} a - an item to compare
+ * @param   {mixed} b - an item to compare
+ * @returns {number} - comparison result
+ */
+function descending(a, b)
+{
+  return -1 * ascending(a, b);
+}
+
+
+/***/ }),
+
 /***/ 3682:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
@@ -6838,6 +12623,1519 @@ function removeHook(state, name, method) {
 
 /***/ }),
 
+/***/ 2286:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+const {
+	V4MAPPED,
+	ADDRCONFIG,
+	ALL,
+	promises: {
+		Resolver: AsyncResolver
+	},
+	lookup: dnsLookup
+} = __nccwpck_require__(9523);
+const {promisify} = __nccwpck_require__(3837);
+const os = __nccwpck_require__(2037);
+
+const kCacheableLookupCreateConnection = Symbol('cacheableLookupCreateConnection');
+const kCacheableLookupInstance = Symbol('cacheableLookupInstance');
+const kExpires = Symbol('expires');
+
+const supportsALL = typeof ALL === 'number';
+
+const verifyAgent = agent => {
+	if (!(agent && typeof agent.createConnection === 'function')) {
+		throw new Error('Expected an Agent instance as the first argument');
+	}
+};
+
+const map4to6 = entries => {
+	for (const entry of entries) {
+		if (entry.family === 6) {
+			continue;
+		}
+
+		entry.address = `::ffff:${entry.address}`;
+		entry.family = 6;
+	}
+};
+
+const getIfaceInfo = () => {
+	let has4 = false;
+	let has6 = false;
+
+	for (const device of Object.values(os.networkInterfaces())) {
+		for (const iface of device) {
+			if (iface.internal) {
+				continue;
+			}
+
+			if (iface.family === 'IPv6') {
+				has6 = true;
+			} else {
+				has4 = true;
+			}
+
+			if (has4 && has6) {
+				return {has4, has6};
+			}
+		}
+	}
+
+	return {has4, has6};
+};
+
+const isIterable = map => {
+	return Symbol.iterator in map;
+};
+
+const ttl = {ttl: true};
+const all = {all: true};
+
+class CacheableLookup {
+	constructor({
+		cache = new Map(),
+		maxTtl = Infinity,
+		fallbackDuration = 3600,
+		errorTtl = 0.15,
+		resolver = new AsyncResolver(),
+		lookup = dnsLookup
+	} = {}) {
+		this.maxTtl = maxTtl;
+		this.errorTtl = errorTtl;
+
+		this._cache = cache;
+		this._resolver = resolver;
+		this._dnsLookup = promisify(lookup);
+
+		if (this._resolver instanceof AsyncResolver) {
+			this._resolve4 = this._resolver.resolve4.bind(this._resolver);
+			this._resolve6 = this._resolver.resolve6.bind(this._resolver);
+		} else {
+			this._resolve4 = promisify(this._resolver.resolve4.bind(this._resolver));
+			this._resolve6 = promisify(this._resolver.resolve6.bind(this._resolver));
+		}
+
+		this._iface = getIfaceInfo();
+
+		this._pending = {};
+		this._nextRemovalTime = false;
+		this._hostnamesToFallback = new Set();
+
+		if (fallbackDuration < 1) {
+			this._fallback = false;
+		} else {
+			this._fallback = true;
+
+			const interval = setInterval(() => {
+				this._hostnamesToFallback.clear();
+			}, fallbackDuration * 1000);
+
+			/* istanbul ignore next: There is no `interval.unref()` when running inside an Electron renderer */
+			if (interval.unref) {
+				interval.unref();
+			}
+		}
+
+		this.lookup = this.lookup.bind(this);
+		this.lookupAsync = this.lookupAsync.bind(this);
+	}
+
+	set servers(servers) {
+		this.clear();
+
+		this._resolver.setServers(servers);
+	}
+
+	get servers() {
+		return this._resolver.getServers();
+	}
+
+	lookup(hostname, options, callback) {
+		if (typeof options === 'function') {
+			callback = options;
+			options = {};
+		} else if (typeof options === 'number') {
+			options = {
+				family: options
+			};
+		}
+
+		if (!callback) {
+			throw new Error('Callback must be a function.');
+		}
+
+		// eslint-disable-next-line promise/prefer-await-to-then
+		this.lookupAsync(hostname, options).then(result => {
+			if (options.all) {
+				callback(null, result);
+			} else {
+				callback(null, result.address, result.family, result.expires, result.ttl);
+			}
+		}, callback);
+	}
+
+	async lookupAsync(hostname, options = {}) {
+		if (typeof options === 'number') {
+			options = {
+				family: options
+			};
+		}
+
+		let cached = await this.query(hostname);
+
+		if (options.family === 6) {
+			const filtered = cached.filter(entry => entry.family === 6);
+
+			if (options.hints & V4MAPPED) {
+				if ((supportsALL && options.hints & ALL) || filtered.length === 0) {
+					map4to6(cached);
+				} else {
+					cached = filtered;
+				}
+			} else {
+				cached = filtered;
+			}
+		} else if (options.family === 4) {
+			cached = cached.filter(entry => entry.family === 4);
+		}
+
+		if (options.hints & ADDRCONFIG) {
+			const {_iface} = this;
+			cached = cached.filter(entry => entry.family === 6 ? _iface.has6 : _iface.has4);
+		}
+
+		if (cached.length === 0) {
+			const error = new Error(`cacheableLookup ENOTFOUND ${hostname}`);
+			error.code = 'ENOTFOUND';
+			error.hostname = hostname;
+
+			throw error;
+		}
+
+		if (options.all) {
+			return cached;
+		}
+
+		return cached[0];
+	}
+
+	async query(hostname) {
+		let cached = await this._cache.get(hostname);
+
+		if (!cached) {
+			const pending = this._pending[hostname];
+
+			if (pending) {
+				cached = await pending;
+			} else {
+				const newPromise = this.queryAndCache(hostname);
+				this._pending[hostname] = newPromise;
+
+				try {
+					cached = await newPromise;
+				} finally {
+					delete this._pending[hostname];
+				}
+			}
+		}
+
+		cached = cached.map(entry => {
+			return {...entry};
+		});
+
+		return cached;
+	}
+
+	async _resolve(hostname) {
+		const wrap = async promise => {
+			try {
+				return await promise;
+			} catch (error) {
+				if (error.code === 'ENODATA' || error.code === 'ENOTFOUND') {
+					return [];
+				}
+
+				throw error;
+			}
+		};
+
+		// ANY is unsafe as it doesn't trigger new queries in the underlying server.
+		const [A, AAAA] = await Promise.all([
+			this._resolve4(hostname, ttl),
+			this._resolve6(hostname, ttl)
+		].map(promise => wrap(promise)));
+
+		let aTtl = 0;
+		let aaaaTtl = 0;
+		let cacheTtl = 0;
+
+		const now = Date.now();
+
+		for (const entry of A) {
+			entry.family = 4;
+			entry.expires = now + (entry.ttl * 1000);
+
+			aTtl = Math.max(aTtl, entry.ttl);
+		}
+
+		for (const entry of AAAA) {
+			entry.family = 6;
+			entry.expires = now + (entry.ttl * 1000);
+
+			aaaaTtl = Math.max(aaaaTtl, entry.ttl);
+		}
+
+		if (A.length > 0) {
+			if (AAAA.length > 0) {
+				cacheTtl = Math.min(aTtl, aaaaTtl);
+			} else {
+				cacheTtl = aTtl;
+			}
+		} else {
+			cacheTtl = aaaaTtl;
+		}
+
+		return {
+			entries: [
+				...A,
+				...AAAA
+			],
+			cacheTtl
+		};
+	}
+
+	async _lookup(hostname) {
+		try {
+			const entries = await this._dnsLookup(hostname, {
+				all: true
+			});
+
+			return {
+				entries,
+				cacheTtl: 0
+			};
+		} catch (_) {
+			return {
+				entries: [],
+				cacheTtl: 0
+			};
+		}
+	}
+
+	async _set(hostname, data, cacheTtl) {
+		if (this.maxTtl > 0 && cacheTtl > 0) {
+			cacheTtl = Math.min(cacheTtl, this.maxTtl) * 1000;
+			data[kExpires] = Date.now() + cacheTtl;
+
+			try {
+				await this._cache.set(hostname, data, cacheTtl);
+			} catch (error) {
+				this.lookupAsync = async () => {
+					const cacheError = new Error('Cache Error. Please recreate the CacheableLookup instance.');
+					cacheError.cause = error;
+
+					throw cacheError;
+				};
+			}
+
+			if (isIterable(this._cache)) {
+				this._tick(cacheTtl);
+			}
+		}
+	}
+
+	async queryAndCache(hostname) {
+		if (this._hostnamesToFallback.has(hostname)) {
+			return this._dnsLookup(hostname, all);
+		}
+
+		let query = await this._resolve(hostname);
+
+		if (query.entries.length === 0 && this._fallback) {
+			query = await this._lookup(hostname);
+
+			if (query.entries.length !== 0) {
+				// Use `dns.lookup(...)` for that particular hostname
+				this._hostnamesToFallback.add(hostname);
+			}
+		}
+
+		const cacheTtl = query.entries.length === 0 ? this.errorTtl : query.cacheTtl;
+		await this._set(hostname, query.entries, cacheTtl);
+
+		return query.entries;
+	}
+
+	_tick(ms) {
+		const nextRemovalTime = this._nextRemovalTime;
+
+		if (!nextRemovalTime || ms < nextRemovalTime) {
+			clearTimeout(this._removalTimeout);
+
+			this._nextRemovalTime = ms;
+
+			this._removalTimeout = setTimeout(() => {
+				this._nextRemovalTime = false;
+
+				let nextExpiry = Infinity;
+
+				const now = Date.now();
+
+				for (const [hostname, entries] of this._cache) {
+					const expires = entries[kExpires];
+
+					if (now >= expires) {
+						this._cache.delete(hostname);
+					} else if (expires < nextExpiry) {
+						nextExpiry = expires;
+					}
+				}
+
+				if (nextExpiry !== Infinity) {
+					this._tick(nextExpiry - now);
+				}
+			}, ms);
+
+			/* istanbul ignore next: There is no `timeout.unref()` when running inside an Electron renderer */
+			if (this._removalTimeout.unref) {
+				this._removalTimeout.unref();
+			}
+		}
+	}
+
+	install(agent) {
+		verifyAgent(agent);
+
+		if (kCacheableLookupCreateConnection in agent) {
+			throw new Error('CacheableLookup has been already installed');
+		}
+
+		agent[kCacheableLookupCreateConnection] = agent.createConnection;
+		agent[kCacheableLookupInstance] = this;
+
+		agent.createConnection = (options, callback) => {
+			if (!('lookup' in options)) {
+				options.lookup = this.lookup;
+			}
+
+			return agent[kCacheableLookupCreateConnection](options, callback);
+		};
+	}
+
+	uninstall(agent) {
+		verifyAgent(agent);
+
+		if (agent[kCacheableLookupCreateConnection]) {
+			if (agent[kCacheableLookupInstance] !== this) {
+				throw new Error('The agent is not owned by this CacheableLookup instance');
+			}
+
+			agent.createConnection = agent[kCacheableLookupCreateConnection];
+
+			delete agent[kCacheableLookupCreateConnection];
+			delete agent[kCacheableLookupInstance];
+		}
+	}
+
+	updateInterfaceInfo() {
+		const {_iface} = this;
+
+		this._iface = getIfaceInfo();
+
+		if ((_iface.has4 && !this._iface.has4) || (_iface.has6 && !this._iface.has6)) {
+			this._cache.clear();
+		}
+	}
+
+	clear(hostname) {
+		if (hostname) {
+			this._cache.delete(hostname);
+			return;
+		}
+
+		this._cache.clear();
+	}
+}
+
+module.exports = CacheableLookup;
+module.exports["default"] = CacheableLookup;
+
+
+/***/ }),
+
+/***/ 8116:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+
+const EventEmitter = __nccwpck_require__(2361);
+const urlLib = __nccwpck_require__(7310);
+const normalizeUrl = __nccwpck_require__(7952);
+const getStream = __nccwpck_require__(1766);
+const CachePolicy = __nccwpck_require__(1002);
+const Response = __nccwpck_require__(9004);
+const lowercaseKeys = __nccwpck_require__(9662);
+const cloneResponse = __nccwpck_require__(1312);
+const Keyv = __nccwpck_require__(1531);
+
+class CacheableRequest {
+	constructor(request, cacheAdapter) {
+		if (typeof request !== 'function') {
+			throw new TypeError('Parameter `request` must be a function');
+		}
+
+		this.cache = new Keyv({
+			uri: typeof cacheAdapter === 'string' && cacheAdapter,
+			store: typeof cacheAdapter !== 'string' && cacheAdapter,
+			namespace: 'cacheable-request'
+		});
+
+		return this.createCacheableRequest(request);
+	}
+
+	createCacheableRequest(request) {
+		return (opts, cb) => {
+			let url;
+			if (typeof opts === 'string') {
+				url = normalizeUrlObject(urlLib.parse(opts));
+				opts = {};
+			} else if (opts instanceof urlLib.URL) {
+				url = normalizeUrlObject(urlLib.parse(opts.toString()));
+				opts = {};
+			} else {
+				const [pathname, ...searchParts] = (opts.path || '').split('?');
+				const search = searchParts.length > 0 ?
+					`?${searchParts.join('?')}` :
+					'';
+				url = normalizeUrlObject({ ...opts, pathname, search });
+			}
+
+			opts = {
+				headers: {},
+				method: 'GET',
+				cache: true,
+				strictTtl: false,
+				automaticFailover: false,
+				...opts,
+				...urlObjectToRequestOptions(url)
+			};
+			opts.headers = lowercaseKeys(opts.headers);
+
+			const ee = new EventEmitter();
+			const normalizedUrlString = normalizeUrl(
+				urlLib.format(url),
+				{
+					stripWWW: false,
+					removeTrailingSlash: false,
+					stripAuthentication: false
+				}
+			);
+			const key = `${opts.method}:${normalizedUrlString}`;
+			let revalidate = false;
+			let madeRequest = false;
+
+			const makeRequest = opts => {
+				madeRequest = true;
+				let requestErrored = false;
+				let requestErrorCallback;
+
+				const requestErrorPromise = new Promise(resolve => {
+					requestErrorCallback = () => {
+						if (!requestErrored) {
+							requestErrored = true;
+							resolve();
+						}
+					};
+				});
+
+				const handler = response => {
+					if (revalidate && !opts.forceRefresh) {
+						response.status = response.statusCode;
+						const revalidatedPolicy = CachePolicy.fromObject(revalidate.cachePolicy).revalidatedPolicy(opts, response);
+						if (!revalidatedPolicy.modified) {
+							const headers = revalidatedPolicy.policy.responseHeaders();
+							response = new Response(revalidate.statusCode, headers, revalidate.body, revalidate.url);
+							response.cachePolicy = revalidatedPolicy.policy;
+							response.fromCache = true;
+						}
+					}
+
+					if (!response.fromCache) {
+						response.cachePolicy = new CachePolicy(opts, response, opts);
+						response.fromCache = false;
+					}
+
+					let clonedResponse;
+					if (opts.cache && response.cachePolicy.storable()) {
+						clonedResponse = cloneResponse(response);
+
+						(async () => {
+							try {
+								const bodyPromise = getStream.buffer(response);
+
+								await Promise.race([
+									requestErrorPromise,
+									new Promise(resolve => response.once('end', resolve))
+								]);
+
+								if (requestErrored) {
+									return;
+								}
+
+								const body = await bodyPromise;
+
+								const value = {
+									cachePolicy: response.cachePolicy.toObject(),
+									url: response.url,
+									statusCode: response.fromCache ? revalidate.statusCode : response.statusCode,
+									body
+								};
+
+								let ttl = opts.strictTtl ? response.cachePolicy.timeToLive() : undefined;
+								if (opts.maxTtl) {
+									ttl = ttl ? Math.min(ttl, opts.maxTtl) : opts.maxTtl;
+								}
+
+								await this.cache.set(key, value, ttl);
+							} catch (error) {
+								ee.emit('error', new CacheableRequest.CacheError(error));
+							}
+						})();
+					} else if (opts.cache && revalidate) {
+						(async () => {
+							try {
+								await this.cache.delete(key);
+							} catch (error) {
+								ee.emit('error', new CacheableRequest.CacheError(error));
+							}
+						})();
+					}
+
+					ee.emit('response', clonedResponse || response);
+					if (typeof cb === 'function') {
+						cb(clonedResponse || response);
+					}
+				};
+
+				try {
+					const req = request(opts, handler);
+					req.once('error', requestErrorCallback);
+					req.once('abort', requestErrorCallback);
+					ee.emit('request', req);
+				} catch (error) {
+					ee.emit('error', new CacheableRequest.RequestError(error));
+				}
+			};
+
+			(async () => {
+				const get = async opts => {
+					await Promise.resolve();
+
+					const cacheEntry = opts.cache ? await this.cache.get(key) : undefined;
+					if (typeof cacheEntry === 'undefined') {
+						return makeRequest(opts);
+					}
+
+					const policy = CachePolicy.fromObject(cacheEntry.cachePolicy);
+					if (policy.satisfiesWithoutRevalidation(opts) && !opts.forceRefresh) {
+						const headers = policy.responseHeaders();
+						const response = new Response(cacheEntry.statusCode, headers, cacheEntry.body, cacheEntry.url);
+						response.cachePolicy = policy;
+						response.fromCache = true;
+
+						ee.emit('response', response);
+						if (typeof cb === 'function') {
+							cb(response);
+						}
+					} else {
+						revalidate = cacheEntry;
+						opts.headers = policy.revalidationHeaders(opts);
+						makeRequest(opts);
+					}
+				};
+
+				const errorHandler = error => ee.emit('error', new CacheableRequest.CacheError(error));
+				this.cache.once('error', errorHandler);
+				ee.on('response', () => this.cache.removeListener('error', errorHandler));
+
+				try {
+					await get(opts);
+				} catch (error) {
+					if (opts.automaticFailover && !madeRequest) {
+						makeRequest(opts);
+					}
+
+					ee.emit('error', new CacheableRequest.CacheError(error));
+				}
+			})();
+
+			return ee;
+		};
+	}
+}
+
+function urlObjectToRequestOptions(url) {
+	const options = { ...url };
+	options.path = `${url.pathname || '/'}${url.search || ''}`;
+	delete options.pathname;
+	delete options.search;
+	return options;
+}
+
+function normalizeUrlObject(url) {
+	// If url was parsed by url.parse or new URL:
+	// - hostname will be set
+	// - host will be hostname[:port]
+	// - port will be set if it was explicit in the parsed string
+	// Otherwise, url was from request options:
+	// - hostname or host may be set
+	// - host shall not have port encoded
+	return {
+		protocol: url.protocol,
+		auth: url.auth,
+		hostname: url.hostname || url.host || 'localhost',
+		port: url.port,
+		pathname: url.pathname,
+		search: url.search
+	};
+}
+
+CacheableRequest.RequestError = class extends Error {
+	constructor(error) {
+		super(error.message);
+		this.name = 'RequestError';
+		Object.assign(this, error);
+	}
+};
+
+CacheableRequest.CacheError = class extends Error {
+	constructor(error) {
+		super(error.message);
+		this.name = 'CacheError';
+		Object.assign(this, error);
+	}
+};
+
+module.exports = CacheableRequest;
+
+
+/***/ }),
+
+/***/ 8803:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+
+var GetIntrinsic = __nccwpck_require__(4538);
+
+var callBind = __nccwpck_require__(2977);
+
+var $indexOf = callBind(GetIntrinsic('String.prototype.indexOf'));
+
+module.exports = function callBoundIntrinsic(name, allowMissing) {
+	var intrinsic = GetIntrinsic(name, !!allowMissing);
+	if (typeof intrinsic === 'function' && $indexOf(name, '.prototype.') > -1) {
+		return callBind(intrinsic);
+	}
+	return intrinsic;
+};
+
+
+/***/ }),
+
+/***/ 2977:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+
+var bind = __nccwpck_require__(8334);
+var GetIntrinsic = __nccwpck_require__(4538);
+
+var $apply = GetIntrinsic('%Function.prototype.apply%');
+var $call = GetIntrinsic('%Function.prototype.call%');
+var $reflectApply = GetIntrinsic('%Reflect.apply%', true) || bind.call($call, $apply);
+
+var $gOPD = GetIntrinsic('%Object.getOwnPropertyDescriptor%', true);
+var $defineProperty = GetIntrinsic('%Object.defineProperty%', true);
+var $max = GetIntrinsic('%Math.max%');
+
+if ($defineProperty) {
+	try {
+		$defineProperty({}, 'a', { value: 1 });
+	} catch (e) {
+		// IE 8 has a broken defineProperty
+		$defineProperty = null;
+	}
+}
+
+module.exports = function callBind(originalFunction) {
+	var func = $reflectApply(bind, $call, arguments);
+	if ($gOPD && $defineProperty) {
+		var desc = $gOPD(func, 'length');
+		if (desc.configurable) {
+			// original length, plus the receiver, minus any additional arguments (after the receiver)
+			$defineProperty(
+				func,
+				'length',
+				{ value: 1 + $max(0, originalFunction.length - (arguments.length - 1)) }
+			);
+		}
+	}
+	return func;
+};
+
+var applyBind = function applyBind() {
+	return $reflectApply(bind, $apply, arguments);
+};
+
+if ($defineProperty) {
+	$defineProperty(module.exports, 'apply', { value: applyBind });
+} else {
+	module.exports.apply = applyBind;
+}
+
+
+/***/ }),
+
+/***/ 1312:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+
+const PassThrough = (__nccwpck_require__(2781).PassThrough);
+const mimicResponse = __nccwpck_require__(2610);
+
+const cloneResponse = response => {
+	if (!(response && response.pipe)) {
+		throw new TypeError('Parameter `response` must be a response stream.');
+	}
+
+	const clone = new PassThrough();
+	mimicResponse(response, clone);
+
+	return response.pipe(clone);
+};
+
+module.exports = cloneResponse;
+
+
+/***/ }),
+
+/***/ 5443:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+var util = __nccwpck_require__(3837);
+var Stream = (__nccwpck_require__(2781).Stream);
+var DelayedStream = __nccwpck_require__(8611);
+
+module.exports = CombinedStream;
+function CombinedStream() {
+  this.writable = false;
+  this.readable = true;
+  this.dataSize = 0;
+  this.maxDataSize = 2 * 1024 * 1024;
+  this.pauseStreams = true;
+
+  this._released = false;
+  this._streams = [];
+  this._currentStream = null;
+  this._insideLoop = false;
+  this._pendingNext = false;
+}
+util.inherits(CombinedStream, Stream);
+
+CombinedStream.create = function(options) {
+  var combinedStream = new this();
+
+  options = options || {};
+  for (var option in options) {
+    combinedStream[option] = options[option];
+  }
+
+  return combinedStream;
+};
+
+CombinedStream.isStreamLike = function(stream) {
+  return (typeof stream !== 'function')
+    && (typeof stream !== 'string')
+    && (typeof stream !== 'boolean')
+    && (typeof stream !== 'number')
+    && (!Buffer.isBuffer(stream));
+};
+
+CombinedStream.prototype.append = function(stream) {
+  var isStreamLike = CombinedStream.isStreamLike(stream);
+
+  if (isStreamLike) {
+    if (!(stream instanceof DelayedStream)) {
+      var newStream = DelayedStream.create(stream, {
+        maxDataSize: Infinity,
+        pauseStream: this.pauseStreams,
+      });
+      stream.on('data', this._checkDataSize.bind(this));
+      stream = newStream;
+    }
+
+    this._handleErrors(stream);
+
+    if (this.pauseStreams) {
+      stream.pause();
+    }
+  }
+
+  this._streams.push(stream);
+  return this;
+};
+
+CombinedStream.prototype.pipe = function(dest, options) {
+  Stream.prototype.pipe.call(this, dest, options);
+  this.resume();
+  return dest;
+};
+
+CombinedStream.prototype._getNext = function() {
+  this._currentStream = null;
+
+  if (this._insideLoop) {
+    this._pendingNext = true;
+    return; // defer call
+  }
+
+  this._insideLoop = true;
+  try {
+    do {
+      this._pendingNext = false;
+      this._realGetNext();
+    } while (this._pendingNext);
+  } finally {
+    this._insideLoop = false;
+  }
+};
+
+CombinedStream.prototype._realGetNext = function() {
+  var stream = this._streams.shift();
+
+
+  if (typeof stream == 'undefined') {
+    this.end();
+    return;
+  }
+
+  if (typeof stream !== 'function') {
+    this._pipeNext(stream);
+    return;
+  }
+
+  var getStream = stream;
+  getStream(function(stream) {
+    var isStreamLike = CombinedStream.isStreamLike(stream);
+    if (isStreamLike) {
+      stream.on('data', this._checkDataSize.bind(this));
+      this._handleErrors(stream);
+    }
+
+    this._pipeNext(stream);
+  }.bind(this));
+};
+
+CombinedStream.prototype._pipeNext = function(stream) {
+  this._currentStream = stream;
+
+  var isStreamLike = CombinedStream.isStreamLike(stream);
+  if (isStreamLike) {
+    stream.on('end', this._getNext.bind(this));
+    stream.pipe(this, {end: false});
+    return;
+  }
+
+  var value = stream;
+  this.write(value);
+  this._getNext();
+};
+
+CombinedStream.prototype._handleErrors = function(stream) {
+  var self = this;
+  stream.on('error', function(err) {
+    self._emitError(err);
+  });
+};
+
+CombinedStream.prototype.write = function(data) {
+  this.emit('data', data);
+};
+
+CombinedStream.prototype.pause = function() {
+  if (!this.pauseStreams) {
+    return;
+  }
+
+  if(this.pauseStreams && this._currentStream && typeof(this._currentStream.pause) == 'function') this._currentStream.pause();
+  this.emit('pause');
+};
+
+CombinedStream.prototype.resume = function() {
+  if (!this._released) {
+    this._released = true;
+    this.writable = true;
+    this._getNext();
+  }
+
+  if(this.pauseStreams && this._currentStream && typeof(this._currentStream.resume) == 'function') this._currentStream.resume();
+  this.emit('resume');
+};
+
+CombinedStream.prototype.end = function() {
+  this._reset();
+  this.emit('end');
+};
+
+CombinedStream.prototype.destroy = function() {
+  this._reset();
+  this.emit('close');
+};
+
+CombinedStream.prototype._reset = function() {
+  this.writable = false;
+  this._streams = [];
+  this._currentStream = null;
+};
+
+CombinedStream.prototype._checkDataSize = function() {
+  this._updateDataSize();
+  if (this.dataSize <= this.maxDataSize) {
+    return;
+  }
+
+  var message =
+    'DelayedStream#maxDataSize of ' + this.maxDataSize + ' bytes exceeded.';
+  this._emitError(new Error(message));
+};
+
+CombinedStream.prototype._updateDataSize = function() {
+  this.dataSize = 0;
+
+  var self = this;
+  this._streams.forEach(function(stream) {
+    if (!stream.dataSize) {
+      return;
+    }
+
+    self.dataSize += stream.dataSize;
+  });
+
+  if (this._currentStream && this._currentStream.dataSize) {
+    this.dataSize += this._currentStream.dataSize;
+  }
+};
+
+CombinedStream.prototype._emitError = function(err) {
+  this._reset();
+  this.emit('error', err);
+};
+
+
+/***/ }),
+
+/***/ 3186:
+/***/ ((module) => {
+
+
+var token = '%[a-f0-9]{2}';
+var singleMatcher = new RegExp('(' + token + ')|([^%]+?)', 'gi');
+var multiMatcher = new RegExp('(' + token + ')+', 'gi');
+
+function decodeComponents(components, split) {
+	try {
+		// Try to decode the entire string first
+		return [decodeURIComponent(components.join(''))];
+	} catch (err) {
+		// Do nothing
+	}
+
+	if (components.length === 1) {
+		return components;
+	}
+
+	split = split || 1;
+
+	// Split the array in 2 parts
+	var left = components.slice(0, split);
+	var right = components.slice(split);
+
+	return Array.prototype.concat.call([], decodeComponents(left), decodeComponents(right));
+}
+
+function decode(input) {
+	try {
+		return decodeURIComponent(input);
+	} catch (err) {
+		var tokens = input.match(singleMatcher) || [];
+
+		for (var i = 1; i < tokens.length; i++) {
+			input = decodeComponents(tokens, i).join('');
+
+			tokens = input.match(singleMatcher) || [];
+		}
+
+		return input;
+	}
+}
+
+function customDecodeURIComponent(input) {
+	// Keep track of all the replacements and prefill the map with the `BOM`
+	var replaceMap = {
+		'%FE%FF': '\uFFFD\uFFFD',
+		'%FF%FE': '\uFFFD\uFFFD'
+	};
+
+	var match = multiMatcher.exec(input);
+	while (match) {
+		try {
+			// Decode as big chunks as possible
+			replaceMap[match[0]] = decodeURIComponent(match[0]);
+		} catch (err) {
+			var result = decode(match[0]);
+
+			if (result !== match[0]) {
+				replaceMap[match[0]] = result;
+			}
+		}
+
+		match = multiMatcher.exec(input);
+	}
+
+	// Add `%C2` at the end of the map to make sure it does not replace the combinator before everything else
+	replaceMap['%C2'] = '\uFFFD';
+
+	var entries = Object.keys(replaceMap);
+
+	for (var i = 0; i < entries.length; i++) {
+		// Replace all decoded components
+		var key = entries[i];
+		input = input.replace(new RegExp(key, 'g'), replaceMap[key]);
+	}
+
+	return input;
+}
+
+module.exports = function (encodedURI) {
+	if (typeof encodedURI !== 'string') {
+		throw new TypeError('Expected `encodedURI` to be of type `string`, got `' + typeof encodedURI + '`');
+	}
+
+	try {
+		encodedURI = encodedURI.replace(/\+/g, ' ');
+
+		// Try the built in decoder first
+		return decodeURIComponent(encodedURI);
+	} catch (err) {
+		// Fallback to a more advanced decoder
+		return customDecodeURIComponent(encodedURI);
+	}
+};
+
+
+/***/ }),
+
+/***/ 2391:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+const {Transform, PassThrough} = __nccwpck_require__(2781);
+const zlib = __nccwpck_require__(9796);
+const mimicResponse = __nccwpck_require__(3877);
+
+module.exports = response => {
+	const contentEncoding = (response.headers['content-encoding'] || '').toLowerCase();
+
+	if (!['gzip', 'deflate', 'br'].includes(contentEncoding)) {
+		return response;
+	}
+
+	// TODO: Remove this when targeting Node.js 12.
+	const isBrotli = contentEncoding === 'br';
+	if (isBrotli && typeof zlib.createBrotliDecompress !== 'function') {
+		response.destroy(new Error('Brotli is not supported on Node.js < 12'));
+		return response;
+	}
+
+	let isEmpty = true;
+
+	const checker = new Transform({
+		transform(data, _encoding, callback) {
+			isEmpty = false;
+
+			callback(null, data);
+		},
+
+		flush(callback) {
+			callback();
+		}
+	});
+
+	const finalStream = new PassThrough({
+		autoDestroy: false,
+		destroy(error, callback) {
+			response.destroy();
+
+			callback(error);
+		}
+	});
+
+	const decompressStream = isBrotli ? zlib.createBrotliDecompress() : zlib.createUnzip();
+
+	decompressStream.once('error', error => {
+		if (isEmpty && !response.readable) {
+			finalStream.end();
+			return;
+		}
+
+		finalStream.destroy(error);
+	});
+
+	mimicResponse(response, finalStream);
+	response.pipe(checker).pipe(decompressStream).pipe(finalStream);
+
+	return finalStream;
+};
+
+
+/***/ }),
+
+/***/ 3877:
+/***/ ((module) => {
+
+
+
+// We define these manually to ensure they're always copied
+// even if they would move up the prototype chain
+// https://nodejs.org/api/http.html#http_class_http_incomingmessage
+const knownProperties = [
+	'aborted',
+	'complete',
+	'headers',
+	'httpVersion',
+	'httpVersionMinor',
+	'httpVersionMajor',
+	'method',
+	'rawHeaders',
+	'rawTrailers',
+	'setTimeout',
+	'socket',
+	'statusCode',
+	'statusMessage',
+	'trailers',
+	'url'
+];
+
+module.exports = (fromStream, toStream) => {
+	if (toStream._readableState.autoDestroy) {
+		throw new Error('The second stream must have the `autoDestroy` option set to `false`');
+	}
+
+	const fromProperties = new Set(Object.keys(fromStream).concat(knownProperties));
+
+	const properties = {};
+
+	for (const property of fromProperties) {
+		// Don't overwrite existing properties.
+		if (property in toStream) {
+			continue;
+		}
+
+		properties[property] = {
+			get() {
+				const value = fromStream[property];
+				const isFunction = typeof value === 'function';
+
+				return isFunction ? value.bind(fromStream) : value;
+			},
+			set(value) {
+				fromStream[property] = value;
+			},
+			enumerable: true,
+			configurable: false
+		};
+	}
+
+	Object.defineProperties(toStream, properties);
+
+	fromStream.once('aborted', () => {
+		toStream.destroy();
+
+		toStream.emit('aborted');
+	});
+
+	fromStream.once('close', () => {
+		if (fromStream.complete) {
+			if (toStream.readable) {
+				toStream.once('end', () => {
+					toStream.emit('close');
+				});
+			} else {
+				toStream.emit('close');
+			}
+		} else {
+			toStream.emit('close');
+		}
+	});
+
+	return toStream;
+};
+
+
+/***/ }),
+
+/***/ 6214:
+/***/ ((module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+function isTLSSocket(socket) {
+    return socket.encrypted;
+}
+const deferToConnect = (socket, fn) => {
+    let listeners;
+    if (typeof fn === 'function') {
+        const connect = fn;
+        listeners = { connect };
+    }
+    else {
+        listeners = fn;
+    }
+    const hasConnectListener = typeof listeners.connect === 'function';
+    const hasSecureConnectListener = typeof listeners.secureConnect === 'function';
+    const hasCloseListener = typeof listeners.close === 'function';
+    const onConnect = () => {
+        if (hasConnectListener) {
+            listeners.connect();
+        }
+        if (isTLSSocket(socket) && hasSecureConnectListener) {
+            if (socket.authorized) {
+                listeners.secureConnect();
+            }
+            else if (!socket.authorizationError) {
+                socket.once('secureConnect', listeners.secureConnect);
+            }
+        }
+        if (hasCloseListener) {
+            socket.once('close', listeners.close);
+        }
+    };
+    if (socket.writable && !socket.connecting) {
+        onConnect();
+    }
+    else if (socket.connecting) {
+        socket.once('connect', onConnect);
+    }
+    else if (socket.destroyed && hasCloseListener) {
+        listeners.close(socket._hadError);
+    }
+};
+exports["default"] = deferToConnect;
+// For CommonJS default export support
+module.exports = deferToConnect;
+module.exports["default"] = deferToConnect;
+
+
+/***/ }),
+
+/***/ 86:
+/***/ ((module) => {
+
+
+
+// From https://github.com/sindresorhus/random-int/blob/c37741b56f76b9160b0b63dae4e9c64875128146/index.js#L13-L15
+const randomInteger = (minimum, maximum) => Math.floor((Math.random() * (maximum - minimum + 1)) + minimum);
+
+const createAbortError = () => {
+	const error = new Error('Delay aborted');
+	error.name = 'AbortError';
+	return error;
+};
+
+const createDelay = ({clearTimeout: defaultClear, setTimeout: set, willResolve}) => (ms, {value, signal} = {}) => {
+	if (signal && signal.aborted) {
+		return Promise.reject(createAbortError());
+	}
+
+	let timeoutId;
+	let settle;
+	let rejectFn;
+	const clear = defaultClear || clearTimeout;
+
+	const signalListener = () => {
+		clear(timeoutId);
+		rejectFn(createAbortError());
+	};
+
+	const cleanup = () => {
+		if (signal) {
+			signal.removeEventListener('abort', signalListener);
+		}
+	};
+
+	const delayPromise = new Promise((resolve, reject) => {
+		settle = () => {
+			cleanup();
+			if (willResolve) {
+				resolve(value);
+			} else {
+				reject(value);
+			}
+		};
+
+		rejectFn = reject;
+		timeoutId = (set || setTimeout)(settle, ms);
+	});
+
+	if (signal) {
+		signal.addEventListener('abort', signalListener, {once: true});
+	}
+
+	delayPromise.clear = () => {
+		clear(timeoutId);
+		timeoutId = null;
+		settle();
+	};
+
+	return delayPromise;
+};
+
+const createWithTimers = clearAndSet => {
+	const delay = createDelay({...clearAndSet, willResolve: true});
+	delay.reject = createDelay({...clearAndSet, willResolve: false});
+	delay.range = (minimum, maximum, options) => delay(randomInteger(minimum, maximum), options);
+	return delay;
+};
+
+const delay = createWithTimers();
+delay.createWithTimers = createWithTimers;
+
+module.exports = delay;
+// TODO: Remove this for the next major release
+module.exports["default"] = delay;
+
+
+/***/ }),
+
+/***/ 8611:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+var Stream = (__nccwpck_require__(2781).Stream);
+var util = __nccwpck_require__(3837);
+
+module.exports = DelayedStream;
+function DelayedStream() {
+  this.source = null;
+  this.dataSize = 0;
+  this.maxDataSize = 1024 * 1024;
+  this.pauseStream = true;
+
+  this._maxDataSizeExceeded = false;
+  this._released = false;
+  this._bufferedEvents = [];
+}
+util.inherits(DelayedStream, Stream);
+
+DelayedStream.create = function(source, options) {
+  var delayedStream = new this();
+
+  options = options || {};
+  for (var option in options) {
+    delayedStream[option] = options[option];
+  }
+
+  delayedStream.source = source;
+
+  var realEmit = source.emit;
+  source.emit = function() {
+    delayedStream._handleEmit(arguments);
+    return realEmit.apply(source, arguments);
+  };
+
+  source.on('error', function() {});
+  if (delayedStream.pauseStream) {
+    source.pause();
+  }
+
+  return delayedStream;
+};
+
+Object.defineProperty(DelayedStream.prototype, 'readable', {
+  configurable: true,
+  enumerable: true,
+  get: function() {
+    return this.source.readable;
+  }
+});
+
+DelayedStream.prototype.setEncoding = function() {
+  return this.source.setEncoding.apply(this.source, arguments);
+};
+
+DelayedStream.prototype.resume = function() {
+  if (!this._released) {
+    this.release();
+  }
+
+  this.source.resume();
+};
+
+DelayedStream.prototype.pause = function() {
+  this.source.pause();
+};
+
+DelayedStream.prototype.release = function() {
+  this._released = true;
+
+  this._bufferedEvents.forEach(function(args) {
+    this.emit.apply(this, args);
+  }.bind(this));
+  this._bufferedEvents = [];
+};
+
+DelayedStream.prototype.pipe = function() {
+  var r = Stream.prototype.pipe.apply(this, arguments);
+  this.resume();
+  return r;
+};
+
+DelayedStream.prototype._handleEmit = function(args) {
+  if (this._released) {
+    this.emit.apply(this, args);
+    return;
+  }
+
+  if (args[0] === 'data') {
+    this.dataSize += args[1].length;
+    this._checkIfMaxDataSizeExceeded();
+  }
+
+  this._bufferedEvents.push(args);
+};
+
+DelayedStream.prototype._checkIfMaxDataSizeExceeded = function() {
+  if (this._maxDataSizeExceeded) {
+    return;
+  }
+
+  if (this.dataSize <= this.maxDataSize) {
+    return;
+  }
+
+  this._maxDataSizeExceeded = true;
+  var message =
+    'DelayedStream#maxDataSize of ' + this.maxDataSize + ' bytes exceeded.'
+  this.emit('error', new Error(message));
+};
+
+
+/***/ }),
+
 /***/ 8932:
 /***/ ((__unused_webpack_module, exports) => {
 
@@ -6984,6 +14282,5766 @@ module.exports = DotenvModule
 
 /***/ }),
 
+/***/ 1205:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+var once = __nccwpck_require__(1223);
+
+var noop = function() {};
+
+var isRequest = function(stream) {
+	return stream.setHeader && typeof stream.abort === 'function';
+};
+
+var isChildProcess = function(stream) {
+	return stream.stdio && Array.isArray(stream.stdio) && stream.stdio.length === 3
+};
+
+var eos = function(stream, opts, callback) {
+	if (typeof opts === 'function') return eos(stream, null, opts);
+	if (!opts) opts = {};
+
+	callback = once(callback || noop);
+
+	var ws = stream._writableState;
+	var rs = stream._readableState;
+	var readable = opts.readable || (opts.readable !== false && stream.readable);
+	var writable = opts.writable || (opts.writable !== false && stream.writable);
+	var cancelled = false;
+
+	var onlegacyfinish = function() {
+		if (!stream.writable) onfinish();
+	};
+
+	var onfinish = function() {
+		writable = false;
+		if (!readable) callback.call(stream);
+	};
+
+	var onend = function() {
+		readable = false;
+		if (!writable) callback.call(stream);
+	};
+
+	var onexit = function(exitCode) {
+		callback.call(stream, exitCode ? new Error('exited with error code: ' + exitCode) : null);
+	};
+
+	var onerror = function(err) {
+		callback.call(stream, err);
+	};
+
+	var onclose = function() {
+		process.nextTick(onclosenexttick);
+	};
+
+	var onclosenexttick = function() {
+		if (cancelled) return;
+		if (readable && !(rs && (rs.ended && !rs.destroyed))) return callback.call(stream, new Error('premature close'));
+		if (writable && !(ws && (ws.ended && !ws.destroyed))) return callback.call(stream, new Error('premature close'));
+	};
+
+	var onrequest = function() {
+		stream.req.on('finish', onfinish);
+	};
+
+	if (isRequest(stream)) {
+		stream.on('complete', onfinish);
+		stream.on('abort', onclose);
+		if (stream.req) onrequest();
+		else stream.on('request', onrequest);
+	} else if (writable && !ws) { // legacy streams
+		stream.on('end', onlegacyfinish);
+		stream.on('close', onlegacyfinish);
+	}
+
+	if (isChildProcess(stream)) stream.on('exit', onexit);
+
+	stream.on('end', onend);
+	stream.on('finish', onfinish);
+	if (opts.error !== false) stream.on('error', onerror);
+	stream.on('close', onclose);
+
+	return function() {
+		cancelled = true;
+		stream.removeListener('complete', onfinish);
+		stream.removeListener('abort', onclose);
+		stream.removeListener('request', onrequest);
+		if (stream.req) stream.req.removeListener('finish', onfinish);
+		stream.removeListener('end', onlegacyfinish);
+		stream.removeListener('close', onlegacyfinish);
+		stream.removeListener('finish', onfinish);
+		stream.removeListener('exit', onexit);
+		stream.removeListener('end', onend);
+		stream.removeListener('error', onerror);
+		stream.removeListener('close', onclose);
+	};
+};
+
+module.exports = eos;
+
+
+/***/ }),
+
+/***/ 4940:
+/***/ ((module) => {
+
+
+module.exports = function (obj, predicate) {
+	var ret = {};
+	var keys = Object.keys(obj);
+	var isArr = Array.isArray(predicate);
+
+	for (var i = 0; i < keys.length; i++) {
+		var key = keys[i];
+		var val = obj[key];
+
+		if (isArr ? predicate.indexOf(key) !== -1 : predicate(key, val, obj)) {
+			ret[key] = val;
+		}
+	}
+
+	return ret;
+};
+
+
+/***/ }),
+
+/***/ 9320:
+/***/ ((module) => {
+
+
+
+/* eslint no-invalid-this: 1 */
+
+var ERROR_MESSAGE = 'Function.prototype.bind called on incompatible ';
+var slice = Array.prototype.slice;
+var toStr = Object.prototype.toString;
+var funcType = '[object Function]';
+
+module.exports = function bind(that) {
+    var target = this;
+    if (typeof target !== 'function' || toStr.call(target) !== funcType) {
+        throw new TypeError(ERROR_MESSAGE + target);
+    }
+    var args = slice.call(arguments, 1);
+
+    var bound;
+    var binder = function () {
+        if (this instanceof bound) {
+            var result = target.apply(
+                this,
+                args.concat(slice.call(arguments))
+            );
+            if (Object(result) === result) {
+                return result;
+            }
+            return this;
+        } else {
+            return target.apply(
+                that,
+                args.concat(slice.call(arguments))
+            );
+        }
+    };
+
+    var boundLength = Math.max(0, target.length - args.length);
+    var boundArgs = [];
+    for (var i = 0; i < boundLength; i++) {
+        boundArgs.push('$' + i);
+    }
+
+    bound = Function('binder', 'return function (' + boundArgs.join(',') + '){ return binder.apply(this,arguments); }')(binder);
+
+    if (target.prototype) {
+        var Empty = function Empty() {};
+        Empty.prototype = target.prototype;
+        bound.prototype = new Empty();
+        Empty.prototype = null;
+    }
+
+    return bound;
+};
+
+
+/***/ }),
+
+/***/ 8334:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+
+var implementation = __nccwpck_require__(9320);
+
+module.exports = Function.prototype.bind || implementation;
+
+
+/***/ }),
+
+/***/ 4538:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+
+var undefined;
+
+var $SyntaxError = SyntaxError;
+var $Function = Function;
+var $TypeError = TypeError;
+
+// eslint-disable-next-line consistent-return
+var getEvalledConstructor = function (expressionSyntax) {
+	try {
+		return $Function('"use strict"; return (' + expressionSyntax + ').constructor;')();
+	} catch (e) {}
+};
+
+var $gOPD = Object.getOwnPropertyDescriptor;
+if ($gOPD) {
+	try {
+		$gOPD({}, '');
+	} catch (e) {
+		$gOPD = null; // this is IE 8, which has a broken gOPD
+	}
+}
+
+var throwTypeError = function () {
+	throw new $TypeError();
+};
+var ThrowTypeError = $gOPD
+	? (function () {
+		try {
+			// eslint-disable-next-line no-unused-expressions, no-caller, no-restricted-properties
+			arguments.callee; // IE 8 does not throw here
+			return throwTypeError;
+		} catch (calleeThrows) {
+			try {
+				// IE 8 throws on Object.getOwnPropertyDescriptor(arguments, '')
+				return $gOPD(arguments, 'callee').get;
+			} catch (gOPDthrows) {
+				return throwTypeError;
+			}
+		}
+	}())
+	: throwTypeError;
+
+var hasSymbols = __nccwpck_require__(587)();
+
+var getProto = Object.getPrototypeOf || function (x) { return x.__proto__; }; // eslint-disable-line no-proto
+
+var needsEval = {};
+
+var TypedArray = typeof Uint8Array === 'undefined' ? undefined : getProto(Uint8Array);
+
+var INTRINSICS = {
+	'%AggregateError%': typeof AggregateError === 'undefined' ? undefined : AggregateError,
+	'%Array%': Array,
+	'%ArrayBuffer%': typeof ArrayBuffer === 'undefined' ? undefined : ArrayBuffer,
+	'%ArrayIteratorPrototype%': hasSymbols ? getProto([][Symbol.iterator]()) : undefined,
+	'%AsyncFromSyncIteratorPrototype%': undefined,
+	'%AsyncFunction%': needsEval,
+	'%AsyncGenerator%': needsEval,
+	'%AsyncGeneratorFunction%': needsEval,
+	'%AsyncIteratorPrototype%': needsEval,
+	'%Atomics%': typeof Atomics === 'undefined' ? undefined : Atomics,
+	'%BigInt%': typeof BigInt === 'undefined' ? undefined : BigInt,
+	'%BigInt64Array%': typeof BigInt64Array === 'undefined' ? undefined : BigInt64Array,
+	'%BigUint64Array%': typeof BigUint64Array === 'undefined' ? undefined : BigUint64Array,
+	'%Boolean%': Boolean,
+	'%DataView%': typeof DataView === 'undefined' ? undefined : DataView,
+	'%Date%': Date,
+	'%decodeURI%': decodeURI,
+	'%decodeURIComponent%': decodeURIComponent,
+	'%encodeURI%': encodeURI,
+	'%encodeURIComponent%': encodeURIComponent,
+	'%Error%': Error,
+	'%eval%': eval, // eslint-disable-line no-eval
+	'%EvalError%': EvalError,
+	'%Float32Array%': typeof Float32Array === 'undefined' ? undefined : Float32Array,
+	'%Float64Array%': typeof Float64Array === 'undefined' ? undefined : Float64Array,
+	'%FinalizationRegistry%': typeof FinalizationRegistry === 'undefined' ? undefined : FinalizationRegistry,
+	'%Function%': $Function,
+	'%GeneratorFunction%': needsEval,
+	'%Int8Array%': typeof Int8Array === 'undefined' ? undefined : Int8Array,
+	'%Int16Array%': typeof Int16Array === 'undefined' ? undefined : Int16Array,
+	'%Int32Array%': typeof Int32Array === 'undefined' ? undefined : Int32Array,
+	'%isFinite%': isFinite,
+	'%isNaN%': isNaN,
+	'%IteratorPrototype%': hasSymbols ? getProto(getProto([][Symbol.iterator]())) : undefined,
+	'%JSON%': typeof JSON === 'object' ? JSON : undefined,
+	'%Map%': typeof Map === 'undefined' ? undefined : Map,
+	'%MapIteratorPrototype%': typeof Map === 'undefined' || !hasSymbols ? undefined : getProto(new Map()[Symbol.iterator]()),
+	'%Math%': Math,
+	'%Number%': Number,
+	'%Object%': Object,
+	'%parseFloat%': parseFloat,
+	'%parseInt%': parseInt,
+	'%Promise%': typeof Promise === 'undefined' ? undefined : Promise,
+	'%Proxy%': typeof Proxy === 'undefined' ? undefined : Proxy,
+	'%RangeError%': RangeError,
+	'%ReferenceError%': ReferenceError,
+	'%Reflect%': typeof Reflect === 'undefined' ? undefined : Reflect,
+	'%RegExp%': RegExp,
+	'%Set%': typeof Set === 'undefined' ? undefined : Set,
+	'%SetIteratorPrototype%': typeof Set === 'undefined' || !hasSymbols ? undefined : getProto(new Set()[Symbol.iterator]()),
+	'%SharedArrayBuffer%': typeof SharedArrayBuffer === 'undefined' ? undefined : SharedArrayBuffer,
+	'%String%': String,
+	'%StringIteratorPrototype%': hasSymbols ? getProto(''[Symbol.iterator]()) : undefined,
+	'%Symbol%': hasSymbols ? Symbol : undefined,
+	'%SyntaxError%': $SyntaxError,
+	'%ThrowTypeError%': ThrowTypeError,
+	'%TypedArray%': TypedArray,
+	'%TypeError%': $TypeError,
+	'%Uint8Array%': typeof Uint8Array === 'undefined' ? undefined : Uint8Array,
+	'%Uint8ClampedArray%': typeof Uint8ClampedArray === 'undefined' ? undefined : Uint8ClampedArray,
+	'%Uint16Array%': typeof Uint16Array === 'undefined' ? undefined : Uint16Array,
+	'%Uint32Array%': typeof Uint32Array === 'undefined' ? undefined : Uint32Array,
+	'%URIError%': URIError,
+	'%WeakMap%': typeof WeakMap === 'undefined' ? undefined : WeakMap,
+	'%WeakRef%': typeof WeakRef === 'undefined' ? undefined : WeakRef,
+	'%WeakSet%': typeof WeakSet === 'undefined' ? undefined : WeakSet
+};
+
+try {
+	null.error; // eslint-disable-line no-unused-expressions
+} catch (e) {
+	// https://github.com/tc39/proposal-shadowrealm/pull/384#issuecomment-1364264229
+	var errorProto = getProto(getProto(e));
+	INTRINSICS['%Error.prototype%'] = errorProto;
+}
+
+var doEval = function doEval(name) {
+	var value;
+	if (name === '%AsyncFunction%') {
+		value = getEvalledConstructor('async function () {}');
+	} else if (name === '%GeneratorFunction%') {
+		value = getEvalledConstructor('function* () {}');
+	} else if (name === '%AsyncGeneratorFunction%') {
+		value = getEvalledConstructor('async function* () {}');
+	} else if (name === '%AsyncGenerator%') {
+		var fn = doEval('%AsyncGeneratorFunction%');
+		if (fn) {
+			value = fn.prototype;
+		}
+	} else if (name === '%AsyncIteratorPrototype%') {
+		var gen = doEval('%AsyncGenerator%');
+		if (gen) {
+			value = getProto(gen.prototype);
+		}
+	}
+
+	INTRINSICS[name] = value;
+
+	return value;
+};
+
+var LEGACY_ALIASES = {
+	'%ArrayBufferPrototype%': ['ArrayBuffer', 'prototype'],
+	'%ArrayPrototype%': ['Array', 'prototype'],
+	'%ArrayProto_entries%': ['Array', 'prototype', 'entries'],
+	'%ArrayProto_forEach%': ['Array', 'prototype', 'forEach'],
+	'%ArrayProto_keys%': ['Array', 'prototype', 'keys'],
+	'%ArrayProto_values%': ['Array', 'prototype', 'values'],
+	'%AsyncFunctionPrototype%': ['AsyncFunction', 'prototype'],
+	'%AsyncGenerator%': ['AsyncGeneratorFunction', 'prototype'],
+	'%AsyncGeneratorPrototype%': ['AsyncGeneratorFunction', 'prototype', 'prototype'],
+	'%BooleanPrototype%': ['Boolean', 'prototype'],
+	'%DataViewPrototype%': ['DataView', 'prototype'],
+	'%DatePrototype%': ['Date', 'prototype'],
+	'%ErrorPrototype%': ['Error', 'prototype'],
+	'%EvalErrorPrototype%': ['EvalError', 'prototype'],
+	'%Float32ArrayPrototype%': ['Float32Array', 'prototype'],
+	'%Float64ArrayPrototype%': ['Float64Array', 'prototype'],
+	'%FunctionPrototype%': ['Function', 'prototype'],
+	'%Generator%': ['GeneratorFunction', 'prototype'],
+	'%GeneratorPrototype%': ['GeneratorFunction', 'prototype', 'prototype'],
+	'%Int8ArrayPrototype%': ['Int8Array', 'prototype'],
+	'%Int16ArrayPrototype%': ['Int16Array', 'prototype'],
+	'%Int32ArrayPrototype%': ['Int32Array', 'prototype'],
+	'%JSONParse%': ['JSON', 'parse'],
+	'%JSONStringify%': ['JSON', 'stringify'],
+	'%MapPrototype%': ['Map', 'prototype'],
+	'%NumberPrototype%': ['Number', 'prototype'],
+	'%ObjectPrototype%': ['Object', 'prototype'],
+	'%ObjProto_toString%': ['Object', 'prototype', 'toString'],
+	'%ObjProto_valueOf%': ['Object', 'prototype', 'valueOf'],
+	'%PromisePrototype%': ['Promise', 'prototype'],
+	'%PromiseProto_then%': ['Promise', 'prototype', 'then'],
+	'%Promise_all%': ['Promise', 'all'],
+	'%Promise_reject%': ['Promise', 'reject'],
+	'%Promise_resolve%': ['Promise', 'resolve'],
+	'%RangeErrorPrototype%': ['RangeError', 'prototype'],
+	'%ReferenceErrorPrototype%': ['ReferenceError', 'prototype'],
+	'%RegExpPrototype%': ['RegExp', 'prototype'],
+	'%SetPrototype%': ['Set', 'prototype'],
+	'%SharedArrayBufferPrototype%': ['SharedArrayBuffer', 'prototype'],
+	'%StringPrototype%': ['String', 'prototype'],
+	'%SymbolPrototype%': ['Symbol', 'prototype'],
+	'%SyntaxErrorPrototype%': ['SyntaxError', 'prototype'],
+	'%TypedArrayPrototype%': ['TypedArray', 'prototype'],
+	'%TypeErrorPrototype%': ['TypeError', 'prototype'],
+	'%Uint8ArrayPrototype%': ['Uint8Array', 'prototype'],
+	'%Uint8ClampedArrayPrototype%': ['Uint8ClampedArray', 'prototype'],
+	'%Uint16ArrayPrototype%': ['Uint16Array', 'prototype'],
+	'%Uint32ArrayPrototype%': ['Uint32Array', 'prototype'],
+	'%URIErrorPrototype%': ['URIError', 'prototype'],
+	'%WeakMapPrototype%': ['WeakMap', 'prototype'],
+	'%WeakSetPrototype%': ['WeakSet', 'prototype']
+};
+
+var bind = __nccwpck_require__(8334);
+var hasOwn = __nccwpck_require__(6339);
+var $concat = bind.call(Function.call, Array.prototype.concat);
+var $spliceApply = bind.call(Function.apply, Array.prototype.splice);
+var $replace = bind.call(Function.call, String.prototype.replace);
+var $strSlice = bind.call(Function.call, String.prototype.slice);
+var $exec = bind.call(Function.call, RegExp.prototype.exec);
+
+/* adapted from https://github.com/lodash/lodash/blob/4.17.15/dist/lodash.js#L6735-L6744 */
+var rePropName = /[^%.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["'])((?:(?!\2)[^\\]|\\.)*?)\2)\]|(?=(?:\.|\[\])(?:\.|\[\]|%$))/g;
+var reEscapeChar = /\\(\\)?/g; /** Used to match backslashes in property paths. */
+var stringToPath = function stringToPath(string) {
+	var first = $strSlice(string, 0, 1);
+	var last = $strSlice(string, -1);
+	if (first === '%' && last !== '%') {
+		throw new $SyntaxError('invalid intrinsic syntax, expected closing `%`');
+	} else if (last === '%' && first !== '%') {
+		throw new $SyntaxError('invalid intrinsic syntax, expected opening `%`');
+	}
+	var result = [];
+	$replace(string, rePropName, function (match, number, quote, subString) {
+		result[result.length] = quote ? $replace(subString, reEscapeChar, '$1') : number || match;
+	});
+	return result;
+};
+/* end adaptation */
+
+var getBaseIntrinsic = function getBaseIntrinsic(name, allowMissing) {
+	var intrinsicName = name;
+	var alias;
+	if (hasOwn(LEGACY_ALIASES, intrinsicName)) {
+		alias = LEGACY_ALIASES[intrinsicName];
+		intrinsicName = '%' + alias[0] + '%';
+	}
+
+	if (hasOwn(INTRINSICS, intrinsicName)) {
+		var value = INTRINSICS[intrinsicName];
+		if (value === needsEval) {
+			value = doEval(intrinsicName);
+		}
+		if (typeof value === 'undefined' && !allowMissing) {
+			throw new $TypeError('intrinsic ' + name + ' exists, but is not available. Please file an issue!');
+		}
+
+		return {
+			alias: alias,
+			name: intrinsicName,
+			value: value
+		};
+	}
+
+	throw new $SyntaxError('intrinsic ' + name + ' does not exist!');
+};
+
+module.exports = function GetIntrinsic(name, allowMissing) {
+	if (typeof name !== 'string' || name.length === 0) {
+		throw new $TypeError('intrinsic name must be a non-empty string');
+	}
+	if (arguments.length > 1 && typeof allowMissing !== 'boolean') {
+		throw new $TypeError('"allowMissing" argument must be a boolean');
+	}
+
+	if ($exec(/^%?[^%]*%?$/, name) === null) {
+		throw new $SyntaxError('`%` may not be present anywhere but at the beginning and end of the intrinsic name');
+	}
+	var parts = stringToPath(name);
+	var intrinsicBaseName = parts.length > 0 ? parts[0] : '';
+
+	var intrinsic = getBaseIntrinsic('%' + intrinsicBaseName + '%', allowMissing);
+	var intrinsicRealName = intrinsic.name;
+	var value = intrinsic.value;
+	var skipFurtherCaching = false;
+
+	var alias = intrinsic.alias;
+	if (alias) {
+		intrinsicBaseName = alias[0];
+		$spliceApply(parts, $concat([0, 1], alias));
+	}
+
+	for (var i = 1, isOwn = true; i < parts.length; i += 1) {
+		var part = parts[i];
+		var first = $strSlice(part, 0, 1);
+		var last = $strSlice(part, -1);
+		if (
+			(
+				(first === '"' || first === "'" || first === '`')
+				|| (last === '"' || last === "'" || last === '`')
+			)
+			&& first !== last
+		) {
+			throw new $SyntaxError('property names with quotes must have matching quotes');
+		}
+		if (part === 'constructor' || !isOwn) {
+			skipFurtherCaching = true;
+		}
+
+		intrinsicBaseName += '.' + part;
+		intrinsicRealName = '%' + intrinsicBaseName + '%';
+
+		if (hasOwn(INTRINSICS, intrinsicRealName)) {
+			value = INTRINSICS[intrinsicRealName];
+		} else if (value != null) {
+			if (!(part in value)) {
+				if (!allowMissing) {
+					throw new $TypeError('base intrinsic for ' + name + ' exists, but the property is not available.');
+				}
+				return void undefined;
+			}
+			if ($gOPD && (i + 1) >= parts.length) {
+				var desc = $gOPD(value, part);
+				isOwn = !!desc;
+
+				// By convention, when a data property is converted to an accessor
+				// property to emulate a data property that does not suffer from
+				// the override mistake, that accessor's getter is marked with
+				// an `originalValue` property. Here, when we detect this, we
+				// uphold the illusion by pretending to see that original data
+				// property, i.e., returning the value rather than the getter
+				// itself.
+				if (isOwn && 'get' in desc && !('originalValue' in desc.get)) {
+					value = desc.get;
+				} else {
+					value = value[part];
+				}
+			} else {
+				isOwn = hasOwn(value, part);
+				value = value[part];
+			}
+
+			if (isOwn && !skipFurtherCaching) {
+				INTRINSICS[intrinsicRealName] = value;
+			}
+		}
+	}
+	return value;
+};
+
+
+/***/ }),
+
+/***/ 1585:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+const {PassThrough: PassThroughStream} = __nccwpck_require__(2781);
+
+module.exports = options => {
+	options = {...options};
+
+	const {array} = options;
+	let {encoding} = options;
+	const isBuffer = encoding === 'buffer';
+	let objectMode = false;
+
+	if (array) {
+		objectMode = !(encoding || isBuffer);
+	} else {
+		encoding = encoding || 'utf8';
+	}
+
+	if (isBuffer) {
+		encoding = null;
+	}
+
+	const stream = new PassThroughStream({objectMode});
+
+	if (encoding) {
+		stream.setEncoding(encoding);
+	}
+
+	let length = 0;
+	const chunks = [];
+
+	stream.on('data', chunk => {
+		chunks.push(chunk);
+
+		if (objectMode) {
+			length = chunks.length;
+		} else {
+			length += chunk.length;
+		}
+	});
+
+	stream.getBufferedValue = () => {
+		if (array) {
+			return chunks;
+		}
+
+		return isBuffer ? Buffer.concat(chunks, length) : chunks.join('');
+	};
+
+	stream.getBufferedLength = () => length;
+
+	return stream;
+};
+
+
+/***/ }),
+
+/***/ 1766:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+const {constants: BufferConstants} = __nccwpck_require__(4300);
+const pump = __nccwpck_require__(8341);
+const bufferStream = __nccwpck_require__(1585);
+
+class MaxBufferError extends Error {
+	constructor() {
+		super('maxBuffer exceeded');
+		this.name = 'MaxBufferError';
+	}
+}
+
+async function getStream(inputStream, options) {
+	if (!inputStream) {
+		return Promise.reject(new Error('Expected a stream'));
+	}
+
+	options = {
+		maxBuffer: Infinity,
+		...options
+	};
+
+	const {maxBuffer} = options;
+
+	let stream;
+	await new Promise((resolve, reject) => {
+		const rejectPromise = error => {
+			// Don't retrieve an oversized buffer.
+			if (error && stream.getBufferedLength() <= BufferConstants.MAX_LENGTH) {
+				error.bufferedData = stream.getBufferedValue();
+			}
+
+			reject(error);
+		};
+
+		stream = pump(inputStream, bufferStream(options), error => {
+			if (error) {
+				rejectPromise(error);
+				return;
+			}
+
+			resolve();
+		});
+
+		stream.on('data', () => {
+			if (stream.getBufferedLength() > maxBuffer) {
+				rejectPromise(new MaxBufferError());
+			}
+		});
+	});
+
+	return stream.getBufferedValue();
+}
+
+module.exports = getStream;
+// TODO: Remove this for the next major release
+module.exports["default"] = getStream;
+module.exports.buffer = (stream, options) => getStream(stream, {...options, encoding: 'buffer'});
+module.exports.array = (stream, options) => getStream(stream, {...options, array: true});
+module.exports.MaxBufferError = MaxBufferError;
+
+
+/***/ }),
+
+/***/ 6457:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const types_1 = __nccwpck_require__(4597);
+function createRejection(error, ...beforeErrorGroups) {
+    const promise = (async () => {
+        if (error instanceof types_1.RequestError) {
+            try {
+                for (const hooks of beforeErrorGroups) {
+                    if (hooks) {
+                        for (const hook of hooks) {
+                            // eslint-disable-next-line no-await-in-loop
+                            error = await hook(error);
+                        }
+                    }
+                }
+            }
+            catch (error_) {
+                error = error_;
+            }
+        }
+        throw error;
+    })();
+    const returnPromise = () => promise;
+    promise.json = returnPromise;
+    promise.text = returnPromise;
+    promise.buffer = returnPromise;
+    promise.on = returnPromise;
+    return promise;
+}
+exports["default"] = createRejection;
+
+
+/***/ }),
+
+/***/ 6056:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const events_1 = __nccwpck_require__(2361);
+const is_1 = __nccwpck_require__(7678);
+const PCancelable = __nccwpck_require__(9072);
+const types_1 = __nccwpck_require__(4597);
+const parse_body_1 = __nccwpck_require__(8220);
+const core_1 = __nccwpck_require__(94);
+const proxy_events_1 = __nccwpck_require__(3021);
+const get_buffer_1 = __nccwpck_require__(4500);
+const is_response_ok_1 = __nccwpck_require__(9298);
+const proxiedRequestEvents = [
+    'request',
+    'response',
+    'redirect',
+    'uploadProgress',
+    'downloadProgress'
+];
+function asPromise(normalizedOptions) {
+    let globalRequest;
+    let globalResponse;
+    const emitter = new events_1.EventEmitter();
+    const promise = new PCancelable((resolve, reject, onCancel) => {
+        const makeRequest = (retryCount) => {
+            const request = new core_1.default(undefined, normalizedOptions);
+            request.retryCount = retryCount;
+            request._noPipe = true;
+            onCancel(() => request.destroy());
+            onCancel.shouldReject = false;
+            onCancel(() => reject(new types_1.CancelError(request)));
+            globalRequest = request;
+            request.once('response', async (response) => {
+                var _a;
+                response.retryCount = retryCount;
+                if (response.request.aborted) {
+                    // Canceled while downloading - will throw a `CancelError` or `TimeoutError` error
+                    return;
+                }
+                // Download body
+                let rawBody;
+                try {
+                    rawBody = await get_buffer_1.default(request);
+                    response.rawBody = rawBody;
+                }
+                catch (_b) {
+                    // The same error is caught below.
+                    // See request.once('error')
+                    return;
+                }
+                if (request._isAboutToError) {
+                    return;
+                }
+                // Parse body
+                const contentEncoding = ((_a = response.headers['content-encoding']) !== null && _a !== void 0 ? _a : '').toLowerCase();
+                const isCompressed = ['gzip', 'deflate', 'br'].includes(contentEncoding);
+                const { options } = request;
+                if (isCompressed && !options.decompress) {
+                    response.body = rawBody;
+                }
+                else {
+                    try {
+                        response.body = parse_body_1.default(response, options.responseType, options.parseJson, options.encoding);
+                    }
+                    catch (error) {
+                        // Fallback to `utf8`
+                        response.body = rawBody.toString();
+                        if (is_response_ok_1.isResponseOk(response)) {
+                            request._beforeError(error);
+                            return;
+                        }
+                    }
+                }
+                try {
+                    for (const [index, hook] of options.hooks.afterResponse.entries()) {
+                        // @ts-expect-error TS doesn't notice that CancelableRequest is a Promise
+                        // eslint-disable-next-line no-await-in-loop
+                        response = await hook(response, async (updatedOptions) => {
+                            const typedOptions = core_1.default.normalizeArguments(undefined, {
+                                ...updatedOptions,
+                                retry: {
+                                    calculateDelay: () => 0
+                                },
+                                throwHttpErrors: false,
+                                resolveBodyOnly: false
+                            }, options);
+                            // Remove any further hooks for that request, because we'll call them anyway.
+                            // The loop continues. We don't want duplicates (asPromise recursion).
+                            typedOptions.hooks.afterResponse = typedOptions.hooks.afterResponse.slice(0, index);
+                            for (const hook of typedOptions.hooks.beforeRetry) {
+                                // eslint-disable-next-line no-await-in-loop
+                                await hook(typedOptions);
+                            }
+                            const promise = asPromise(typedOptions);
+                            onCancel(() => {
+                                promise.catch(() => { });
+                                promise.cancel();
+                            });
+                            return promise;
+                        });
+                    }
+                }
+                catch (error) {
+                    request._beforeError(new types_1.RequestError(error.message, error, request));
+                    return;
+                }
+                globalResponse = response;
+                if (!is_response_ok_1.isResponseOk(response)) {
+                    request._beforeError(new types_1.HTTPError(response));
+                    return;
+                }
+                request.destroy();
+                resolve(request.options.resolveBodyOnly ? response.body : response);
+            });
+            const onError = (error) => {
+                if (promise.isCanceled) {
+                    return;
+                }
+                const { options } = request;
+                if (error instanceof types_1.HTTPError && !options.throwHttpErrors) {
+                    const { response } = error;
+                    resolve(request.options.resolveBodyOnly ? response.body : response);
+                    return;
+                }
+                reject(error);
+            };
+            request.once('error', onError);
+            const previousBody = request.options.body;
+            request.once('retry', (newRetryCount, error) => {
+                var _a, _b;
+                if (previousBody === ((_a = error.request) === null || _a === void 0 ? void 0 : _a.options.body) && is_1.default.nodeStream((_b = error.request) === null || _b === void 0 ? void 0 : _b.options.body)) {
+                    onError(error);
+                    return;
+                }
+                makeRequest(newRetryCount);
+            });
+            proxy_events_1.default(request, emitter, proxiedRequestEvents);
+        };
+        makeRequest(0);
+    });
+    promise.on = (event, fn) => {
+        emitter.on(event, fn);
+        return promise;
+    };
+    const shortcut = (responseType) => {
+        const newPromise = (async () => {
+            // Wait until downloading has ended
+            await promise;
+            const { options } = globalResponse.request;
+            return parse_body_1.default(globalResponse, responseType, options.parseJson, options.encoding);
+        })();
+        Object.defineProperties(newPromise, Object.getOwnPropertyDescriptors(promise));
+        return newPromise;
+    };
+    promise.json = () => {
+        const { headers } = globalRequest.options;
+        if (!globalRequest.writableFinished && headers.accept === undefined) {
+            headers.accept = 'application/json';
+        }
+        return shortcut('json');
+    };
+    promise.buffer = () => shortcut('buffer');
+    promise.text = () => shortcut('text');
+    return promise;
+}
+exports["default"] = asPromise;
+__exportStar(__nccwpck_require__(4597), exports);
+
+
+/***/ }),
+
+/***/ 1048:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const is_1 = __nccwpck_require__(7678);
+const normalizeArguments = (options, defaults) => {
+    if (is_1.default.null_(options.encoding)) {
+        throw new TypeError('To get a Buffer, set `options.responseType` to `buffer` instead');
+    }
+    is_1.assert.any([is_1.default.string, is_1.default.undefined], options.encoding);
+    is_1.assert.any([is_1.default.boolean, is_1.default.undefined], options.resolveBodyOnly);
+    is_1.assert.any([is_1.default.boolean, is_1.default.undefined], options.methodRewriting);
+    is_1.assert.any([is_1.default.boolean, is_1.default.undefined], options.isStream);
+    is_1.assert.any([is_1.default.string, is_1.default.undefined], options.responseType);
+    // `options.responseType`
+    if (options.responseType === undefined) {
+        options.responseType = 'text';
+    }
+    // `options.retry`
+    const { retry } = options;
+    if (defaults) {
+        options.retry = { ...defaults.retry };
+    }
+    else {
+        options.retry = {
+            calculateDelay: retryObject => retryObject.computedValue,
+            limit: 0,
+            methods: [],
+            statusCodes: [],
+            errorCodes: [],
+            maxRetryAfter: undefined
+        };
+    }
+    if (is_1.default.object(retry)) {
+        options.retry = {
+            ...options.retry,
+            ...retry
+        };
+        options.retry.methods = [...new Set(options.retry.methods.map(method => method.toUpperCase()))];
+        options.retry.statusCodes = [...new Set(options.retry.statusCodes)];
+        options.retry.errorCodes = [...new Set(options.retry.errorCodes)];
+    }
+    else if (is_1.default.number(retry)) {
+        options.retry.limit = retry;
+    }
+    if (is_1.default.undefined(options.retry.maxRetryAfter)) {
+        options.retry.maxRetryAfter = Math.min(
+        // TypeScript is not smart enough to handle `.filter(x => is.number(x))`.
+        // eslint-disable-next-line unicorn/no-fn-reference-in-iterator
+        ...[options.timeout.request, options.timeout.connect].filter(is_1.default.number));
+    }
+    // `options.pagination`
+    if (is_1.default.object(options.pagination)) {
+        if (defaults) {
+            options.pagination = {
+                ...defaults.pagination,
+                ...options.pagination
+            };
+        }
+        const { pagination } = options;
+        if (!is_1.default.function_(pagination.transform)) {
+            throw new Error('`options.pagination.transform` must be implemented');
+        }
+        if (!is_1.default.function_(pagination.shouldContinue)) {
+            throw new Error('`options.pagination.shouldContinue` must be implemented');
+        }
+        if (!is_1.default.function_(pagination.filter)) {
+            throw new TypeError('`options.pagination.filter` must be implemented');
+        }
+        if (!is_1.default.function_(pagination.paginate)) {
+            throw new Error('`options.pagination.paginate` must be implemented');
+        }
+    }
+    // JSON mode
+    if (options.responseType === 'json' && options.headers.accept === undefined) {
+        options.headers.accept = 'application/json';
+    }
+    return options;
+};
+exports["default"] = normalizeArguments;
+
+
+/***/ }),
+
+/***/ 8220:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const types_1 = __nccwpck_require__(4597);
+const parseBody = (response, responseType, parseJson, encoding) => {
+    const { rawBody } = response;
+    try {
+        if (responseType === 'text') {
+            return rawBody.toString(encoding);
+        }
+        if (responseType === 'json') {
+            return rawBody.length === 0 ? '' : parseJson(rawBody.toString());
+        }
+        if (responseType === 'buffer') {
+            return rawBody;
+        }
+        throw new types_1.ParseError({
+            message: `Unknown body type '${responseType}'`,
+            name: 'Error'
+        }, response);
+    }
+    catch (error) {
+        throw new types_1.ParseError(error, response);
+    }
+};
+exports["default"] = parseBody;
+
+
+/***/ }),
+
+/***/ 4597:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.CancelError = exports.ParseError = void 0;
+const core_1 = __nccwpck_require__(94);
+/**
+An error to be thrown when server response code is 2xx, and parsing body fails.
+Includes a `response` property.
+*/
+class ParseError extends core_1.RequestError {
+    constructor(error, response) {
+        const { options } = response.request;
+        super(`${error.message} in "${options.url.toString()}"`, error, response.request);
+        this.name = 'ParseError';
+        this.code = this.code === 'ERR_GOT_REQUEST_ERROR' ? 'ERR_BODY_PARSE_FAILURE' : this.code;
+    }
+}
+exports.ParseError = ParseError;
+/**
+An error to be thrown when the request is aborted with `.cancel()`.
+*/
+class CancelError extends core_1.RequestError {
+    constructor(request) {
+        super('Promise was canceled', {}, request);
+        this.name = 'CancelError';
+        this.code = 'ERR_CANCELED';
+    }
+    get isCanceled() {
+        return true;
+    }
+}
+exports.CancelError = CancelError;
+__exportStar(__nccwpck_require__(94), exports);
+
+
+/***/ }),
+
+/***/ 3462:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.retryAfterStatusCodes = void 0;
+exports.retryAfterStatusCodes = new Set([413, 429, 503]);
+const calculateRetryDelay = ({ attemptCount, retryOptions, error, retryAfter }) => {
+    if (attemptCount > retryOptions.limit) {
+        return 0;
+    }
+    const hasMethod = retryOptions.methods.includes(error.options.method);
+    const hasErrorCode = retryOptions.errorCodes.includes(error.code);
+    const hasStatusCode = error.response && retryOptions.statusCodes.includes(error.response.statusCode);
+    if (!hasMethod || (!hasErrorCode && !hasStatusCode)) {
+        return 0;
+    }
+    if (error.response) {
+        if (retryAfter) {
+            if (retryOptions.maxRetryAfter === undefined || retryAfter > retryOptions.maxRetryAfter) {
+                return 0;
+            }
+            return retryAfter;
+        }
+        if (error.response.statusCode === 413) {
+            return 0;
+        }
+    }
+    const noise = Math.random() * 100;
+    return ((2 ** (attemptCount - 1)) * 1000) + noise;
+};
+exports["default"] = calculateRetryDelay;
+
+
+/***/ }),
+
+/***/ 94:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.UnsupportedProtocolError = exports.ReadError = exports.TimeoutError = exports.UploadError = exports.CacheError = exports.HTTPError = exports.MaxRedirectsError = exports.RequestError = exports.setNonEnumerableProperties = exports.knownHookEvents = exports.withoutBody = exports.kIsNormalizedAlready = void 0;
+const util_1 = __nccwpck_require__(3837);
+const stream_1 = __nccwpck_require__(2781);
+const fs_1 = __nccwpck_require__(7147);
+const url_1 = __nccwpck_require__(7310);
+const http = __nccwpck_require__(3685);
+const http_1 = __nccwpck_require__(3685);
+const https = __nccwpck_require__(5687);
+const http_timer_1 = __nccwpck_require__(8097);
+const cacheable_lookup_1 = __nccwpck_require__(2286);
+const CacheableRequest = __nccwpck_require__(8116);
+const decompressResponse = __nccwpck_require__(2391);
+// @ts-expect-error Missing types
+const http2wrapper = __nccwpck_require__(4645);
+const lowercaseKeys = __nccwpck_require__(9662);
+const is_1 = __nccwpck_require__(7678);
+const get_body_size_1 = __nccwpck_require__(4564);
+const is_form_data_1 = __nccwpck_require__(40);
+const proxy_events_1 = __nccwpck_require__(3021);
+const timed_out_1 = __nccwpck_require__(2454);
+const url_to_options_1 = __nccwpck_require__(8026);
+const options_to_url_1 = __nccwpck_require__(9219);
+const weakable_map_1 = __nccwpck_require__(7288);
+const get_buffer_1 = __nccwpck_require__(4500);
+const dns_ip_version_1 = __nccwpck_require__(4993);
+const is_response_ok_1 = __nccwpck_require__(9298);
+const deprecation_warning_1 = __nccwpck_require__(397);
+const normalize_arguments_1 = __nccwpck_require__(1048);
+const calculate_retry_delay_1 = __nccwpck_require__(3462);
+let globalDnsCache;
+const kRequest = Symbol('request');
+const kResponse = Symbol('response');
+const kResponseSize = Symbol('responseSize');
+const kDownloadedSize = Symbol('downloadedSize');
+const kBodySize = Symbol('bodySize');
+const kUploadedSize = Symbol('uploadedSize');
+const kServerResponsesPiped = Symbol('serverResponsesPiped');
+const kUnproxyEvents = Symbol('unproxyEvents');
+const kIsFromCache = Symbol('isFromCache');
+const kCancelTimeouts = Symbol('cancelTimeouts');
+const kStartedReading = Symbol('startedReading');
+const kStopReading = Symbol('stopReading');
+const kTriggerRead = Symbol('triggerRead');
+const kBody = Symbol('body');
+const kJobs = Symbol('jobs');
+const kOriginalResponse = Symbol('originalResponse');
+const kRetryTimeout = Symbol('retryTimeout');
+exports.kIsNormalizedAlready = Symbol('isNormalizedAlready');
+const supportsBrotli = is_1.default.string(process.versions.brotli);
+exports.withoutBody = new Set(['GET', 'HEAD']);
+exports.knownHookEvents = [
+    'init',
+    'beforeRequest',
+    'beforeRedirect',
+    'beforeError',
+    'beforeRetry',
+    // Promise-Only
+    'afterResponse'
+];
+function validateSearchParameters(searchParameters) {
+    // eslint-disable-next-line guard-for-in
+    for (const key in searchParameters) {
+        const value = searchParameters[key];
+        if (!is_1.default.string(value) && !is_1.default.number(value) && !is_1.default.boolean(value) && !is_1.default.null_(value) && !is_1.default.undefined(value)) {
+            throw new TypeError(`The \`searchParams\` value '${String(value)}' must be a string, number, boolean or null`);
+        }
+    }
+}
+function isClientRequest(clientRequest) {
+    return is_1.default.object(clientRequest) && !('statusCode' in clientRequest);
+}
+const cacheableStore = new weakable_map_1.default();
+const waitForOpenFile = async (file) => new Promise((resolve, reject) => {
+    const onError = (error) => {
+        reject(error);
+    };
+    // Node.js 12 has incomplete types
+    if (!file.pending) {
+        resolve();
+    }
+    file.once('error', onError);
+    file.once('ready', () => {
+        file.off('error', onError);
+        resolve();
+    });
+});
+const redirectCodes = new Set([300, 301, 302, 303, 304, 307, 308]);
+const nonEnumerableProperties = [
+    'context',
+    'body',
+    'json',
+    'form'
+];
+exports.setNonEnumerableProperties = (sources, to) => {
+    // Non enumerable properties shall not be merged
+    const properties = {};
+    for (const source of sources) {
+        if (!source) {
+            continue;
+        }
+        for (const name of nonEnumerableProperties) {
+            if (!(name in source)) {
+                continue;
+            }
+            properties[name] = {
+                writable: true,
+                configurable: true,
+                enumerable: false,
+                // @ts-expect-error TS doesn't see the check above
+                value: source[name]
+            };
+        }
+    }
+    Object.defineProperties(to, properties);
+};
+/**
+An error to be thrown when a request fails.
+Contains a `code` property with error class code, like `ECONNREFUSED`.
+*/
+class RequestError extends Error {
+    constructor(message, error, self) {
+        var _a, _b;
+        super(message);
+        Error.captureStackTrace(this, this.constructor);
+        this.name = 'RequestError';
+        this.code = (_a = error.code) !== null && _a !== void 0 ? _a : 'ERR_GOT_REQUEST_ERROR';
+        if (self instanceof Request) {
+            Object.defineProperty(this, 'request', {
+                enumerable: false,
+                value: self
+            });
+            Object.defineProperty(this, 'response', {
+                enumerable: false,
+                value: self[kResponse]
+            });
+            Object.defineProperty(this, 'options', {
+                // This fails because of TS 3.7.2 useDefineForClassFields
+                // Ref: https://github.com/microsoft/TypeScript/issues/34972
+                enumerable: false,
+                value: self.options
+            });
+        }
+        else {
+            Object.defineProperty(this, 'options', {
+                // This fails because of TS 3.7.2 useDefineForClassFields
+                // Ref: https://github.com/microsoft/TypeScript/issues/34972
+                enumerable: false,
+                value: self
+            });
+        }
+        this.timings = (_b = this.request) === null || _b === void 0 ? void 0 : _b.timings;
+        // Recover the original stacktrace
+        if (is_1.default.string(error.stack) && is_1.default.string(this.stack)) {
+            const indexOfMessage = this.stack.indexOf(this.message) + this.message.length;
+            const thisStackTrace = this.stack.slice(indexOfMessage).split('\n').reverse();
+            const errorStackTrace = error.stack.slice(error.stack.indexOf(error.message) + error.message.length).split('\n').reverse();
+            // Remove duplicated traces
+            while (errorStackTrace.length !== 0 && errorStackTrace[0] === thisStackTrace[0]) {
+                thisStackTrace.shift();
+            }
+            this.stack = `${this.stack.slice(0, indexOfMessage)}${thisStackTrace.reverse().join('\n')}${errorStackTrace.reverse().join('\n')}`;
+        }
+    }
+}
+exports.RequestError = RequestError;
+/**
+An error to be thrown when the server redirects you more than ten times.
+Includes a `response` property.
+*/
+class MaxRedirectsError extends RequestError {
+    constructor(request) {
+        super(`Redirected ${request.options.maxRedirects} times. Aborting.`, {}, request);
+        this.name = 'MaxRedirectsError';
+        this.code = 'ERR_TOO_MANY_REDIRECTS';
+    }
+}
+exports.MaxRedirectsError = MaxRedirectsError;
+/**
+An error to be thrown when the server response code is not 2xx nor 3xx if `options.followRedirect` is `true`, but always except for 304.
+Includes a `response` property.
+*/
+class HTTPError extends RequestError {
+    constructor(response) {
+        super(`Response code ${response.statusCode} (${response.statusMessage})`, {}, response.request);
+        this.name = 'HTTPError';
+        this.code = 'ERR_NON_2XX_3XX_RESPONSE';
+    }
+}
+exports.HTTPError = HTTPError;
+/**
+An error to be thrown when a cache method fails.
+For example, if the database goes down or there's a filesystem error.
+*/
+class CacheError extends RequestError {
+    constructor(error, request) {
+        super(error.message, error, request);
+        this.name = 'CacheError';
+        this.code = this.code === 'ERR_GOT_REQUEST_ERROR' ? 'ERR_CACHE_ACCESS' : this.code;
+    }
+}
+exports.CacheError = CacheError;
+/**
+An error to be thrown when the request body is a stream and an error occurs while reading from that stream.
+*/
+class UploadError extends RequestError {
+    constructor(error, request) {
+        super(error.message, error, request);
+        this.name = 'UploadError';
+        this.code = this.code === 'ERR_GOT_REQUEST_ERROR' ? 'ERR_UPLOAD' : this.code;
+    }
+}
+exports.UploadError = UploadError;
+/**
+An error to be thrown when the request is aborted due to a timeout.
+Includes an `event` and `timings` property.
+*/
+class TimeoutError extends RequestError {
+    constructor(error, timings, request) {
+        super(error.message, error, request);
+        this.name = 'TimeoutError';
+        this.event = error.event;
+        this.timings = timings;
+    }
+}
+exports.TimeoutError = TimeoutError;
+/**
+An error to be thrown when reading from response stream fails.
+*/
+class ReadError extends RequestError {
+    constructor(error, request) {
+        super(error.message, error, request);
+        this.name = 'ReadError';
+        this.code = this.code === 'ERR_GOT_REQUEST_ERROR' ? 'ERR_READING_RESPONSE_STREAM' : this.code;
+    }
+}
+exports.ReadError = ReadError;
+/**
+An error to be thrown when given an unsupported protocol.
+*/
+class UnsupportedProtocolError extends RequestError {
+    constructor(options) {
+        super(`Unsupported protocol "${options.url.protocol}"`, {}, options);
+        this.name = 'UnsupportedProtocolError';
+        this.code = 'ERR_UNSUPPORTED_PROTOCOL';
+    }
+}
+exports.UnsupportedProtocolError = UnsupportedProtocolError;
+const proxiedRequestEvents = [
+    'socket',
+    'connect',
+    'continue',
+    'information',
+    'upgrade',
+    'timeout'
+];
+class Request extends stream_1.Duplex {
+    constructor(url, options = {}, defaults) {
+        super({
+            // This must be false, to enable throwing after destroy
+            // It is used for retry logic in Promise API
+            autoDestroy: false,
+            // It needs to be zero because we're just proxying the data to another stream
+            highWaterMark: 0
+        });
+        this[kDownloadedSize] = 0;
+        this[kUploadedSize] = 0;
+        this.requestInitialized = false;
+        this[kServerResponsesPiped] = new Set();
+        this.redirects = [];
+        this[kStopReading] = false;
+        this[kTriggerRead] = false;
+        this[kJobs] = [];
+        this.retryCount = 0;
+        // TODO: Remove this when targeting Node.js >= 12
+        this._progressCallbacks = [];
+        const unlockWrite = () => this._unlockWrite();
+        const lockWrite = () => this._lockWrite();
+        this.on('pipe', (source) => {
+            source.prependListener('data', unlockWrite);
+            source.on('data', lockWrite);
+            source.prependListener('end', unlockWrite);
+            source.on('end', lockWrite);
+        });
+        this.on('unpipe', (source) => {
+            source.off('data', unlockWrite);
+            source.off('data', lockWrite);
+            source.off('end', unlockWrite);
+            source.off('end', lockWrite);
+        });
+        this.on('pipe', source => {
+            if (source instanceof http_1.IncomingMessage) {
+                this.options.headers = {
+                    ...source.headers,
+                    ...this.options.headers
+                };
+            }
+        });
+        const { json, body, form } = options;
+        if (json || body || form) {
+            this._lockWrite();
+        }
+        if (exports.kIsNormalizedAlready in options) {
+            this.options = options;
+        }
+        else {
+            try {
+                // @ts-expect-error Common TypeScript bug saying that `this.constructor` is not accessible
+                this.options = this.constructor.normalizeArguments(url, options, defaults);
+            }
+            catch (error) {
+                // TODO: Move this to `_destroy()`
+                if (is_1.default.nodeStream(options.body)) {
+                    options.body.destroy();
+                }
+                this.destroy(error);
+                return;
+            }
+        }
+        (async () => {
+            var _a;
+            try {
+                if (this.options.body instanceof fs_1.ReadStream) {
+                    await waitForOpenFile(this.options.body);
+                }
+                const { url: normalizedURL } = this.options;
+                if (!normalizedURL) {
+                    throw new TypeError('Missing `url` property');
+                }
+                this.requestUrl = normalizedURL.toString();
+                decodeURI(this.requestUrl);
+                await this._finalizeBody();
+                await this._makeRequest();
+                if (this.destroyed) {
+                    (_a = this[kRequest]) === null || _a === void 0 ? void 0 : _a.destroy();
+                    return;
+                }
+                // Queued writes etc.
+                for (const job of this[kJobs]) {
+                    job();
+                }
+                // Prevent memory leak
+                this[kJobs].length = 0;
+                this.requestInitialized = true;
+            }
+            catch (error) {
+                if (error instanceof RequestError) {
+                    this._beforeError(error);
+                    return;
+                }
+                // This is a workaround for https://github.com/nodejs/node/issues/33335
+                if (!this.destroyed) {
+                    this.destroy(error);
+                }
+            }
+        })();
+    }
+    static normalizeArguments(url, options, defaults) {
+        var _a, _b, _c, _d, _e;
+        const rawOptions = options;
+        if (is_1.default.object(url) && !is_1.default.urlInstance(url)) {
+            options = { ...defaults, ...url, ...options };
+        }
+        else {
+            if (url && options && options.url !== undefined) {
+                throw new TypeError('The `url` option is mutually exclusive with the `input` argument');
+            }
+            options = { ...defaults, ...options };
+            if (url !== undefined) {
+                options.url = url;
+            }
+            if (is_1.default.urlInstance(options.url)) {
+                options.url = new url_1.URL(options.url.toString());
+            }
+        }
+        // TODO: Deprecate URL options in Got 12.
+        // Support extend-specific options
+        if (options.cache === false) {
+            options.cache = undefined;
+        }
+        if (options.dnsCache === false) {
+            options.dnsCache = undefined;
+        }
+        // Nice type assertions
+        is_1.assert.any([is_1.default.string, is_1.default.undefined], options.method);
+        is_1.assert.any([is_1.default.object, is_1.default.undefined], options.headers);
+        is_1.assert.any([is_1.default.string, is_1.default.urlInstance, is_1.default.undefined], options.prefixUrl);
+        is_1.assert.any([is_1.default.object, is_1.default.undefined], options.cookieJar);
+        is_1.assert.any([is_1.default.object, is_1.default.string, is_1.default.undefined], options.searchParams);
+        is_1.assert.any([is_1.default.object, is_1.default.string, is_1.default.undefined], options.cache);
+        is_1.assert.any([is_1.default.object, is_1.default.number, is_1.default.undefined], options.timeout);
+        is_1.assert.any([is_1.default.object, is_1.default.undefined], options.context);
+        is_1.assert.any([is_1.default.object, is_1.default.undefined], options.hooks);
+        is_1.assert.any([is_1.default.boolean, is_1.default.undefined], options.decompress);
+        is_1.assert.any([is_1.default.boolean, is_1.default.undefined], options.ignoreInvalidCookies);
+        is_1.assert.any([is_1.default.boolean, is_1.default.undefined], options.followRedirect);
+        is_1.assert.any([is_1.default.number, is_1.default.undefined], options.maxRedirects);
+        is_1.assert.any([is_1.default.boolean, is_1.default.undefined], options.throwHttpErrors);
+        is_1.assert.any([is_1.default.boolean, is_1.default.undefined], options.http2);
+        is_1.assert.any([is_1.default.boolean, is_1.default.undefined], options.allowGetBody);
+        is_1.assert.any([is_1.default.string, is_1.default.undefined], options.localAddress);
+        is_1.assert.any([dns_ip_version_1.isDnsLookupIpVersion, is_1.default.undefined], options.dnsLookupIpVersion);
+        is_1.assert.any([is_1.default.object, is_1.default.undefined], options.https);
+        is_1.assert.any([is_1.default.boolean, is_1.default.undefined], options.rejectUnauthorized);
+        if (options.https) {
+            is_1.assert.any([is_1.default.boolean, is_1.default.undefined], options.https.rejectUnauthorized);
+            is_1.assert.any([is_1.default.function_, is_1.default.undefined], options.https.checkServerIdentity);
+            is_1.assert.any([is_1.default.string, is_1.default.object, is_1.default.array, is_1.default.undefined], options.https.certificateAuthority);
+            is_1.assert.any([is_1.default.string, is_1.default.object, is_1.default.array, is_1.default.undefined], options.https.key);
+            is_1.assert.any([is_1.default.string, is_1.default.object, is_1.default.array, is_1.default.undefined], options.https.certificate);
+            is_1.assert.any([is_1.default.string, is_1.default.undefined], options.https.passphrase);
+            is_1.assert.any([is_1.default.string, is_1.default.buffer, is_1.default.array, is_1.default.undefined], options.https.pfx);
+        }
+        is_1.assert.any([is_1.default.object, is_1.default.undefined], options.cacheOptions);
+        // `options.method`
+        if (is_1.default.string(options.method)) {
+            options.method = options.method.toUpperCase();
+        }
+        else {
+            options.method = 'GET';
+        }
+        // `options.headers`
+        if (options.headers === (defaults === null || defaults === void 0 ? void 0 : defaults.headers)) {
+            options.headers = { ...options.headers };
+        }
+        else {
+            options.headers = lowercaseKeys({ ...(defaults === null || defaults === void 0 ? void 0 : defaults.headers), ...options.headers });
+        }
+        // Disallow legacy `url.Url`
+        if ('slashes' in options) {
+            throw new TypeError('The legacy `url.Url` has been deprecated. Use `URL` instead.');
+        }
+        // `options.auth`
+        if ('auth' in options) {
+            throw new TypeError('Parameter `auth` is deprecated. Use `username` / `password` instead.');
+        }
+        // `options.searchParams`
+        if ('searchParams' in options) {
+            if (options.searchParams && options.searchParams !== (defaults === null || defaults === void 0 ? void 0 : defaults.searchParams)) {
+                let searchParameters;
+                if (is_1.default.string(options.searchParams) || (options.searchParams instanceof url_1.URLSearchParams)) {
+                    searchParameters = new url_1.URLSearchParams(options.searchParams);
+                }
+                else {
+                    validateSearchParameters(options.searchParams);
+                    searchParameters = new url_1.URLSearchParams();
+                    // eslint-disable-next-line guard-for-in
+                    for (const key in options.searchParams) {
+                        const value = options.searchParams[key];
+                        if (value === null) {
+                            searchParameters.append(key, '');
+                        }
+                        else if (value !== undefined) {
+                            searchParameters.append(key, value);
+                        }
+                    }
+                }
+                // `normalizeArguments()` is also used to merge options
+                (_a = defaults === null || defaults === void 0 ? void 0 : defaults.searchParams) === null || _a === void 0 ? void 0 : _a.forEach((value, key) => {
+                    // Only use default if one isn't already defined
+                    if (!searchParameters.has(key)) {
+                        searchParameters.append(key, value);
+                    }
+                });
+                options.searchParams = searchParameters;
+            }
+        }
+        // `options.username` & `options.password`
+        options.username = (_b = options.username) !== null && _b !== void 0 ? _b : '';
+        options.password = (_c = options.password) !== null && _c !== void 0 ? _c : '';
+        // `options.prefixUrl` & `options.url`
+        if (is_1.default.undefined(options.prefixUrl)) {
+            options.prefixUrl = (_d = defaults === null || defaults === void 0 ? void 0 : defaults.prefixUrl) !== null && _d !== void 0 ? _d : '';
+        }
+        else {
+            options.prefixUrl = options.prefixUrl.toString();
+            if (options.prefixUrl !== '' && !options.prefixUrl.endsWith('/')) {
+                options.prefixUrl += '/';
+            }
+        }
+        if (is_1.default.string(options.url)) {
+            if (options.url.startsWith('/')) {
+                throw new Error('`input` must not start with a slash when using `prefixUrl`');
+            }
+            options.url = options_to_url_1.default(options.prefixUrl + options.url, options);
+        }
+        else if ((is_1.default.undefined(options.url) && options.prefixUrl !== '') || options.protocol) {
+            options.url = options_to_url_1.default(options.prefixUrl, options);
+        }
+        if (options.url) {
+            if ('port' in options) {
+                delete options.port;
+            }
+            // Make it possible to change `options.prefixUrl`
+            let { prefixUrl } = options;
+            Object.defineProperty(options, 'prefixUrl', {
+                set: (value) => {
+                    const url = options.url;
+                    if (!url.href.startsWith(value)) {
+                        throw new Error(`Cannot change \`prefixUrl\` from ${prefixUrl} to ${value}: ${url.href}`);
+                    }
+                    options.url = new url_1.URL(value + url.href.slice(prefixUrl.length));
+                    prefixUrl = value;
+                },
+                get: () => prefixUrl
+            });
+            // Support UNIX sockets
+            let { protocol } = options.url;
+            if (protocol === 'unix:') {
+                protocol = 'http:';
+                options.url = new url_1.URL(`http://unix${options.url.pathname}${options.url.search}`);
+            }
+            // Set search params
+            if (options.searchParams) {
+                // eslint-disable-next-line @typescript-eslint/no-base-to-string
+                options.url.search = options.searchParams.toString();
+            }
+            // Protocol check
+            if (protocol !== 'http:' && protocol !== 'https:') {
+                throw new UnsupportedProtocolError(options);
+            }
+            // Update `username`
+            if (options.username === '') {
+                options.username = options.url.username;
+            }
+            else {
+                options.url.username = options.username;
+            }
+            // Update `password`
+            if (options.password === '') {
+                options.password = options.url.password;
+            }
+            else {
+                options.url.password = options.password;
+            }
+        }
+        // `options.cookieJar`
+        const { cookieJar } = options;
+        if (cookieJar) {
+            let { setCookie, getCookieString } = cookieJar;
+            is_1.assert.function_(setCookie);
+            is_1.assert.function_(getCookieString);
+            /* istanbul ignore next: Horrible `tough-cookie` v3 check */
+            if (setCookie.length === 4 && getCookieString.length === 0) {
+                setCookie = util_1.promisify(setCookie.bind(options.cookieJar));
+                getCookieString = util_1.promisify(getCookieString.bind(options.cookieJar));
+                options.cookieJar = {
+                    setCookie,
+                    getCookieString: getCookieString
+                };
+            }
+        }
+        // `options.cache`
+        const { cache } = options;
+        if (cache) {
+            if (!cacheableStore.has(cache)) {
+                cacheableStore.set(cache, new CacheableRequest(((requestOptions, handler) => {
+                    const result = requestOptions[kRequest](requestOptions, handler);
+                    // TODO: remove this when `cacheable-request` supports async request functions.
+                    if (is_1.default.promise(result)) {
+                        // @ts-expect-error
+                        // We only need to implement the error handler in order to support HTTP2 caching.
+                        // The result will be a promise anyway.
+                        result.once = (event, handler) => {
+                            if (event === 'error') {
+                                result.catch(handler);
+                            }
+                            else if (event === 'abort') {
+                                // The empty catch is needed here in case when
+                                // it rejects before it's `await`ed in `_makeRequest`.
+                                (async () => {
+                                    try {
+                                        const request = (await result);
+                                        request.once('abort', handler);
+                                    }
+                                    catch (_a) { }
+                                })();
+                            }
+                            else {
+                                /* istanbul ignore next: safety check */
+                                throw new Error(`Unknown HTTP2 promise event: ${event}`);
+                            }
+                            return result;
+                        };
+                    }
+                    return result;
+                }), cache));
+            }
+        }
+        // `options.cacheOptions`
+        options.cacheOptions = { ...options.cacheOptions };
+        // `options.dnsCache`
+        if (options.dnsCache === true) {
+            if (!globalDnsCache) {
+                globalDnsCache = new cacheable_lookup_1.default();
+            }
+            options.dnsCache = globalDnsCache;
+        }
+        else if (!is_1.default.undefined(options.dnsCache) && !options.dnsCache.lookup) {
+            throw new TypeError(`Parameter \`dnsCache\` must be a CacheableLookup instance or a boolean, got ${is_1.default(options.dnsCache)}`);
+        }
+        // `options.timeout`
+        if (is_1.default.number(options.timeout)) {
+            options.timeout = { request: options.timeout };
+        }
+        else if (defaults && options.timeout !== defaults.timeout) {
+            options.timeout = {
+                ...defaults.timeout,
+                ...options.timeout
+            };
+        }
+        else {
+            options.timeout = { ...options.timeout };
+        }
+        // `options.context`
+        if (!options.context) {
+            options.context = {};
+        }
+        // `options.hooks`
+        const areHooksDefault = options.hooks === (defaults === null || defaults === void 0 ? void 0 : defaults.hooks);
+        options.hooks = { ...options.hooks };
+        for (const event of exports.knownHookEvents) {
+            if (event in options.hooks) {
+                if (is_1.default.array(options.hooks[event])) {
+                    // See https://github.com/microsoft/TypeScript/issues/31445#issuecomment-576929044
+                    options.hooks[event] = [...options.hooks[event]];
+                }
+                else {
+                    throw new TypeError(`Parameter \`${event}\` must be an Array, got ${is_1.default(options.hooks[event])}`);
+                }
+            }
+            else {
+                options.hooks[event] = [];
+            }
+        }
+        if (defaults && !areHooksDefault) {
+            for (const event of exports.knownHookEvents) {
+                const defaultHooks = defaults.hooks[event];
+                if (defaultHooks.length > 0) {
+                    // See https://github.com/microsoft/TypeScript/issues/31445#issuecomment-576929044
+                    options.hooks[event] = [
+                        ...defaults.hooks[event],
+                        ...options.hooks[event]
+                    ];
+                }
+            }
+        }
+        // DNS options
+        if ('family' in options) {
+            deprecation_warning_1.default('"options.family" was never documented, please use "options.dnsLookupIpVersion"');
+        }
+        // HTTPS options
+        if (defaults === null || defaults === void 0 ? void 0 : defaults.https) {
+            options.https = { ...defaults.https, ...options.https };
+        }
+        if ('rejectUnauthorized' in options) {
+            deprecation_warning_1.default('"options.rejectUnauthorized" is now deprecated, please use "options.https.rejectUnauthorized"');
+        }
+        if ('checkServerIdentity' in options) {
+            deprecation_warning_1.default('"options.checkServerIdentity" was never documented, please use "options.https.checkServerIdentity"');
+        }
+        if ('ca' in options) {
+            deprecation_warning_1.default('"options.ca" was never documented, please use "options.https.certificateAuthority"');
+        }
+        if ('key' in options) {
+            deprecation_warning_1.default('"options.key" was never documented, please use "options.https.key"');
+        }
+        if ('cert' in options) {
+            deprecation_warning_1.default('"options.cert" was never documented, please use "options.https.certificate"');
+        }
+        if ('passphrase' in options) {
+            deprecation_warning_1.default('"options.passphrase" was never documented, please use "options.https.passphrase"');
+        }
+        if ('pfx' in options) {
+            deprecation_warning_1.default('"options.pfx" was never documented, please use "options.https.pfx"');
+        }
+        // Other options
+        if ('followRedirects' in options) {
+            throw new TypeError('The `followRedirects` option does not exist. Use `followRedirect` instead.');
+        }
+        if (options.agent) {
+            for (const key in options.agent) {
+                if (key !== 'http' && key !== 'https' && key !== 'http2') {
+                    throw new TypeError(`Expected the \`options.agent\` properties to be \`http\`, \`https\` or \`http2\`, got \`${key}\``);
+                }
+            }
+        }
+        options.maxRedirects = (_e = options.maxRedirects) !== null && _e !== void 0 ? _e : 0;
+        // Set non-enumerable properties
+        exports.setNonEnumerableProperties([defaults, rawOptions], options);
+        return normalize_arguments_1.default(options, defaults);
+    }
+    _lockWrite() {
+        const onLockedWrite = () => {
+            throw new TypeError('The payload has been already provided');
+        };
+        this.write = onLockedWrite;
+        this.end = onLockedWrite;
+    }
+    _unlockWrite() {
+        this.write = super.write;
+        this.end = super.end;
+    }
+    async _finalizeBody() {
+        const { options } = this;
+        const { headers } = options;
+        const isForm = !is_1.default.undefined(options.form);
+        const isJSON = !is_1.default.undefined(options.json);
+        const isBody = !is_1.default.undefined(options.body);
+        const hasPayload = isForm || isJSON || isBody;
+        const cannotHaveBody = exports.withoutBody.has(options.method) && !(options.method === 'GET' && options.allowGetBody);
+        this._cannotHaveBody = cannotHaveBody;
+        if (hasPayload) {
+            if (cannotHaveBody) {
+                throw new TypeError(`The \`${options.method}\` method cannot be used with a body`);
+            }
+            if ([isBody, isForm, isJSON].filter(isTrue => isTrue).length > 1) {
+                throw new TypeError('The `body`, `json` and `form` options are mutually exclusive');
+            }
+            if (isBody &&
+                !(options.body instanceof stream_1.Readable) &&
+                !is_1.default.string(options.body) &&
+                !is_1.default.buffer(options.body) &&
+                !is_form_data_1.default(options.body)) {
+                throw new TypeError('The `body` option must be a stream.Readable, string or Buffer');
+            }
+            if (isForm && !is_1.default.object(options.form)) {
+                throw new TypeError('The `form` option must be an Object');
+            }
+            {
+                // Serialize body
+                const noContentType = !is_1.default.string(headers['content-type']);
+                if (isBody) {
+                    // Special case for https://github.com/form-data/form-data
+                    if (is_form_data_1.default(options.body) && noContentType) {
+                        headers['content-type'] = `multipart/form-data; boundary=${options.body.getBoundary()}`;
+                    }
+                    this[kBody] = options.body;
+                }
+                else if (isForm) {
+                    if (noContentType) {
+                        headers['content-type'] = 'application/x-www-form-urlencoded';
+                    }
+                    this[kBody] = (new url_1.URLSearchParams(options.form)).toString();
+                }
+                else {
+                    if (noContentType) {
+                        headers['content-type'] = 'application/json';
+                    }
+                    this[kBody] = options.stringifyJson(options.json);
+                }
+                const uploadBodySize = await get_body_size_1.default(this[kBody], options.headers);
+                // See https://tools.ietf.org/html/rfc7230#section-3.3.2
+                // A user agent SHOULD send a Content-Length in a request message when
+                // no Transfer-Encoding is sent and the request method defines a meaning
+                // for an enclosed payload body.  For example, a Content-Length header
+                // field is normally sent in a POST request even when the value is 0
+                // (indicating an empty payload body).  A user agent SHOULD NOT send a
+                // Content-Length header field when the request message does not contain
+                // a payload body and the method semantics do not anticipate such a
+                // body.
+                if (is_1.default.undefined(headers['content-length']) && is_1.default.undefined(headers['transfer-encoding'])) {
+                    if (!cannotHaveBody && !is_1.default.undefined(uploadBodySize)) {
+                        headers['content-length'] = String(uploadBodySize);
+                    }
+                }
+            }
+        }
+        else if (cannotHaveBody) {
+            this._lockWrite();
+        }
+        else {
+            this._unlockWrite();
+        }
+        this[kBodySize] = Number(headers['content-length']) || undefined;
+    }
+    async _onResponseBase(response) {
+        const { options } = this;
+        const { url } = options;
+        this[kOriginalResponse] = response;
+        if (options.decompress) {
+            response = decompressResponse(response);
+        }
+        const statusCode = response.statusCode;
+        const typedResponse = response;
+        typedResponse.statusMessage = typedResponse.statusMessage ? typedResponse.statusMessage : http.STATUS_CODES[statusCode];
+        typedResponse.url = options.url.toString();
+        typedResponse.requestUrl = this.requestUrl;
+        typedResponse.redirectUrls = this.redirects;
+        typedResponse.request = this;
+        typedResponse.isFromCache = response.fromCache || false;
+        typedResponse.ip = this.ip;
+        typedResponse.retryCount = this.retryCount;
+        this[kIsFromCache] = typedResponse.isFromCache;
+        this[kResponseSize] = Number(response.headers['content-length']) || undefined;
+        this[kResponse] = response;
+        response.once('end', () => {
+            this[kResponseSize] = this[kDownloadedSize];
+            this.emit('downloadProgress', this.downloadProgress);
+        });
+        response.once('error', (error) => {
+            // Force clean-up, because some packages don't do this.
+            // TODO: Fix decompress-response
+            response.destroy();
+            this._beforeError(new ReadError(error, this));
+        });
+        response.once('aborted', () => {
+            this._beforeError(new ReadError({
+                name: 'Error',
+                message: 'The server aborted pending request',
+                code: 'ECONNRESET'
+            }, this));
+        });
+        this.emit('downloadProgress', this.downloadProgress);
+        const rawCookies = response.headers['set-cookie'];
+        if (is_1.default.object(options.cookieJar) && rawCookies) {
+            let promises = rawCookies.map(async (rawCookie) => options.cookieJar.setCookie(rawCookie, url.toString()));
+            if (options.ignoreInvalidCookies) {
+                promises = promises.map(async (p) => p.catch(() => { }));
+            }
+            try {
+                await Promise.all(promises);
+            }
+            catch (error) {
+                this._beforeError(error);
+                return;
+            }
+        }
+        if (options.followRedirect && response.headers.location && redirectCodes.has(statusCode)) {
+            // We're being redirected, we don't care about the response.
+            // It'd be best to abort the request, but we can't because
+            // we would have to sacrifice the TCP connection. We don't want that.
+            response.resume();
+            if (this[kRequest]) {
+                this[kCancelTimeouts]();
+                // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+                delete this[kRequest];
+                this[kUnproxyEvents]();
+            }
+            const shouldBeGet = statusCode === 303 && options.method !== 'GET' && options.method !== 'HEAD';
+            if (shouldBeGet || !options.methodRewriting) {
+                // Server responded with "see other", indicating that the resource exists at another location,
+                // and the client should request it from that location via GET or HEAD.
+                options.method = 'GET';
+                if ('body' in options) {
+                    delete options.body;
+                }
+                if ('json' in options) {
+                    delete options.json;
+                }
+                if ('form' in options) {
+                    delete options.form;
+                }
+                this[kBody] = undefined;
+                delete options.headers['content-length'];
+            }
+            if (this.redirects.length >= options.maxRedirects) {
+                this._beforeError(new MaxRedirectsError(this));
+                return;
+            }
+            try {
+                // Do not remove. See https://github.com/sindresorhus/got/pull/214
+                const redirectBuffer = Buffer.from(response.headers.location, 'binary').toString();
+                // Handles invalid URLs. See https://github.com/sindresorhus/got/issues/604
+                const redirectUrl = new url_1.URL(redirectBuffer, url);
+                const redirectString = redirectUrl.toString();
+                decodeURI(redirectString);
+                // eslint-disable-next-line no-inner-declarations
+                function isUnixSocketURL(url) {
+                    return url.protocol === 'unix:' || url.hostname === 'unix';
+                }
+                if (!isUnixSocketURL(url) && isUnixSocketURL(redirectUrl)) {
+                    this._beforeError(new RequestError('Cannot redirect to UNIX socket', {}, this));
+                    return;
+                }
+                // Redirecting to a different site, clear sensitive data.
+                if (redirectUrl.hostname !== url.hostname || redirectUrl.port !== url.port) {
+                    if ('host' in options.headers) {
+                        delete options.headers.host;
+                    }
+                    if ('cookie' in options.headers) {
+                        delete options.headers.cookie;
+                    }
+                    if ('authorization' in options.headers) {
+                        delete options.headers.authorization;
+                    }
+                    if (options.username || options.password) {
+                        options.username = '';
+                        options.password = '';
+                    }
+                }
+                else {
+                    redirectUrl.username = options.username;
+                    redirectUrl.password = options.password;
+                }
+                this.redirects.push(redirectString);
+                options.url = redirectUrl;
+                for (const hook of options.hooks.beforeRedirect) {
+                    // eslint-disable-next-line no-await-in-loop
+                    await hook(options, typedResponse);
+                }
+                this.emit('redirect', typedResponse, options);
+                await this._makeRequest();
+            }
+            catch (error) {
+                this._beforeError(error);
+                return;
+            }
+            return;
+        }
+        if (options.isStream && options.throwHttpErrors && !is_response_ok_1.isResponseOk(typedResponse)) {
+            this._beforeError(new HTTPError(typedResponse));
+            return;
+        }
+        response.on('readable', () => {
+            if (this[kTriggerRead]) {
+                this._read();
+            }
+        });
+        this.on('resume', () => {
+            response.resume();
+        });
+        this.on('pause', () => {
+            response.pause();
+        });
+        response.once('end', () => {
+            this.push(null);
+        });
+        this.emit('response', response);
+        for (const destination of this[kServerResponsesPiped]) {
+            if (destination.headersSent) {
+                continue;
+            }
+            // eslint-disable-next-line guard-for-in
+            for (const key in response.headers) {
+                const isAllowed = options.decompress ? key !== 'content-encoding' : true;
+                const value = response.headers[key];
+                if (isAllowed) {
+                    destination.setHeader(key, value);
+                }
+            }
+            destination.statusCode = statusCode;
+        }
+    }
+    async _onResponse(response) {
+        try {
+            await this._onResponseBase(response);
+        }
+        catch (error) {
+            /* istanbul ignore next: better safe than sorry */
+            this._beforeError(error);
+        }
+    }
+    _onRequest(request) {
+        const { options } = this;
+        const { timeout, url } = options;
+        http_timer_1.default(request);
+        this[kCancelTimeouts] = timed_out_1.default(request, timeout, url);
+        const responseEventName = options.cache ? 'cacheableResponse' : 'response';
+        request.once(responseEventName, (response) => {
+            void this._onResponse(response);
+        });
+        request.once('error', (error) => {
+            var _a;
+            // Force clean-up, because some packages (e.g. nock) don't do this.
+            request.destroy();
+            // Node.js <= 12.18.2 mistakenly emits the response `end` first.
+            (_a = request.res) === null || _a === void 0 ? void 0 : _a.removeAllListeners('end');
+            error = error instanceof timed_out_1.TimeoutError ? new TimeoutError(error, this.timings, this) : new RequestError(error.message, error, this);
+            this._beforeError(error);
+        });
+        this[kUnproxyEvents] = proxy_events_1.default(request, this, proxiedRequestEvents);
+        this[kRequest] = request;
+        this.emit('uploadProgress', this.uploadProgress);
+        // Send body
+        const body = this[kBody];
+        const currentRequest = this.redirects.length === 0 ? this : request;
+        if (is_1.default.nodeStream(body)) {
+            body.pipe(currentRequest);
+            body.once('error', (error) => {
+                this._beforeError(new UploadError(error, this));
+            });
+        }
+        else {
+            this._unlockWrite();
+            if (!is_1.default.undefined(body)) {
+                this._writeRequest(body, undefined, () => { });
+                currentRequest.end();
+                this._lockWrite();
+            }
+            else if (this._cannotHaveBody || this._noPipe) {
+                currentRequest.end();
+                this._lockWrite();
+            }
+        }
+        this.emit('request', request);
+    }
+    async _createCacheableRequest(url, options) {
+        return new Promise((resolve, reject) => {
+            // TODO: Remove `utils/url-to-options.ts` when `cacheable-request` is fixed
+            Object.assign(options, url_to_options_1.default(url));
+            // `http-cache-semantics` checks this
+            // TODO: Fix this ignore.
+            // @ts-expect-error
+            delete options.url;
+            let request;
+            // This is ugly
+            const cacheRequest = cacheableStore.get(options.cache)(options, async (response) => {
+                // TODO: Fix `cacheable-response`
+                response._readableState.autoDestroy = false;
+                if (request) {
+                    (await request).emit('cacheableResponse', response);
+                }
+                resolve(response);
+            });
+            // Restore options
+            options.url = url;
+            cacheRequest.once('error', reject);
+            cacheRequest.once('request', async (requestOrPromise) => {
+                request = requestOrPromise;
+                resolve(request);
+            });
+        });
+    }
+    async _makeRequest() {
+        var _a, _b, _c, _d, _e;
+        const { options } = this;
+        const { headers } = options;
+        for (const key in headers) {
+            if (is_1.default.undefined(headers[key])) {
+                // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+                delete headers[key];
+            }
+            else if (is_1.default.null_(headers[key])) {
+                throw new TypeError(`Use \`undefined\` instead of \`null\` to delete the \`${key}\` header`);
+            }
+        }
+        if (options.decompress && is_1.default.undefined(headers['accept-encoding'])) {
+            headers['accept-encoding'] = supportsBrotli ? 'gzip, deflate, br' : 'gzip, deflate';
+        }
+        // Set cookies
+        if (options.cookieJar) {
+            const cookieString = await options.cookieJar.getCookieString(options.url.toString());
+            if (is_1.default.nonEmptyString(cookieString)) {
+                options.headers.cookie = cookieString;
+            }
+        }
+        for (const hook of options.hooks.beforeRequest) {
+            // eslint-disable-next-line no-await-in-loop
+            const result = await hook(options);
+            if (!is_1.default.undefined(result)) {
+                // @ts-expect-error Skip the type mismatch to support abstract responses
+                options.request = () => result;
+                break;
+            }
+        }
+        if (options.body && this[kBody] !== options.body) {
+            this[kBody] = options.body;
+        }
+        const { agent, request, timeout, url } = options;
+        if (options.dnsCache && !('lookup' in options)) {
+            options.lookup = options.dnsCache.lookup;
+        }
+        // UNIX sockets
+        if (url.hostname === 'unix') {
+            const matches = /(?<socketPath>.+?):(?<path>.+)/.exec(`${url.pathname}${url.search}`);
+            if (matches === null || matches === void 0 ? void 0 : matches.groups) {
+                const { socketPath, path } = matches.groups;
+                Object.assign(options, {
+                    socketPath,
+                    path,
+                    host: ''
+                });
+            }
+        }
+        const isHttps = url.protocol === 'https:';
+        // Fallback function
+        let fallbackFn;
+        if (options.http2) {
+            fallbackFn = http2wrapper.auto;
+        }
+        else {
+            fallbackFn = isHttps ? https.request : http.request;
+        }
+        const realFn = (_a = options.request) !== null && _a !== void 0 ? _a : fallbackFn;
+        // Cache support
+        const fn = options.cache ? this._createCacheableRequest : realFn;
+        // Pass an agent directly when HTTP2 is disabled
+        if (agent && !options.http2) {
+            options.agent = agent[isHttps ? 'https' : 'http'];
+        }
+        // Prepare plain HTTP request options
+        options[kRequest] = realFn;
+        delete options.request;
+        // TODO: Fix this ignore.
+        // @ts-expect-error
+        delete options.timeout;
+        const requestOptions = options;
+        requestOptions.shared = (_b = options.cacheOptions) === null || _b === void 0 ? void 0 : _b.shared;
+        requestOptions.cacheHeuristic = (_c = options.cacheOptions) === null || _c === void 0 ? void 0 : _c.cacheHeuristic;
+        requestOptions.immutableMinTimeToLive = (_d = options.cacheOptions) === null || _d === void 0 ? void 0 : _d.immutableMinTimeToLive;
+        requestOptions.ignoreCargoCult = (_e = options.cacheOptions) === null || _e === void 0 ? void 0 : _e.ignoreCargoCult;
+        // If `dnsLookupIpVersion` is not present do not override `family`
+        if (options.dnsLookupIpVersion !== undefined) {
+            try {
+                requestOptions.family = dns_ip_version_1.dnsLookupIpVersionToFamily(options.dnsLookupIpVersion);
+            }
+            catch (_f) {
+                throw new Error('Invalid `dnsLookupIpVersion` option value');
+            }
+        }
+        // HTTPS options remapping
+        if (options.https) {
+            if ('rejectUnauthorized' in options.https) {
+                requestOptions.rejectUnauthorized = options.https.rejectUnauthorized;
+            }
+            if (options.https.checkServerIdentity) {
+                requestOptions.checkServerIdentity = options.https.checkServerIdentity;
+            }
+            if (options.https.certificateAuthority) {
+                requestOptions.ca = options.https.certificateAuthority;
+            }
+            if (options.https.certificate) {
+                requestOptions.cert = options.https.certificate;
+            }
+            if (options.https.key) {
+                requestOptions.key = options.https.key;
+            }
+            if (options.https.passphrase) {
+                requestOptions.passphrase = options.https.passphrase;
+            }
+            if (options.https.pfx) {
+                requestOptions.pfx = options.https.pfx;
+            }
+        }
+        try {
+            let requestOrResponse = await fn(url, requestOptions);
+            if (is_1.default.undefined(requestOrResponse)) {
+                requestOrResponse = fallbackFn(url, requestOptions);
+            }
+            // Restore options
+            options.request = request;
+            options.timeout = timeout;
+            options.agent = agent;
+            // HTTPS options restore
+            if (options.https) {
+                if ('rejectUnauthorized' in options.https) {
+                    delete requestOptions.rejectUnauthorized;
+                }
+                if (options.https.checkServerIdentity) {
+                    // @ts-expect-error - This one will be removed when we remove the alias.
+                    delete requestOptions.checkServerIdentity;
+                }
+                if (options.https.certificateAuthority) {
+                    delete requestOptions.ca;
+                }
+                if (options.https.certificate) {
+                    delete requestOptions.cert;
+                }
+                if (options.https.key) {
+                    delete requestOptions.key;
+                }
+                if (options.https.passphrase) {
+                    delete requestOptions.passphrase;
+                }
+                if (options.https.pfx) {
+                    delete requestOptions.pfx;
+                }
+            }
+            if (isClientRequest(requestOrResponse)) {
+                this._onRequest(requestOrResponse);
+                // Emit the response after the stream has been ended
+            }
+            else if (this.writable) {
+                this.once('finish', () => {
+                    void this._onResponse(requestOrResponse);
+                });
+                this._unlockWrite();
+                this.end();
+                this._lockWrite();
+            }
+            else {
+                void this._onResponse(requestOrResponse);
+            }
+        }
+        catch (error) {
+            if (error instanceof CacheableRequest.CacheError) {
+                throw new CacheError(error, this);
+            }
+            throw new RequestError(error.message, error, this);
+        }
+    }
+    async _error(error) {
+        try {
+            for (const hook of this.options.hooks.beforeError) {
+                // eslint-disable-next-line no-await-in-loop
+                error = await hook(error);
+            }
+        }
+        catch (error_) {
+            error = new RequestError(error_.message, error_, this);
+        }
+        this.destroy(error);
+    }
+    _beforeError(error) {
+        if (this[kStopReading]) {
+            return;
+        }
+        const { options } = this;
+        const retryCount = this.retryCount + 1;
+        this[kStopReading] = true;
+        if (!(error instanceof RequestError)) {
+            error = new RequestError(error.message, error, this);
+        }
+        const typedError = error;
+        const { response } = typedError;
+        void (async () => {
+            if (response && !response.body) {
+                response.setEncoding(this._readableState.encoding);
+                try {
+                    response.rawBody = await get_buffer_1.default(response);
+                    response.body = response.rawBody.toString();
+                }
+                catch (_a) { }
+            }
+            if (this.listenerCount('retry') !== 0) {
+                let backoff;
+                try {
+                    let retryAfter;
+                    if (response && 'retry-after' in response.headers) {
+                        retryAfter = Number(response.headers['retry-after']);
+                        if (Number.isNaN(retryAfter)) {
+                            retryAfter = Date.parse(response.headers['retry-after']) - Date.now();
+                            if (retryAfter <= 0) {
+                                retryAfter = 1;
+                            }
+                        }
+                        else {
+                            retryAfter *= 1000;
+                        }
+                    }
+                    backoff = await options.retry.calculateDelay({
+                        attemptCount: retryCount,
+                        retryOptions: options.retry,
+                        error: typedError,
+                        retryAfter,
+                        computedValue: calculate_retry_delay_1.default({
+                            attemptCount: retryCount,
+                            retryOptions: options.retry,
+                            error: typedError,
+                            retryAfter,
+                            computedValue: 0
+                        })
+                    });
+                }
+                catch (error_) {
+                    void this._error(new RequestError(error_.message, error_, this));
+                    return;
+                }
+                if (backoff) {
+                    const retry = async () => {
+                        try {
+                            for (const hook of this.options.hooks.beforeRetry) {
+                                // eslint-disable-next-line no-await-in-loop
+                                await hook(this.options, typedError, retryCount);
+                            }
+                        }
+                        catch (error_) {
+                            void this._error(new RequestError(error_.message, error, this));
+                            return;
+                        }
+                        // Something forced us to abort the retry
+                        if (this.destroyed) {
+                            return;
+                        }
+                        this.destroy();
+                        this.emit('retry', retryCount, error);
+                    };
+                    this[kRetryTimeout] = setTimeout(retry, backoff);
+                    return;
+                }
+            }
+            void this._error(typedError);
+        })();
+    }
+    _read() {
+        this[kTriggerRead] = true;
+        const response = this[kResponse];
+        if (response && !this[kStopReading]) {
+            // We cannot put this in the `if` above
+            // because `.read()` also triggers the `end` event
+            if (response.readableLength) {
+                this[kTriggerRead] = false;
+            }
+            let data;
+            while ((data = response.read()) !== null) {
+                this[kDownloadedSize] += data.length;
+                this[kStartedReading] = true;
+                const progress = this.downloadProgress;
+                if (progress.percent < 1) {
+                    this.emit('downloadProgress', progress);
+                }
+                this.push(data);
+            }
+        }
+    }
+    // Node.js 12 has incorrect types, so the encoding must be a string
+    _write(chunk, encoding, callback) {
+        const write = () => {
+            this._writeRequest(chunk, encoding, callback);
+        };
+        if (this.requestInitialized) {
+            write();
+        }
+        else {
+            this[kJobs].push(write);
+        }
+    }
+    _writeRequest(chunk, encoding, callback) {
+        if (this[kRequest].destroyed) {
+            // Probably the `ClientRequest` instance will throw
+            return;
+        }
+        this._progressCallbacks.push(() => {
+            this[kUploadedSize] += Buffer.byteLength(chunk, encoding);
+            const progress = this.uploadProgress;
+            if (progress.percent < 1) {
+                this.emit('uploadProgress', progress);
+            }
+        });
+        // TODO: What happens if it's from cache? Then this[kRequest] won't be defined.
+        this[kRequest].write(chunk, encoding, (error) => {
+            if (!error && this._progressCallbacks.length > 0) {
+                this._progressCallbacks.shift()();
+            }
+            callback(error);
+        });
+    }
+    _final(callback) {
+        const endRequest = () => {
+            // FIX: Node.js 10 calls the write callback AFTER the end callback!
+            while (this._progressCallbacks.length !== 0) {
+                this._progressCallbacks.shift()();
+            }
+            // We need to check if `this[kRequest]` is present,
+            // because it isn't when we use cache.
+            if (!(kRequest in this)) {
+                callback();
+                return;
+            }
+            if (this[kRequest].destroyed) {
+                callback();
+                return;
+            }
+            this[kRequest].end((error) => {
+                if (!error) {
+                    this[kBodySize] = this[kUploadedSize];
+                    this.emit('uploadProgress', this.uploadProgress);
+                    this[kRequest].emit('upload-complete');
+                }
+                callback(error);
+            });
+        };
+        if (this.requestInitialized) {
+            endRequest();
+        }
+        else {
+            this[kJobs].push(endRequest);
+        }
+    }
+    _destroy(error, callback) {
+        var _a;
+        this[kStopReading] = true;
+        // Prevent further retries
+        clearTimeout(this[kRetryTimeout]);
+        if (kRequest in this) {
+            this[kCancelTimeouts]();
+            // TODO: Remove the next `if` when these get fixed:
+            // - https://github.com/nodejs/node/issues/32851
+            if (!((_a = this[kResponse]) === null || _a === void 0 ? void 0 : _a.complete)) {
+                this[kRequest].destroy();
+            }
+        }
+        if (error !== null && !is_1.default.undefined(error) && !(error instanceof RequestError)) {
+            error = new RequestError(error.message, error, this);
+        }
+        callback(error);
+    }
+    get _isAboutToError() {
+        return this[kStopReading];
+    }
+    /**
+    The remote IP address.
+    */
+    get ip() {
+        var _a;
+        return (_a = this.socket) === null || _a === void 0 ? void 0 : _a.remoteAddress;
+    }
+    /**
+    Indicates whether the request has been aborted or not.
+    */
+    get aborted() {
+        var _a, _b, _c;
+        return ((_b = (_a = this[kRequest]) === null || _a === void 0 ? void 0 : _a.destroyed) !== null && _b !== void 0 ? _b : this.destroyed) && !((_c = this[kOriginalResponse]) === null || _c === void 0 ? void 0 : _c.complete);
+    }
+    get socket() {
+        var _a, _b;
+        return (_b = (_a = this[kRequest]) === null || _a === void 0 ? void 0 : _a.socket) !== null && _b !== void 0 ? _b : undefined;
+    }
+    /**
+    Progress event for downloading (receiving a response).
+    */
+    get downloadProgress() {
+        let percent;
+        if (this[kResponseSize]) {
+            percent = this[kDownloadedSize] / this[kResponseSize];
+        }
+        else if (this[kResponseSize] === this[kDownloadedSize]) {
+            percent = 1;
+        }
+        else {
+            percent = 0;
+        }
+        return {
+            percent,
+            transferred: this[kDownloadedSize],
+            total: this[kResponseSize]
+        };
+    }
+    /**
+    Progress event for uploading (sending a request).
+    */
+    get uploadProgress() {
+        let percent;
+        if (this[kBodySize]) {
+            percent = this[kUploadedSize] / this[kBodySize];
+        }
+        else if (this[kBodySize] === this[kUploadedSize]) {
+            percent = 1;
+        }
+        else {
+            percent = 0;
+        }
+        return {
+            percent,
+            transferred: this[kUploadedSize],
+            total: this[kBodySize]
+        };
+    }
+    /**
+    The object contains the following properties:
+
+    - `start` - Time when the request started.
+    - `socket` - Time when a socket was assigned to the request.
+    - `lookup` - Time when the DNS lookup finished.
+    - `connect` - Time when the socket successfully connected.
+    - `secureConnect` - Time when the socket securely connected.
+    - `upload` - Time when the request finished uploading.
+    - `response` - Time when the request fired `response` event.
+    - `end` - Time when the response fired `end` event.
+    - `error` - Time when the request fired `error` event.
+    - `abort` - Time when the request fired `abort` event.
+    - `phases`
+        - `wait` - `timings.socket - timings.start`
+        - `dns` - `timings.lookup - timings.socket`
+        - `tcp` - `timings.connect - timings.lookup`
+        - `tls` - `timings.secureConnect - timings.connect`
+        - `request` - `timings.upload - (timings.secureConnect || timings.connect)`
+        - `firstByte` - `timings.response - timings.upload`
+        - `download` - `timings.end - timings.response`
+        - `total` - `(timings.end || timings.error || timings.abort) - timings.start`
+
+    If something has not been measured yet, it will be `undefined`.
+
+    __Note__: The time is a `number` representing the milliseconds elapsed since the UNIX epoch.
+    */
+    get timings() {
+        var _a;
+        return (_a = this[kRequest]) === null || _a === void 0 ? void 0 : _a.timings;
+    }
+    /**
+    Whether the response was retrieved from the cache.
+    */
+    get isFromCache() {
+        return this[kIsFromCache];
+    }
+    pipe(destination, options) {
+        if (this[kStartedReading]) {
+            throw new Error('Failed to pipe. The response has been emitted already.');
+        }
+        if (destination instanceof http_1.ServerResponse) {
+            this[kServerResponsesPiped].add(destination);
+        }
+        return super.pipe(destination, options);
+    }
+    unpipe(destination) {
+        if (destination instanceof http_1.ServerResponse) {
+            this[kServerResponsesPiped].delete(destination);
+        }
+        super.unpipe(destination);
+        return this;
+    }
+}
+exports["default"] = Request;
+
+
+/***/ }),
+
+/***/ 4993:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.dnsLookupIpVersionToFamily = exports.isDnsLookupIpVersion = void 0;
+const conversionTable = {
+    auto: 0,
+    ipv4: 4,
+    ipv6: 6
+};
+exports.isDnsLookupIpVersion = (value) => {
+    return value in conversionTable;
+};
+exports.dnsLookupIpVersionToFamily = (dnsLookupIpVersion) => {
+    if (exports.isDnsLookupIpVersion(dnsLookupIpVersion)) {
+        return conversionTable[dnsLookupIpVersion];
+    }
+    throw new Error('Invalid DNS lookup IP version');
+};
+
+
+/***/ }),
+
+/***/ 4564:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const fs_1 = __nccwpck_require__(7147);
+const util_1 = __nccwpck_require__(3837);
+const is_1 = __nccwpck_require__(7678);
+const is_form_data_1 = __nccwpck_require__(40);
+const statAsync = util_1.promisify(fs_1.stat);
+exports["default"] = async (body, headers) => {
+    if (headers && 'content-length' in headers) {
+        return Number(headers['content-length']);
+    }
+    if (!body) {
+        return 0;
+    }
+    if (is_1.default.string(body)) {
+        return Buffer.byteLength(body);
+    }
+    if (is_1.default.buffer(body)) {
+        return body.length;
+    }
+    if (is_form_data_1.default(body)) {
+        return util_1.promisify(body.getLength.bind(body))();
+    }
+    if (body instanceof fs_1.ReadStream) {
+        const { size } = await statAsync(body.path);
+        if (size === 0) {
+            return undefined;
+        }
+        return size;
+    }
+    return undefined;
+};
+
+
+/***/ }),
+
+/***/ 4500:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+// TODO: Update https://github.com/sindresorhus/get-stream
+const getBuffer = async (stream) => {
+    const chunks = [];
+    let length = 0;
+    for await (const chunk of stream) {
+        chunks.push(chunk);
+        length += Buffer.byteLength(chunk);
+    }
+    if (Buffer.isBuffer(chunks[0])) {
+        return Buffer.concat(chunks, length);
+    }
+    return Buffer.from(chunks.join(''));
+};
+exports["default"] = getBuffer;
+
+
+/***/ }),
+
+/***/ 40:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const is_1 = __nccwpck_require__(7678);
+exports["default"] = (body) => is_1.default.nodeStream(body) && is_1.default.function_(body.getBoundary);
+
+
+/***/ }),
+
+/***/ 9298:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.isResponseOk = void 0;
+exports.isResponseOk = (response) => {
+    const { statusCode } = response;
+    const limitStatusCode = response.request.options.followRedirect ? 299 : 399;
+    return (statusCode >= 200 && statusCode <= limitStatusCode) || statusCode === 304;
+};
+
+
+/***/ }),
+
+/***/ 9219:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+/* istanbul ignore file: deprecated */
+const url_1 = __nccwpck_require__(7310);
+const keys = [
+    'protocol',
+    'host',
+    'hostname',
+    'port',
+    'pathname',
+    'search'
+];
+exports["default"] = (origin, options) => {
+    var _a, _b;
+    if (options.path) {
+        if (options.pathname) {
+            throw new TypeError('Parameters `path` and `pathname` are mutually exclusive.');
+        }
+        if (options.search) {
+            throw new TypeError('Parameters `path` and `search` are mutually exclusive.');
+        }
+        if (options.searchParams) {
+            throw new TypeError('Parameters `path` and `searchParams` are mutually exclusive.');
+        }
+    }
+    if (options.search && options.searchParams) {
+        throw new TypeError('Parameters `search` and `searchParams` are mutually exclusive.');
+    }
+    if (!origin) {
+        if (!options.protocol) {
+            throw new TypeError('No URL protocol specified');
+        }
+        origin = `${options.protocol}//${(_b = (_a = options.hostname) !== null && _a !== void 0 ? _a : options.host) !== null && _b !== void 0 ? _b : ''}`;
+    }
+    const url = new url_1.URL(origin);
+    if (options.path) {
+        const searchIndex = options.path.indexOf('?');
+        if (searchIndex === -1) {
+            options.pathname = options.path;
+        }
+        else {
+            options.pathname = options.path.slice(0, searchIndex);
+            options.search = options.path.slice(searchIndex + 1);
+        }
+        delete options.path;
+    }
+    for (const key of keys) {
+        if (options[key]) {
+            url[key] = options[key].toString();
+        }
+    }
+    return url;
+};
+
+
+/***/ }),
+
+/***/ 3021:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+function default_1(from, to, events) {
+    const fns = {};
+    for (const event of events) {
+        fns[event] = (...args) => {
+            to.emit(event, ...args);
+        };
+        from.on(event, fns[event]);
+    }
+    return () => {
+        for (const event of events) {
+            from.off(event, fns[event]);
+        }
+    };
+}
+exports["default"] = default_1;
+
+
+/***/ }),
+
+/***/ 2454:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.TimeoutError = void 0;
+const net = __nccwpck_require__(1808);
+const unhandle_1 = __nccwpck_require__(1593);
+const reentry = Symbol('reentry');
+const noop = () => { };
+class TimeoutError extends Error {
+    constructor(threshold, event) {
+        super(`Timeout awaiting '${event}' for ${threshold}ms`);
+        this.event = event;
+        this.name = 'TimeoutError';
+        this.code = 'ETIMEDOUT';
+    }
+}
+exports.TimeoutError = TimeoutError;
+exports["default"] = (request, delays, options) => {
+    if (reentry in request) {
+        return noop;
+    }
+    request[reentry] = true;
+    const cancelers = [];
+    const { once, unhandleAll } = unhandle_1.default();
+    const addTimeout = (delay, callback, event) => {
+        var _a;
+        const timeout = setTimeout(callback, delay, delay, event);
+        (_a = timeout.unref) === null || _a === void 0 ? void 0 : _a.call(timeout);
+        const cancel = () => {
+            clearTimeout(timeout);
+        };
+        cancelers.push(cancel);
+        return cancel;
+    };
+    const { host, hostname } = options;
+    const timeoutHandler = (delay, event) => {
+        request.destroy(new TimeoutError(delay, event));
+    };
+    const cancelTimeouts = () => {
+        for (const cancel of cancelers) {
+            cancel();
+        }
+        unhandleAll();
+    };
+    request.once('error', error => {
+        cancelTimeouts();
+        // Save original behavior
+        /* istanbul ignore next */
+        if (request.listenerCount('error') === 0) {
+            throw error;
+        }
+    });
+    request.once('close', cancelTimeouts);
+    once(request, 'response', (response) => {
+        once(response, 'end', cancelTimeouts);
+    });
+    if (typeof delays.request !== 'undefined') {
+        addTimeout(delays.request, timeoutHandler, 'request');
+    }
+    if (typeof delays.socket !== 'undefined') {
+        const socketTimeoutHandler = () => {
+            timeoutHandler(delays.socket, 'socket');
+        };
+        request.setTimeout(delays.socket, socketTimeoutHandler);
+        // `request.setTimeout(0)` causes a memory leak.
+        // We can just remove the listener and forget about the timer - it's unreffed.
+        // See https://github.com/sindresorhus/got/issues/690
+        cancelers.push(() => {
+            request.removeListener('timeout', socketTimeoutHandler);
+        });
+    }
+    once(request, 'socket', (socket) => {
+        var _a;
+        const { socketPath } = request;
+        /* istanbul ignore next: hard to test */
+        if (socket.connecting) {
+            const hasPath = Boolean(socketPath !== null && socketPath !== void 0 ? socketPath : net.isIP((_a = hostname !== null && hostname !== void 0 ? hostname : host) !== null && _a !== void 0 ? _a : '') !== 0);
+            if (typeof delays.lookup !== 'undefined' && !hasPath && typeof socket.address().address === 'undefined') {
+                const cancelTimeout = addTimeout(delays.lookup, timeoutHandler, 'lookup');
+                once(socket, 'lookup', cancelTimeout);
+            }
+            if (typeof delays.connect !== 'undefined') {
+                const timeConnect = () => addTimeout(delays.connect, timeoutHandler, 'connect');
+                if (hasPath) {
+                    once(socket, 'connect', timeConnect());
+                }
+                else {
+                    once(socket, 'lookup', (error) => {
+                        if (error === null) {
+                            once(socket, 'connect', timeConnect());
+                        }
+                    });
+                }
+            }
+            if (typeof delays.secureConnect !== 'undefined' && options.protocol === 'https:') {
+                once(socket, 'connect', () => {
+                    const cancelTimeout = addTimeout(delays.secureConnect, timeoutHandler, 'secureConnect');
+                    once(socket, 'secureConnect', cancelTimeout);
+                });
+            }
+        }
+        if (typeof delays.send !== 'undefined') {
+            const timeRequest = () => addTimeout(delays.send, timeoutHandler, 'send');
+            /* istanbul ignore next: hard to test */
+            if (socket.connecting) {
+                once(socket, 'connect', () => {
+                    once(request, 'upload-complete', timeRequest());
+                });
+            }
+            else {
+                once(request, 'upload-complete', timeRequest());
+            }
+        }
+    });
+    if (typeof delays.response !== 'undefined') {
+        once(request, 'upload-complete', () => {
+            const cancelTimeout = addTimeout(delays.response, timeoutHandler, 'response');
+            once(request, 'response', cancelTimeout);
+        });
+    }
+    return cancelTimeouts;
+};
+
+
+/***/ }),
+
+/***/ 1593:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+// When attaching listeners, it's very easy to forget about them.
+// Especially if you do error handling and set timeouts.
+// So instead of checking if it's proper to throw an error on every timeout ever,
+// use this simple tool which will remove all listeners you have attached.
+exports["default"] = () => {
+    const handlers = [];
+    return {
+        once(origin, event, fn) {
+            origin.once(event, fn);
+            handlers.push({ origin, event, fn });
+        },
+        unhandleAll() {
+            for (const handler of handlers) {
+                const { origin, event, fn } = handler;
+                origin.removeListener(event, fn);
+            }
+            handlers.length = 0;
+        }
+    };
+};
+
+
+/***/ }),
+
+/***/ 8026:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const is_1 = __nccwpck_require__(7678);
+exports["default"] = (url) => {
+    // Cast to URL
+    url = url;
+    const options = {
+        protocol: url.protocol,
+        hostname: is_1.default.string(url.hostname) && url.hostname.startsWith('[') ? url.hostname.slice(1, -1) : url.hostname,
+        host: url.host,
+        hash: url.hash,
+        search: url.search,
+        pathname: url.pathname,
+        href: url.href,
+        path: `${url.pathname || ''}${url.search || ''}`
+    };
+    if (is_1.default.string(url.port) && url.port.length > 0) {
+        options.port = Number(url.port);
+    }
+    if (url.username || url.password) {
+        options.auth = `${url.username || ''}:${url.password || ''}`;
+    }
+    return options;
+};
+
+
+/***/ }),
+
+/***/ 7288:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+class WeakableMap {
+    constructor() {
+        this.weakMap = new WeakMap();
+        this.map = new Map();
+    }
+    set(key, value) {
+        if (typeof key === 'object') {
+            this.weakMap.set(key, value);
+        }
+        else {
+            this.map.set(key, value);
+        }
+    }
+    get(key) {
+        if (typeof key === 'object') {
+            return this.weakMap.get(key);
+        }
+        return this.map.get(key);
+    }
+    has(key) {
+        if (typeof key === 'object') {
+            return this.weakMap.has(key);
+        }
+        return this.map.has(key);
+    }
+}
+exports["default"] = WeakableMap;
+
+
+/***/ }),
+
+/***/ 4337:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.defaultHandler = void 0;
+const is_1 = __nccwpck_require__(7678);
+const as_promise_1 = __nccwpck_require__(6056);
+const create_rejection_1 = __nccwpck_require__(6457);
+const core_1 = __nccwpck_require__(94);
+const deep_freeze_1 = __nccwpck_require__(285);
+const errors = {
+    RequestError: as_promise_1.RequestError,
+    CacheError: as_promise_1.CacheError,
+    ReadError: as_promise_1.ReadError,
+    HTTPError: as_promise_1.HTTPError,
+    MaxRedirectsError: as_promise_1.MaxRedirectsError,
+    TimeoutError: as_promise_1.TimeoutError,
+    ParseError: as_promise_1.ParseError,
+    CancelError: as_promise_1.CancelError,
+    UnsupportedProtocolError: as_promise_1.UnsupportedProtocolError,
+    UploadError: as_promise_1.UploadError
+};
+// The `delay` package weighs 10KB (!)
+const delay = async (ms) => new Promise(resolve => {
+    setTimeout(resolve, ms);
+});
+const { normalizeArguments } = core_1.default;
+const mergeOptions = (...sources) => {
+    let mergedOptions;
+    for (const source of sources) {
+        mergedOptions = normalizeArguments(undefined, source, mergedOptions);
+    }
+    return mergedOptions;
+};
+const getPromiseOrStream = (options) => options.isStream ? new core_1.default(undefined, options) : as_promise_1.default(options);
+const isGotInstance = (value) => ('defaults' in value && 'options' in value.defaults);
+const aliases = [
+    'get',
+    'post',
+    'put',
+    'patch',
+    'head',
+    'delete'
+];
+exports.defaultHandler = (options, next) => next(options);
+const callInitHooks = (hooks, options) => {
+    if (hooks) {
+        for (const hook of hooks) {
+            hook(options);
+        }
+    }
+};
+const create = (defaults) => {
+    // Proxy properties from next handlers
+    defaults._rawHandlers = defaults.handlers;
+    defaults.handlers = defaults.handlers.map(fn => ((options, next) => {
+        // This will be assigned by assigning result
+        let root;
+        const result = fn(options, newOptions => {
+            root = next(newOptions);
+            return root;
+        });
+        if (result !== root && !options.isStream && root) {
+            const typedResult = result;
+            const { then: promiseThen, catch: promiseCatch, finally: promiseFianlly } = typedResult;
+            Object.setPrototypeOf(typedResult, Object.getPrototypeOf(root));
+            Object.defineProperties(typedResult, Object.getOwnPropertyDescriptors(root));
+            // These should point to the new promise
+            // eslint-disable-next-line promise/prefer-await-to-then
+            typedResult.then = promiseThen;
+            typedResult.catch = promiseCatch;
+            typedResult.finally = promiseFianlly;
+        }
+        return result;
+    }));
+    // Got interface
+    const got = ((url, options = {}, _defaults) => {
+        var _a, _b;
+        let iteration = 0;
+        const iterateHandlers = (newOptions) => {
+            return defaults.handlers[iteration++](newOptions, iteration === defaults.handlers.length ? getPromiseOrStream : iterateHandlers);
+        };
+        // TODO: Remove this in Got 12.
+        if (is_1.default.plainObject(url)) {
+            const mergedOptions = {
+                ...url,
+                ...options
+            };
+            core_1.setNonEnumerableProperties([url, options], mergedOptions);
+            options = mergedOptions;
+            url = undefined;
+        }
+        try {
+            // Call `init` hooks
+            let initHookError;
+            try {
+                callInitHooks(defaults.options.hooks.init, options);
+                callInitHooks((_a = options.hooks) === null || _a === void 0 ? void 0 : _a.init, options);
+            }
+            catch (error) {
+                initHookError = error;
+            }
+            // Normalize options & call handlers
+            const normalizedOptions = normalizeArguments(url, options, _defaults !== null && _defaults !== void 0 ? _defaults : defaults.options);
+            normalizedOptions[core_1.kIsNormalizedAlready] = true;
+            if (initHookError) {
+                throw new as_promise_1.RequestError(initHookError.message, initHookError, normalizedOptions);
+            }
+            return iterateHandlers(normalizedOptions);
+        }
+        catch (error) {
+            if (options.isStream) {
+                throw error;
+            }
+            else {
+                return create_rejection_1.default(error, defaults.options.hooks.beforeError, (_b = options.hooks) === null || _b === void 0 ? void 0 : _b.beforeError);
+            }
+        }
+    });
+    got.extend = (...instancesOrOptions) => {
+        const optionsArray = [defaults.options];
+        let handlers = [...defaults._rawHandlers];
+        let isMutableDefaults;
+        for (const value of instancesOrOptions) {
+            if (isGotInstance(value)) {
+                optionsArray.push(value.defaults.options);
+                handlers.push(...value.defaults._rawHandlers);
+                isMutableDefaults = value.defaults.mutableDefaults;
+            }
+            else {
+                optionsArray.push(value);
+                if ('handlers' in value) {
+                    handlers.push(...value.handlers);
+                }
+                isMutableDefaults = value.mutableDefaults;
+            }
+        }
+        handlers = handlers.filter(handler => handler !== exports.defaultHandler);
+        if (handlers.length === 0) {
+            handlers.push(exports.defaultHandler);
+        }
+        return create({
+            options: mergeOptions(...optionsArray),
+            handlers,
+            mutableDefaults: Boolean(isMutableDefaults)
+        });
+    };
+    // Pagination
+    const paginateEach = (async function* (url, options) {
+        // TODO: Remove this `@ts-expect-error` when upgrading to TypeScript 4.
+        // Error: Argument of type 'Merge<Options, PaginationOptions<T, R>> | undefined' is not assignable to parameter of type 'Options | undefined'.
+        // @ts-expect-error
+        let normalizedOptions = normalizeArguments(url, options, defaults.options);
+        normalizedOptions.resolveBodyOnly = false;
+        const pagination = normalizedOptions.pagination;
+        if (!is_1.default.object(pagination)) {
+            throw new TypeError('`options.pagination` must be implemented');
+        }
+        const all = [];
+        let { countLimit } = pagination;
+        let numberOfRequests = 0;
+        while (numberOfRequests < pagination.requestLimit) {
+            if (numberOfRequests !== 0) {
+                // eslint-disable-next-line no-await-in-loop
+                await delay(pagination.backoff);
+            }
+            // @ts-expect-error FIXME!
+            // TODO: Throw when result is not an instance of Response
+            // eslint-disable-next-line no-await-in-loop
+            const result = (await got(undefined, undefined, normalizedOptions));
+            // eslint-disable-next-line no-await-in-loop
+            const parsed = await pagination.transform(result);
+            const current = [];
+            for (const item of parsed) {
+                if (pagination.filter(item, all, current)) {
+                    if (!pagination.shouldContinue(item, all, current)) {
+                        return;
+                    }
+                    yield item;
+                    if (pagination.stackAllItems) {
+                        all.push(item);
+                    }
+                    current.push(item);
+                    if (--countLimit <= 0) {
+                        return;
+                    }
+                }
+            }
+            const optionsToMerge = pagination.paginate(result, all, current);
+            if (optionsToMerge === false) {
+                return;
+            }
+            if (optionsToMerge === result.request.options) {
+                normalizedOptions = result.request.options;
+            }
+            else if (optionsToMerge !== undefined) {
+                normalizedOptions = normalizeArguments(undefined, optionsToMerge, normalizedOptions);
+            }
+            numberOfRequests++;
+        }
+    });
+    got.paginate = paginateEach;
+    got.paginate.all = (async (url, options) => {
+        const results = [];
+        for await (const item of paginateEach(url, options)) {
+            results.push(item);
+        }
+        return results;
+    });
+    // For those who like very descriptive names
+    got.paginate.each = paginateEach;
+    // Stream API
+    got.stream = ((url, options) => got(url, { ...options, isStream: true }));
+    // Shortcuts
+    for (const method of aliases) {
+        got[method] = ((url, options) => got(url, { ...options, method }));
+        got.stream[method] = ((url, options) => {
+            return got(url, { ...options, method, isStream: true });
+        });
+    }
+    Object.assign(got, errors);
+    Object.defineProperty(got, 'defaults', {
+        value: defaults.mutableDefaults ? defaults : deep_freeze_1.default(defaults),
+        writable: defaults.mutableDefaults,
+        configurable: defaults.mutableDefaults,
+        enumerable: true
+    });
+    got.mergeOptions = mergeOptions;
+    return got;
+};
+exports["default"] = create;
+__exportStar(__nccwpck_require__(2613), exports);
+
+
+/***/ }),
+
+/***/ 3061:
+/***/ (function(module, exports, __nccwpck_require__) {
+
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const url_1 = __nccwpck_require__(7310);
+const create_1 = __nccwpck_require__(4337);
+const defaults = {
+    options: {
+        method: 'GET',
+        retry: {
+            limit: 2,
+            methods: [
+                'GET',
+                'PUT',
+                'HEAD',
+                'DELETE',
+                'OPTIONS',
+                'TRACE'
+            ],
+            statusCodes: [
+                408,
+                413,
+                429,
+                500,
+                502,
+                503,
+                504,
+                521,
+                522,
+                524
+            ],
+            errorCodes: [
+                'ETIMEDOUT',
+                'ECONNRESET',
+                'EADDRINUSE',
+                'ECONNREFUSED',
+                'EPIPE',
+                'ENOTFOUND',
+                'ENETUNREACH',
+                'EAI_AGAIN'
+            ],
+            maxRetryAfter: undefined,
+            calculateDelay: ({ computedValue }) => computedValue
+        },
+        timeout: {},
+        headers: {
+            'user-agent': 'got (https://github.com/sindresorhus/got)'
+        },
+        hooks: {
+            init: [],
+            beforeRequest: [],
+            beforeRedirect: [],
+            beforeRetry: [],
+            beforeError: [],
+            afterResponse: []
+        },
+        cache: undefined,
+        dnsCache: undefined,
+        decompress: true,
+        throwHttpErrors: true,
+        followRedirect: true,
+        isStream: false,
+        responseType: 'text',
+        resolveBodyOnly: false,
+        maxRedirects: 10,
+        prefixUrl: '',
+        methodRewriting: true,
+        ignoreInvalidCookies: false,
+        context: {},
+        // TODO: Set this to `true` when Got 12 gets released
+        http2: false,
+        allowGetBody: false,
+        https: undefined,
+        pagination: {
+            transform: (response) => {
+                if (response.request.options.responseType === 'json') {
+                    return response.body;
+                }
+                return JSON.parse(response.body);
+            },
+            paginate: response => {
+                if (!Reflect.has(response.headers, 'link')) {
+                    return false;
+                }
+                const items = response.headers.link.split(',');
+                let next;
+                for (const item of items) {
+                    const parsed = item.split(';');
+                    if (parsed[1].includes('next')) {
+                        next = parsed[0].trimStart().trim();
+                        next = next.slice(1, -1);
+                        break;
+                    }
+                }
+                if (next) {
+                    const options = {
+                        url: new url_1.URL(next)
+                    };
+                    return options;
+                }
+                return false;
+            },
+            filter: () => true,
+            shouldContinue: () => true,
+            countLimit: Infinity,
+            backoff: 0,
+            requestLimit: 10000,
+            stackAllItems: true
+        },
+        parseJson: (text) => JSON.parse(text),
+        stringifyJson: (object) => JSON.stringify(object),
+        cacheOptions: {}
+    },
+    handlers: [create_1.defaultHandler],
+    mutableDefaults: false
+};
+const got = create_1.default(defaults);
+exports["default"] = got;
+// For CommonJS default export support
+module.exports = got;
+module.exports["default"] = got;
+module.exports.__esModule = true; // Workaround for TS issue: https://github.com/sindresorhus/got/pull/1267
+__exportStar(__nccwpck_require__(4337), exports);
+__exportStar(__nccwpck_require__(6056), exports);
+
+
+/***/ }),
+
+/***/ 2613:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+
+
+/***/ }),
+
+/***/ 285:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const is_1 = __nccwpck_require__(7678);
+function deepFreeze(object) {
+    for (const value of Object.values(object)) {
+        if (is_1.default.plainObject(value) || is_1.default.array(value)) {
+            deepFreeze(value);
+        }
+    }
+    return Object.freeze(object);
+}
+exports["default"] = deepFreeze;
+
+
+/***/ }),
+
+/***/ 397:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const alreadyWarned = new Set();
+exports["default"] = (message) => {
+    if (alreadyWarned.has(message)) {
+        return;
+    }
+    alreadyWarned.add(message);
+    // @ts-expect-error Missing types.
+    process.emitWarning(`Got: ${message}`, {
+        type: 'DeprecationWarning'
+    });
+};
+
+
+/***/ }),
+
+/***/ 587:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+
+var origSymbol = typeof Symbol !== 'undefined' && Symbol;
+var hasSymbolSham = __nccwpck_require__(7747);
+
+module.exports = function hasNativeSymbols() {
+	if (typeof origSymbol !== 'function') { return false; }
+	if (typeof Symbol !== 'function') { return false; }
+	if (typeof origSymbol('foo') !== 'symbol') { return false; }
+	if (typeof Symbol('bar') !== 'symbol') { return false; }
+
+	return hasSymbolSham();
+};
+
+
+/***/ }),
+
+/***/ 7747:
+/***/ ((module) => {
+
+
+
+/* eslint complexity: [2, 18], max-statements: [2, 33] */
+module.exports = function hasSymbols() {
+	if (typeof Symbol !== 'function' || typeof Object.getOwnPropertySymbols !== 'function') { return false; }
+	if (typeof Symbol.iterator === 'symbol') { return true; }
+
+	var obj = {};
+	var sym = Symbol('test');
+	var symObj = Object(sym);
+	if (typeof sym === 'string') { return false; }
+
+	if (Object.prototype.toString.call(sym) !== '[object Symbol]') { return false; }
+	if (Object.prototype.toString.call(symObj) !== '[object Symbol]') { return false; }
+
+	// temp disabled per https://github.com/ljharb/object.assign/issues/17
+	// if (sym instanceof Symbol) { return false; }
+	// temp disabled per https://github.com/WebReflection/get-own-property-symbols/issues/4
+	// if (!(symObj instanceof Symbol)) { return false; }
+
+	// if (typeof Symbol.prototype.toString !== 'function') { return false; }
+	// if (String(sym) !== Symbol.prototype.toString.call(sym)) { return false; }
+
+	var symVal = 42;
+	obj[sym] = symVal;
+	for (sym in obj) { return false; } // eslint-disable-line no-restricted-syntax, no-unreachable-loop
+	if (typeof Object.keys === 'function' && Object.keys(obj).length !== 0) { return false; }
+
+	if (typeof Object.getOwnPropertyNames === 'function' && Object.getOwnPropertyNames(obj).length !== 0) { return false; }
+
+	var syms = Object.getOwnPropertySymbols(obj);
+	if (syms.length !== 1 || syms[0] !== sym) { return false; }
+
+	if (!Object.prototype.propertyIsEnumerable.call(obj, sym)) { return false; }
+
+	if (typeof Object.getOwnPropertyDescriptor === 'function') {
+		var descriptor = Object.getOwnPropertyDescriptor(obj, sym);
+		if (descriptor.value !== symVal || descriptor.enumerable !== true) { return false; }
+	}
+
+	return true;
+};
+
+
+/***/ }),
+
+/***/ 6339:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+
+var bind = __nccwpck_require__(8334);
+
+module.exports = bind.call(Function.call, Object.prototype.hasOwnProperty);
+
+
+/***/ }),
+
+/***/ 1002:
+/***/ ((module) => {
+
+
+// rfc7231 6.1
+const statusCodeCacheableByDefault = new Set([
+    200,
+    203,
+    204,
+    206,
+    300,
+    301,
+    308,
+    404,
+    405,
+    410,
+    414,
+    501,
+]);
+
+// This implementation does not understand partial responses (206)
+const understoodStatuses = new Set([
+    200,
+    203,
+    204,
+    300,
+    301,
+    302,
+    303,
+    307,
+    308,
+    404,
+    405,
+    410,
+    414,
+    501,
+]);
+
+const errorStatusCodes = new Set([
+    500,
+    502,
+    503, 
+    504,
+]);
+
+const hopByHopHeaders = {
+    date: true, // included, because we add Age update Date
+    connection: true,
+    'keep-alive': true,
+    'proxy-authenticate': true,
+    'proxy-authorization': true,
+    te: true,
+    trailer: true,
+    'transfer-encoding': true,
+    upgrade: true,
+};
+
+const excludedFromRevalidationUpdate = {
+    // Since the old body is reused, it doesn't make sense to change properties of the body
+    'content-length': true,
+    'content-encoding': true,
+    'transfer-encoding': true,
+    'content-range': true,
+};
+
+function toNumberOrZero(s) {
+    const n = parseInt(s, 10);
+    return isFinite(n) ? n : 0;
+}
+
+// RFC 5861
+function isErrorResponse(response) {
+    // consider undefined response as faulty
+    if(!response) {
+        return true
+    }
+    return errorStatusCodes.has(response.status);
+}
+
+function parseCacheControl(header) {
+    const cc = {};
+    if (!header) return cc;
+
+    // TODO: When there is more than one value present for a given directive (e.g., two Expires header fields, multiple Cache-Control: max-age directives),
+    // the directive's value is considered invalid. Caches are encouraged to consider responses that have invalid freshness information to be stale
+    const parts = header.trim().split(/,/);
+    for (const part of parts) {
+        const [k, v] = part.split(/=/, 2);
+        cc[k.trim()] = v === undefined ? true : v.trim().replace(/^"|"$/g, '');
+    }
+
+    return cc;
+}
+
+function formatCacheControl(cc) {
+    let parts = [];
+    for (const k in cc) {
+        const v = cc[k];
+        parts.push(v === true ? k : k + '=' + v);
+    }
+    if (!parts.length) {
+        return undefined;
+    }
+    return parts.join(', ');
+}
+
+module.exports = class CachePolicy {
+    constructor(
+        req,
+        res,
+        {
+            shared,
+            cacheHeuristic,
+            immutableMinTimeToLive,
+            ignoreCargoCult,
+            _fromObject,
+        } = {}
+    ) {
+        if (_fromObject) {
+            this._fromObject(_fromObject);
+            return;
+        }
+
+        if (!res || !res.headers) {
+            throw Error('Response headers missing');
+        }
+        this._assertRequestHasHeaders(req);
+
+        this._responseTime = this.now();
+        this._isShared = shared !== false;
+        this._cacheHeuristic =
+            undefined !== cacheHeuristic ? cacheHeuristic : 0.1; // 10% matches IE
+        this._immutableMinTtl =
+            undefined !== immutableMinTimeToLive
+                ? immutableMinTimeToLive
+                : 24 * 3600 * 1000;
+
+        this._status = 'status' in res ? res.status : 200;
+        this._resHeaders = res.headers;
+        this._rescc = parseCacheControl(res.headers['cache-control']);
+        this._method = 'method' in req ? req.method : 'GET';
+        this._url = req.url;
+        this._host = req.headers.host;
+        this._noAuthorization = !req.headers.authorization;
+        this._reqHeaders = res.headers.vary ? req.headers : null; // Don't keep all request headers if they won't be used
+        this._reqcc = parseCacheControl(req.headers['cache-control']);
+
+        // Assume that if someone uses legacy, non-standard uncecessary options they don't understand caching,
+        // so there's no point stricly adhering to the blindly copy&pasted directives.
+        if (
+            ignoreCargoCult &&
+            'pre-check' in this._rescc &&
+            'post-check' in this._rescc
+        ) {
+            delete this._rescc['pre-check'];
+            delete this._rescc['post-check'];
+            delete this._rescc['no-cache'];
+            delete this._rescc['no-store'];
+            delete this._rescc['must-revalidate'];
+            this._resHeaders = Object.assign({}, this._resHeaders, {
+                'cache-control': formatCacheControl(this._rescc),
+            });
+            delete this._resHeaders.expires;
+            delete this._resHeaders.pragma;
+        }
+
+        // When the Cache-Control header field is not present in a request, caches MUST consider the no-cache request pragma-directive
+        // as having the same effect as if "Cache-Control: no-cache" were present (see Section 5.2.1).
+        if (
+            res.headers['cache-control'] == null &&
+            /no-cache/.test(res.headers.pragma)
+        ) {
+            this._rescc['no-cache'] = true;
+        }
+    }
+
+    now() {
+        return Date.now();
+    }
+
+    storable() {
+        // The "no-store" request directive indicates that a cache MUST NOT store any part of either this request or any response to it.
+        return !!(
+            !this._reqcc['no-store'] &&
+            // A cache MUST NOT store a response to any request, unless:
+            // The request method is understood by the cache and defined as being cacheable, and
+            ('GET' === this._method ||
+                'HEAD' === this._method ||
+                ('POST' === this._method && this._hasExplicitExpiration())) &&
+            // the response status code is understood by the cache, and
+            understoodStatuses.has(this._status) &&
+            // the "no-store" cache directive does not appear in request or response header fields, and
+            !this._rescc['no-store'] &&
+            // the "private" response directive does not appear in the response, if the cache is shared, and
+            (!this._isShared || !this._rescc.private) &&
+            // the Authorization header field does not appear in the request, if the cache is shared,
+            (!this._isShared ||
+                this._noAuthorization ||
+                this._allowsStoringAuthenticated()) &&
+            // the response either:
+            // contains an Expires header field, or
+            (this._resHeaders.expires ||
+                // contains a max-age response directive, or
+                // contains a s-maxage response directive and the cache is shared, or
+                // contains a public response directive.
+                this._rescc['max-age'] ||
+                (this._isShared && this._rescc['s-maxage']) ||
+                this._rescc.public ||
+                // has a status code that is defined as cacheable by default
+                statusCodeCacheableByDefault.has(this._status))
+        );
+    }
+
+    _hasExplicitExpiration() {
+        // 4.2.1 Calculating Freshness Lifetime
+        return (
+            (this._isShared && this._rescc['s-maxage']) ||
+            this._rescc['max-age'] ||
+            this._resHeaders.expires
+        );
+    }
+
+    _assertRequestHasHeaders(req) {
+        if (!req || !req.headers) {
+            throw Error('Request headers missing');
+        }
+    }
+
+    satisfiesWithoutRevalidation(req) {
+        this._assertRequestHasHeaders(req);
+
+        // When presented with a request, a cache MUST NOT reuse a stored response, unless:
+        // the presented request does not contain the no-cache pragma (Section 5.4), nor the no-cache cache directive,
+        // unless the stored response is successfully validated (Section 4.3), and
+        const requestCC = parseCacheControl(req.headers['cache-control']);
+        if (requestCC['no-cache'] || /no-cache/.test(req.headers.pragma)) {
+            return false;
+        }
+
+        if (requestCC['max-age'] && this.age() > requestCC['max-age']) {
+            return false;
+        }
+
+        if (
+            requestCC['min-fresh'] &&
+            this.timeToLive() < 1000 * requestCC['min-fresh']
+        ) {
+            return false;
+        }
+
+        // the stored response is either:
+        // fresh, or allowed to be served stale
+        if (this.stale()) {
+            const allowsStale =
+                requestCC['max-stale'] &&
+                !this._rescc['must-revalidate'] &&
+                (true === requestCC['max-stale'] ||
+                    requestCC['max-stale'] > this.age() - this.maxAge());
+            if (!allowsStale) {
+                return false;
+            }
+        }
+
+        return this._requestMatches(req, false);
+    }
+
+    _requestMatches(req, allowHeadMethod) {
+        // The presented effective request URI and that of the stored response match, and
+        return (
+            (!this._url || this._url === req.url) &&
+            this._host === req.headers.host &&
+            // the request method associated with the stored response allows it to be used for the presented request, and
+            (!req.method ||
+                this._method === req.method ||
+                (allowHeadMethod && 'HEAD' === req.method)) &&
+            // selecting header fields nominated by the stored response (if any) match those presented, and
+            this._varyMatches(req)
+        );
+    }
+
+    _allowsStoringAuthenticated() {
+        //  following Cache-Control response directives (Section 5.2.2) have such an effect: must-revalidate, public, and s-maxage.
+        return (
+            this._rescc['must-revalidate'] ||
+            this._rescc.public ||
+            this._rescc['s-maxage']
+        );
+    }
+
+    _varyMatches(req) {
+        if (!this._resHeaders.vary) {
+            return true;
+        }
+
+        // A Vary header field-value of "*" always fails to match
+        if (this._resHeaders.vary === '*') {
+            return false;
+        }
+
+        const fields = this._resHeaders.vary
+            .trim()
+            .toLowerCase()
+            .split(/\s*,\s*/);
+        for (const name of fields) {
+            if (req.headers[name] !== this._reqHeaders[name]) return false;
+        }
+        return true;
+    }
+
+    _copyWithoutHopByHopHeaders(inHeaders) {
+        const headers = {};
+        for (const name in inHeaders) {
+            if (hopByHopHeaders[name]) continue;
+            headers[name] = inHeaders[name];
+        }
+        // 9.1.  Connection
+        if (inHeaders.connection) {
+            const tokens = inHeaders.connection.trim().split(/\s*,\s*/);
+            for (const name of tokens) {
+                delete headers[name];
+            }
+        }
+        if (headers.warning) {
+            const warnings = headers.warning.split(/,/).filter(warning => {
+                return !/^\s*1[0-9][0-9]/.test(warning);
+            });
+            if (!warnings.length) {
+                delete headers.warning;
+            } else {
+                headers.warning = warnings.join(',').trim();
+            }
+        }
+        return headers;
+    }
+
+    responseHeaders() {
+        const headers = this._copyWithoutHopByHopHeaders(this._resHeaders);
+        const age = this.age();
+
+        // A cache SHOULD generate 113 warning if it heuristically chose a freshness
+        // lifetime greater than 24 hours and the response's age is greater than 24 hours.
+        if (
+            age > 3600 * 24 &&
+            !this._hasExplicitExpiration() &&
+            this.maxAge() > 3600 * 24
+        ) {
+            headers.warning =
+                (headers.warning ? `${headers.warning}, ` : '') +
+                '113 - "rfc7234 5.5.4"';
+        }
+        headers.age = `${Math.round(age)}`;
+        headers.date = new Date(this.now()).toUTCString();
+        return headers;
+    }
+
+    /**
+     * Value of the Date response header or current time if Date was invalid
+     * @return timestamp
+     */
+    date() {
+        const serverDate = Date.parse(this._resHeaders.date);
+        if (isFinite(serverDate)) {
+            return serverDate;
+        }
+        return this._responseTime;
+    }
+
+    /**
+     * Value of the Age header, in seconds, updated for the current time.
+     * May be fractional.
+     *
+     * @return Number
+     */
+    age() {
+        let age = this._ageValue();
+
+        const residentTime = (this.now() - this._responseTime) / 1000;
+        return age + residentTime;
+    }
+
+    _ageValue() {
+        return toNumberOrZero(this._resHeaders.age);
+    }
+
+    /**
+     * Value of applicable max-age (or heuristic equivalent) in seconds. This counts since response's `Date`.
+     *
+     * For an up-to-date value, see `timeToLive()`.
+     *
+     * @return Number
+     */
+    maxAge() {
+        if (!this.storable() || this._rescc['no-cache']) {
+            return 0;
+        }
+
+        // Shared responses with cookies are cacheable according to the RFC, but IMHO it'd be unwise to do so by default
+        // so this implementation requires explicit opt-in via public header
+        if (
+            this._isShared &&
+            (this._resHeaders['set-cookie'] &&
+                !this._rescc.public &&
+                !this._rescc.immutable)
+        ) {
+            return 0;
+        }
+
+        if (this._resHeaders.vary === '*') {
+            return 0;
+        }
+
+        if (this._isShared) {
+            if (this._rescc['proxy-revalidate']) {
+                return 0;
+            }
+            // if a response includes the s-maxage directive, a shared cache recipient MUST ignore the Expires field.
+            if (this._rescc['s-maxage']) {
+                return toNumberOrZero(this._rescc['s-maxage']);
+            }
+        }
+
+        // If a response includes a Cache-Control field with the max-age directive, a recipient MUST ignore the Expires field.
+        if (this._rescc['max-age']) {
+            return toNumberOrZero(this._rescc['max-age']);
+        }
+
+        const defaultMinTtl = this._rescc.immutable ? this._immutableMinTtl : 0;
+
+        const serverDate = this.date();
+        if (this._resHeaders.expires) {
+            const expires = Date.parse(this._resHeaders.expires);
+            // A cache recipient MUST interpret invalid date formats, especially the value "0", as representing a time in the past (i.e., "already expired").
+            if (Number.isNaN(expires) || expires < serverDate) {
+                return 0;
+            }
+            return Math.max(defaultMinTtl, (expires - serverDate) / 1000);
+        }
+
+        if (this._resHeaders['last-modified']) {
+            const lastModified = Date.parse(this._resHeaders['last-modified']);
+            if (isFinite(lastModified) && serverDate > lastModified) {
+                return Math.max(
+                    defaultMinTtl,
+                    ((serverDate - lastModified) / 1000) * this._cacheHeuristic
+                );
+            }
+        }
+
+        return defaultMinTtl;
+    }
+
+    timeToLive() {
+        const age = this.maxAge() - this.age();
+        const staleIfErrorAge = age + toNumberOrZero(this._rescc['stale-if-error']);
+        const staleWhileRevalidateAge = age + toNumberOrZero(this._rescc['stale-while-revalidate']);
+        return Math.max(0, age, staleIfErrorAge, staleWhileRevalidateAge) * 1000;
+    }
+
+    stale() {
+        return this.maxAge() <= this.age();
+    }
+
+    _useStaleIfError() {
+        return this.maxAge() + toNumberOrZero(this._rescc['stale-if-error']) > this.age();
+    }
+
+    useStaleWhileRevalidate() {
+        return this.maxAge() + toNumberOrZero(this._rescc['stale-while-revalidate']) > this.age();
+    }
+
+    static fromObject(obj) {
+        return new this(undefined, undefined, { _fromObject: obj });
+    }
+
+    _fromObject(obj) {
+        if (this._responseTime) throw Error('Reinitialized');
+        if (!obj || obj.v !== 1) throw Error('Invalid serialization');
+
+        this._responseTime = obj.t;
+        this._isShared = obj.sh;
+        this._cacheHeuristic = obj.ch;
+        this._immutableMinTtl =
+            obj.imm !== undefined ? obj.imm : 24 * 3600 * 1000;
+        this._status = obj.st;
+        this._resHeaders = obj.resh;
+        this._rescc = obj.rescc;
+        this._method = obj.m;
+        this._url = obj.u;
+        this._host = obj.h;
+        this._noAuthorization = obj.a;
+        this._reqHeaders = obj.reqh;
+        this._reqcc = obj.reqcc;
+    }
+
+    toObject() {
+        return {
+            v: 1,
+            t: this._responseTime,
+            sh: this._isShared,
+            ch: this._cacheHeuristic,
+            imm: this._immutableMinTtl,
+            st: this._status,
+            resh: this._resHeaders,
+            rescc: this._rescc,
+            m: this._method,
+            u: this._url,
+            h: this._host,
+            a: this._noAuthorization,
+            reqh: this._reqHeaders,
+            reqcc: this._reqcc,
+        };
+    }
+
+    /**
+     * Headers for sending to the origin server to revalidate stale response.
+     * Allows server to return 304 to allow reuse of the previous response.
+     *
+     * Hop by hop headers are always stripped.
+     * Revalidation headers may be added or removed, depending on request.
+     */
+    revalidationHeaders(incomingReq) {
+        this._assertRequestHasHeaders(incomingReq);
+        const headers = this._copyWithoutHopByHopHeaders(incomingReq.headers);
+
+        // This implementation does not understand range requests
+        delete headers['if-range'];
+
+        if (!this._requestMatches(incomingReq, true) || !this.storable()) {
+            // revalidation allowed via HEAD
+            // not for the same resource, or wasn't allowed to be cached anyway
+            delete headers['if-none-match'];
+            delete headers['if-modified-since'];
+            return headers;
+        }
+
+        /* MUST send that entity-tag in any cache validation request (using If-Match or If-None-Match) if an entity-tag has been provided by the origin server. */
+        if (this._resHeaders.etag) {
+            headers['if-none-match'] = headers['if-none-match']
+                ? `${headers['if-none-match']}, ${this._resHeaders.etag}`
+                : this._resHeaders.etag;
+        }
+
+        // Clients MAY issue simple (non-subrange) GET requests with either weak validators or strong validators. Clients MUST NOT use weak validators in other forms of request.
+        const forbidsWeakValidators =
+            headers['accept-ranges'] ||
+            headers['if-match'] ||
+            headers['if-unmodified-since'] ||
+            (this._method && this._method != 'GET');
+
+        /* SHOULD send the Last-Modified value in non-subrange cache validation requests (using If-Modified-Since) if only a Last-Modified value has been provided by the origin server.
+        Note: This implementation does not understand partial responses (206) */
+        if (forbidsWeakValidators) {
+            delete headers['if-modified-since'];
+
+            if (headers['if-none-match']) {
+                const etags = headers['if-none-match']
+                    .split(/,/)
+                    .filter(etag => {
+                        return !/^\s*W\//.test(etag);
+                    });
+                if (!etags.length) {
+                    delete headers['if-none-match'];
+                } else {
+                    headers['if-none-match'] = etags.join(',').trim();
+                }
+            }
+        } else if (
+            this._resHeaders['last-modified'] &&
+            !headers['if-modified-since']
+        ) {
+            headers['if-modified-since'] = this._resHeaders['last-modified'];
+        }
+
+        return headers;
+    }
+
+    /**
+     * Creates new CachePolicy with information combined from the previews response,
+     * and the new revalidation response.
+     *
+     * Returns {policy, modified} where modified is a boolean indicating
+     * whether the response body has been modified, and old cached body can't be used.
+     *
+     * @return {Object} {policy: CachePolicy, modified: Boolean}
+     */
+    revalidatedPolicy(request, response) {
+        this._assertRequestHasHeaders(request);
+        if(this._useStaleIfError() && isErrorResponse(response)) {  // I consider the revalidation request unsuccessful
+          return {
+            modified: false,
+            matches: false,
+            policy: this,
+          };
+        }
+        if (!response || !response.headers) {
+            throw Error('Response headers missing');
+        }
+
+        // These aren't going to be supported exactly, since one CachePolicy object
+        // doesn't know about all the other cached objects.
+        let matches = false;
+        if (response.status !== undefined && response.status != 304) {
+            matches = false;
+        } else if (
+            response.headers.etag &&
+            !/^\s*W\//.test(response.headers.etag)
+        ) {
+            // "All of the stored responses with the same strong validator are selected.
+            // If none of the stored responses contain the same strong validator,
+            // then the cache MUST NOT use the new response to update any stored responses."
+            matches =
+                this._resHeaders.etag &&
+                this._resHeaders.etag.replace(/^\s*W\//, '') ===
+                    response.headers.etag;
+        } else if (this._resHeaders.etag && response.headers.etag) {
+            // "If the new response contains a weak validator and that validator corresponds
+            // to one of the cache's stored responses,
+            // then the most recent of those matching stored responses is selected for update."
+            matches =
+                this._resHeaders.etag.replace(/^\s*W\//, '') ===
+                response.headers.etag.replace(/^\s*W\//, '');
+        } else if (this._resHeaders['last-modified']) {
+            matches =
+                this._resHeaders['last-modified'] ===
+                response.headers['last-modified'];
+        } else {
+            // If the new response does not include any form of validator (such as in the case where
+            // a client generates an If-Modified-Since request from a source other than the Last-Modified
+            // response header field), and there is only one stored response, and that stored response also
+            // lacks a validator, then that stored response is selected for update.
+            if (
+                !this._resHeaders.etag &&
+                !this._resHeaders['last-modified'] &&
+                !response.headers.etag &&
+                !response.headers['last-modified']
+            ) {
+                matches = true;
+            }
+        }
+
+        if (!matches) {
+            return {
+                policy: new this.constructor(request, response),
+                // Client receiving 304 without body, even if it's invalid/mismatched has no option
+                // but to reuse a cached body. We don't have a good way to tell clients to do
+                // error recovery in such case.
+                modified: response.status != 304,
+                matches: false,
+            };
+        }
+
+        // use other header fields provided in the 304 (Not Modified) response to replace all instances
+        // of the corresponding header fields in the stored response.
+        const headers = {};
+        for (const k in this._resHeaders) {
+            headers[k] =
+                k in response.headers && !excludedFromRevalidationUpdate[k]
+                    ? response.headers[k]
+                    : this._resHeaders[k];
+        }
+
+        const newResponse = Object.assign({}, response, {
+            status: this._status,
+            method: this._method,
+            headers,
+        });
+        return {
+            policy: new this.constructor(request, newResponse, {
+                shared: this._isShared,
+                cacheHeuristic: this._cacheHeuristic,
+                immutableMinTimeToLive: this._immutableMinTtl,
+            }),
+            modified: false,
+            matches: true,
+        };
+    }
+};
+
+
+/***/ }),
+
+/***/ 9898:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+const EventEmitter = __nccwpck_require__(2361);
+const tls = __nccwpck_require__(4404);
+const http2 = __nccwpck_require__(5158);
+const QuickLRU = __nccwpck_require__(9273);
+
+const kCurrentStreamsCount = Symbol('currentStreamsCount');
+const kRequest = Symbol('request');
+const kOriginSet = Symbol('cachedOriginSet');
+const kGracefullyClosing = Symbol('gracefullyClosing');
+
+const nameKeys = [
+	// `http2.connect()` options
+	'maxDeflateDynamicTableSize',
+	'maxSessionMemory',
+	'maxHeaderListPairs',
+	'maxOutstandingPings',
+	'maxReservedRemoteStreams',
+	'maxSendHeaderBlockLength',
+	'paddingStrategy',
+
+	// `tls.connect()` options
+	'localAddress',
+	'path',
+	'rejectUnauthorized',
+	'minDHSize',
+
+	// `tls.createSecureContext()` options
+	'ca',
+	'cert',
+	'clientCertEngine',
+	'ciphers',
+	'key',
+	'pfx',
+	'servername',
+	'minVersion',
+	'maxVersion',
+	'secureProtocol',
+	'crl',
+	'honorCipherOrder',
+	'ecdhCurve',
+	'dhparam',
+	'secureOptions',
+	'sessionIdContext'
+];
+
+const getSortedIndex = (array, value, compare) => {
+	let low = 0;
+	let high = array.length;
+
+	while (low < high) {
+		const mid = (low + high) >>> 1;
+
+		/* istanbul ignore next */
+		if (compare(array[mid], value)) {
+			// This never gets called because we use descending sort. Better to have this anyway.
+			low = mid + 1;
+		} else {
+			high = mid;
+		}
+	}
+
+	return low;
+};
+
+const compareSessions = (a, b) => {
+	return a.remoteSettings.maxConcurrentStreams > b.remoteSettings.maxConcurrentStreams;
+};
+
+// See https://tools.ietf.org/html/rfc8336
+const closeCoveredSessions = (where, session) => {
+	// Clients SHOULD NOT emit new requests on any connection whose Origin
+	// Set is a proper subset of another connection's Origin Set, and they
+	// SHOULD close it once all outstanding requests are satisfied.
+	for (const coveredSession of where) {
+		if (
+			// The set is a proper subset when its length is less than the other set.
+			coveredSession[kOriginSet].length < session[kOriginSet].length &&
+
+			// And the other set includes all elements of the subset.
+			coveredSession[kOriginSet].every(origin => session[kOriginSet].includes(origin)) &&
+
+			// Makes sure that the session can handle all requests from the covered session.
+			coveredSession[kCurrentStreamsCount] + session[kCurrentStreamsCount] <= session.remoteSettings.maxConcurrentStreams
+		) {
+			// This allows pending requests to finish and prevents making new requests.
+			gracefullyClose(coveredSession);
+		}
+	}
+};
+
+// This is basically inverted `closeCoveredSessions(...)`.
+const closeSessionIfCovered = (where, coveredSession) => {
+	for (const session of where) {
+		if (
+			coveredSession[kOriginSet].length < session[kOriginSet].length &&
+			coveredSession[kOriginSet].every(origin => session[kOriginSet].includes(origin)) &&
+			coveredSession[kCurrentStreamsCount] + session[kCurrentStreamsCount] <= session.remoteSettings.maxConcurrentStreams
+		) {
+			gracefullyClose(coveredSession);
+		}
+	}
+};
+
+const getSessions = ({agent, isFree}) => {
+	const result = {};
+
+	// eslint-disable-next-line guard-for-in
+	for (const normalizedOptions in agent.sessions) {
+		const sessions = agent.sessions[normalizedOptions];
+
+		const filtered = sessions.filter(session => {
+			const result = session[Agent.kCurrentStreamsCount] < session.remoteSettings.maxConcurrentStreams;
+
+			return isFree ? result : !result;
+		});
+
+		if (filtered.length !== 0) {
+			result[normalizedOptions] = filtered;
+		}
+	}
+
+	return result;
+};
+
+const gracefullyClose = session => {
+	session[kGracefullyClosing] = true;
+
+	if (session[kCurrentStreamsCount] === 0) {
+		session.close();
+	}
+};
+
+class Agent extends EventEmitter {
+	constructor({timeout = 60000, maxSessions = Infinity, maxFreeSessions = 10, maxCachedTlsSessions = 100} = {}) {
+		super();
+
+		// A session is considered busy when its current streams count
+		// is equal to or greater than the `maxConcurrentStreams` value.
+
+		// A session is considered free when its current streams count
+		// is less than the `maxConcurrentStreams` value.
+
+		// SESSIONS[NORMALIZED_OPTIONS] = [];
+		this.sessions = {};
+
+		// The queue for creating new sessions. It looks like this:
+		// QUEUE[NORMALIZED_OPTIONS][NORMALIZED_ORIGIN] = ENTRY_FUNCTION
+		//
+		// The entry function has `listeners`, `completed` and `destroyed` properties.
+		// `listeners` is an array of objects containing `resolve` and `reject` functions.
+		// `completed` is a boolean. It's set to true after ENTRY_FUNCTION is executed.
+		// `destroyed` is a boolean. If it's set to true, the session will be destroyed if hasn't connected yet.
+		this.queue = {};
+
+		// Each session will use this timeout value.
+		this.timeout = timeout;
+
+		// Max sessions in total
+		this.maxSessions = maxSessions;
+
+		// Max free sessions in total
+		// TODO: decreasing `maxFreeSessions` should close some sessions
+		this.maxFreeSessions = maxFreeSessions;
+
+		this._freeSessionsCount = 0;
+		this._sessionsCount = 0;
+
+		// We don't support push streams by default.
+		this.settings = {
+			enablePush: false
+		};
+
+		// Reusing TLS sessions increases performance.
+		this.tlsSessionCache = new QuickLRU({maxSize: maxCachedTlsSessions});
+	}
+
+	static normalizeOrigin(url, servername) {
+		if (typeof url === 'string') {
+			url = new URL(url);
+		}
+
+		if (servername && url.hostname !== servername) {
+			url.hostname = servername;
+		}
+
+		return url.origin;
+	}
+
+	normalizeOptions(options) {
+		let normalized = '';
+
+		if (options) {
+			for (const key of nameKeys) {
+				if (options[key]) {
+					normalized += `:${options[key]}`;
+				}
+			}
+		}
+
+		return normalized;
+	}
+
+	_tryToCreateNewSession(normalizedOptions, normalizedOrigin) {
+		if (!(normalizedOptions in this.queue) || !(normalizedOrigin in this.queue[normalizedOptions])) {
+			return;
+		}
+
+		const item = this.queue[normalizedOptions][normalizedOrigin];
+
+		// The entry function can be run only once.
+		// BUG: The session may be never created when:
+		// - the first condition is false AND
+		// - this function is never called with the same arguments in the future.
+		if (this._sessionsCount < this.maxSessions && !item.completed) {
+			item.completed = true;
+
+			item();
+		}
+	}
+
+	getSession(origin, options, listeners) {
+		return new Promise((resolve, reject) => {
+			if (Array.isArray(listeners)) {
+				listeners = [...listeners];
+
+				// Resolve the current promise ASAP, we're just moving the listeners.
+				// They will be executed at a different time.
+				resolve();
+			} else {
+				listeners = [{resolve, reject}];
+			}
+
+			const normalizedOptions = this.normalizeOptions(options);
+			const normalizedOrigin = Agent.normalizeOrigin(origin, options && options.servername);
+
+			if (normalizedOrigin === undefined) {
+				for (const {reject} of listeners) {
+					reject(new TypeError('The `origin` argument needs to be a string or an URL object'));
+				}
+
+				return;
+			}
+
+			if (normalizedOptions in this.sessions) {
+				const sessions = this.sessions[normalizedOptions];
+
+				let maxConcurrentStreams = -1;
+				let currentStreamsCount = -1;
+				let optimalSession;
+
+				// We could just do this.sessions[normalizedOptions].find(...) but that isn't optimal.
+				// Additionally, we are looking for session which has biggest current pending streams count.
+				for (const session of sessions) {
+					const sessionMaxConcurrentStreams = session.remoteSettings.maxConcurrentStreams;
+
+					if (sessionMaxConcurrentStreams < maxConcurrentStreams) {
+						break;
+					}
+
+					if (session[kOriginSet].includes(normalizedOrigin)) {
+						const sessionCurrentStreamsCount = session[kCurrentStreamsCount];
+
+						if (
+							sessionCurrentStreamsCount >= sessionMaxConcurrentStreams ||
+							session[kGracefullyClosing] ||
+							// Unfortunately the `close` event isn't called immediately,
+							// so `session.destroyed` is `true`, but `session.closed` is `false`.
+							session.destroyed
+						) {
+							continue;
+						}
+
+						// We only need set this once.
+						if (!optimalSession) {
+							maxConcurrentStreams = sessionMaxConcurrentStreams;
+						}
+
+						// We're looking for the session which has biggest current pending stream count,
+						// in order to minimalize the amount of active sessions.
+						if (sessionCurrentStreamsCount > currentStreamsCount) {
+							optimalSession = session;
+							currentStreamsCount = sessionCurrentStreamsCount;
+						}
+					}
+				}
+
+				if (optimalSession) {
+					/* istanbul ignore next: safety check */
+					if (listeners.length !== 1) {
+						for (const {reject} of listeners) {
+							const error = new Error(
+								`Expected the length of listeners to be 1, got ${listeners.length}.\n` +
+								'Please report this to https://github.com/szmarczak/http2-wrapper/'
+							);
+
+							reject(error);
+						}
+
+						return;
+					}
+
+					listeners[0].resolve(optimalSession);
+					return;
+				}
+			}
+
+			if (normalizedOptions in this.queue) {
+				if (normalizedOrigin in this.queue[normalizedOptions]) {
+					// There's already an item in the queue, just attach ourselves to it.
+					this.queue[normalizedOptions][normalizedOrigin].listeners.push(...listeners);
+
+					// This shouldn't be executed here.
+					// See the comment inside _tryToCreateNewSession.
+					this._tryToCreateNewSession(normalizedOptions, normalizedOrigin);
+					return;
+				}
+			} else {
+				this.queue[normalizedOptions] = {};
+			}
+
+			// The entry must be removed from the queue IMMEDIATELY when:
+			// 1. the session connects successfully,
+			// 2. an error occurs.
+			const removeFromQueue = () => {
+				// Our entry can be replaced. We cannot remove the new one.
+				if (normalizedOptions in this.queue && this.queue[normalizedOptions][normalizedOrigin] === entry) {
+					delete this.queue[normalizedOptions][normalizedOrigin];
+
+					if (Object.keys(this.queue[normalizedOptions]).length === 0) {
+						delete this.queue[normalizedOptions];
+					}
+				}
+			};
+
+			// The main logic is here
+			const entry = () => {
+				const name = `${normalizedOrigin}:${normalizedOptions}`;
+				let receivedSettings = false;
+
+				try {
+					const session = http2.connect(origin, {
+						createConnection: this.createConnection,
+						settings: this.settings,
+						session: this.tlsSessionCache.get(name),
+						...options
+					});
+					session[kCurrentStreamsCount] = 0;
+					session[kGracefullyClosing] = false;
+
+					const isFree = () => session[kCurrentStreamsCount] < session.remoteSettings.maxConcurrentStreams;
+					let wasFree = true;
+
+					session.socket.once('session', tlsSession => {
+						this.tlsSessionCache.set(name, tlsSession);
+					});
+
+					session.once('error', error => {
+						// Listeners are empty when the session successfully connected.
+						for (const {reject} of listeners) {
+							reject(error);
+						}
+
+						// The connection got broken, purge the cache.
+						this.tlsSessionCache.delete(name);
+					});
+
+					session.setTimeout(this.timeout, () => {
+						// Terminates all streams owned by this session.
+						// TODO: Maybe the streams should have a "Session timed out" error?
+						session.destroy();
+					});
+
+					session.once('close', () => {
+						if (receivedSettings) {
+							// 1. If it wasn't free then no need to decrease because
+							//    it has been decreased already in session.request().
+							// 2. `stream.once('close')` won't increment the count
+							//    because the session is already closed.
+							if (wasFree) {
+								this._freeSessionsCount--;
+							}
+
+							this._sessionsCount--;
+
+							// This cannot be moved to the stream logic,
+							// because there may be a session that hadn't made a single request.
+							const where = this.sessions[normalizedOptions];
+							where.splice(where.indexOf(session), 1);
+
+							if (where.length === 0) {
+								delete this.sessions[normalizedOptions];
+							}
+						} else {
+							// Broken connection
+							const error = new Error('Session closed without receiving a SETTINGS frame');
+							error.code = 'HTTP2WRAPPER_NOSETTINGS';
+
+							for (const {reject} of listeners) {
+								reject(error);
+							}
+
+							removeFromQueue();
+						}
+
+						// There may be another session awaiting.
+						this._tryToCreateNewSession(normalizedOptions, normalizedOrigin);
+					});
+
+					// Iterates over the queue and processes listeners.
+					const processListeners = () => {
+						if (!(normalizedOptions in this.queue) || !isFree()) {
+							return;
+						}
+
+						for (const origin of session[kOriginSet]) {
+							if (origin in this.queue[normalizedOptions]) {
+								const {listeners} = this.queue[normalizedOptions][origin];
+
+								// Prevents session overloading.
+								while (listeners.length !== 0 && isFree()) {
+									// We assume `resolve(...)` calls `request(...)` *directly*,
+									// otherwise the session will get overloaded.
+									listeners.shift().resolve(session);
+								}
+
+								const where = this.queue[normalizedOptions];
+								if (where[origin].listeners.length === 0) {
+									delete where[origin];
+
+									if (Object.keys(where).length === 0) {
+										delete this.queue[normalizedOptions];
+										break;
+									}
+								}
+
+								// We're no longer free, no point in continuing.
+								if (!isFree()) {
+									break;
+								}
+							}
+						}
+					};
+
+					// The Origin Set cannot shrink. No need to check if it suddenly became covered by another one.
+					session.on('origin', () => {
+						session[kOriginSet] = session.originSet;
+
+						if (!isFree()) {
+							// The session is full.
+							return;
+						}
+
+						processListeners();
+
+						// Close covered sessions (if possible).
+						closeCoveredSessions(this.sessions[normalizedOptions], session);
+					});
+
+					session.once('remoteSettings', () => {
+						// Fix Node.js bug preventing the process from exiting
+						session.ref();
+						session.unref();
+
+						this._sessionsCount++;
+
+						// The Agent could have been destroyed already.
+						if (entry.destroyed) {
+							const error = new Error('Agent has been destroyed');
+
+							for (const listener of listeners) {
+								listener.reject(error);
+							}
+
+							session.destroy();
+							return;
+						}
+
+						session[kOriginSet] = session.originSet;
+
+						{
+							const where = this.sessions;
+
+							if (normalizedOptions in where) {
+								const sessions = where[normalizedOptions];
+								sessions.splice(getSortedIndex(sessions, session, compareSessions), 0, session);
+							} else {
+								where[normalizedOptions] = [session];
+							}
+						}
+
+						this._freeSessionsCount += 1;
+						receivedSettings = true;
+
+						this.emit('session', session);
+
+						processListeners();
+						removeFromQueue();
+
+						// TODO: Close last recently used (or least used?) session
+						if (session[kCurrentStreamsCount] === 0 && this._freeSessionsCount > this.maxFreeSessions) {
+							session.close();
+						}
+
+						// Check if we haven't managed to execute all listeners.
+						if (listeners.length !== 0) {
+							// Request for a new session with predefined listeners.
+							this.getSession(normalizedOrigin, options, listeners);
+							listeners.length = 0;
+						}
+
+						// `session.remoteSettings.maxConcurrentStreams` might get increased
+						session.on('remoteSettings', () => {
+							processListeners();
+
+							// In case the Origin Set changes
+							closeCoveredSessions(this.sessions[normalizedOptions], session);
+						});
+					});
+
+					// Shim `session.request()` in order to catch all streams
+					session[kRequest] = session.request;
+					session.request = (headers, streamOptions) => {
+						if (session[kGracefullyClosing]) {
+							throw new Error('The session is gracefully closing. No new streams are allowed.');
+						}
+
+						const stream = session[kRequest](headers, streamOptions);
+
+						// The process won't exit until the session is closed or all requests are gone.
+						session.ref();
+
+						++session[kCurrentStreamsCount];
+
+						if (session[kCurrentStreamsCount] === session.remoteSettings.maxConcurrentStreams) {
+							this._freeSessionsCount--;
+						}
+
+						stream.once('close', () => {
+							wasFree = isFree();
+
+							--session[kCurrentStreamsCount];
+
+							if (!session.destroyed && !session.closed) {
+								closeSessionIfCovered(this.sessions[normalizedOptions], session);
+
+								if (isFree() && !session.closed) {
+									if (!wasFree) {
+										this._freeSessionsCount++;
+
+										wasFree = true;
+									}
+
+									const isEmpty = session[kCurrentStreamsCount] === 0;
+
+									if (isEmpty) {
+										session.unref();
+									}
+
+									if (
+										isEmpty &&
+										(
+											this._freeSessionsCount > this.maxFreeSessions ||
+											session[kGracefullyClosing]
+										)
+									) {
+										session.close();
+									} else {
+										closeCoveredSessions(this.sessions[normalizedOptions], session);
+										processListeners();
+									}
+								}
+							}
+						});
+
+						return stream;
+					};
+				} catch (error) {
+					for (const listener of listeners) {
+						listener.reject(error);
+					}
+
+					removeFromQueue();
+				}
+			};
+
+			entry.listeners = listeners;
+			entry.completed = false;
+			entry.destroyed = false;
+
+			this.queue[normalizedOptions][normalizedOrigin] = entry;
+			this._tryToCreateNewSession(normalizedOptions, normalizedOrigin);
+		});
+	}
+
+	request(origin, options, headers, streamOptions) {
+		return new Promise((resolve, reject) => {
+			this.getSession(origin, options, [{
+				reject,
+				resolve: session => {
+					try {
+						resolve(session.request(headers, streamOptions));
+					} catch (error) {
+						reject(error);
+					}
+				}
+			}]);
+		});
+	}
+
+	createConnection(origin, options) {
+		return Agent.connect(origin, options);
+	}
+
+	static connect(origin, options) {
+		options.ALPNProtocols = ['h2'];
+
+		const port = origin.port || 443;
+		const host = origin.hostname || origin.host;
+
+		if (typeof options.servername === 'undefined') {
+			options.servername = host;
+		}
+
+		return tls.connect(port, host, options);
+	}
+
+	closeFreeSessions() {
+		for (const sessions of Object.values(this.sessions)) {
+			for (const session of sessions) {
+				if (session[kCurrentStreamsCount] === 0) {
+					session.close();
+				}
+			}
+		}
+	}
+
+	destroy(reason) {
+		for (const sessions of Object.values(this.sessions)) {
+			for (const session of sessions) {
+				session.destroy(reason);
+			}
+		}
+
+		for (const entriesOfAuthority of Object.values(this.queue)) {
+			for (const entry of Object.values(entriesOfAuthority)) {
+				entry.destroyed = true;
+			}
+		}
+
+		// New requests should NOT attach to destroyed sessions
+		this.queue = {};
+	}
+
+	get freeSessions() {
+		return getSessions({agent: this, isFree: true});
+	}
+
+	get busySessions() {
+		return getSessions({agent: this, isFree: false});
+	}
+}
+
+Agent.kCurrentStreamsCount = kCurrentStreamsCount;
+Agent.kGracefullyClosing = kGracefullyClosing;
+
+module.exports = {
+	Agent,
+	globalAgent: new Agent()
+};
+
+
+/***/ }),
+
+/***/ 7167:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+const http = __nccwpck_require__(3685);
+const https = __nccwpck_require__(5687);
+const resolveALPN = __nccwpck_require__(6624);
+const QuickLRU = __nccwpck_require__(9273);
+const Http2ClientRequest = __nccwpck_require__(9632);
+const calculateServerName = __nccwpck_require__(1982);
+const urlToOptions = __nccwpck_require__(2686);
+
+const cache = new QuickLRU({maxSize: 100});
+const queue = new Map();
+
+const installSocket = (agent, socket, options) => {
+	socket._httpMessage = {shouldKeepAlive: true};
+
+	const onFree = () => {
+		agent.emit('free', socket, options);
+	};
+
+	socket.on('free', onFree);
+
+	const onClose = () => {
+		agent.removeSocket(socket, options);
+	};
+
+	socket.on('close', onClose);
+
+	const onRemove = () => {
+		agent.removeSocket(socket, options);
+		socket.off('close', onClose);
+		socket.off('free', onFree);
+		socket.off('agentRemove', onRemove);
+	};
+
+	socket.on('agentRemove', onRemove);
+
+	agent.emit('free', socket, options);
+};
+
+const resolveProtocol = async options => {
+	const name = `${options.host}:${options.port}:${options.ALPNProtocols.sort()}`;
+
+	if (!cache.has(name)) {
+		if (queue.has(name)) {
+			const result = await queue.get(name);
+			return result.alpnProtocol;
+		}
+
+		const {path, agent} = options;
+		options.path = options.socketPath;
+
+		const resultPromise = resolveALPN(options);
+		queue.set(name, resultPromise);
+
+		try {
+			const {socket, alpnProtocol} = await resultPromise;
+			cache.set(name, alpnProtocol);
+
+			options.path = path;
+
+			if (alpnProtocol === 'h2') {
+				// https://github.com/nodejs/node/issues/33343
+				socket.destroy();
+			} else {
+				const {globalAgent} = https;
+				const defaultCreateConnection = https.Agent.prototype.createConnection;
+
+				if (agent) {
+					if (agent.createConnection === defaultCreateConnection) {
+						installSocket(agent, socket, options);
+					} else {
+						socket.destroy();
+					}
+				} else if (globalAgent.createConnection === defaultCreateConnection) {
+					installSocket(globalAgent, socket, options);
+				} else {
+					socket.destroy();
+				}
+			}
+
+			queue.delete(name);
+
+			return alpnProtocol;
+		} catch (error) {
+			queue.delete(name);
+
+			throw error;
+		}
+	}
+
+	return cache.get(name);
+};
+
+module.exports = async (input, options, callback) => {
+	if (typeof input === 'string' || input instanceof URL) {
+		input = urlToOptions(new URL(input));
+	}
+
+	if (typeof options === 'function') {
+		callback = options;
+		options = undefined;
+	}
+
+	options = {
+		ALPNProtocols: ['h2', 'http/1.1'],
+		...input,
+		...options,
+		resolveSocket: true
+	};
+
+	if (!Array.isArray(options.ALPNProtocols) || options.ALPNProtocols.length === 0) {
+		throw new Error('The `ALPNProtocols` option must be an Array with at least one entry');
+	}
+
+	options.protocol = options.protocol || 'https:';
+	const isHttps = options.protocol === 'https:';
+
+	options.host = options.hostname || options.host || 'localhost';
+	options.session = options.tlsSession;
+	options.servername = options.servername || calculateServerName(options);
+	options.port = options.port || (isHttps ? 443 : 80);
+	options._defaultAgent = isHttps ? https.globalAgent : http.globalAgent;
+
+	const agents = options.agent;
+
+	if (agents) {
+		if (agents.addRequest) {
+			throw new Error('The `options.agent` object can contain only `http`, `https` or `http2` properties');
+		}
+
+		options.agent = agents[isHttps ? 'https' : 'http'];
+	}
+
+	if (isHttps) {
+		const protocol = await resolveProtocol(options);
+
+		if (protocol === 'h2') {
+			if (agents) {
+				options.agent = agents.http2;
+			}
+
+			return new Http2ClientRequest(options, callback);
+		}
+	}
+
+	return http.request(options, callback);
+};
+
+module.exports.protocolCache = cache;
+
+
+/***/ }),
+
+/***/ 9632:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+const http2 = __nccwpck_require__(5158);
+const {Writable} = __nccwpck_require__(2781);
+const {Agent, globalAgent} = __nccwpck_require__(9898);
+const IncomingMessage = __nccwpck_require__(2575);
+const urlToOptions = __nccwpck_require__(2686);
+const proxyEvents = __nccwpck_require__(1818);
+const isRequestPseudoHeader = __nccwpck_require__(1199);
+const {
+	ERR_INVALID_ARG_TYPE,
+	ERR_INVALID_PROTOCOL,
+	ERR_HTTP_HEADERS_SENT,
+	ERR_INVALID_HTTP_TOKEN,
+	ERR_HTTP_INVALID_HEADER_VALUE,
+	ERR_INVALID_CHAR
+} = __nccwpck_require__(7087);
+
+const {
+	HTTP2_HEADER_STATUS,
+	HTTP2_HEADER_METHOD,
+	HTTP2_HEADER_PATH,
+	HTTP2_METHOD_CONNECT
+} = http2.constants;
+
+const kHeaders = Symbol('headers');
+const kOrigin = Symbol('origin');
+const kSession = Symbol('session');
+const kOptions = Symbol('options');
+const kFlushedHeaders = Symbol('flushedHeaders');
+const kJobs = Symbol('jobs');
+
+const isValidHttpToken = /^[\^`\-\w!#$%&*+.|~]+$/;
+const isInvalidHeaderValue = /[^\t\u0020-\u007E\u0080-\u00FF]/;
+
+class ClientRequest extends Writable {
+	constructor(input, options, callback) {
+		super({
+			autoDestroy: false
+		});
+
+		const hasInput = typeof input === 'string' || input instanceof URL;
+		if (hasInput) {
+			input = urlToOptions(input instanceof URL ? input : new URL(input));
+		}
+
+		if (typeof options === 'function' || options === undefined) {
+			// (options, callback)
+			callback = options;
+			options = hasInput ? input : {...input};
+		} else {
+			// (input, options, callback)
+			options = {...input, ...options};
+		}
+
+		if (options.h2session) {
+			this[kSession] = options.h2session;
+		} else if (options.agent === false) {
+			this.agent = new Agent({maxFreeSessions: 0});
+		} else if (typeof options.agent === 'undefined' || options.agent === null) {
+			if (typeof options.createConnection === 'function') {
+				// This is a workaround - we don't have to create the session on our own.
+				this.agent = new Agent({maxFreeSessions: 0});
+				this.agent.createConnection = options.createConnection;
+			} else {
+				this.agent = globalAgent;
+			}
+		} else if (typeof options.agent.request === 'function') {
+			this.agent = options.agent;
+		} else {
+			throw new ERR_INVALID_ARG_TYPE('options.agent', ['Agent-like Object', 'undefined', 'false'], options.agent);
+		}
+
+		if (options.protocol && options.protocol !== 'https:') {
+			throw new ERR_INVALID_PROTOCOL(options.protocol, 'https:');
+		}
+
+		const port = options.port || options.defaultPort || (this.agent && this.agent.defaultPort) || 443;
+		const host = options.hostname || options.host || 'localhost';
+
+		// Don't enforce the origin via options. It may be changed in an Agent.
+		delete options.hostname;
+		delete options.host;
+		delete options.port;
+
+		const {timeout} = options;
+		options.timeout = undefined;
+
+		this[kHeaders] = Object.create(null);
+		this[kJobs] = [];
+
+		this.socket = null;
+		this.connection = null;
+
+		this.method = options.method || 'GET';
+		this.path = options.path;
+
+		this.res = null;
+		this.aborted = false;
+		this.reusedSocket = false;
+
+		if (options.headers) {
+			for (const [header, value] of Object.entries(options.headers)) {
+				this.setHeader(header, value);
+			}
+		}
+
+		if (options.auth && !('authorization' in this[kHeaders])) {
+			this[kHeaders].authorization = 'Basic ' + Buffer.from(options.auth).toString('base64');
+		}
+
+		options.session = options.tlsSession;
+		options.path = options.socketPath;
+
+		this[kOptions] = options;
+
+		// Clients that generate HTTP/2 requests directly SHOULD use the :authority pseudo-header field instead of the Host header field.
+		if (port === 443) {
+			this[kOrigin] = `https://${host}`;
+
+			if (!(':authority' in this[kHeaders])) {
+				this[kHeaders][':authority'] = host;
+			}
+		} else {
+			this[kOrigin] = `https://${host}:${port}`;
+
+			if (!(':authority' in this[kHeaders])) {
+				this[kHeaders][':authority'] = `${host}:${port}`;
+			}
+		}
+
+		if (timeout) {
+			this.setTimeout(timeout);
+		}
+
+		if (callback) {
+			this.once('response', callback);
+		}
+
+		this[kFlushedHeaders] = false;
+	}
+
+	get method() {
+		return this[kHeaders][HTTP2_HEADER_METHOD];
+	}
+
+	set method(value) {
+		if (value) {
+			this[kHeaders][HTTP2_HEADER_METHOD] = value.toUpperCase();
+		}
+	}
+
+	get path() {
+		return this[kHeaders][HTTP2_HEADER_PATH];
+	}
+
+	set path(value) {
+		if (value) {
+			this[kHeaders][HTTP2_HEADER_PATH] = value;
+		}
+	}
+
+	get _mustNotHaveABody() {
+		return this.method === 'GET' || this.method === 'HEAD' || this.method === 'DELETE';
+	}
+
+	_write(chunk, encoding, callback) {
+		// https://github.com/nodejs/node/blob/654df09ae0c5e17d1b52a900a545f0664d8c7627/lib/internal/http2/util.js#L148-L156
+		if (this._mustNotHaveABody) {
+			callback(new Error('The GET, HEAD and DELETE methods must NOT have a body'));
+			/* istanbul ignore next: Node.js 12 throws directly */
+			return;
+		}
+
+		this.flushHeaders();
+
+		const callWrite = () => this._request.write(chunk, encoding, callback);
+		if (this._request) {
+			callWrite();
+		} else {
+			this[kJobs].push(callWrite);
+		}
+	}
+
+	_final(callback) {
+		if (this.destroyed) {
+			return;
+		}
+
+		this.flushHeaders();
+
+		const callEnd = () => {
+			// For GET, HEAD and DELETE
+			if (this._mustNotHaveABody) {
+				callback();
+				return;
+			}
+
+			this._request.end(callback);
+		};
+
+		if (this._request) {
+			callEnd();
+		} else {
+			this[kJobs].push(callEnd);
+		}
+	}
+
+	abort() {
+		if (this.res && this.res.complete) {
+			return;
+		}
+
+		if (!this.aborted) {
+			process.nextTick(() => this.emit('abort'));
+		}
+
+		this.aborted = true;
+
+		this.destroy();
+	}
+
+	_destroy(error, callback) {
+		if (this.res) {
+			this.res._dump();
+		}
+
+		if (this._request) {
+			this._request.destroy();
+		}
+
+		callback(error);
+	}
+
+	async flushHeaders() {
+		if (this[kFlushedHeaders] || this.destroyed) {
+			return;
+		}
+
+		this[kFlushedHeaders] = true;
+
+		const isConnectMethod = this.method === HTTP2_METHOD_CONNECT;
+
+		// The real magic is here
+		const onStream = stream => {
+			this._request = stream;
+
+			if (this.destroyed) {
+				stream.destroy();
+				return;
+			}
+
+			// Forwards `timeout`, `continue`, `close` and `error` events to this instance.
+			if (!isConnectMethod) {
+				proxyEvents(stream, this, ['timeout', 'continue', 'close', 'error']);
+			}
+
+			// Wait for the `finish` event. We don't want to emit the `response` event
+			// before `request.end()` is called.
+			const waitForEnd = fn => {
+				return (...args) => {
+					if (!this.writable && !this.destroyed) {
+						fn(...args);
+					} else {
+						this.once('finish', () => {
+							fn(...args);
+						});
+					}
+				};
+			};
+
+			// This event tells we are ready to listen for the data.
+			stream.once('response', waitForEnd((headers, flags, rawHeaders) => {
+				// If we were to emit raw request stream, it would be as fast as the native approach.
+				// Note that wrapping the raw stream in a Proxy instance won't improve the performance (already tested it).
+				const response = new IncomingMessage(this.socket, stream.readableHighWaterMark);
+				this.res = response;
+
+				response.req = this;
+				response.statusCode = headers[HTTP2_HEADER_STATUS];
+				response.headers = headers;
+				response.rawHeaders = rawHeaders;
+
+				response.once('end', () => {
+					if (this.aborted) {
+						response.aborted = true;
+						response.emit('aborted');
+					} else {
+						response.complete = true;
+
+						// Has no effect, just be consistent with the Node.js behavior
+						response.socket = null;
+						response.connection = null;
+					}
+				});
+
+				if (isConnectMethod) {
+					response.upgrade = true;
+
+					// The HTTP1 API says the socket is detached here,
+					// but we can't do that so we pass the original HTTP2 request.
+					if (this.emit('connect', response, stream, Buffer.alloc(0))) {
+						this.emit('close');
+					} else {
+						// No listeners attached, destroy the original request.
+						stream.destroy();
+					}
+				} else {
+					// Forwards data
+					stream.on('data', chunk => {
+						if (!response._dumped && !response.push(chunk)) {
+							stream.pause();
+						}
+					});
+
+					stream.once('end', () => {
+						response.push(null);
+					});
+
+					if (!this.emit('response', response)) {
+						// No listeners attached, dump the response.
+						response._dump();
+					}
+				}
+			}));
+
+			// Emits `information` event
+			stream.once('headers', waitForEnd(
+				headers => this.emit('information', {statusCode: headers[HTTP2_HEADER_STATUS]})
+			));
+
+			stream.once('trailers', waitForEnd((trailers, flags, rawTrailers) => {
+				const {res} = this;
+
+				// Assigns trailers to the response object.
+				res.trailers = trailers;
+				res.rawTrailers = rawTrailers;
+			}));
+
+			const {socket} = stream.session;
+			this.socket = socket;
+			this.connection = socket;
+
+			for (const job of this[kJobs]) {
+				job();
+			}
+
+			this.emit('socket', this.socket);
+		};
+
+		// Makes a HTTP2 request
+		if (this[kSession]) {
+			try {
+				onStream(this[kSession].request(this[kHeaders]));
+			} catch (error) {
+				this.emit('error', error);
+			}
+		} else {
+			this.reusedSocket = true;
+
+			try {
+				onStream(await this.agent.request(this[kOrigin], this[kOptions], this[kHeaders]));
+			} catch (error) {
+				this.emit('error', error);
+			}
+		}
+	}
+
+	getHeader(name) {
+		if (typeof name !== 'string') {
+			throw new ERR_INVALID_ARG_TYPE('name', 'string', name);
+		}
+
+		return this[kHeaders][name.toLowerCase()];
+	}
+
+	get headersSent() {
+		return this[kFlushedHeaders];
+	}
+
+	removeHeader(name) {
+		if (typeof name !== 'string') {
+			throw new ERR_INVALID_ARG_TYPE('name', 'string', name);
+		}
+
+		if (this.headersSent) {
+			throw new ERR_HTTP_HEADERS_SENT('remove');
+		}
+
+		delete this[kHeaders][name.toLowerCase()];
+	}
+
+	setHeader(name, value) {
+		if (this.headersSent) {
+			throw new ERR_HTTP_HEADERS_SENT('set');
+		}
+
+		if (typeof name !== 'string' || (!isValidHttpToken.test(name) && !isRequestPseudoHeader(name))) {
+			throw new ERR_INVALID_HTTP_TOKEN('Header name', name);
+		}
+
+		if (typeof value === 'undefined') {
+			throw new ERR_HTTP_INVALID_HEADER_VALUE(value, name);
+		}
+
+		if (isInvalidHeaderValue.test(value)) {
+			throw new ERR_INVALID_CHAR('header content', name);
+		}
+
+		this[kHeaders][name.toLowerCase()] = value;
+	}
+
+	setNoDelay() {
+		// HTTP2 sockets cannot be malformed, do nothing.
+	}
+
+	setSocketKeepAlive() {
+		// HTTP2 sockets cannot be malformed, do nothing.
+	}
+
+	setTimeout(ms, callback) {
+		const applyTimeout = () => this._request.setTimeout(ms, callback);
+
+		if (this._request) {
+			applyTimeout();
+		} else {
+			this[kJobs].push(applyTimeout);
+		}
+
+		return this;
+	}
+
+	get maxHeadersCount() {
+		if (!this.destroyed && this._request) {
+			return this._request.session.localSettings.maxHeaderListSize;
+		}
+
+		return undefined;
+	}
+
+	set maxHeadersCount(_value) {
+		// Updating HTTP2 settings would affect all requests, do nothing.
+	}
+}
+
+module.exports = ClientRequest;
+
+
+/***/ }),
+
+/***/ 2575:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+const {Readable} = __nccwpck_require__(2781);
+
+class IncomingMessage extends Readable {
+	constructor(socket, highWaterMark) {
+		super({
+			highWaterMark,
+			autoDestroy: false
+		});
+
+		this.statusCode = null;
+		this.statusMessage = '';
+		this.httpVersion = '2.0';
+		this.httpVersionMajor = 2;
+		this.httpVersionMinor = 0;
+		this.headers = {};
+		this.trailers = {};
+		this.req = null;
+
+		this.aborted = false;
+		this.complete = false;
+		this.upgrade = null;
+
+		this.rawHeaders = [];
+		this.rawTrailers = [];
+
+		this.socket = socket;
+		this.connection = socket;
+
+		this._dumped = false;
+	}
+
+	_destroy(error) {
+		this.req._request.destroy(error);
+	}
+
+	setTimeout(ms, callback) {
+		this.req.setTimeout(ms, callback);
+		return this;
+	}
+
+	_dump() {
+		if (!this._dumped) {
+			this._dumped = true;
+
+			this.removeAllListeners('data');
+			this.resume();
+		}
+	}
+
+	_read() {
+		if (this.req) {
+			this.req._request.resume();
+		}
+	}
+}
+
+module.exports = IncomingMessage;
+
+
+/***/ }),
+
+/***/ 4645:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+const http2 = __nccwpck_require__(5158);
+const agent = __nccwpck_require__(9898);
+const ClientRequest = __nccwpck_require__(9632);
+const IncomingMessage = __nccwpck_require__(2575);
+const auto = __nccwpck_require__(7167);
+
+const request = (url, options, callback) => {
+	return new ClientRequest(url, options, callback);
+};
+
+const get = (url, options, callback) => {
+	// eslint-disable-next-line unicorn/prevent-abbreviations
+	const req = new ClientRequest(url, options, callback);
+	req.end();
+
+	return req;
+};
+
+module.exports = {
+	...http2,
+	ClientRequest,
+	IncomingMessage,
+	...agent,
+	request,
+	get,
+	auto
+};
+
+
+/***/ }),
+
+/***/ 1982:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+const net = __nccwpck_require__(1808);
+/* istanbul ignore file: https://github.com/nodejs/node/blob/v13.0.1/lib/_http_agent.js */
+
+module.exports = options => {
+	let servername = options.host;
+	const hostHeader = options.headers && options.headers.host;
+
+	if (hostHeader) {
+		if (hostHeader.startsWith('[')) {
+			const index = hostHeader.indexOf(']');
+			if (index === -1) {
+				servername = hostHeader;
+			} else {
+				servername = hostHeader.slice(1, -1);
+			}
+		} else {
+			servername = hostHeader.split(':', 1)[0];
+		}
+	}
+
+	if (net.isIP(servername)) {
+		return '';
+	}
+
+	return servername;
+};
+
+
+/***/ }),
+
+/***/ 7087:
+/***/ ((module) => {
+
+
+/* istanbul ignore file: https://github.com/nodejs/node/blob/master/lib/internal/errors.js */
+
+const makeError = (Base, key, getMessage) => {
+	module.exports[key] = class NodeError extends Base {
+		constructor(...args) {
+			super(typeof getMessage === 'string' ? getMessage : getMessage(args));
+			this.name = `${super.name} [${key}]`;
+			this.code = key;
+		}
+	};
+};
+
+makeError(TypeError, 'ERR_INVALID_ARG_TYPE', args => {
+	const type = args[0].includes('.') ? 'property' : 'argument';
+
+	let valid = args[1];
+	const isManyTypes = Array.isArray(valid);
+
+	if (isManyTypes) {
+		valid = `${valid.slice(0, -1).join(', ')} or ${valid.slice(-1)}`;
+	}
+
+	return `The "${args[0]}" ${type} must be ${isManyTypes ? 'one of' : 'of'} type ${valid}. Received ${typeof args[2]}`;
+});
+
+makeError(TypeError, 'ERR_INVALID_PROTOCOL', args => {
+	return `Protocol "${args[0]}" not supported. Expected "${args[1]}"`;
+});
+
+makeError(Error, 'ERR_HTTP_HEADERS_SENT', args => {
+	return `Cannot ${args[0]} headers after they are sent to the client`;
+});
+
+makeError(TypeError, 'ERR_INVALID_HTTP_TOKEN', args => {
+	return `${args[0]} must be a valid HTTP token [${args[1]}]`;
+});
+
+makeError(TypeError, 'ERR_HTTP_INVALID_HEADER_VALUE', args => {
+	return `Invalid value "${args[0]} for header "${args[1]}"`;
+});
+
+makeError(TypeError, 'ERR_INVALID_CHAR', args => {
+	return `Invalid character in ${args[0]} [${args[1]}]`;
+});
+
+
+/***/ }),
+
+/***/ 1199:
+/***/ ((module) => {
+
+
+
+module.exports = header => {
+	switch (header) {
+		case ':method':
+		case ':scheme':
+		case ':authority':
+		case ':path':
+			return true;
+		default:
+			return false;
+	}
+};
+
+
+/***/ }),
+
+/***/ 1818:
+/***/ ((module) => {
+
+
+
+module.exports = (from, to, events) => {
+	for (const event of events) {
+		from.on(event, (...args) => to.emit(event, ...args));
+	}
+};
+
+
+/***/ }),
+
+/***/ 2686:
+/***/ ((module) => {
+
+
+/* istanbul ignore file: https://github.com/nodejs/node/blob/a91293d4d9ab403046ab5eb022332e4e3d249bd3/lib/internal/url.js#L1257 */
+
+module.exports = url => {
+	const options = {
+		protocol: url.protocol,
+		hostname: typeof url.hostname === 'string' && url.hostname.startsWith('[') ? url.hostname.slice(1, -1) : url.hostname,
+		host: url.host,
+		hash: url.hash,
+		search: url.search,
+		pathname: url.pathname,
+		href: url.href,
+		path: `${url.pathname || ''}${url.search || ''}`
+	};
+
+	if (typeof url.port === 'string' && url.port.length !== 0) {
+		options.port = Number(url.port);
+	}
+
+	if (url.username || url.password) {
+		options.auth = `${url.username || ''}:${url.password || ''}`;
+	}
+
+	return options;
+};
+
+
+/***/ }),
+
 /***/ 3287:
 /***/ ((__unused_webpack_module, exports) => {
 
@@ -7029,6 +20087,71 @@ exports.isPlainObject = isPlainObject;
 
 /***/ }),
 
+/***/ 2820:
+/***/ ((__unused_webpack_module, exports) => {
+
+//TODO: handle reviver/dehydrate function like normal
+//and handle indentation, like normal.
+//if anyone needs this... please send pull request.
+
+exports.stringify = function stringify (o) {
+  if('undefined' == typeof o) return o
+
+  if(o && Buffer.isBuffer(o))
+    return JSON.stringify(':base64:' + o.toString('base64'))
+
+  if(o && o.toJSON)
+    o =  o.toJSON()
+
+  if(o && 'object' === typeof o) {
+    var s = ''
+    var array = Array.isArray(o)
+    s = array ? '[' : '{'
+    var first = true
+
+    for(var k in o) {
+      var ignore = 'function' == typeof o[k] || (!array && 'undefined' === typeof o[k])
+      if(Object.hasOwnProperty.call(o, k) && !ignore) {
+        if(!first)
+          s += ','
+        first = false
+        if (array) {
+          if(o[k] == undefined)
+            s += 'null'
+          else
+            s += stringify(o[k])
+        } else if (o[k] !== void(0)) {
+          s += stringify(k) + ':' + stringify(o[k])
+        }
+      }
+    }
+
+    s += array ? ']' : '}'
+
+    return s
+  } else if ('string' === typeof o) {
+    return JSON.stringify(/^:/.test(o) ? ':' + o : o)
+  } else if ('undefined' === typeof o) {
+    return 'null';
+  } else
+    return JSON.stringify(o)
+}
+
+exports.parse = function (s) {
+  return JSON.parse(s, function (key, value) {
+    if('string' === typeof value) {
+      if(/^:base64:/.test(value))
+        return Buffer.from(value.substring(8), 'base64')
+      else
+        return /^:/.test(value) ? value.substring(1) : value 
+    }
+    return value
+  })
+}
+
+
+/***/ }),
+
 /***/ 7073:
 /***/ ((module, exports) => {
 
@@ -7063,6 +20186,767 @@ function serializer(replacer, cycleReplacer) {
 
 /***/ }),
 
+/***/ 1531:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+
+const EventEmitter = __nccwpck_require__(2361);
+const JSONB = __nccwpck_require__(2820);
+
+const loadStore = options => {
+	const adapters = {
+		redis: '@keyv/redis',
+		rediss: '@keyv/redis',
+		mongodb: '@keyv/mongo',
+		mongo: '@keyv/mongo',
+		sqlite: '@keyv/sqlite',
+		postgresql: '@keyv/postgres',
+		postgres: '@keyv/postgres',
+		mysql: '@keyv/mysql',
+		etcd: '@keyv/etcd',
+		offline: '@keyv/offline',
+		tiered: '@keyv/tiered',
+	};
+	if (options.adapter || options.uri) {
+		const adapter = options.adapter || /^[^:+]*/.exec(options.uri)[0];
+		return new (require(adapters[adapter]))(options);
+	}
+
+	return new Map();
+};
+
+const iterableAdapters = [
+	'sqlite',
+	'postgres',
+	'mysql',
+	'mongo',
+	'redis',
+	'tiered',
+];
+
+class Keyv extends EventEmitter {
+	constructor(uri, {emitErrors = true, ...options} = {}) {
+		super();
+		this.opts = {
+			namespace: 'keyv',
+			serialize: JSONB.stringify,
+			deserialize: JSONB.parse,
+			...((typeof uri === 'string') ? {uri} : uri),
+			...options,
+		};
+
+		if (!this.opts.store) {
+			const adapterOptions = {...this.opts};
+			this.opts.store = loadStore(adapterOptions);
+		}
+
+		if (this.opts.compression) {
+			const compression = this.opts.compression;
+			this.opts.serialize = compression.serialize.bind(compression);
+			this.opts.deserialize = compression.deserialize.bind(compression);
+		}
+
+		if (typeof this.opts.store.on === 'function' && emitErrors) {
+			this.opts.store.on('error', error => this.emit('error', error));
+		}
+
+		this.opts.store.namespace = this.opts.namespace;
+
+		const generateIterator = iterator => async function * () {
+			for await (const [key, raw] of typeof iterator === 'function'
+				? iterator(this.opts.store.namespace)
+				: iterator) {
+				const data = this.opts.deserialize(raw);
+				if (this.opts.store.namespace && !key.includes(this.opts.store.namespace)) {
+					continue;
+				}
+
+				if (typeof data.expires === 'number' && Date.now() > data.expires) {
+					this.delete(key);
+					continue;
+				}
+
+				yield [this._getKeyUnprefix(key), data.value];
+			}
+		};
+
+		// Attach iterators
+		if (typeof this.opts.store[Symbol.iterator] === 'function' && this.opts.store instanceof Map) {
+			this.iterator = generateIterator(this.opts.store);
+		} else if (typeof this.opts.store.iterator === 'function' && this.opts.store.opts
+			&& this._checkIterableAdaptar()) {
+			this.iterator = generateIterator(this.opts.store.iterator.bind(this.opts.store));
+		}
+	}
+
+	_checkIterableAdaptar() {
+		return iterableAdapters.includes(this.opts.store.opts.dialect)
+			|| iterableAdapters.findIndex(element => this.opts.store.opts.url.includes(element)) >= 0;
+	}
+
+	_getKeyPrefix(key) {
+		return `${this.opts.namespace}:${key}`;
+	}
+
+	_getKeyPrefixArray(keys) {
+		return keys.map(key => `${this.opts.namespace}:${key}`);
+	}
+
+	_getKeyUnprefix(key) {
+		return key
+			.split(':')
+			.splice(1)
+			.join(':');
+	}
+
+	get(key, options) {
+		const {store} = this.opts;
+		const isArray = Array.isArray(key);
+		const keyPrefixed = isArray ? this._getKeyPrefixArray(key) : this._getKeyPrefix(key);
+		if (isArray && store.getMany === undefined) {
+			const promises = [];
+			for (const key of keyPrefixed) {
+				promises.push(Promise.resolve()
+					.then(() => store.get(key))
+					.then(data => (typeof data === 'string') ? this.opts.deserialize(data) : (this.opts.compression ? this.opts.deserialize(data) : data))
+					.then(data => {
+						if (data === undefined || data === null) {
+							return undefined;
+						}
+
+						if (typeof data.expires === 'number' && Date.now() > data.expires) {
+							return this.delete(key).then(() => undefined);
+						}
+
+						return (options && options.raw) ? data : data.value;
+					}),
+				);
+			}
+
+			return Promise.allSettled(promises)
+				.then(values => {
+					const data = [];
+					for (const value of values) {
+						data.push(value.value);
+					}
+
+					return data;
+				});
+		}
+
+		return Promise.resolve()
+			.then(() => isArray ? store.getMany(keyPrefixed) : store.get(keyPrefixed))
+			.then(data => (typeof data === 'string') ? this.opts.deserialize(data) : (this.opts.compression ? this.opts.deserialize(data) : data))
+			.then(data => {
+				if (data === undefined || data === null) {
+					return undefined;
+				}
+
+				if (isArray) {
+					const result = [];
+
+					for (let row of data) {
+						if ((typeof row === 'string')) {
+							row = this.opts.deserialize(row);
+						}
+
+						if (row === undefined || row === null) {
+							result.push(undefined);
+							continue;
+						}
+
+						if (typeof row.expires === 'number' && Date.now() > row.expires) {
+							this.delete(key).then(() => undefined);
+							result.push(undefined);
+						} else {
+							result.push((options && options.raw) ? row : row.value);
+						}
+					}
+
+					return result;
+				}
+
+				if (typeof data.expires === 'number' && Date.now() > data.expires) {
+					return this.delete(key).then(() => undefined);
+				}
+
+				return (options && options.raw) ? data : data.value;
+			});
+	}
+
+	set(key, value, ttl) {
+		const keyPrefixed = this._getKeyPrefix(key);
+		if (typeof ttl === 'undefined') {
+			ttl = this.opts.ttl;
+		}
+
+		if (ttl === 0) {
+			ttl = undefined;
+		}
+
+		const {store} = this.opts;
+
+		return Promise.resolve()
+			.then(() => {
+				const expires = (typeof ttl === 'number') ? (Date.now() + ttl) : null;
+				if (typeof value === 'symbol') {
+					this.emit('error', 'symbol cannot be serialized');
+				}
+
+				value = {value, expires};
+				return this.opts.serialize(value);
+			})
+			.then(value => store.set(keyPrefixed, value, ttl))
+			.then(() => true);
+	}
+
+	delete(key) {
+		const {store} = this.opts;
+		if (Array.isArray(key)) {
+			const keyPrefixed = this._getKeyPrefixArray(key);
+			if (store.deleteMany === undefined) {
+				const promises = [];
+				for (const key of keyPrefixed) {
+					promises.push(store.delete(key));
+				}
+
+				return Promise.allSettled(promises)
+					.then(values => values.every(x => x.value === true));
+			}
+
+			return Promise.resolve()
+				.then(() => store.deleteMany(keyPrefixed));
+		}
+
+		const keyPrefixed = this._getKeyPrefix(key);
+		return Promise.resolve()
+			.then(() => store.delete(keyPrefixed));
+	}
+
+	clear() {
+		const {store} = this.opts;
+		return Promise.resolve()
+			.then(() => store.clear());
+	}
+
+	has(key) {
+		const keyPrefixed = this._getKeyPrefix(key);
+		const {store} = this.opts;
+		return Promise.resolve()
+			.then(async () => {
+				if (typeof store.has === 'function') {
+					return store.has(keyPrefixed);
+				}
+
+				const value = await store.get(keyPrefixed);
+				return value !== undefined;
+			});
+	}
+
+	disconnect() {
+		const {store} = this.opts;
+		if (typeof store.disconnect === 'function') {
+			return store.disconnect();
+		}
+	}
+}
+
+module.exports = Keyv;
+
+
+/***/ }),
+
+/***/ 4186:
+/***/ (function(module) {
+
+(function (name, definition, context) {
+
+  //try CommonJS, then AMD (require.js), then use global.
+
+  if ( true && module.exports) module.exports = definition();
+  else if (typeof context['define'] == 'function' && context['define']['amd']) define(definition);
+  else context[name] = definition();
+
+})('li', function () {
+  // compile regular expressions ahead of time for efficiency
+  var relsRegExp = /^;\s*([^"=]+)=(?:"([^"]+)"|([^";,]+)(?:[;,]|$))/;
+  var sourceRegExp = /^<([^>]*)>/;
+  var delimiterRegExp = /^\s*,\s*/;
+
+  return {
+    parse: function (linksHeader, options) {
+      var match;
+      var source;
+      var rels;
+      var extended = options && options.extended || false;
+      var links = [];
+
+      while (linksHeader) {
+        linksHeader = linksHeader.trim();
+
+        // Parse `<link>`
+        source = sourceRegExp.exec(linksHeader);
+        if (!source) break;
+
+        var current = {
+          link: source[1]
+        };
+
+        // Move cursor
+        linksHeader = linksHeader.slice(source[0].length);
+
+        // Parse `; attr=relation` and `; attr="relation"`
+
+        var nextDelimiter = linksHeader.match(delimiterRegExp);
+        while(linksHeader && (!nextDelimiter || nextDelimiter.index > 0)) {
+          match = relsRegExp.exec(linksHeader);
+          if (!match) break;
+
+          // Move cursor
+          linksHeader = linksHeader.slice(match[0].length);
+          nextDelimiter = linksHeader.match(delimiterRegExp);
+
+
+          if (match[1] === 'rel' || match[1] === 'rev') {
+            // Add either quoted rel or unquoted rel
+            rels = (match[2] || match[3]).split(/\s+/);
+            current[match[1]] = rels;
+          } else {
+            current[match[1]] = match[2] || match[3];
+          }
+        }
+
+        links.push(current);
+        // Move cursor
+        linksHeader = linksHeader.replace(delimiterRegExp, '');
+      }
+
+      if (!extended) {
+        return links.reduce(function(result, currentLink) {
+          if (currentLink.rel) {
+            currentLink.rel.forEach(function(rel) {
+              result[rel] = currentLink.link;
+            });
+          }
+          return result;
+        }, {});
+      }
+
+      return links;
+    },
+    stringify: function (params) {
+      var grouped = Object.keys(params).reduce(function(grouped, key) {
+        grouped[params[key]] = grouped[params[key]] || [];
+        grouped[params[key]].push(key);
+        return grouped;
+      }, {});
+
+      var entries = Object.keys(grouped).reduce(function(result, link) {
+        return result.concat('<' + link + '>; rel="' + grouped[link].join(' ') + '"');
+      }, []);
+
+      return entries.join(', ');
+    }
+  };
+
+}, this);
+
+
+/***/ }),
+
+/***/ 9662:
+/***/ ((module) => {
+
+
+module.exports = object => {
+	const result = {};
+
+	for (const [key, value] of Object.entries(object)) {
+		result[key.toLowerCase()] = value;
+	}
+
+	return result;
+};
+
+
+/***/ }),
+
+/***/ 7426:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+/*!
+ * mime-db
+ * Copyright(c) 2014 Jonathan Ong
+ * Copyright(c) 2015-2022 Douglas Christopher Wilson
+ * MIT Licensed
+ */
+
+/**
+ * Module exports.
+ */
+
+module.exports = __nccwpck_require__(3765)
+
+
+/***/ }),
+
+/***/ 3583:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+/*!
+ * mime-types
+ * Copyright(c) 2014 Jonathan Ong
+ * Copyright(c) 2015 Douglas Christopher Wilson
+ * MIT Licensed
+ */
+
+
+
+/**
+ * Module dependencies.
+ * @private
+ */
+
+var db = __nccwpck_require__(7426)
+var extname = (__nccwpck_require__(1017).extname)
+
+/**
+ * Module variables.
+ * @private
+ */
+
+var EXTRACT_TYPE_REGEXP = /^\s*([^;\s]*)(?:;|\s|$)/
+var TEXT_TYPE_REGEXP = /^text\//i
+
+/**
+ * Module exports.
+ * @public
+ */
+
+exports.charset = charset
+exports.charsets = { lookup: charset }
+exports.contentType = contentType
+exports.extension = extension
+exports.extensions = Object.create(null)
+exports.lookup = lookup
+exports.types = Object.create(null)
+
+// Populate the extensions/types maps
+populateMaps(exports.extensions, exports.types)
+
+/**
+ * Get the default charset for a MIME type.
+ *
+ * @param {string} type
+ * @return {boolean|string}
+ */
+
+function charset (type) {
+  if (!type || typeof type !== 'string') {
+    return false
+  }
+
+  // TODO: use media-typer
+  var match = EXTRACT_TYPE_REGEXP.exec(type)
+  var mime = match && db[match[1].toLowerCase()]
+
+  if (mime && mime.charset) {
+    return mime.charset
+  }
+
+  // default text/* to utf-8
+  if (match && TEXT_TYPE_REGEXP.test(match[1])) {
+    return 'UTF-8'
+  }
+
+  return false
+}
+
+/**
+ * Create a full Content-Type header given a MIME type or extension.
+ *
+ * @param {string} str
+ * @return {boolean|string}
+ */
+
+function contentType (str) {
+  // TODO: should this even be in this module?
+  if (!str || typeof str !== 'string') {
+    return false
+  }
+
+  var mime = str.indexOf('/') === -1
+    ? exports.lookup(str)
+    : str
+
+  if (!mime) {
+    return false
+  }
+
+  // TODO: use content-type or other module
+  if (mime.indexOf('charset') === -1) {
+    var charset = exports.charset(mime)
+    if (charset) mime += '; charset=' + charset.toLowerCase()
+  }
+
+  return mime
+}
+
+/**
+ * Get the default extension for a MIME type.
+ *
+ * @param {string} type
+ * @return {boolean|string}
+ */
+
+function extension (type) {
+  if (!type || typeof type !== 'string') {
+    return false
+  }
+
+  // TODO: use media-typer
+  var match = EXTRACT_TYPE_REGEXP.exec(type)
+
+  // get extensions
+  var exts = match && exports.extensions[match[1].toLowerCase()]
+
+  if (!exts || !exts.length) {
+    return false
+  }
+
+  return exts[0]
+}
+
+/**
+ * Lookup the MIME type for a file path/extension.
+ *
+ * @param {string} path
+ * @return {boolean|string}
+ */
+
+function lookup (path) {
+  if (!path || typeof path !== 'string') {
+    return false
+  }
+
+  // get the extension ("ext" or ".ext" or full path)
+  var extension = extname('x.' + path)
+    .toLowerCase()
+    .substr(1)
+
+  if (!extension) {
+    return false
+  }
+
+  return exports.types[extension] || false
+}
+
+/**
+ * Populate the extensions and types maps.
+ * @private
+ */
+
+function populateMaps (extensions, types) {
+  // source preference (least -> most)
+  var preference = ['nginx', 'apache', undefined, 'iana']
+
+  Object.keys(db).forEach(function forEachMimeType (type) {
+    var mime = db[type]
+    var exts = mime.extensions
+
+    if (!exts || !exts.length) {
+      return
+    }
+
+    // mime -> extensions
+    extensions[type] = exts
+
+    // extension -> mime
+    for (var i = 0; i < exts.length; i++) {
+      var extension = exts[i]
+
+      if (types[extension]) {
+        var from = preference.indexOf(db[types[extension]].source)
+        var to = preference.indexOf(mime.source)
+
+        if (types[extension] !== 'application/octet-stream' &&
+          (from > to || (from === to && types[extension].substr(0, 12) === 'application/'))) {
+          // skip the remapping
+          continue
+        }
+      }
+
+      // set the extension -> mime
+      types[extension] = type
+    }
+  })
+}
+
+
+/***/ }),
+
+/***/ 6038:
+/***/ ((module) => {
+
+
+
+/**
+ * @param typeMap [Object] Map of MIME type -> Array[extensions]
+ * @param ...
+ */
+function Mime() {
+  this._types = Object.create(null);
+  this._extensions = Object.create(null);
+
+  for (let i = 0; i < arguments.length; i++) {
+    this.define(arguments[i]);
+  }
+
+  this.define = this.define.bind(this);
+  this.getType = this.getType.bind(this);
+  this.getExtension = this.getExtension.bind(this);
+}
+
+/**
+ * Define mimetype -> extension mappings.  Each key is a mime-type that maps
+ * to an array of extensions associated with the type.  The first extension is
+ * used as the default extension for the type.
+ *
+ * e.g. mime.define({'audio/ogg', ['oga', 'ogg', 'spx']});
+ *
+ * If a type declares an extension that has already been defined, an error will
+ * be thrown.  To suppress this error and force the extension to be associated
+ * with the new type, pass `force`=true.  Alternatively, you may prefix the
+ * extension with "*" to map the type to extension, without mapping the
+ * extension to the type.
+ *
+ * e.g. mime.define({'audio/wav', ['wav']}, {'audio/x-wav', ['*wav']});
+ *
+ *
+ * @param map (Object) type definitions
+ * @param force (Boolean) if true, force overriding of existing definitions
+ */
+Mime.prototype.define = function(typeMap, force) {
+  for (let type in typeMap) {
+    let extensions = typeMap[type].map(function(t) {
+      return t.toLowerCase();
+    });
+    type = type.toLowerCase();
+
+    for (let i = 0; i < extensions.length; i++) {
+      const ext = extensions[i];
+
+      // '*' prefix = not the preferred type for this extension.  So fixup the
+      // extension, and skip it.
+      if (ext[0] === '*') {
+        continue;
+      }
+
+      if (!force && (ext in this._types)) {
+        throw new Error(
+          'Attempt to change mapping for "' + ext +
+          '" extension from "' + this._types[ext] + '" to "' + type +
+          '". Pass `force=true` to allow this, otherwise remove "' + ext +
+          '" from the list of extensions for "' + type + '".'
+        );
+      }
+
+      this._types[ext] = type;
+    }
+
+    // Use first extension as default
+    if (force || !this._extensions[type]) {
+      const ext = extensions[0];
+      this._extensions[type] = (ext[0] !== '*') ? ext : ext.substr(1);
+    }
+  }
+};
+
+/**
+ * Lookup a mime type based on extension
+ */
+Mime.prototype.getType = function(path) {
+  path = String(path);
+  let last = path.replace(/^.*[/\\]/, '').toLowerCase();
+  let ext = last.replace(/^.*\./, '').toLowerCase();
+
+  let hasPath = last.length < path.length;
+  let hasDot = ext.length < last.length - 1;
+
+  return (hasDot || !hasPath) && this._types[ext] || null;
+};
+
+/**
+ * Return file extension associated with a mime type
+ */
+Mime.prototype.getExtension = function(type) {
+  type = /^\s*([^;\s]*)/.test(type) && RegExp.$1;
+  return type && this._extensions[type.toLowerCase()] || null;
+};
+
+module.exports = Mime;
+
+
+/***/ }),
+
+/***/ 531:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+
+let Mime = __nccwpck_require__(6038);
+module.exports = new Mime(__nccwpck_require__(3114));
+
+
+/***/ }),
+
+/***/ 3114:
+/***/ ((module) => {
+
+module.exports = {"application/andrew-inset":["ez"],"application/applixware":["aw"],"application/atom+xml":["atom"],"application/atomcat+xml":["atomcat"],"application/atomdeleted+xml":["atomdeleted"],"application/atomsvc+xml":["atomsvc"],"application/atsc-dwd+xml":["dwd"],"application/atsc-held+xml":["held"],"application/atsc-rsat+xml":["rsat"],"application/bdoc":["bdoc"],"application/calendar+xml":["xcs"],"application/ccxml+xml":["ccxml"],"application/cdfx+xml":["cdfx"],"application/cdmi-capability":["cdmia"],"application/cdmi-container":["cdmic"],"application/cdmi-domain":["cdmid"],"application/cdmi-object":["cdmio"],"application/cdmi-queue":["cdmiq"],"application/cu-seeme":["cu"],"application/dash+xml":["mpd"],"application/davmount+xml":["davmount"],"application/docbook+xml":["dbk"],"application/dssc+der":["dssc"],"application/dssc+xml":["xdssc"],"application/ecmascript":["es","ecma"],"application/emma+xml":["emma"],"application/emotionml+xml":["emotionml"],"application/epub+zip":["epub"],"application/exi":["exi"],"application/express":["exp"],"application/fdt+xml":["fdt"],"application/font-tdpfr":["pfr"],"application/geo+json":["geojson"],"application/gml+xml":["gml"],"application/gpx+xml":["gpx"],"application/gxf":["gxf"],"application/gzip":["gz"],"application/hjson":["hjson"],"application/hyperstudio":["stk"],"application/inkml+xml":["ink","inkml"],"application/ipfix":["ipfix"],"application/its+xml":["its"],"application/java-archive":["jar","war","ear"],"application/java-serialized-object":["ser"],"application/java-vm":["class"],"application/javascript":["js","mjs"],"application/json":["json","map"],"application/json5":["json5"],"application/jsonml+json":["jsonml"],"application/ld+json":["jsonld"],"application/lgr+xml":["lgr"],"application/lost+xml":["lostxml"],"application/mac-binhex40":["hqx"],"application/mac-compactpro":["cpt"],"application/mads+xml":["mads"],"application/manifest+json":["webmanifest"],"application/marc":["mrc"],"application/marcxml+xml":["mrcx"],"application/mathematica":["ma","nb","mb"],"application/mathml+xml":["mathml"],"application/mbox":["mbox"],"application/mediaservercontrol+xml":["mscml"],"application/metalink+xml":["metalink"],"application/metalink4+xml":["meta4"],"application/mets+xml":["mets"],"application/mmt-aei+xml":["maei"],"application/mmt-usd+xml":["musd"],"application/mods+xml":["mods"],"application/mp21":["m21","mp21"],"application/mp4":["mp4s","m4p"],"application/msword":["doc","dot"],"application/mxf":["mxf"],"application/n-quads":["nq"],"application/n-triples":["nt"],"application/node":["cjs"],"application/octet-stream":["bin","dms","lrf","mar","so","dist","distz","pkg","bpk","dump","elc","deploy","exe","dll","deb","dmg","iso","img","msi","msp","msm","buffer"],"application/oda":["oda"],"application/oebps-package+xml":["opf"],"application/ogg":["ogx"],"application/omdoc+xml":["omdoc"],"application/onenote":["onetoc","onetoc2","onetmp","onepkg"],"application/oxps":["oxps"],"application/p2p-overlay+xml":["relo"],"application/patch-ops-error+xml":["xer"],"application/pdf":["pdf"],"application/pgp-encrypted":["pgp"],"application/pgp-signature":["asc","sig"],"application/pics-rules":["prf"],"application/pkcs10":["p10"],"application/pkcs7-mime":["p7m","p7c"],"application/pkcs7-signature":["p7s"],"application/pkcs8":["p8"],"application/pkix-attr-cert":["ac"],"application/pkix-cert":["cer"],"application/pkix-crl":["crl"],"application/pkix-pkipath":["pkipath"],"application/pkixcmp":["pki"],"application/pls+xml":["pls"],"application/postscript":["ai","eps","ps"],"application/provenance+xml":["provx"],"application/pskc+xml":["pskcxml"],"application/raml+yaml":["raml"],"application/rdf+xml":["rdf","owl"],"application/reginfo+xml":["rif"],"application/relax-ng-compact-syntax":["rnc"],"application/resource-lists+xml":["rl"],"application/resource-lists-diff+xml":["rld"],"application/rls-services+xml":["rs"],"application/route-apd+xml":["rapd"],"application/route-s-tsid+xml":["sls"],"application/route-usd+xml":["rusd"],"application/rpki-ghostbusters":["gbr"],"application/rpki-manifest":["mft"],"application/rpki-roa":["roa"],"application/rsd+xml":["rsd"],"application/rss+xml":["rss"],"application/rtf":["rtf"],"application/sbml+xml":["sbml"],"application/scvp-cv-request":["scq"],"application/scvp-cv-response":["scs"],"application/scvp-vp-request":["spq"],"application/scvp-vp-response":["spp"],"application/sdp":["sdp"],"application/senml+xml":["senmlx"],"application/sensml+xml":["sensmlx"],"application/set-payment-initiation":["setpay"],"application/set-registration-initiation":["setreg"],"application/shf+xml":["shf"],"application/sieve":["siv","sieve"],"application/smil+xml":["smi","smil"],"application/sparql-query":["rq"],"application/sparql-results+xml":["srx"],"application/srgs":["gram"],"application/srgs+xml":["grxml"],"application/sru+xml":["sru"],"application/ssdl+xml":["ssdl"],"application/ssml+xml":["ssml"],"application/swid+xml":["swidtag"],"application/tei+xml":["tei","teicorpus"],"application/thraud+xml":["tfi"],"application/timestamped-data":["tsd"],"application/toml":["toml"],"application/trig":["trig"],"application/ttml+xml":["ttml"],"application/ubjson":["ubj"],"application/urc-ressheet+xml":["rsheet"],"application/urc-targetdesc+xml":["td"],"application/voicexml+xml":["vxml"],"application/wasm":["wasm"],"application/widget":["wgt"],"application/winhlp":["hlp"],"application/wsdl+xml":["wsdl"],"application/wspolicy+xml":["wspolicy"],"application/xaml+xml":["xaml"],"application/xcap-att+xml":["xav"],"application/xcap-caps+xml":["xca"],"application/xcap-diff+xml":["xdf"],"application/xcap-el+xml":["xel"],"application/xcap-ns+xml":["xns"],"application/xenc+xml":["xenc"],"application/xhtml+xml":["xhtml","xht"],"application/xliff+xml":["xlf"],"application/xml":["xml","xsl","xsd","rng"],"application/xml-dtd":["dtd"],"application/xop+xml":["xop"],"application/xproc+xml":["xpl"],"application/xslt+xml":["*xsl","xslt"],"application/xspf+xml":["xspf"],"application/xv+xml":["mxml","xhvml","xvml","xvm"],"application/yang":["yang"],"application/yin+xml":["yin"],"application/zip":["zip"],"audio/3gpp":["*3gpp"],"audio/adpcm":["adp"],"audio/amr":["amr"],"audio/basic":["au","snd"],"audio/midi":["mid","midi","kar","rmi"],"audio/mobile-xmf":["mxmf"],"audio/mp3":["*mp3"],"audio/mp4":["m4a","mp4a"],"audio/mpeg":["mpga","mp2","mp2a","mp3","m2a","m3a"],"audio/ogg":["oga","ogg","spx","opus"],"audio/s3m":["s3m"],"audio/silk":["sil"],"audio/wav":["wav"],"audio/wave":["*wav"],"audio/webm":["weba"],"audio/xm":["xm"],"font/collection":["ttc"],"font/otf":["otf"],"font/ttf":["ttf"],"font/woff":["woff"],"font/woff2":["woff2"],"image/aces":["exr"],"image/apng":["apng"],"image/avif":["avif"],"image/bmp":["bmp"],"image/cgm":["cgm"],"image/dicom-rle":["drle"],"image/emf":["emf"],"image/fits":["fits"],"image/g3fax":["g3"],"image/gif":["gif"],"image/heic":["heic"],"image/heic-sequence":["heics"],"image/heif":["heif"],"image/heif-sequence":["heifs"],"image/hej2k":["hej2"],"image/hsj2":["hsj2"],"image/ief":["ief"],"image/jls":["jls"],"image/jp2":["jp2","jpg2"],"image/jpeg":["jpeg","jpg","jpe"],"image/jph":["jph"],"image/jphc":["jhc"],"image/jpm":["jpm"],"image/jpx":["jpx","jpf"],"image/jxr":["jxr"],"image/jxra":["jxra"],"image/jxrs":["jxrs"],"image/jxs":["jxs"],"image/jxsc":["jxsc"],"image/jxsi":["jxsi"],"image/jxss":["jxss"],"image/ktx":["ktx"],"image/ktx2":["ktx2"],"image/png":["png"],"image/sgi":["sgi"],"image/svg+xml":["svg","svgz"],"image/t38":["t38"],"image/tiff":["tif","tiff"],"image/tiff-fx":["tfx"],"image/webp":["webp"],"image/wmf":["wmf"],"message/disposition-notification":["disposition-notification"],"message/global":["u8msg"],"message/global-delivery-status":["u8dsn"],"message/global-disposition-notification":["u8mdn"],"message/global-headers":["u8hdr"],"message/rfc822":["eml","mime"],"model/3mf":["3mf"],"model/gltf+json":["gltf"],"model/gltf-binary":["glb"],"model/iges":["igs","iges"],"model/mesh":["msh","mesh","silo"],"model/mtl":["mtl"],"model/obj":["obj"],"model/step+xml":["stpx"],"model/step+zip":["stpz"],"model/step-xml+zip":["stpxz"],"model/stl":["stl"],"model/vrml":["wrl","vrml"],"model/x3d+binary":["*x3db","x3dbz"],"model/x3d+fastinfoset":["x3db"],"model/x3d+vrml":["*x3dv","x3dvz"],"model/x3d+xml":["x3d","x3dz"],"model/x3d-vrml":["x3dv"],"text/cache-manifest":["appcache","manifest"],"text/calendar":["ics","ifb"],"text/coffeescript":["coffee","litcoffee"],"text/css":["css"],"text/csv":["csv"],"text/html":["html","htm","shtml"],"text/jade":["jade"],"text/jsx":["jsx"],"text/less":["less"],"text/markdown":["markdown","md"],"text/mathml":["mml"],"text/mdx":["mdx"],"text/n3":["n3"],"text/plain":["txt","text","conf","def","list","log","in","ini"],"text/richtext":["rtx"],"text/rtf":["*rtf"],"text/sgml":["sgml","sgm"],"text/shex":["shex"],"text/slim":["slim","slm"],"text/spdx":["spdx"],"text/stylus":["stylus","styl"],"text/tab-separated-values":["tsv"],"text/troff":["t","tr","roff","man","me","ms"],"text/turtle":["ttl"],"text/uri-list":["uri","uris","urls"],"text/vcard":["vcard"],"text/vtt":["vtt"],"text/xml":["*xml"],"text/yaml":["yaml","yml"],"video/3gpp":["3gp","3gpp"],"video/3gpp2":["3g2"],"video/h261":["h261"],"video/h263":["h263"],"video/h264":["h264"],"video/iso.segment":["m4s"],"video/jpeg":["jpgv"],"video/jpm":["*jpm","jpgm"],"video/mj2":["mj2","mjp2"],"video/mp2t":["ts"],"video/mp4":["mp4","mp4v","mpg4"],"video/mpeg":["mpeg","mpg","mpe","m1v","m2v"],"video/ogg":["ogv"],"video/quicktime":["qt","mov"],"video/webm":["webm"]};
+
+/***/ }),
+
+/***/ 2610:
+/***/ ((module) => {
+
+
+
+// We define these manually to ensure they're always copied
+// even if they would move up the prototype chain
+// https://nodejs.org/api/http.html#http_class_http_incomingmessage
+const knownProps = [
+	'destroy',
+	'setTimeout',
+	'socket',
+	'headers',
+	'trailers',
+	'rawHeaders',
+	'statusCode',
+	'httpVersion',
+	'httpVersionMinor',
+	'httpVersionMajor',
+	'rawTrailers',
+	'statusMessage'
+];
+
+module.exports = (fromStream, toStream) => {
+	const fromProps = new Set(Object.keys(fromStream).concat(knownProps));
+
+	for (const prop of fromProps) {
+		// Don't overwrite existing properties
+		if (prop in toStream) {
+			continue;
+		}
+
+		toStream[prop] = typeof fromStream[prop] === 'function' ? fromStream[prop].bind(fromStream) : fromStream[prop];
+	}
+};
+
+
+/***/ }),
+
 /***/ 7760:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
@@ -7082,6 +20966,760 @@ if (!globalThis.DOMException) {
 }
 
 module.exports = globalThis.DOMException
+
+
+/***/ }),
+
+/***/ 7952:
+/***/ ((module) => {
+
+
+
+// https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs
+const DATA_URL_DEFAULT_MIME_TYPE = 'text/plain';
+const DATA_URL_DEFAULT_CHARSET = 'us-ascii';
+
+const testParameter = (name, filters) => {
+	return filters.some(filter => filter instanceof RegExp ? filter.test(name) : filter === name);
+};
+
+const normalizeDataURL = (urlString, {stripHash}) => {
+	const match = /^data:(?<type>[^,]*?),(?<data>[^#]*?)(?:#(?<hash>.*))?$/.exec(urlString);
+
+	if (!match) {
+		throw new Error(`Invalid URL: ${urlString}`);
+	}
+
+	let {type, data, hash} = match.groups;
+	const mediaType = type.split(';');
+	hash = stripHash ? '' : hash;
+
+	let isBase64 = false;
+	if (mediaType[mediaType.length - 1] === 'base64') {
+		mediaType.pop();
+		isBase64 = true;
+	}
+
+	// Lowercase MIME type
+	const mimeType = (mediaType.shift() || '').toLowerCase();
+	const attributes = mediaType
+		.map(attribute => {
+			let [key, value = ''] = attribute.split('=').map(string => string.trim());
+
+			// Lowercase `charset`
+			if (key === 'charset') {
+				value = value.toLowerCase();
+
+				if (value === DATA_URL_DEFAULT_CHARSET) {
+					return '';
+				}
+			}
+
+			return `${key}${value ? `=${value}` : ''}`;
+		})
+		.filter(Boolean);
+
+	const normalizedMediaType = [
+		...attributes
+	];
+
+	if (isBase64) {
+		normalizedMediaType.push('base64');
+	}
+
+	if (normalizedMediaType.length !== 0 || (mimeType && mimeType !== DATA_URL_DEFAULT_MIME_TYPE)) {
+		normalizedMediaType.unshift(mimeType);
+	}
+
+	return `data:${normalizedMediaType.join(';')},${isBase64 ? data.trim() : data}${hash ? `#${hash}` : ''}`;
+};
+
+const normalizeUrl = (urlString, options) => {
+	options = {
+		defaultProtocol: 'http:',
+		normalizeProtocol: true,
+		forceHttp: false,
+		forceHttps: false,
+		stripAuthentication: true,
+		stripHash: false,
+		stripTextFragment: true,
+		stripWWW: true,
+		removeQueryParameters: [/^utm_\w+/i],
+		removeTrailingSlash: true,
+		removeSingleSlash: true,
+		removeDirectoryIndex: false,
+		sortQueryParameters: true,
+		...options
+	};
+
+	urlString = urlString.trim();
+
+	// Data URL
+	if (/^data:/i.test(urlString)) {
+		return normalizeDataURL(urlString, options);
+	}
+
+	if (/^view-source:/i.test(urlString)) {
+		throw new Error('`view-source:` is not supported as it is a non-standard protocol');
+	}
+
+	const hasRelativeProtocol = urlString.startsWith('//');
+	const isRelativeUrl = !hasRelativeProtocol && /^\.*\//.test(urlString);
+
+	// Prepend protocol
+	if (!isRelativeUrl) {
+		urlString = urlString.replace(/^(?!(?:\w+:)?\/\/)|^\/\//, options.defaultProtocol);
+	}
+
+	const urlObj = new URL(urlString);
+
+	if (options.forceHttp && options.forceHttps) {
+		throw new Error('The `forceHttp` and `forceHttps` options cannot be used together');
+	}
+
+	if (options.forceHttp && urlObj.protocol === 'https:') {
+		urlObj.protocol = 'http:';
+	}
+
+	if (options.forceHttps && urlObj.protocol === 'http:') {
+		urlObj.protocol = 'https:';
+	}
+
+	// Remove auth
+	if (options.stripAuthentication) {
+		urlObj.username = '';
+		urlObj.password = '';
+	}
+
+	// Remove hash
+	if (options.stripHash) {
+		urlObj.hash = '';
+	} else if (options.stripTextFragment) {
+		urlObj.hash = urlObj.hash.replace(/#?:~:text.*?$/i, '');
+	}
+
+	// Remove duplicate slashes if not preceded by a protocol
+	if (urlObj.pathname) {
+		urlObj.pathname = urlObj.pathname.replace(/(?<!\b(?:[a-z][a-z\d+\-.]{1,50}:))\/{2,}/g, '/');
+	}
+
+	// Decode URI octets
+	if (urlObj.pathname) {
+		try {
+			urlObj.pathname = decodeURI(urlObj.pathname);
+		} catch (_) {}
+	}
+
+	// Remove directory index
+	if (options.removeDirectoryIndex === true) {
+		options.removeDirectoryIndex = [/^index\.[a-z]+$/];
+	}
+
+	if (Array.isArray(options.removeDirectoryIndex) && options.removeDirectoryIndex.length > 0) {
+		let pathComponents = urlObj.pathname.split('/');
+		const lastComponent = pathComponents[pathComponents.length - 1];
+
+		if (testParameter(lastComponent, options.removeDirectoryIndex)) {
+			pathComponents = pathComponents.slice(0, pathComponents.length - 1);
+			urlObj.pathname = pathComponents.slice(1).join('/') + '/';
+		}
+	}
+
+	if (urlObj.hostname) {
+		// Remove trailing dot
+		urlObj.hostname = urlObj.hostname.replace(/\.$/, '');
+
+		// Remove `www.`
+		if (options.stripWWW && /^www\.(?!www\.)(?:[a-z\-\d]{1,63})\.(?:[a-z.\-\d]{2,63})$/.test(urlObj.hostname)) {
+			// Each label should be max 63 at length (min: 1).
+			// Source: https://en.wikipedia.org/wiki/Hostname#Restrictions_on_valid_host_names
+			// Each TLD should be up to 63 characters long (min: 2).
+			// It is technically possible to have a single character TLD, but none currently exist.
+			urlObj.hostname = urlObj.hostname.replace(/^www\./, '');
+		}
+	}
+
+	// Remove query unwanted parameters
+	if (Array.isArray(options.removeQueryParameters)) {
+		for (const key of [...urlObj.searchParams.keys()]) {
+			if (testParameter(key, options.removeQueryParameters)) {
+				urlObj.searchParams.delete(key);
+			}
+		}
+	}
+
+	if (options.removeQueryParameters === true) {
+		urlObj.search = '';
+	}
+
+	// Sort query parameters
+	if (options.sortQueryParameters) {
+		urlObj.searchParams.sort();
+	}
+
+	if (options.removeTrailingSlash) {
+		urlObj.pathname = urlObj.pathname.replace(/\/$/, '');
+	}
+
+	const oldUrlString = urlString;
+
+	// Take advantage of many of the Node `url` normalizations
+	urlString = urlObj.toString();
+
+	if (!options.removeSingleSlash && urlObj.pathname === '/' && !oldUrlString.endsWith('/') && urlObj.hash === '') {
+		urlString = urlString.replace(/\/$/, '');
+	}
+
+	// Remove ending `/` unless removeSingleSlash is false
+	if ((options.removeTrailingSlash || urlObj.pathname === '/') && urlObj.hash === '' && options.removeSingleSlash) {
+		urlString = urlString.replace(/\/$/, '');
+	}
+
+	// Restore relative protocol, if applicable
+	if (hasRelativeProtocol && !options.normalizeProtocol) {
+		urlString = urlString.replace(/^http:\/\//, '//');
+	}
+
+	// Remove http/https
+	if (options.stripProtocol) {
+		urlString = urlString.replace(/^(?:https?:)?\/\//, '');
+	}
+
+	return urlString;
+};
+
+module.exports = normalizeUrl;
+
+
+/***/ }),
+
+/***/ 504:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+var hasMap = typeof Map === 'function' && Map.prototype;
+var mapSizeDescriptor = Object.getOwnPropertyDescriptor && hasMap ? Object.getOwnPropertyDescriptor(Map.prototype, 'size') : null;
+var mapSize = hasMap && mapSizeDescriptor && typeof mapSizeDescriptor.get === 'function' ? mapSizeDescriptor.get : null;
+var mapForEach = hasMap && Map.prototype.forEach;
+var hasSet = typeof Set === 'function' && Set.prototype;
+var setSizeDescriptor = Object.getOwnPropertyDescriptor && hasSet ? Object.getOwnPropertyDescriptor(Set.prototype, 'size') : null;
+var setSize = hasSet && setSizeDescriptor && typeof setSizeDescriptor.get === 'function' ? setSizeDescriptor.get : null;
+var setForEach = hasSet && Set.prototype.forEach;
+var hasWeakMap = typeof WeakMap === 'function' && WeakMap.prototype;
+var weakMapHas = hasWeakMap ? WeakMap.prototype.has : null;
+var hasWeakSet = typeof WeakSet === 'function' && WeakSet.prototype;
+var weakSetHas = hasWeakSet ? WeakSet.prototype.has : null;
+var hasWeakRef = typeof WeakRef === 'function' && WeakRef.prototype;
+var weakRefDeref = hasWeakRef ? WeakRef.prototype.deref : null;
+var booleanValueOf = Boolean.prototype.valueOf;
+var objectToString = Object.prototype.toString;
+var functionToString = Function.prototype.toString;
+var $match = String.prototype.match;
+var $slice = String.prototype.slice;
+var $replace = String.prototype.replace;
+var $toUpperCase = String.prototype.toUpperCase;
+var $toLowerCase = String.prototype.toLowerCase;
+var $test = RegExp.prototype.test;
+var $concat = Array.prototype.concat;
+var $join = Array.prototype.join;
+var $arrSlice = Array.prototype.slice;
+var $floor = Math.floor;
+var bigIntValueOf = typeof BigInt === 'function' ? BigInt.prototype.valueOf : null;
+var gOPS = Object.getOwnPropertySymbols;
+var symToString = typeof Symbol === 'function' && typeof Symbol.iterator === 'symbol' ? Symbol.prototype.toString : null;
+var hasShammedSymbols = typeof Symbol === 'function' && typeof Symbol.iterator === 'object';
+// ie, `has-tostringtag/shams
+var toStringTag = typeof Symbol === 'function' && Symbol.toStringTag && (typeof Symbol.toStringTag === hasShammedSymbols ? 'object' : 'symbol')
+    ? Symbol.toStringTag
+    : null;
+var isEnumerable = Object.prototype.propertyIsEnumerable;
+
+var gPO = (typeof Reflect === 'function' ? Reflect.getPrototypeOf : Object.getPrototypeOf) || (
+    [].__proto__ === Array.prototype // eslint-disable-line no-proto
+        ? function (O) {
+            return O.__proto__; // eslint-disable-line no-proto
+        }
+        : null
+);
+
+function addNumericSeparator(num, str) {
+    if (
+        num === Infinity
+        || num === -Infinity
+        || num !== num
+        || (num && num > -1000 && num < 1000)
+        || $test.call(/e/, str)
+    ) {
+        return str;
+    }
+    var sepRegex = /[0-9](?=(?:[0-9]{3})+(?![0-9]))/g;
+    if (typeof num === 'number') {
+        var int = num < 0 ? -$floor(-num) : $floor(num); // trunc(num)
+        if (int !== num) {
+            var intStr = String(int);
+            var dec = $slice.call(str, intStr.length + 1);
+            return $replace.call(intStr, sepRegex, '$&_') + '.' + $replace.call($replace.call(dec, /([0-9]{3})/g, '$&_'), /_$/, '');
+        }
+    }
+    return $replace.call(str, sepRegex, '$&_');
+}
+
+var utilInspect = __nccwpck_require__(7265);
+var inspectCustom = utilInspect.custom;
+var inspectSymbol = isSymbol(inspectCustom) ? inspectCustom : null;
+
+module.exports = function inspect_(obj, options, depth, seen) {
+    var opts = options || {};
+
+    if (has(opts, 'quoteStyle') && (opts.quoteStyle !== 'single' && opts.quoteStyle !== 'double')) {
+        throw new TypeError('option "quoteStyle" must be "single" or "double"');
+    }
+    if (
+        has(opts, 'maxStringLength') && (typeof opts.maxStringLength === 'number'
+            ? opts.maxStringLength < 0 && opts.maxStringLength !== Infinity
+            : opts.maxStringLength !== null
+        )
+    ) {
+        throw new TypeError('option "maxStringLength", if provided, must be a positive integer, Infinity, or `null`');
+    }
+    var customInspect = has(opts, 'customInspect') ? opts.customInspect : true;
+    if (typeof customInspect !== 'boolean' && customInspect !== 'symbol') {
+        throw new TypeError('option "customInspect", if provided, must be `true`, `false`, or `\'symbol\'`');
+    }
+
+    if (
+        has(opts, 'indent')
+        && opts.indent !== null
+        && opts.indent !== '\t'
+        && !(parseInt(opts.indent, 10) === opts.indent && opts.indent > 0)
+    ) {
+        throw new TypeError('option "indent" must be "\\t", an integer > 0, or `null`');
+    }
+    if (has(opts, 'numericSeparator') && typeof opts.numericSeparator !== 'boolean') {
+        throw new TypeError('option "numericSeparator", if provided, must be `true` or `false`');
+    }
+    var numericSeparator = opts.numericSeparator;
+
+    if (typeof obj === 'undefined') {
+        return 'undefined';
+    }
+    if (obj === null) {
+        return 'null';
+    }
+    if (typeof obj === 'boolean') {
+        return obj ? 'true' : 'false';
+    }
+
+    if (typeof obj === 'string') {
+        return inspectString(obj, opts);
+    }
+    if (typeof obj === 'number') {
+        if (obj === 0) {
+            return Infinity / obj > 0 ? '0' : '-0';
+        }
+        var str = String(obj);
+        return numericSeparator ? addNumericSeparator(obj, str) : str;
+    }
+    if (typeof obj === 'bigint') {
+        var bigIntStr = String(obj) + 'n';
+        return numericSeparator ? addNumericSeparator(obj, bigIntStr) : bigIntStr;
+    }
+
+    var maxDepth = typeof opts.depth === 'undefined' ? 5 : opts.depth;
+    if (typeof depth === 'undefined') { depth = 0; }
+    if (depth >= maxDepth && maxDepth > 0 && typeof obj === 'object') {
+        return isArray(obj) ? '[Array]' : '[Object]';
+    }
+
+    var indent = getIndent(opts, depth);
+
+    if (typeof seen === 'undefined') {
+        seen = [];
+    } else if (indexOf(seen, obj) >= 0) {
+        return '[Circular]';
+    }
+
+    function inspect(value, from, noIndent) {
+        if (from) {
+            seen = $arrSlice.call(seen);
+            seen.push(from);
+        }
+        if (noIndent) {
+            var newOpts = {
+                depth: opts.depth
+            };
+            if (has(opts, 'quoteStyle')) {
+                newOpts.quoteStyle = opts.quoteStyle;
+            }
+            return inspect_(value, newOpts, depth + 1, seen);
+        }
+        return inspect_(value, opts, depth + 1, seen);
+    }
+
+    if (typeof obj === 'function' && !isRegExp(obj)) { // in older engines, regexes are callable
+        var name = nameOf(obj);
+        var keys = arrObjKeys(obj, inspect);
+        return '[Function' + (name ? ': ' + name : ' (anonymous)') + ']' + (keys.length > 0 ? ' { ' + $join.call(keys, ', ') + ' }' : '');
+    }
+    if (isSymbol(obj)) {
+        var symString = hasShammedSymbols ? $replace.call(String(obj), /^(Symbol\(.*\))_[^)]*$/, '$1') : symToString.call(obj);
+        return typeof obj === 'object' && !hasShammedSymbols ? markBoxed(symString) : symString;
+    }
+    if (isElement(obj)) {
+        var s = '<' + $toLowerCase.call(String(obj.nodeName));
+        var attrs = obj.attributes || [];
+        for (var i = 0; i < attrs.length; i++) {
+            s += ' ' + attrs[i].name + '=' + wrapQuotes(quote(attrs[i].value), 'double', opts);
+        }
+        s += '>';
+        if (obj.childNodes && obj.childNodes.length) { s += '...'; }
+        s += '</' + $toLowerCase.call(String(obj.nodeName)) + '>';
+        return s;
+    }
+    if (isArray(obj)) {
+        if (obj.length === 0) { return '[]'; }
+        var xs = arrObjKeys(obj, inspect);
+        if (indent && !singleLineValues(xs)) {
+            return '[' + indentedJoin(xs, indent) + ']';
+        }
+        return '[ ' + $join.call(xs, ', ') + ' ]';
+    }
+    if (isError(obj)) {
+        var parts = arrObjKeys(obj, inspect);
+        if (!('cause' in Error.prototype) && 'cause' in obj && !isEnumerable.call(obj, 'cause')) {
+            return '{ [' + String(obj) + '] ' + $join.call($concat.call('[cause]: ' + inspect(obj.cause), parts), ', ') + ' }';
+        }
+        if (parts.length === 0) { return '[' + String(obj) + ']'; }
+        return '{ [' + String(obj) + '] ' + $join.call(parts, ', ') + ' }';
+    }
+    if (typeof obj === 'object' && customInspect) {
+        if (inspectSymbol && typeof obj[inspectSymbol] === 'function' && utilInspect) {
+            return utilInspect(obj, { depth: maxDepth - depth });
+        } else if (customInspect !== 'symbol' && typeof obj.inspect === 'function') {
+            return obj.inspect();
+        }
+    }
+    if (isMap(obj)) {
+        var mapParts = [];
+        if (mapForEach) {
+            mapForEach.call(obj, function (value, key) {
+                mapParts.push(inspect(key, obj, true) + ' => ' + inspect(value, obj));
+            });
+        }
+        return collectionOf('Map', mapSize.call(obj), mapParts, indent);
+    }
+    if (isSet(obj)) {
+        var setParts = [];
+        if (setForEach) {
+            setForEach.call(obj, function (value) {
+                setParts.push(inspect(value, obj));
+            });
+        }
+        return collectionOf('Set', setSize.call(obj), setParts, indent);
+    }
+    if (isWeakMap(obj)) {
+        return weakCollectionOf('WeakMap');
+    }
+    if (isWeakSet(obj)) {
+        return weakCollectionOf('WeakSet');
+    }
+    if (isWeakRef(obj)) {
+        return weakCollectionOf('WeakRef');
+    }
+    if (isNumber(obj)) {
+        return markBoxed(inspect(Number(obj)));
+    }
+    if (isBigInt(obj)) {
+        return markBoxed(inspect(bigIntValueOf.call(obj)));
+    }
+    if (isBoolean(obj)) {
+        return markBoxed(booleanValueOf.call(obj));
+    }
+    if (isString(obj)) {
+        return markBoxed(inspect(String(obj)));
+    }
+    if (!isDate(obj) && !isRegExp(obj)) {
+        var ys = arrObjKeys(obj, inspect);
+        var isPlainObject = gPO ? gPO(obj) === Object.prototype : obj instanceof Object || obj.constructor === Object;
+        var protoTag = obj instanceof Object ? '' : 'null prototype';
+        var stringTag = !isPlainObject && toStringTag && Object(obj) === obj && toStringTag in obj ? $slice.call(toStr(obj), 8, -1) : protoTag ? 'Object' : '';
+        var constructorTag = isPlainObject || typeof obj.constructor !== 'function' ? '' : obj.constructor.name ? obj.constructor.name + ' ' : '';
+        var tag = constructorTag + (stringTag || protoTag ? '[' + $join.call($concat.call([], stringTag || [], protoTag || []), ': ') + '] ' : '');
+        if (ys.length === 0) { return tag + '{}'; }
+        if (indent) {
+            return tag + '{' + indentedJoin(ys, indent) + '}';
+        }
+        return tag + '{ ' + $join.call(ys, ', ') + ' }';
+    }
+    return String(obj);
+};
+
+function wrapQuotes(s, defaultStyle, opts) {
+    var quoteChar = (opts.quoteStyle || defaultStyle) === 'double' ? '"' : "'";
+    return quoteChar + s + quoteChar;
+}
+
+function quote(s) {
+    return $replace.call(String(s), /"/g, '&quot;');
+}
+
+function isArray(obj) { return toStr(obj) === '[object Array]' && (!toStringTag || !(typeof obj === 'object' && toStringTag in obj)); }
+function isDate(obj) { return toStr(obj) === '[object Date]' && (!toStringTag || !(typeof obj === 'object' && toStringTag in obj)); }
+function isRegExp(obj) { return toStr(obj) === '[object RegExp]' && (!toStringTag || !(typeof obj === 'object' && toStringTag in obj)); }
+function isError(obj) { return toStr(obj) === '[object Error]' && (!toStringTag || !(typeof obj === 'object' && toStringTag in obj)); }
+function isString(obj) { return toStr(obj) === '[object String]' && (!toStringTag || !(typeof obj === 'object' && toStringTag in obj)); }
+function isNumber(obj) { return toStr(obj) === '[object Number]' && (!toStringTag || !(typeof obj === 'object' && toStringTag in obj)); }
+function isBoolean(obj) { return toStr(obj) === '[object Boolean]' && (!toStringTag || !(typeof obj === 'object' && toStringTag in obj)); }
+
+// Symbol and BigInt do have Symbol.toStringTag by spec, so that can't be used to eliminate false positives
+function isSymbol(obj) {
+    if (hasShammedSymbols) {
+        return obj && typeof obj === 'object' && obj instanceof Symbol;
+    }
+    if (typeof obj === 'symbol') {
+        return true;
+    }
+    if (!obj || typeof obj !== 'object' || !symToString) {
+        return false;
+    }
+    try {
+        symToString.call(obj);
+        return true;
+    } catch (e) {}
+    return false;
+}
+
+function isBigInt(obj) {
+    if (!obj || typeof obj !== 'object' || !bigIntValueOf) {
+        return false;
+    }
+    try {
+        bigIntValueOf.call(obj);
+        return true;
+    } catch (e) {}
+    return false;
+}
+
+var hasOwn = Object.prototype.hasOwnProperty || function (key) { return key in this; };
+function has(obj, key) {
+    return hasOwn.call(obj, key);
+}
+
+function toStr(obj) {
+    return objectToString.call(obj);
+}
+
+function nameOf(f) {
+    if (f.name) { return f.name; }
+    var m = $match.call(functionToString.call(f), /^function\s*([\w$]+)/);
+    if (m) { return m[1]; }
+    return null;
+}
+
+function indexOf(xs, x) {
+    if (xs.indexOf) { return xs.indexOf(x); }
+    for (var i = 0, l = xs.length; i < l; i++) {
+        if (xs[i] === x) { return i; }
+    }
+    return -1;
+}
+
+function isMap(x) {
+    if (!mapSize || !x || typeof x !== 'object') {
+        return false;
+    }
+    try {
+        mapSize.call(x);
+        try {
+            setSize.call(x);
+        } catch (s) {
+            return true;
+        }
+        return x instanceof Map; // core-js workaround, pre-v2.5.0
+    } catch (e) {}
+    return false;
+}
+
+function isWeakMap(x) {
+    if (!weakMapHas || !x || typeof x !== 'object') {
+        return false;
+    }
+    try {
+        weakMapHas.call(x, weakMapHas);
+        try {
+            weakSetHas.call(x, weakSetHas);
+        } catch (s) {
+            return true;
+        }
+        return x instanceof WeakMap; // core-js workaround, pre-v2.5.0
+    } catch (e) {}
+    return false;
+}
+
+function isWeakRef(x) {
+    if (!weakRefDeref || !x || typeof x !== 'object') {
+        return false;
+    }
+    try {
+        weakRefDeref.call(x);
+        return true;
+    } catch (e) {}
+    return false;
+}
+
+function isSet(x) {
+    if (!setSize || !x || typeof x !== 'object') {
+        return false;
+    }
+    try {
+        setSize.call(x);
+        try {
+            mapSize.call(x);
+        } catch (m) {
+            return true;
+        }
+        return x instanceof Set; // core-js workaround, pre-v2.5.0
+    } catch (e) {}
+    return false;
+}
+
+function isWeakSet(x) {
+    if (!weakSetHas || !x || typeof x !== 'object') {
+        return false;
+    }
+    try {
+        weakSetHas.call(x, weakSetHas);
+        try {
+            weakMapHas.call(x, weakMapHas);
+        } catch (s) {
+            return true;
+        }
+        return x instanceof WeakSet; // core-js workaround, pre-v2.5.0
+    } catch (e) {}
+    return false;
+}
+
+function isElement(x) {
+    if (!x || typeof x !== 'object') { return false; }
+    if (typeof HTMLElement !== 'undefined' && x instanceof HTMLElement) {
+        return true;
+    }
+    return typeof x.nodeName === 'string' && typeof x.getAttribute === 'function';
+}
+
+function inspectString(str, opts) {
+    if (str.length > opts.maxStringLength) {
+        var remaining = str.length - opts.maxStringLength;
+        var trailer = '... ' + remaining + ' more character' + (remaining > 1 ? 's' : '');
+        return inspectString($slice.call(str, 0, opts.maxStringLength), opts) + trailer;
+    }
+    // eslint-disable-next-line no-control-regex
+    var s = $replace.call($replace.call(str, /(['\\])/g, '\\$1'), /[\x00-\x1f]/g, lowbyte);
+    return wrapQuotes(s, 'single', opts);
+}
+
+function lowbyte(c) {
+    var n = c.charCodeAt(0);
+    var x = {
+        8: 'b',
+        9: 't',
+        10: 'n',
+        12: 'f',
+        13: 'r'
+    }[n];
+    if (x) { return '\\' + x; }
+    return '\\x' + (n < 0x10 ? '0' : '') + $toUpperCase.call(n.toString(16));
+}
+
+function markBoxed(str) {
+    return 'Object(' + str + ')';
+}
+
+function weakCollectionOf(type) {
+    return type + ' { ? }';
+}
+
+function collectionOf(type, size, entries, indent) {
+    var joinedEntries = indent ? indentedJoin(entries, indent) : $join.call(entries, ', ');
+    return type + ' (' + size + ') {' + joinedEntries + '}';
+}
+
+function singleLineValues(xs) {
+    for (var i = 0; i < xs.length; i++) {
+        if (indexOf(xs[i], '\n') >= 0) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function getIndent(opts, depth) {
+    var baseIndent;
+    if (opts.indent === '\t') {
+        baseIndent = '\t';
+    } else if (typeof opts.indent === 'number' && opts.indent > 0) {
+        baseIndent = $join.call(Array(opts.indent + 1), ' ');
+    } else {
+        return null;
+    }
+    return {
+        base: baseIndent,
+        prev: $join.call(Array(depth + 1), baseIndent)
+    };
+}
+
+function indentedJoin(xs, indent) {
+    if (xs.length === 0) { return ''; }
+    var lineJoiner = '\n' + indent.prev + indent.base;
+    return lineJoiner + $join.call(xs, ',' + lineJoiner) + '\n' + indent.prev;
+}
+
+function arrObjKeys(obj, inspect) {
+    var isArr = isArray(obj);
+    var xs = [];
+    if (isArr) {
+        xs.length = obj.length;
+        for (var i = 0; i < obj.length; i++) {
+            xs[i] = has(obj, i) ? inspect(obj[i], obj) : '';
+        }
+    }
+    var syms = typeof gOPS === 'function' ? gOPS(obj) : [];
+    var symMap;
+    if (hasShammedSymbols) {
+        symMap = {};
+        for (var k = 0; k < syms.length; k++) {
+            symMap['$' + syms[k]] = syms[k];
+        }
+    }
+
+    for (var key in obj) { // eslint-disable-line no-restricted-syntax
+        if (!has(obj, key)) { continue; } // eslint-disable-line no-restricted-syntax, no-continue
+        if (isArr && String(Number(key)) === key && key < obj.length) { continue; } // eslint-disable-line no-restricted-syntax, no-continue
+        if (hasShammedSymbols && symMap['$' + key] instanceof Symbol) {
+            // this is to prevent shammed Symbols, which are stored as strings, from being included in the string key section
+            continue; // eslint-disable-line no-restricted-syntax, no-continue
+        } else if ($test.call(/[^\w$]/, key)) {
+            xs.push(inspect(key, obj) + ': ' + inspect(obj[key], obj));
+        } else {
+            xs.push(key + ': ' + inspect(obj[key], obj));
+        }
+    }
+    if (typeof gOPS === 'function') {
+        for (var j = 0; j < syms.length; j++) {
+            if (isEnumerable.call(obj, syms[j])) {
+                xs.push('[' + inspect(syms[j]) + ']: ' + inspect(obj[syms[j]], obj));
+            }
+        }
+    }
+    return xs;
+}
+
+
+/***/ }),
+
+/***/ 7265:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+module.exports = __nccwpck_require__(3837).inspect;
 
 
 /***/ }),
@@ -7131,6 +21769,1513 @@ function onceStrict (fn) {
   f.called = false
   return f
 }
+
+
+/***/ }),
+
+/***/ 9072:
+/***/ ((module) => {
+
+
+
+class CancelError extends Error {
+	constructor(reason) {
+		super(reason || 'Promise was canceled');
+		this.name = 'CancelError';
+	}
+
+	get isCanceled() {
+		return true;
+	}
+}
+
+class PCancelable {
+	static fn(userFn) {
+		return (...arguments_) => {
+			return new PCancelable((resolve, reject, onCancel) => {
+				arguments_.push(onCancel);
+				// eslint-disable-next-line promise/prefer-await-to-then
+				userFn(...arguments_).then(resolve, reject);
+			});
+		};
+	}
+
+	constructor(executor) {
+		this._cancelHandlers = [];
+		this._isPending = true;
+		this._isCanceled = false;
+		this._rejectOnCancel = true;
+
+		this._promise = new Promise((resolve, reject) => {
+			this._reject = reject;
+
+			const onResolve = value => {
+				if (!this._isCanceled || !onCancel.shouldReject) {
+					this._isPending = false;
+					resolve(value);
+				}
+			};
+
+			const onReject = error => {
+				this._isPending = false;
+				reject(error);
+			};
+
+			const onCancel = handler => {
+				if (!this._isPending) {
+					throw new Error('The `onCancel` handler was attached after the promise settled.');
+				}
+
+				this._cancelHandlers.push(handler);
+			};
+
+			Object.defineProperties(onCancel, {
+				shouldReject: {
+					get: () => this._rejectOnCancel,
+					set: boolean => {
+						this._rejectOnCancel = boolean;
+					}
+				}
+			});
+
+			return executor(onResolve, onReject, onCancel);
+		});
+	}
+
+	then(onFulfilled, onRejected) {
+		// eslint-disable-next-line promise/prefer-await-to-then
+		return this._promise.then(onFulfilled, onRejected);
+	}
+
+	catch(onRejected) {
+		return this._promise.catch(onRejected);
+	}
+
+	finally(onFinally) {
+		return this._promise.finally(onFinally);
+	}
+
+	cancel(reason) {
+		if (!this._isPending || this._isCanceled) {
+			return;
+		}
+
+		this._isCanceled = true;
+
+		if (this._cancelHandlers.length > 0) {
+			try {
+				for (const handler of this._cancelHandlers) {
+					handler();
+				}
+			} catch (error) {
+				this._reject(error);
+				return;
+			}
+		}
+
+		if (this._rejectOnCancel) {
+			this._reject(new CancelError(reason));
+		}
+	}
+
+	get isCanceled() {
+		return this._isCanceled;
+	}
+}
+
+Object.setPrototypeOf(PCancelable.prototype, Promise.prototype);
+
+module.exports = PCancelable;
+module.exports.CancelError = CancelError;
+
+
+/***/ }),
+
+/***/ 8341:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+var once = __nccwpck_require__(1223)
+var eos = __nccwpck_require__(1205)
+var fs = __nccwpck_require__(7147) // we only need fs to get the ReadStream and WriteStream prototypes
+
+var noop = function () {}
+var ancient = /^v?\.0/.test(process.version)
+
+var isFn = function (fn) {
+  return typeof fn === 'function'
+}
+
+var isFS = function (stream) {
+  if (!ancient) return false // newer node version do not need to care about fs is a special way
+  if (!fs) return false // browser
+  return (stream instanceof (fs.ReadStream || noop) || stream instanceof (fs.WriteStream || noop)) && isFn(stream.close)
+}
+
+var isRequest = function (stream) {
+  return stream.setHeader && isFn(stream.abort)
+}
+
+var destroyer = function (stream, reading, writing, callback) {
+  callback = once(callback)
+
+  var closed = false
+  stream.on('close', function () {
+    closed = true
+  })
+
+  eos(stream, {readable: reading, writable: writing}, function (err) {
+    if (err) return callback(err)
+    closed = true
+    callback()
+  })
+
+  var destroyed = false
+  return function (err) {
+    if (closed) return
+    if (destroyed) return
+    destroyed = true
+
+    if (isFS(stream)) return stream.close(noop) // use close for fs streams to avoid fd leaks
+    if (isRequest(stream)) return stream.abort() // request.destroy just do .end - .abort is what we want
+
+    if (isFn(stream.destroy)) return stream.destroy()
+
+    callback(err || new Error('stream was destroyed'))
+  }
+}
+
+var call = function (fn) {
+  fn()
+}
+
+var pipe = function (from, to) {
+  return from.pipe(to)
+}
+
+var pump = function () {
+  var streams = Array.prototype.slice.call(arguments)
+  var callback = isFn(streams[streams.length - 1] || noop) && streams.pop() || noop
+
+  if (Array.isArray(streams[0])) streams = streams[0]
+  if (streams.length < 2) throw new Error('pump requires two streams per minimum')
+
+  var error
+  var destroys = streams.map(function (stream, i) {
+    var reading = i < streams.length - 1
+    var writing = i > 0
+    return destroyer(stream, reading, writing, function (err) {
+      if (!error) error = err
+      if (err) destroys.forEach(call)
+      if (reading) return
+      destroys.forEach(call)
+      callback(error)
+    })
+  })
+
+  return streams.reduce(pipe)
+}
+
+module.exports = pump
+
+
+/***/ }),
+
+/***/ 4907:
+/***/ ((module) => {
+
+
+
+var replace = String.prototype.replace;
+var percentTwenties = /%20/g;
+
+var Format = {
+    RFC1738: 'RFC1738',
+    RFC3986: 'RFC3986'
+};
+
+module.exports = {
+    'default': Format.RFC3986,
+    formatters: {
+        RFC1738: function (value) {
+            return replace.call(value, percentTwenties, '+');
+        },
+        RFC3986: function (value) {
+            return String(value);
+        }
+    },
+    RFC1738: Format.RFC1738,
+    RFC3986: Format.RFC3986
+};
+
+
+/***/ }),
+
+/***/ 2760:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+
+var stringify = __nccwpck_require__(9954);
+var parse = __nccwpck_require__(3912);
+var formats = __nccwpck_require__(4907);
+
+module.exports = {
+    formats: formats,
+    parse: parse,
+    stringify: stringify
+};
+
+
+/***/ }),
+
+/***/ 3912:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+
+var utils = __nccwpck_require__(2360);
+
+var has = Object.prototype.hasOwnProperty;
+var isArray = Array.isArray;
+
+var defaults = {
+    allowDots: false,
+    allowPrototypes: false,
+    allowSparse: false,
+    arrayLimit: 20,
+    charset: 'utf-8',
+    charsetSentinel: false,
+    comma: false,
+    decoder: utils.decode,
+    delimiter: '&',
+    depth: 5,
+    ignoreQueryPrefix: false,
+    interpretNumericEntities: false,
+    parameterLimit: 1000,
+    parseArrays: true,
+    plainObjects: false,
+    strictNullHandling: false
+};
+
+var interpretNumericEntities = function (str) {
+    return str.replace(/&#(\d+);/g, function ($0, numberStr) {
+        return String.fromCharCode(parseInt(numberStr, 10));
+    });
+};
+
+var parseArrayValue = function (val, options) {
+    if (val && typeof val === 'string' && options.comma && val.indexOf(',') > -1) {
+        return val.split(',');
+    }
+
+    return val;
+};
+
+// This is what browsers will submit when the ✓ character occurs in an
+// application/x-www-form-urlencoded body and the encoding of the page containing
+// the form is iso-8859-1, or when the submitted form has an accept-charset
+// attribute of iso-8859-1. Presumably also with other charsets that do not contain
+// the ✓ character, such as us-ascii.
+var isoSentinel = 'utf8=%26%2310003%3B'; // encodeURIComponent('&#10003;')
+
+// These are the percent-encoded utf-8 octets representing a checkmark, indicating that the request actually is utf-8 encoded.
+var charsetSentinel = 'utf8=%E2%9C%93'; // encodeURIComponent('✓')
+
+var parseValues = function parseQueryStringValues(str, options) {
+    var obj = {};
+    var cleanStr = options.ignoreQueryPrefix ? str.replace(/^\?/, '') : str;
+    var limit = options.parameterLimit === Infinity ? undefined : options.parameterLimit;
+    var parts = cleanStr.split(options.delimiter, limit);
+    var skipIndex = -1; // Keep track of where the utf8 sentinel was found
+    var i;
+
+    var charset = options.charset;
+    if (options.charsetSentinel) {
+        for (i = 0; i < parts.length; ++i) {
+            if (parts[i].indexOf('utf8=') === 0) {
+                if (parts[i] === charsetSentinel) {
+                    charset = 'utf-8';
+                } else if (parts[i] === isoSentinel) {
+                    charset = 'iso-8859-1';
+                }
+                skipIndex = i;
+                i = parts.length; // The eslint settings do not allow break;
+            }
+        }
+    }
+
+    for (i = 0; i < parts.length; ++i) {
+        if (i === skipIndex) {
+            continue;
+        }
+        var part = parts[i];
+
+        var bracketEqualsPos = part.indexOf(']=');
+        var pos = bracketEqualsPos === -1 ? part.indexOf('=') : bracketEqualsPos + 1;
+
+        var key, val;
+        if (pos === -1) {
+            key = options.decoder(part, defaults.decoder, charset, 'key');
+            val = options.strictNullHandling ? null : '';
+        } else {
+            key = options.decoder(part.slice(0, pos), defaults.decoder, charset, 'key');
+            val = utils.maybeMap(
+                parseArrayValue(part.slice(pos + 1), options),
+                function (encodedVal) {
+                    return options.decoder(encodedVal, defaults.decoder, charset, 'value');
+                }
+            );
+        }
+
+        if (val && options.interpretNumericEntities && charset === 'iso-8859-1') {
+            val = interpretNumericEntities(val);
+        }
+
+        if (part.indexOf('[]=') > -1) {
+            val = isArray(val) ? [val] : val;
+        }
+
+        if (has.call(obj, key)) {
+            obj[key] = utils.combine(obj[key], val);
+        } else {
+            obj[key] = val;
+        }
+    }
+
+    return obj;
+};
+
+var parseObject = function (chain, val, options, valuesParsed) {
+    var leaf = valuesParsed ? val : parseArrayValue(val, options);
+
+    for (var i = chain.length - 1; i >= 0; --i) {
+        var obj;
+        var root = chain[i];
+
+        if (root === '[]' && options.parseArrays) {
+            obj = [].concat(leaf);
+        } else {
+            obj = options.plainObjects ? Object.create(null) : {};
+            var cleanRoot = root.charAt(0) === '[' && root.charAt(root.length - 1) === ']' ? root.slice(1, -1) : root;
+            var index = parseInt(cleanRoot, 10);
+            if (!options.parseArrays && cleanRoot === '') {
+                obj = { 0: leaf };
+            } else if (
+                !isNaN(index)
+                && root !== cleanRoot
+                && String(index) === cleanRoot
+                && index >= 0
+                && (options.parseArrays && index <= options.arrayLimit)
+            ) {
+                obj = [];
+                obj[index] = leaf;
+            } else if (cleanRoot !== '__proto__') {
+                obj[cleanRoot] = leaf;
+            }
+        }
+
+        leaf = obj;
+    }
+
+    return leaf;
+};
+
+var parseKeys = function parseQueryStringKeys(givenKey, val, options, valuesParsed) {
+    if (!givenKey) {
+        return;
+    }
+
+    // Transform dot notation to bracket notation
+    var key = options.allowDots ? givenKey.replace(/\.([^.[]+)/g, '[$1]') : givenKey;
+
+    // The regex chunks
+
+    var brackets = /(\[[^[\]]*])/;
+    var child = /(\[[^[\]]*])/g;
+
+    // Get the parent
+
+    var segment = options.depth > 0 && brackets.exec(key);
+    var parent = segment ? key.slice(0, segment.index) : key;
+
+    // Stash the parent if it exists
+
+    var keys = [];
+    if (parent) {
+        // If we aren't using plain objects, optionally prefix keys that would overwrite object prototype properties
+        if (!options.plainObjects && has.call(Object.prototype, parent)) {
+            if (!options.allowPrototypes) {
+                return;
+            }
+        }
+
+        keys.push(parent);
+    }
+
+    // Loop through children appending to the array until we hit depth
+
+    var i = 0;
+    while (options.depth > 0 && (segment = child.exec(key)) !== null && i < options.depth) {
+        i += 1;
+        if (!options.plainObjects && has.call(Object.prototype, segment[1].slice(1, -1))) {
+            if (!options.allowPrototypes) {
+                return;
+            }
+        }
+        keys.push(segment[1]);
+    }
+
+    // If there's a remainder, just add whatever is left
+
+    if (segment) {
+        keys.push('[' + key.slice(segment.index) + ']');
+    }
+
+    return parseObject(keys, val, options, valuesParsed);
+};
+
+var normalizeParseOptions = function normalizeParseOptions(opts) {
+    if (!opts) {
+        return defaults;
+    }
+
+    if (opts.decoder !== null && opts.decoder !== undefined && typeof opts.decoder !== 'function') {
+        throw new TypeError('Decoder has to be a function.');
+    }
+
+    if (typeof opts.charset !== 'undefined' && opts.charset !== 'utf-8' && opts.charset !== 'iso-8859-1') {
+        throw new TypeError('The charset option must be either utf-8, iso-8859-1, or undefined');
+    }
+    var charset = typeof opts.charset === 'undefined' ? defaults.charset : opts.charset;
+
+    return {
+        allowDots: typeof opts.allowDots === 'undefined' ? defaults.allowDots : !!opts.allowDots,
+        allowPrototypes: typeof opts.allowPrototypes === 'boolean' ? opts.allowPrototypes : defaults.allowPrototypes,
+        allowSparse: typeof opts.allowSparse === 'boolean' ? opts.allowSparse : defaults.allowSparse,
+        arrayLimit: typeof opts.arrayLimit === 'number' ? opts.arrayLimit : defaults.arrayLimit,
+        charset: charset,
+        charsetSentinel: typeof opts.charsetSentinel === 'boolean' ? opts.charsetSentinel : defaults.charsetSentinel,
+        comma: typeof opts.comma === 'boolean' ? opts.comma : defaults.comma,
+        decoder: typeof opts.decoder === 'function' ? opts.decoder : defaults.decoder,
+        delimiter: typeof opts.delimiter === 'string' || utils.isRegExp(opts.delimiter) ? opts.delimiter : defaults.delimiter,
+        // eslint-disable-next-line no-implicit-coercion, no-extra-parens
+        depth: (typeof opts.depth === 'number' || opts.depth === false) ? +opts.depth : defaults.depth,
+        ignoreQueryPrefix: opts.ignoreQueryPrefix === true,
+        interpretNumericEntities: typeof opts.interpretNumericEntities === 'boolean' ? opts.interpretNumericEntities : defaults.interpretNumericEntities,
+        parameterLimit: typeof opts.parameterLimit === 'number' ? opts.parameterLimit : defaults.parameterLimit,
+        parseArrays: opts.parseArrays !== false,
+        plainObjects: typeof opts.plainObjects === 'boolean' ? opts.plainObjects : defaults.plainObjects,
+        strictNullHandling: typeof opts.strictNullHandling === 'boolean' ? opts.strictNullHandling : defaults.strictNullHandling
+    };
+};
+
+module.exports = function (str, opts) {
+    var options = normalizeParseOptions(opts);
+
+    if (str === '' || str === null || typeof str === 'undefined') {
+        return options.plainObjects ? Object.create(null) : {};
+    }
+
+    var tempObj = typeof str === 'string' ? parseValues(str, options) : str;
+    var obj = options.plainObjects ? Object.create(null) : {};
+
+    // Iterate over the keys and setup the new object
+
+    var keys = Object.keys(tempObj);
+    for (var i = 0; i < keys.length; ++i) {
+        var key = keys[i];
+        var newObj = parseKeys(key, tempObj[key], options, typeof str === 'string');
+        obj = utils.merge(obj, newObj, options);
+    }
+
+    if (options.allowSparse === true) {
+        return obj;
+    }
+
+    return utils.compact(obj);
+};
+
+
+/***/ }),
+
+/***/ 9954:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+
+var getSideChannel = __nccwpck_require__(4334);
+var utils = __nccwpck_require__(2360);
+var formats = __nccwpck_require__(4907);
+var has = Object.prototype.hasOwnProperty;
+
+var arrayPrefixGenerators = {
+    brackets: function brackets(prefix) {
+        return prefix + '[]';
+    },
+    comma: 'comma',
+    indices: function indices(prefix, key) {
+        return prefix + '[' + key + ']';
+    },
+    repeat: function repeat(prefix) {
+        return prefix;
+    }
+};
+
+var isArray = Array.isArray;
+var split = String.prototype.split;
+var push = Array.prototype.push;
+var pushToArray = function (arr, valueOrArray) {
+    push.apply(arr, isArray(valueOrArray) ? valueOrArray : [valueOrArray]);
+};
+
+var toISO = Date.prototype.toISOString;
+
+var defaultFormat = formats['default'];
+var defaults = {
+    addQueryPrefix: false,
+    allowDots: false,
+    charset: 'utf-8',
+    charsetSentinel: false,
+    delimiter: '&',
+    encode: true,
+    encoder: utils.encode,
+    encodeValuesOnly: false,
+    format: defaultFormat,
+    formatter: formats.formatters[defaultFormat],
+    // deprecated
+    indices: false,
+    serializeDate: function serializeDate(date) {
+        return toISO.call(date);
+    },
+    skipNulls: false,
+    strictNullHandling: false
+};
+
+var isNonNullishPrimitive = function isNonNullishPrimitive(v) {
+    return typeof v === 'string'
+        || typeof v === 'number'
+        || typeof v === 'boolean'
+        || typeof v === 'symbol'
+        || typeof v === 'bigint';
+};
+
+var sentinel = {};
+
+var stringify = function stringify(
+    object,
+    prefix,
+    generateArrayPrefix,
+    commaRoundTrip,
+    strictNullHandling,
+    skipNulls,
+    encoder,
+    filter,
+    sort,
+    allowDots,
+    serializeDate,
+    format,
+    formatter,
+    encodeValuesOnly,
+    charset,
+    sideChannel
+) {
+    var obj = object;
+
+    var tmpSc = sideChannel;
+    var step = 0;
+    var findFlag = false;
+    while ((tmpSc = tmpSc.get(sentinel)) !== void undefined && !findFlag) {
+        // Where object last appeared in the ref tree
+        var pos = tmpSc.get(object);
+        step += 1;
+        if (typeof pos !== 'undefined') {
+            if (pos === step) {
+                throw new RangeError('Cyclic object value');
+            } else {
+                findFlag = true; // Break while
+            }
+        }
+        if (typeof tmpSc.get(sentinel) === 'undefined') {
+            step = 0;
+        }
+    }
+
+    if (typeof filter === 'function') {
+        obj = filter(prefix, obj);
+    } else if (obj instanceof Date) {
+        obj = serializeDate(obj);
+    } else if (generateArrayPrefix === 'comma' && isArray(obj)) {
+        obj = utils.maybeMap(obj, function (value) {
+            if (value instanceof Date) {
+                return serializeDate(value);
+            }
+            return value;
+        });
+    }
+
+    if (obj === null) {
+        if (strictNullHandling) {
+            return encoder && !encodeValuesOnly ? encoder(prefix, defaults.encoder, charset, 'key', format) : prefix;
+        }
+
+        obj = '';
+    }
+
+    if (isNonNullishPrimitive(obj) || utils.isBuffer(obj)) {
+        if (encoder) {
+            var keyValue = encodeValuesOnly ? prefix : encoder(prefix, defaults.encoder, charset, 'key', format);
+            if (generateArrayPrefix === 'comma' && encodeValuesOnly) {
+                var valuesArray = split.call(String(obj), ',');
+                var valuesJoined = '';
+                for (var i = 0; i < valuesArray.length; ++i) {
+                    valuesJoined += (i === 0 ? '' : ',') + formatter(encoder(valuesArray[i], defaults.encoder, charset, 'value', format));
+                }
+                return [formatter(keyValue) + (commaRoundTrip && isArray(obj) && valuesArray.length === 1 ? '[]' : '') + '=' + valuesJoined];
+            }
+            return [formatter(keyValue) + '=' + formatter(encoder(obj, defaults.encoder, charset, 'value', format))];
+        }
+        return [formatter(prefix) + '=' + formatter(String(obj))];
+    }
+
+    var values = [];
+
+    if (typeof obj === 'undefined') {
+        return values;
+    }
+
+    var objKeys;
+    if (generateArrayPrefix === 'comma' && isArray(obj)) {
+        // we need to join elements in
+        objKeys = [{ value: obj.length > 0 ? obj.join(',') || null : void undefined }];
+    } else if (isArray(filter)) {
+        objKeys = filter;
+    } else {
+        var keys = Object.keys(obj);
+        objKeys = sort ? keys.sort(sort) : keys;
+    }
+
+    var adjustedPrefix = commaRoundTrip && isArray(obj) && obj.length === 1 ? prefix + '[]' : prefix;
+
+    for (var j = 0; j < objKeys.length; ++j) {
+        var key = objKeys[j];
+        var value = typeof key === 'object' && typeof key.value !== 'undefined' ? key.value : obj[key];
+
+        if (skipNulls && value === null) {
+            continue;
+        }
+
+        var keyPrefix = isArray(obj)
+            ? typeof generateArrayPrefix === 'function' ? generateArrayPrefix(adjustedPrefix, key) : adjustedPrefix
+            : adjustedPrefix + (allowDots ? '.' + key : '[' + key + ']');
+
+        sideChannel.set(object, step);
+        var valueSideChannel = getSideChannel();
+        valueSideChannel.set(sentinel, sideChannel);
+        pushToArray(values, stringify(
+            value,
+            keyPrefix,
+            generateArrayPrefix,
+            commaRoundTrip,
+            strictNullHandling,
+            skipNulls,
+            encoder,
+            filter,
+            sort,
+            allowDots,
+            serializeDate,
+            format,
+            formatter,
+            encodeValuesOnly,
+            charset,
+            valueSideChannel
+        ));
+    }
+
+    return values;
+};
+
+var normalizeStringifyOptions = function normalizeStringifyOptions(opts) {
+    if (!opts) {
+        return defaults;
+    }
+
+    if (opts.encoder !== null && typeof opts.encoder !== 'undefined' && typeof opts.encoder !== 'function') {
+        throw new TypeError('Encoder has to be a function.');
+    }
+
+    var charset = opts.charset || defaults.charset;
+    if (typeof opts.charset !== 'undefined' && opts.charset !== 'utf-8' && opts.charset !== 'iso-8859-1') {
+        throw new TypeError('The charset option must be either utf-8, iso-8859-1, or undefined');
+    }
+
+    var format = formats['default'];
+    if (typeof opts.format !== 'undefined') {
+        if (!has.call(formats.formatters, opts.format)) {
+            throw new TypeError('Unknown format option provided.');
+        }
+        format = opts.format;
+    }
+    var formatter = formats.formatters[format];
+
+    var filter = defaults.filter;
+    if (typeof opts.filter === 'function' || isArray(opts.filter)) {
+        filter = opts.filter;
+    }
+
+    return {
+        addQueryPrefix: typeof opts.addQueryPrefix === 'boolean' ? opts.addQueryPrefix : defaults.addQueryPrefix,
+        allowDots: typeof opts.allowDots === 'undefined' ? defaults.allowDots : !!opts.allowDots,
+        charset: charset,
+        charsetSentinel: typeof opts.charsetSentinel === 'boolean' ? opts.charsetSentinel : defaults.charsetSentinel,
+        delimiter: typeof opts.delimiter === 'undefined' ? defaults.delimiter : opts.delimiter,
+        encode: typeof opts.encode === 'boolean' ? opts.encode : defaults.encode,
+        encoder: typeof opts.encoder === 'function' ? opts.encoder : defaults.encoder,
+        encodeValuesOnly: typeof opts.encodeValuesOnly === 'boolean' ? opts.encodeValuesOnly : defaults.encodeValuesOnly,
+        filter: filter,
+        format: format,
+        formatter: formatter,
+        serializeDate: typeof opts.serializeDate === 'function' ? opts.serializeDate : defaults.serializeDate,
+        skipNulls: typeof opts.skipNulls === 'boolean' ? opts.skipNulls : defaults.skipNulls,
+        sort: typeof opts.sort === 'function' ? opts.sort : null,
+        strictNullHandling: typeof opts.strictNullHandling === 'boolean' ? opts.strictNullHandling : defaults.strictNullHandling
+    };
+};
+
+module.exports = function (object, opts) {
+    var obj = object;
+    var options = normalizeStringifyOptions(opts);
+
+    var objKeys;
+    var filter;
+
+    if (typeof options.filter === 'function') {
+        filter = options.filter;
+        obj = filter('', obj);
+    } else if (isArray(options.filter)) {
+        filter = options.filter;
+        objKeys = filter;
+    }
+
+    var keys = [];
+
+    if (typeof obj !== 'object' || obj === null) {
+        return '';
+    }
+
+    var arrayFormat;
+    if (opts && opts.arrayFormat in arrayPrefixGenerators) {
+        arrayFormat = opts.arrayFormat;
+    } else if (opts && 'indices' in opts) {
+        arrayFormat = opts.indices ? 'indices' : 'repeat';
+    } else {
+        arrayFormat = 'indices';
+    }
+
+    var generateArrayPrefix = arrayPrefixGenerators[arrayFormat];
+    if (opts && 'commaRoundTrip' in opts && typeof opts.commaRoundTrip !== 'boolean') {
+        throw new TypeError('`commaRoundTrip` must be a boolean, or absent');
+    }
+    var commaRoundTrip = generateArrayPrefix === 'comma' && opts && opts.commaRoundTrip;
+
+    if (!objKeys) {
+        objKeys = Object.keys(obj);
+    }
+
+    if (options.sort) {
+        objKeys.sort(options.sort);
+    }
+
+    var sideChannel = getSideChannel();
+    for (var i = 0; i < objKeys.length; ++i) {
+        var key = objKeys[i];
+
+        if (options.skipNulls && obj[key] === null) {
+            continue;
+        }
+        pushToArray(keys, stringify(
+            obj[key],
+            key,
+            generateArrayPrefix,
+            commaRoundTrip,
+            options.strictNullHandling,
+            options.skipNulls,
+            options.encode ? options.encoder : null,
+            options.filter,
+            options.sort,
+            options.allowDots,
+            options.serializeDate,
+            options.format,
+            options.formatter,
+            options.encodeValuesOnly,
+            options.charset,
+            sideChannel
+        ));
+    }
+
+    var joined = keys.join(options.delimiter);
+    var prefix = options.addQueryPrefix === true ? '?' : '';
+
+    if (options.charsetSentinel) {
+        if (options.charset === 'iso-8859-1') {
+            // encodeURIComponent('&#10003;'), the "numeric entity" representation of a checkmark
+            prefix += 'utf8=%26%2310003%3B&';
+        } else {
+            // encodeURIComponent('✓')
+            prefix += 'utf8=%E2%9C%93&';
+        }
+    }
+
+    return joined.length > 0 ? prefix + joined : '';
+};
+
+
+/***/ }),
+
+/***/ 2360:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+
+var formats = __nccwpck_require__(4907);
+
+var has = Object.prototype.hasOwnProperty;
+var isArray = Array.isArray;
+
+var hexTable = (function () {
+    var array = [];
+    for (var i = 0; i < 256; ++i) {
+        array.push('%' + ((i < 16 ? '0' : '') + i.toString(16)).toUpperCase());
+    }
+
+    return array;
+}());
+
+var compactQueue = function compactQueue(queue) {
+    while (queue.length > 1) {
+        var item = queue.pop();
+        var obj = item.obj[item.prop];
+
+        if (isArray(obj)) {
+            var compacted = [];
+
+            for (var j = 0; j < obj.length; ++j) {
+                if (typeof obj[j] !== 'undefined') {
+                    compacted.push(obj[j]);
+                }
+            }
+
+            item.obj[item.prop] = compacted;
+        }
+    }
+};
+
+var arrayToObject = function arrayToObject(source, options) {
+    var obj = options && options.plainObjects ? Object.create(null) : {};
+    for (var i = 0; i < source.length; ++i) {
+        if (typeof source[i] !== 'undefined') {
+            obj[i] = source[i];
+        }
+    }
+
+    return obj;
+};
+
+var merge = function merge(target, source, options) {
+    /* eslint no-param-reassign: 0 */
+    if (!source) {
+        return target;
+    }
+
+    if (typeof source !== 'object') {
+        if (isArray(target)) {
+            target.push(source);
+        } else if (target && typeof target === 'object') {
+            if ((options && (options.plainObjects || options.allowPrototypes)) || !has.call(Object.prototype, source)) {
+                target[source] = true;
+            }
+        } else {
+            return [target, source];
+        }
+
+        return target;
+    }
+
+    if (!target || typeof target !== 'object') {
+        return [target].concat(source);
+    }
+
+    var mergeTarget = target;
+    if (isArray(target) && !isArray(source)) {
+        mergeTarget = arrayToObject(target, options);
+    }
+
+    if (isArray(target) && isArray(source)) {
+        source.forEach(function (item, i) {
+            if (has.call(target, i)) {
+                var targetItem = target[i];
+                if (targetItem && typeof targetItem === 'object' && item && typeof item === 'object') {
+                    target[i] = merge(targetItem, item, options);
+                } else {
+                    target.push(item);
+                }
+            } else {
+                target[i] = item;
+            }
+        });
+        return target;
+    }
+
+    return Object.keys(source).reduce(function (acc, key) {
+        var value = source[key];
+
+        if (has.call(acc, key)) {
+            acc[key] = merge(acc[key], value, options);
+        } else {
+            acc[key] = value;
+        }
+        return acc;
+    }, mergeTarget);
+};
+
+var assign = function assignSingleSource(target, source) {
+    return Object.keys(source).reduce(function (acc, key) {
+        acc[key] = source[key];
+        return acc;
+    }, target);
+};
+
+var decode = function (str, decoder, charset) {
+    var strWithoutPlus = str.replace(/\+/g, ' ');
+    if (charset === 'iso-8859-1') {
+        // unescape never throws, no try...catch needed:
+        return strWithoutPlus.replace(/%[0-9a-f]{2}/gi, unescape);
+    }
+    // utf-8
+    try {
+        return decodeURIComponent(strWithoutPlus);
+    } catch (e) {
+        return strWithoutPlus;
+    }
+};
+
+var encode = function encode(str, defaultEncoder, charset, kind, format) {
+    // This code was originally written by Brian White (mscdex) for the io.js core querystring library.
+    // It has been adapted here for stricter adherence to RFC 3986
+    if (str.length === 0) {
+        return str;
+    }
+
+    var string = str;
+    if (typeof str === 'symbol') {
+        string = Symbol.prototype.toString.call(str);
+    } else if (typeof str !== 'string') {
+        string = String(str);
+    }
+
+    if (charset === 'iso-8859-1') {
+        return escape(string).replace(/%u[0-9a-f]{4}/gi, function ($0) {
+            return '%26%23' + parseInt($0.slice(2), 16) + '%3B';
+        });
+    }
+
+    var out = '';
+    for (var i = 0; i < string.length; ++i) {
+        var c = string.charCodeAt(i);
+
+        if (
+            c === 0x2D // -
+            || c === 0x2E // .
+            || c === 0x5F // _
+            || c === 0x7E // ~
+            || (c >= 0x30 && c <= 0x39) // 0-9
+            || (c >= 0x41 && c <= 0x5A) // a-z
+            || (c >= 0x61 && c <= 0x7A) // A-Z
+            || (format === formats.RFC1738 && (c === 0x28 || c === 0x29)) // ( )
+        ) {
+            out += string.charAt(i);
+            continue;
+        }
+
+        if (c < 0x80) {
+            out = out + hexTable[c];
+            continue;
+        }
+
+        if (c < 0x800) {
+            out = out + (hexTable[0xC0 | (c >> 6)] + hexTable[0x80 | (c & 0x3F)]);
+            continue;
+        }
+
+        if (c < 0xD800 || c >= 0xE000) {
+            out = out + (hexTable[0xE0 | (c >> 12)] + hexTable[0x80 | ((c >> 6) & 0x3F)] + hexTable[0x80 | (c & 0x3F)]);
+            continue;
+        }
+
+        i += 1;
+        c = 0x10000 + (((c & 0x3FF) << 10) | (string.charCodeAt(i) & 0x3FF));
+        /* eslint operator-linebreak: [2, "before"] */
+        out += hexTable[0xF0 | (c >> 18)]
+            + hexTable[0x80 | ((c >> 12) & 0x3F)]
+            + hexTable[0x80 | ((c >> 6) & 0x3F)]
+            + hexTable[0x80 | (c & 0x3F)];
+    }
+
+    return out;
+};
+
+var compact = function compact(value) {
+    var queue = [{ obj: { o: value }, prop: 'o' }];
+    var refs = [];
+
+    for (var i = 0; i < queue.length; ++i) {
+        var item = queue[i];
+        var obj = item.obj[item.prop];
+
+        var keys = Object.keys(obj);
+        for (var j = 0; j < keys.length; ++j) {
+            var key = keys[j];
+            var val = obj[key];
+            if (typeof val === 'object' && val !== null && refs.indexOf(val) === -1) {
+                queue.push({ obj: obj, prop: key });
+                refs.push(val);
+            }
+        }
+    }
+
+    compactQueue(queue);
+
+    return value;
+};
+
+var isRegExp = function isRegExp(obj) {
+    return Object.prototype.toString.call(obj) === '[object RegExp]';
+};
+
+var isBuffer = function isBuffer(obj) {
+    if (!obj || typeof obj !== 'object') {
+        return false;
+    }
+
+    return !!(obj.constructor && obj.constructor.isBuffer && obj.constructor.isBuffer(obj));
+};
+
+var combine = function combine(a, b) {
+    return [].concat(a, b);
+};
+
+var maybeMap = function maybeMap(val, fn) {
+    if (isArray(val)) {
+        var mapped = [];
+        for (var i = 0; i < val.length; i += 1) {
+            mapped.push(fn(val[i]));
+        }
+        return mapped;
+    }
+    return fn(val);
+};
+
+module.exports = {
+    arrayToObject: arrayToObject,
+    assign: assign,
+    combine: combine,
+    compact: compact,
+    decode: decode,
+    encode: encode,
+    isBuffer: isBuffer,
+    isRegExp: isRegExp,
+    maybeMap: maybeMap,
+    merge: merge
+};
+
+
+/***/ }),
+
+/***/ 9273:
+/***/ ((module) => {
+
+
+
+class QuickLRU {
+	constructor(options = {}) {
+		if (!(options.maxSize && options.maxSize > 0)) {
+			throw new TypeError('`maxSize` must be a number greater than 0');
+		}
+
+		this.maxSize = options.maxSize;
+		this.onEviction = options.onEviction;
+		this.cache = new Map();
+		this.oldCache = new Map();
+		this._size = 0;
+	}
+
+	_set(key, value) {
+		this.cache.set(key, value);
+		this._size++;
+
+		if (this._size >= this.maxSize) {
+			this._size = 0;
+
+			if (typeof this.onEviction === 'function') {
+				for (const [key, value] of this.oldCache.entries()) {
+					this.onEviction(key, value);
+				}
+			}
+
+			this.oldCache = this.cache;
+			this.cache = new Map();
+		}
+	}
+
+	get(key) {
+		if (this.cache.has(key)) {
+			return this.cache.get(key);
+		}
+
+		if (this.oldCache.has(key)) {
+			const value = this.oldCache.get(key);
+			this.oldCache.delete(key);
+			this._set(key, value);
+			return value;
+		}
+	}
+
+	set(key, value) {
+		if (this.cache.has(key)) {
+			this.cache.set(key, value);
+		} else {
+			this._set(key, value);
+		}
+
+		return this;
+	}
+
+	has(key) {
+		return this.cache.has(key) || this.oldCache.has(key);
+	}
+
+	peek(key) {
+		if (this.cache.has(key)) {
+			return this.cache.get(key);
+		}
+
+		if (this.oldCache.has(key)) {
+			return this.oldCache.get(key);
+		}
+	}
+
+	delete(key) {
+		const deleted = this.cache.delete(key);
+		if (deleted) {
+			this._size--;
+		}
+
+		return this.oldCache.delete(key) || deleted;
+	}
+
+	clear() {
+		this.cache.clear();
+		this.oldCache.clear();
+		this._size = 0;
+	}
+
+	* keys() {
+		for (const [key] of this) {
+			yield key;
+		}
+	}
+
+	* values() {
+		for (const [, value] of this) {
+			yield value;
+		}
+	}
+
+	* [Symbol.iterator]() {
+		for (const item of this.cache) {
+			yield item;
+		}
+
+		for (const item of this.oldCache) {
+			const [key] = item;
+			if (!this.cache.has(key)) {
+				yield item;
+			}
+		}
+	}
+
+	get size() {
+		let oldCacheSize = 0;
+		for (const key of this.oldCache.keys()) {
+			if (!this.cache.has(key)) {
+				oldCacheSize++;
+			}
+		}
+
+		return Math.min(this._size + oldCacheSize, this.maxSize);
+	}
+}
+
+module.exports = QuickLRU;
+
+
+/***/ }),
+
+/***/ 6624:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+const tls = __nccwpck_require__(4404);
+
+module.exports = (options = {}, connect = tls.connect) => new Promise((resolve, reject) => {
+	let timeout = false;
+
+	let socket;
+
+	const callback = async () => {
+		await socketPromise;
+
+		socket.off('timeout', onTimeout);
+		socket.off('error', reject);
+
+		if (options.resolveSocket) {
+			resolve({alpnProtocol: socket.alpnProtocol, socket, timeout});
+
+			if (timeout) {
+				await Promise.resolve();
+				socket.emit('timeout');
+			}
+		} else {
+			socket.destroy();
+			resolve({alpnProtocol: socket.alpnProtocol, timeout});
+		}
+	};
+
+	const onTimeout = async () => {
+		timeout = true;
+		callback();
+	};
+
+	const socketPromise = (async () => {
+		try {
+			socket = await connect(options, callback);
+
+			socket.on('error', reject);
+			socket.once('timeout', onTimeout);
+		} catch (error) {
+			reject(error);
+		}
+	})();
+});
+
+
+/***/ }),
+
+/***/ 9004:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+
+const Readable = (__nccwpck_require__(2781).Readable);
+const lowercaseKeys = __nccwpck_require__(9662);
+
+class Response extends Readable {
+	constructor(statusCode, headers, body, url) {
+		if (typeof statusCode !== 'number') {
+			throw new TypeError('Argument `statusCode` should be a number');
+		}
+		if (typeof headers !== 'object') {
+			throw new TypeError('Argument `headers` should be an object');
+		}
+		if (!(body instanceof Buffer)) {
+			throw new TypeError('Argument `body` should be a buffer');
+		}
+		if (typeof url !== 'string') {
+			throw new TypeError('Argument `url` should be a string');
+		}
+
+		super();
+		this.statusCode = statusCode;
+		this.headers = lowercaseKeys(headers);
+		this.body = body;
+		this.url = url;
+	}
+
+	_read() {
+		this.push(this.body);
+		this.push(null);
+	}
+}
+
+module.exports = Response;
+
+
+/***/ }),
+
+/***/ 4334:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+
+var GetIntrinsic = __nccwpck_require__(4538);
+var callBound = __nccwpck_require__(8803);
+var inspect = __nccwpck_require__(504);
+
+var $TypeError = GetIntrinsic('%TypeError%');
+var $WeakMap = GetIntrinsic('%WeakMap%', true);
+var $Map = GetIntrinsic('%Map%', true);
+
+var $weakMapGet = callBound('WeakMap.prototype.get', true);
+var $weakMapSet = callBound('WeakMap.prototype.set', true);
+var $weakMapHas = callBound('WeakMap.prototype.has', true);
+var $mapGet = callBound('Map.prototype.get', true);
+var $mapSet = callBound('Map.prototype.set', true);
+var $mapHas = callBound('Map.prototype.has', true);
+
+/*
+ * This function traverses the list returning the node corresponding to the
+ * given key.
+ *
+ * That node is also moved to the head of the list, so that if it's accessed
+ * again we don't need to traverse the whole list. By doing so, all the recently
+ * used nodes can be accessed relatively quickly.
+ */
+var listGetNode = function (list, key) { // eslint-disable-line consistent-return
+	for (var prev = list, curr; (curr = prev.next) !== null; prev = curr) {
+		if (curr.key === key) {
+			prev.next = curr.next;
+			curr.next = list.next;
+			list.next = curr; // eslint-disable-line no-param-reassign
+			return curr;
+		}
+	}
+};
+
+var listGet = function (objects, key) {
+	var node = listGetNode(objects, key);
+	return node && node.value;
+};
+var listSet = function (objects, key, value) {
+	var node = listGetNode(objects, key);
+	if (node) {
+		node.value = value;
+	} else {
+		// Prepend the new node to the beginning of the list
+		objects.next = { // eslint-disable-line no-param-reassign
+			key: key,
+			next: objects.next,
+			value: value
+		};
+	}
+};
+var listHas = function (objects, key) {
+	return !!listGetNode(objects, key);
+};
+
+module.exports = function getSideChannel() {
+	var $wm;
+	var $m;
+	var $o;
+	var channel = {
+		assert: function (key) {
+			if (!channel.has(key)) {
+				throw new $TypeError('Side channel does not contain ' + inspect(key));
+			}
+		},
+		get: function (key) { // eslint-disable-line consistent-return
+			if ($WeakMap && key && (typeof key === 'object' || typeof key === 'function')) {
+				if ($wm) {
+					return $weakMapGet($wm, key);
+				}
+			} else if ($Map) {
+				if ($m) {
+					return $mapGet($m, key);
+				}
+			} else {
+				if ($o) { // eslint-disable-line no-lonely-if
+					return listGet($o, key);
+				}
+			}
+		},
+		has: function (key) {
+			if ($WeakMap && key && (typeof key === 'object' || typeof key === 'function')) {
+				if ($wm) {
+					return $weakMapHas($wm, key);
+				}
+			} else if ($Map) {
+				if ($m) {
+					return $mapHas($m, key);
+				}
+			} else {
+				if ($o) { // eslint-disable-line no-lonely-if
+					return listHas($o, key);
+				}
+			}
+			return false;
+		},
+		set: function (key, value) {
+			if ($WeakMap && key && (typeof key === 'object' || typeof key === 'function')) {
+				if (!$wm) {
+					$wm = new $WeakMap();
+				}
+				$weakMapSet($wm, key, value);
+			} else if ($Map) {
+				if (!$m) {
+					$m = new $Map();
+				}
+				$mapSet($m, key, value);
+			} else {
+				if (!$o) {
+					/*
+					 * Initialize the linked list as an empty node, so that we don't have
+					 * to special-case handling of the first node: we can always refer to
+					 * it as (previous node).next, instead of something like (list).head
+					 */
+					$o = { key: {}, next: null };
+				}
+				listSet($o, key, value);
+			}
+		}
+	};
+	return channel;
+};
+
+
+/***/ }),
+
+/***/ 4878:
+/***/ ((module) => {
+
+
+
+module.exports = (string, separator) => {
+	if (!(typeof string === 'string' && typeof separator === 'string')) {
+		throw new TypeError('Expected the arguments to be of type `string`');
+	}
+
+	if (separator === '') {
+		return [string];
+	}
+
+	const separatorIndex = string.indexOf(separator);
+
+	if (separatorIndex === -1) {
+		return [string];
+	}
+
+	return [
+		string.slice(0, separatorIndex),
+		string.slice(separatorIndex + separator.length)
+	];
+};
+
+
+/***/ }),
+
+/***/ 3605:
+/***/ ((module) => {
+
+
+module.exports = str => encodeURIComponent(str).replace(/[!'()*]/g, x => `%${x.charCodeAt(0).toString(16).toUpperCase()}`);
 
 
 /***/ }),
@@ -14519,6 +30664,247 @@ function wrappy (fn, cb) {
 
 /***/ }),
 
+/***/ 7020:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
+function isLower(char) {
+  return char >= 0x61 /* 'a' */ && char <= 0x7a /* 'z' */;
+}
+
+function isUpper(char) {
+  return char >= 0x41 /* 'A' */ && char <= 0x5a /* 'Z' */;
+}
+
+function isDigit(char) {
+  return char >= 0x30 /* '0' */ && char <= 0x39 /* '9' */;
+}
+
+function toUpper(char) {
+  return char - 0x20;
+}
+
+function toUpperSafe(char) {
+  if (isLower(char)) {
+    return char - 0x20;
+  }
+  return char;
+}
+
+function toLower(char) {
+  return char + 0x20;
+}
+
+function camelize$1(str, separator) {
+  var firstChar = str.charCodeAt(0);
+  if (isDigit(firstChar) || isUpper(firstChar) || firstChar == separator) {
+    return str;
+  }
+  var out = [];
+  var changed = false;
+  if (isUpper(firstChar)) {
+    changed = true;
+    out.push(toLower(firstChar));
+  } else {
+    out.push(firstChar);
+  }
+
+  var length = str.length;
+  for (var i = 1; i < length; ++i) {
+    var c = str.charCodeAt(i);
+    if (c === separator) {
+      changed = true;
+      c = str.charCodeAt(++i);
+      if (isNaN(c)) {
+        return str;
+      }
+      out.push(toUpperSafe(c));
+    } else {
+      out.push(c);
+    }
+  }
+  return changed ? String.fromCharCode.apply(undefined, out) : str;
+}
+
+function decamelize$1(str, separator) {
+  var firstChar = str.charCodeAt(0);
+  if (!isLower(firstChar)) {
+    return str;
+  }
+  var length = str.length;
+  var changed = false;
+  var out = [];
+  for (var i = 0; i < length; ++i) {
+    var c = str.charCodeAt(i);
+    if (isUpper(c)) {
+      out.push(separator);
+      out.push(toLower(c));
+      changed = true;
+    } else {
+      out.push(c);
+    }
+  }
+  return changed ? String.fromCharCode.apply(undefined, out) : str;
+}
+
+function pascalize$1(str, separator) {
+  var firstChar = str.charCodeAt(0);
+  if (isDigit(firstChar) || firstChar == separator) {
+    return str;
+  }
+  var length = str.length;
+  var changed = false;
+  var out = [];
+  for (var i = 0; i < length; ++i) {
+    var c = str.charCodeAt(i);
+    if (c === separator) {
+      changed = true;
+      c = str.charCodeAt(++i);
+      if (isNaN(c)) {
+        return str;
+      }
+      out.push(toUpperSafe(c));
+    } else if (i === 0 && isLower(c)) {
+      changed = true;
+      out.push(toUpper(c));
+    } else {
+      out.push(c);
+    }
+  }
+  return changed ? String.fromCharCode.apply(undefined, out) : str;
+}
+
+function depascalize$1(str, separator) {
+  var firstChar = str.charCodeAt(0);
+  if (!isUpper(firstChar)) {
+    return str;
+  }
+  var length = str.length;
+  var changed = false;
+  var out = [];
+  for (var i = 0; i < length; ++i) {
+    var c = str.charCodeAt(i);
+    if (isUpper(c)) {
+      if (i > 0) {
+        out.push(separator);
+      }
+      out.push(toLower(c));
+      changed = true;
+    } else {
+      out.push(c);
+    }
+  }
+  return changed ? String.fromCharCode.apply(undefined, out) : str;
+}
+
+function shouldProcessValue(value) {
+  return value && (typeof value === 'undefined' ? 'undefined' : _typeof(value)) == 'object' && !(value instanceof Date) && !(value instanceof Function);
+}
+
+function processKeys(obj, fun, opts) {
+  var obj2 = void 0;
+  if (obj instanceof Array) {
+    obj2 = [];
+  } else {
+    if (typeof obj.prototype !== 'undefined') {
+      // return non-plain object unchanged
+      return obj;
+    }
+    obj2 = {};
+  }
+  for (var key in obj) {
+    var value = obj[key];
+    if (typeof key === 'string') key = fun(key, opts && opts.separator);
+    if (shouldProcessValue(value)) {
+      obj2[key] = processKeys(value, fun, opts);
+    } else {
+      obj2[key] = value;
+    }
+  }
+  return obj2;
+}
+
+function processKeysInPlace(obj, fun, opts) {
+  var keys = Object.keys(obj);
+  for (var idx = 0; idx < keys.length; ++idx) {
+    var key = keys[idx];
+    var value = obj[key];
+    var newKey = fun(key, opts && opts.separator);
+    if (newKey !== key) {
+      delete obj[key];
+    }
+    if (shouldProcessValue(value)) {
+      obj[newKey] = processKeys(value, fun, opts);
+    } else {
+      obj[newKey] = value;
+    }
+  }
+  return obj;
+}
+
+function camelize$$1(str, separator) {
+  return camelize$1(str, separator && separator.charCodeAt(0) || 0x5f /* _ */);
+}
+
+function decamelize$$1(str, separator) {
+  return decamelize$1(str, separator && separator.charCodeAt(0) || 0x5f /* _ */);
+}
+
+function pascalize$$1(str, separator) {
+  return pascalize$1(str, separator && separator.charCodeAt(0) || 0x5f /* _ */);
+}
+
+function depascalize$$1(str, separator) {
+  return depascalize$1(str, separator && separator.charCodeAt(0) || 0x5f /* _ */);
+}
+
+function camelizeKeys(obj, opts) {
+  opts = opts || {};
+  if (!shouldProcessValue(obj)) return obj;
+  if (opts.inPlace) return processKeysInPlace(obj, camelize$$1, opts);
+  return processKeys(obj, camelize$$1, opts);
+}
+
+function decamelizeKeys(obj, opts) {
+  opts = opts || {};
+  if (!shouldProcessValue(obj)) return obj;
+  if (opts.inPlace) return processKeysInPlace(obj, decamelize$$1, opts);
+  return processKeys(obj, decamelize$$1, opts);
+}
+
+function pascalizeKeys(obj, opts) {
+  opts = opts || {};
+  if (!shouldProcessValue(obj)) return obj;
+  if (opts.inPlace) return processKeysInPlace(obj, pascalize$$1, opts);
+  return processKeys(obj, pascalize$$1, opts);
+}
+
+function depascalizeKeys(obj, opts) {
+  opts = opts || {};
+  if (!shouldProcessValue(obj)) return obj;
+  if (opts.inPlace) return processKeysInPlace(obj, depascalize$$1, opts);
+  return processKeys(obj, depascalize$$1, opts);
+}
+
+exports.camelize = camelize$$1;
+exports.decamelize = decamelize$$1;
+exports.pascalize = pascalize$$1;
+exports.depascalize = depascalize$$1;
+exports.camelizeKeys = camelizeKeys;
+exports.decamelizeKeys = decamelizeKeys;
+exports.pascalizeKeys = pascalizeKeys;
+exports.depascalizeKeys = depascalizeKeys;
+
+
+/***/ }),
+
 /***/ 2877:
 /***/ ((module) => {
 
@@ -14548,6 +30934,13 @@ module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("crypto");
 
 /***/ }),
 
+/***/ 9523:
+/***/ ((module) => {
+
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("dns");
+
+/***/ }),
+
 /***/ 2361:
 /***/ ((module) => {
 
@@ -14566,6 +30959,13 @@ module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("fs");
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("http");
+
+/***/ }),
+
+/***/ 5158:
+/***/ ((module) => {
+
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("http2");
 
 /***/ }),
 
@@ -15221,10 +31621,24 @@ return new B(c,{type:"multipart/form-data; boundary="+b})}
 
 /***/ }),
 
+/***/ 8111:
+/***/ ((module) => {
+
+module.exports = JSON.parse('{"ApplicationSettings":[{"name":"constructor","args":["0","1"]},{"name":"all","args":[]},{"name":"edit","args":[]}],"Branches":[{"name":"constructor","args":["0","1"]},{"name":"all","args":["projectId"]},{"name":"create","args":["projectId","branchName","ref"]},{"name":"remove","args":["projectId","branchName"]},{"name":"show","args":["projectId","branchName"]}],"BroadcastMessages":[{"name":"constructor","args":["0","1"]},{"name":"all","args":[]},{"name":"create","args":[]},{"name":"edit","args":["broadcastMessageId"]},{"name":"remove","args":["broadcastMessageId"]},{"name":"show","args":["broadcastMessageId"]}],"CommitDiscussions":[{"name":"constructor","args":["0","1"]},{"name":"addNote","args":["resourceId","resource2Id","discussionId","noteId","body"]},{"name":"all","args":["resourceId","resource2Id"]},{"name":"create","args":["resourceId","resource2Id","body",{}]},{"name":"editNote","args":["resourceId","resource2Id","discussionId","noteId",{}]},{"name":"removeNote","args":["resourceId","resource2Id","discussionId","noteId"]},{"name":"show","args":["resourceId","resource2Id","discussionId"]}],"Commits":[{"name":"constructor","args":["0","1"]},{"name":"all","args":["projectId"]},{"name":"cherryPick","args":["projectId","sha","branch"]},{"name":"comments","args":["projectId","sha"]},{"name":"create","args":[]},{"name":"createComment","args":["projectId","sha","note"]},{"name":"diff","args":["projectId","sha"]},{"name":"editStatus","args":["projectId","sha"]},{"name":"references","args":["projectId","sha"]},{"name":"revert","args":["projectId","sha"]},{"name":"show","args":["projectId","sha"]},{"name":"statuses","args":["projectId","sha"]},{"name":"mergeRequests","args":["projectId","sha"]},{"name":"signature","args":["projectId","sha"]}],"ContainerRegistry":[{"name":"constructor","args":["0","1"]},{"name":"projectRepositories","args":["projectId"]},{"name":"groupRepositories","args":["projectId"]},{"name":"showRepository","args":["projectId","repositoryId"]},{"name":"tags","args":["projectId","repositoryId"]},{"name":"removeRepository","args":["projectId","repositoryId"]},{"name":"removeTag","args":["projectId","repositoryId","tagName"]},{"name":"removeTags","args":["projectId","repositoryId","nameRegexDelete"]},{"name":"showTag","args":["projectId","repositoryId","tagName"]}],"DeployKeys":[{"name":"constructor","args":["0","1"]},{"name":"add","args":["projectId"]},{"name":"all","args":[{}]},{"name":"edit","args":["projectId","keyId"]},{"name":"enable","args":["projectId","keyId"]},{"name":"remove","args":["projectId","keyId"]},{"name":"show","args":["projectId","keyId"]}],"Deployments":[{"name":"constructor","args":["0","1"]},{"name":"all","args":["projectId"]},{"name":"create","args":["projectId","environment","sha","ref","tag","status"]},{"name":"edit","args":["projectId","deploymentId","status"]},{"name":"show","args":["projectId","deploymentId"]},{"name":"mergeRequests","args":["projectId","deploymentId"]}],"Environments":[{"name":"constructor","args":["0","1"]},{"name":"all","args":["projectId"]},{"name":"show","args":["projectId","environmentId"]},{"name":"create","args":["projectId"]},{"name":"edit","args":["projectId","environmentId"]},{"name":"remove","args":["projectId","environmentId"]},{"name":"stop","args":["projectId","environmentId"]}],"EpicDiscussions":[{"name":"constructor","args":["0","1"]},{"name":"addNote","args":["resourceId","resource2Id","discussionId","noteId","body"]},{"name":"all","args":["resourceId","resource2Id"]},{"name":"create","args":["resourceId","resource2Id","body",{}]},{"name":"editNote","args":["resourceId","resource2Id","discussionId","noteId",{}]},{"name":"removeNote","args":["resourceId","resource2Id","discussionId","noteId"]},{"name":"show","args":["resourceId","resource2Id","discussionId"]}],"EpicIssues":[{"name":"constructor","args":["0","1"]},{"name":"all","args":["groupId","epicIId"]},{"name":"assign","args":["groupId","epicIId","epicIssueId"]},{"name":"edit","args":["groupId","epicIId","epicIssueId"]},{"name":"remove","args":["groupId","epicIId","epicIssueId"]}],"EpicNotes":[{"name":"constructor","args":["0","1"]},{"name":"all","args":["resourceId","resource2Id"]},{"name":"create","args":["resourceId","resource2Id","body"]},{"name":"edit","args":["resourceId","resource2Id","noteId","body"]},{"name":"remove","args":["resourceId","resource2Id","noteId"]},{"name":"show","args":["resourceId","resource2Id","noteId"]}],"Epics":[{"name":"constructor","args":["0","1"]},{"name":"all","args":["groupId"]},{"name":"create","args":["groupId","title"]},{"name":"edit","args":["groupId","epicId"]},{"name":"remove","args":["groupId","epicId"]},{"name":"show","args":["groupId","epicId"]}],"Events":[{"name":"constructor","args":["0","1"]},{"name":"all","args":[{}]}],"FeatureFlags":[{"name":"constructor","args":["0","1"]},{"name":"all","args":["projectId"]},{"name":"create","args":["projectId","flagName","version"]},{"name":"edit","args":["projectId","flagName"]},{"name":"remove","args":["projectId","flagName"]},{"name":"show","args":["projectId","flagName"]}],"FreezePeriods":[{"name":"constructor","args":["0","1"]},{"name":"all","args":["projectId"]},{"name":"show","args":["projectId","freezePeriodId"]},{"name":"create","args":["projectId","freezeStart","freezeEnd"]},{"name":"edit","args":["projectId","freezePeriodId"]},{"name":"delete","args":["projectId","freezePeriodId"]}],"GeoNodes":[{"name":"constructor","args":["0","1"]},{"name":"all","args":[]},{"name":"create","args":["geonodeId"]},{"name":"edit","args":["geonodeId"]},{"name":"failures","args":[]},{"name":"repair","args":["geonodeId"]},{"name":"remove","args":["geonodeId"]},{"name":"show","args":["geonodeId"]},{"name":"status","args":["geonodeId"]},{"name":"statuses","args":[]}],"GitLabCIYMLTemplates":[{"name":"constructor","args":["0","1"]},{"name":"all","args":[]},{"name":"show","args":["key"]}],"GitignoreTemplates":[{"name":"constructor","args":["0","1"]},{"name":"all","args":[]},{"name":"show","args":["key"]}],"Gitlab":[{"name":"constructor","args":["0","1"]}],"GroupAccessRequests":[{"name":"constructor","args":["0","1"]},{"name":"all","args":["resourceId"]},{"name":"request","args":["resourceId"]},{"name":"approve","args":["resourceId","userId"]},{"name":"deny","args":["resourceId","userId"]}],"GroupBadges":[{"name":"constructor","args":["0","1"]},{"name":"add","args":["resourceId"]},{"name":"all","args":["resourceId"]},{"name":"edit","args":["resourceId","badgeId"]},{"name":"preview","args":["resourceId","linkUrl","imageUrl"]},{"name":"remove","args":["resourceId","badgeId"]},{"name":"show","args":["resourceId","badgeId"]}],"GroupCustomAttributes":[{"name":"constructor","args":["0","1"]},{"name":"all","args":["resourceId"]},{"name":"set","args":["resourceId","customAttributeId","value"]},{"name":"remove","args":["resourceId","customAttributeId"]},{"name":"show","args":["resourceId","customAttributeId"]}],"GroupDeployTokens":[{"name":"constructor","args":["0","1"]},{"name":"add","args":["resourceId","tokenName","tokenScopes"]},{"name":"all","args":[{}]},{"name":"remove","args":["resourceId","tokenId"]}],"GroupIssueBoards":[{"name":"constructor","args":["0","1"]},{"name":"all","args":["resourceId"]},{"name":"create","args":["resourceId","name"]},{"name":"createList","args":["resourceId","boardId","labelId"]},{"name":"edit","args":["resourceId","boardId"]},{"name":"editList","args":["resourceId","boardId","listId","position"]},{"name":"lists","args":["resourceId","boardId"]},{"name":"remove","args":["resourceId","boardId"]},{"name":"removeList","args":["resourceId","boardId","listId"]},{"name":"show","args":["resourceId","boardId"]},{"name":"showList","args":["resourceId","boardId","listId"]}],"GroupLabels":[{"name":"constructor","args":["0","1"]},{"name":"all","args":["resourceId"]},{"name":"create","args":["resourceId","labelName","color"]},{"name":"edit","args":["resourceId","labelId"]},{"name":"remove","args":["resourceId","labelId"]},{"name":"subscribe","args":["resourceId","labelId"]},{"name":"unsubscribe","args":["resourceId","labelId"]}],"GroupMembers":[{"name":"constructor","args":["0","1"]},{"name":"add","args":["resourceId","userId","accessLevel"]},{"name":"all","args":["resourceId",{}]},{"name":"edit","args":["resourceId","userId","accessLevel"]},{"name":"show","args":["resourceId","userId",{}]},{"name":"remove","args":["resourceId","userId"]}],"GroupMilestones":[{"name":"constructor","args":["0","1"]},{"name":"all","args":["resourceId"]},{"name":"create","args":["resourceId","title"]},{"name":"edit","args":["resourceId","milestoneId"]},{"name":"issues","args":["resourceId","milestoneId"]},{"name":"mergeRequests","args":["resourceId","milestoneId"]},{"name":"show","args":["resourceId","milestoneId"]}],"GroupRunners":[{"name":"constructor","args":["0","1"]},{"name":"all","args":["groupId"]}],"GroupVariables":[{"name":"constructor","args":["0","1"]},{"name":"all","args":["resourceId"]},{"name":"create","args":["resourceId"]},{"name":"edit","args":["resourceId","keyId"]},{"name":"show","args":["resourceId","keyId"]},{"name":"remove","args":["resourceId","keyId"]}],"Groups":[{"name":"constructor","args":["0","1"]},{"name":"all","args":[]},{"name":"create","args":["name","path"]},{"name":"createLDAPLink","args":["groupId","cn","groupAccess","provider"]},{"name":"edit","args":["groupId"]},{"name":"projects","args":["groupId"]},{"name":"remove","args":["groupId"]},{"name":"removeLDAPLink","args":["groupId","cn",{}]},{"name":"search","args":["nameOrPath"]},{"name":"show","args":["groupId"]},{"name":"subgroups","args":["groupId"]},{"name":"syncLDAP","args":["groupId"]},{"name":"transferProject","args":["groupId","projectId"]}],"IssueAwardEmojis":[{"name":"constructor","args":["0","1"]},{"name":"all","args":["projectId","resourceIId"]},{"name":"award","args":["projectId","resourceIId","name"]},{"name":"remove","args":["projectId","resourceIId","awardId"]},{"name":"show","args":["projectId","resourceIId","awardId"]}],"IssueDiscussions":[{"name":"constructor","args":["0","1"]},{"name":"addNote","args":["resourceId","resource2Id","discussionId","noteId","body"]},{"name":"all","args":["resourceId","resource2Id"]},{"name":"create","args":["resourceId","resource2Id","body",{}]},{"name":"editNote","args":["resourceId","resource2Id","discussionId","noteId",{}]},{"name":"removeNote","args":["resourceId","resource2Id","discussionId","noteId"]},{"name":"show","args":["resourceId","resource2Id","discussionId"]}],"IssueNoteAwardEmojis":[{"name":"constructor","args":["0","1"]},{"name":"all","args":["projectId","resourceIId","noteId"]},{"name":"award","args":["projectId","resourceIId","noteId","name"]},{"name":"remove","args":["projectId","resourceIId","noteId","awardId"]},{"name":"show","args":["projectId","resourceIId","noteId","awardId"]}],"IssueNotes":[{"name":"constructor","args":["0","1"]},{"name":"all","args":["resourceId","resource2Id"]},{"name":"create","args":["resourceId","resource2Id","body"]},{"name":"edit","args":["resourceId","resource2Id","noteId","body"]},{"name":"remove","args":["resourceId","resource2Id","noteId"]},{"name":"show","args":["resourceId","resource2Id","noteId"]}],"Issues":[{"name":"constructor","args":["0","1"]},{"name":"addSpentTime","args":["projectId","issueIid","duration"]},{"name":"addTimeEstimate","args":["projectId","issueIid","duration"]},{"name":"all","args":[{}]},{"name":"create","args":["projectId"]},{"name":"closedBy","args":["projectId","issueIid"]},{"name":"edit","args":["projectId","issueIid"]},{"name":"link","args":["projectId","issueIId","targetProjectId","targetIssueIId"]},{"name":"links","args":["projectId","issueIid"]},{"name":"participants","args":["projectId","issueIid"]},{"name":"relatedMergeRequests","args":["projectId","issueIid"]},{"name":"removeLink","args":["projectId","issueIid","issueLinkId"]},{"name":"remove","args":["projectId","issueIid"]},{"name":"resetSpentTime","args":["projectId","issueIid"]},{"name":"resetTimeEstimate","args":["projectId","issueIid"]},{"name":"show","args":["projectId","issueIid"]},{"name":"subscribe","args":["projectId","issueIid"]},{"name":"timeStats","args":["projectId","issueIid"]},{"name":"unsubscribe","args":["projectId","issueIid"]}],"IssuesStatistics":[{"name":"constructor","args":["0","1"]},{"name":"all","args":[{}]}],"Jobs":[{"name":"constructor","args":["0","1"]},{"name":"all","args":["projectId"]},{"name":"cancel","args":["projectId","jobId"]},{"name":"downloadSingleArtifactFile","args":["projectId","jobId","artifactPath",{"stream":false}]},{"name":"downloadSingleArtifactFileFromRef","args":["projectId","ref","artifactPath","jobName",{"stream":false}]},{"name":"downloadLatestArtifactFile","args":["projectId","ref","jobName",{"stream":false}]},{"name":"downloadTraceFile","args":["projectId","jobId"]},{"name":"erase","args":["projectId","jobId"]},{"name":"eraseArtifacts","args":["projectId","jobId"]},{"name":"keepArtifacts","args":["projectId","jobId"]},{"name":"play","args":["projectId","jobId"]},{"name":"retry","args":["projectId","jobId"]},{"name":"show","args":["projectId","jobId"]},{"name":"showPipelineJobs","args":["projectId","pipelineId"]},{"name":"showPipelineBridges","args":["projectId","pipelineId"]}],"Keys":[{"name":"constructor","args":["0","1"]},{"name":"show","args":["keyId"]}],"Labels":[{"name":"constructor","args":["0","1"]},{"name":"all","args":["resourceId"]},{"name":"create","args":["resourceId","labelName","color"]},{"name":"edit","args":["resourceId","labelId"]},{"name":"remove","args":["resourceId","labelId"]},{"name":"subscribe","args":["resourceId","labelId"]},{"name":"unsubscribe","args":["resourceId","labelId"]}],"License":[{"name":"constructor","args":["0","1"]},{"name":"add","args":["license"]},{"name":"all","args":[]},{"name":"show","args":[]},{"name":"remove","args":["licenceId"]}],"LicenseTemplates":[{"name":"constructor","args":["0","1"]},{"name":"all","args":[]},{"name":"show","args":["key"]}],"Lint":[{"name":"constructor","args":["0","1"]},{"name":"lint","args":["content"]},{"name":"lintWithNamespace","args":["projectId","content"]}],"Markdown":[{"name":"constructor","args":["0","1"]},{"name":"render","args":["text"]}],"MergeRequestApprovals":[{"name":"constructor","args":["0","1"]},{"name":"configuration","args":["projectId",{}]},{"name":"editConfiguration","args":["projectId",{}]},{"name":"approvalRule","args":["projectId","approvalRuleId"]},{"name":"approvalRules","args":["projectId",{}]},{"name":"addApprovalRule","args":["projectId","name","approvalsRequired",{}]},{"name":"approvalState","args":["projectId","mergerequestIid"]},{"name":"editApprovalRule","args":["projectId","approvalRuleId","name","approvalsRequired",{}]},{"name":"removeApprovalRule","args":["projectId","approvalRuleId",{}]},{"name":"approve","args":["projectId","mergerequestIid"]},{"name":"unapprove","args":["projectId","mergerequestIid"]}],"MergeRequestAwardEmojis":[{"name":"constructor","args":["0","1"]},{"name":"all","args":["projectId","resourceIId"]},{"name":"award","args":["projectId","resourceIId","name"]},{"name":"remove","args":["projectId","resourceIId","awardId"]},{"name":"show","args":["projectId","resourceIId","awardId"]}],"MergeRequestDiscussions":[{"name":"constructor","args":["0","1"]},{"name":"resolve","args":["projectId","mergerequestId","discussionId","resolved"]},{"name":"addNote","args":["resourceId","resource2Id","discussionId","noteId","body"]},{"name":"all","args":["resourceId","resource2Id"]},{"name":"create","args":["resourceId","resource2Id","body",{}]},{"name":"editNote","args":["resourceId","resource2Id","discussionId","noteId",{}]},{"name":"removeNote","args":["resourceId","resource2Id","discussionId","noteId"]},{"name":"show","args":["resourceId","resource2Id","discussionId"]}],"MergeRequestNotes":[{"name":"constructor","args":["0","1"]},{"name":"all","args":["resourceId","resource2Id"]},{"name":"create","args":["resourceId","resource2Id","body"]},{"name":"edit","args":["resourceId","resource2Id","noteId","body"]},{"name":"remove","args":["resourceId","resource2Id","noteId"]},{"name":"show","args":["resourceId","resource2Id","noteId"]}],"MergeRequests":[{"name":"constructor","args":["0","1"]},{"name":"accept","args":["projectId","mergerequestIid"]},{"name":"addSpentTime","args":["projectId","mergerequestIid","duration"]},{"name":"addTimeEstimate","args":["projectId","mergerequestIid","duration"]},{"name":"all","args":[{}]},{"name":"cancelOnPipelineSucess","args":["projectId","mergerequestIid"]},{"name":"changes","args":["projectId","mergerequestIid"]},{"name":"closesIssues","args":["projectId","mergerequestIid"]},{"name":"commits","args":["projectId","mergerequestIid"]},{"name":"create","args":["projectId","sourceBranch","targetBranch","title"]},{"name":"edit","args":["projectId","mergerequestIid"]},{"name":"participants","args":["projectId","mergerequestIid"]},{"name":"pipelines","args":["projectId","mergerequestIid"]},{"name":"rebase","args":["projectId","mergerequestIid"]},{"name":"remove","args":["projectId","mergerequestIid"]},{"name":"resetSpentTime","args":["projectId","mergerequestIid"]},{"name":"resetTimeEstimate","args":["projectId","mergerequestIid"]},{"name":"show","args":["projectId","mergerequestIid"]},{"name":"subscribe","args":["projectId","mergerequestIid"]},{"name":"timeStats","args":["projectId","mergerequestIid"]},{"name":"version","args":["projectId","mergerequestIid","versionId"]},{"name":"versions","args":["projectId","mergerequestIid"]},{"name":"unsubscribe","args":["projectId","mergerequestIid"]}],"Namespaces":[{"name":"constructor","args":["0","1"]},{"name":"all","args":[]},{"name":"show","args":["namespaceId"]}],"NotificationSettings":[{"name":"constructor","args":["0","1"]},{"name":"all","args":[{}]},{"name":"edit","args":[{}]}],"PackageRegistry":[{"name":"constructor","args":["0","1"]},{"name":"publish","args":["projectId","packageName","packageVersion","filename","content",{}]},{"name":"download","args":["projectId","packageName","packageVersion","filename"]}],"Packages":[{"name":"constructor","args":["0","1"]},{"name":"all","args":[{}]},{"name":"remove","args":["projectId","packageId"]},{"name":"removeFile","args":["projectId","packageId","projectFileId"]},{"name":"show","args":["projectId","packageId"]},{"name":"showFiles","args":["projectId","packageId"]}],"PagesDomains":[{"name":"constructor","args":["0","1"]},{"name":"all","args":[{}]},{"name":"create","args":["projectId","domain"]},{"name":"edit","args":["projectId","domain"]},{"name":"show","args":["projectId","domain"]},{"name":"remove","args":["projectId","domain"]}],"PipelineScheduleVariables":[{"name":"constructor","args":["0","1"]},{"name":"all","args":["projectId","pipelineScheduleId"]},{"name":"create","args":["projectId","pipelineScheduleId"]},{"name":"edit","args":["projectId","pipelineScheduleId","keyId"]},{"name":"show","args":["projectId","pipelineScheduleId","keyId"]},{"name":"remove","args":["projectId","pipelineScheduleId","keyId"]}],"PipelineSchedules":[{"name":"constructor","args":["0","1"]},{"name":"all","args":["projectId"]},{"name":"create","args":["projectId","description","ref","cron"]},{"name":"edit","args":["projectId","scheduleId"]},{"name":"remove","args":["projectId","scheduleId"]},{"name":"show","args":["projectId","scheduleId"]},{"name":"takeOwnership","args":["projectId","scheduleId"]}],"Pipelines":[{"name":"constructor","args":["0","1"]},{"name":"all","args":["projectId"]},{"name":"create","args":["projectId","ref"]},{"name":"delete","args":["projectId","pipelineId"]},{"name":"show","args":["projectId","pipelineId"]},{"name":"retry","args":["projectId","pipelineId"]},{"name":"cancel","args":["projectId","pipelineId"]},{"name":"allVariables","args":["projectId","pipelineId"]}],"ProjectAccessRequests":[{"name":"constructor","args":["0","1"]},{"name":"all","args":["resourceId"]},{"name":"request","args":["resourceId"]},{"name":"approve","args":["resourceId","userId"]},{"name":"deny","args":["resourceId","userId"]}],"ProjectBadges":[{"name":"constructor","args":["0","1"]},{"name":"add","args":["resourceId"]},{"name":"all","args":["resourceId"]},{"name":"edit","args":["resourceId","badgeId"]},{"name":"preview","args":["resourceId","linkUrl","imageUrl"]},{"name":"remove","args":["resourceId","badgeId"]},{"name":"show","args":["resourceId","badgeId"]}],"ProjectCustomAttributes":[{"name":"constructor","args":["0","1"]},{"name":"all","args":["resourceId"]},{"name":"set","args":["resourceId","customAttributeId","value"]},{"name":"remove","args":["resourceId","customAttributeId"]},{"name":"show","args":["resourceId","customAttributeId"]}],"ProjectDeployTokens":[{"name":"constructor","args":["0","1"]},{"name":"add","args":["resourceId","tokenName","tokenScopes"]},{"name":"all","args":[{}]},{"name":"remove","args":["resourceId","tokenId"]}],"ProjectHooks":[{"name":"constructor","args":["0","1"]},{"name":"all","args":["projectId"]},{"name":"show","args":["projectId","hookId"]},{"name":"add","args":["projectId","url"]},{"name":"edit","args":["projectId","hookId","url"]},{"name":"remove","args":["projectId","hookId"]}],"ProjectImportExport":[{"name":"constructor","args":["0","1"]},{"name":"download","args":["projectId"]},{"name":"exportStatus","args":["projectId"]},{"name":"import","args":["content","path",{}]},{"name":"importStatus","args":["projectId"]},{"name":"schedule","args":["projectId"]}],"ProjectIssueBoards":[{"name":"constructor","args":["0","1"]},{"name":"all","args":["resourceId"]},{"name":"create","args":["resourceId","name"]},{"name":"createList","args":["resourceId","boardId","labelId"]},{"name":"edit","args":["resourceId","boardId"]},{"name":"editList","args":["resourceId","boardId","listId","position"]},{"name":"lists","args":["resourceId","boardId"]},{"name":"remove","args":["resourceId","boardId"]},{"name":"removeList","args":["resourceId","boardId","listId"]},{"name":"show","args":["resourceId","boardId"]},{"name":"showList","args":["resourceId","boardId","listId"]}],"ProjectMembers":[{"name":"constructor","args":["0","1"]},{"name":"add","args":["resourceId","userId","accessLevel"]},{"name":"all","args":["resourceId",{}]},{"name":"edit","args":["resourceId","userId","accessLevel"]},{"name":"show","args":["resourceId","userId",{}]},{"name":"remove","args":["resourceId","userId"]}],"ProjectMilestones":[{"name":"constructor","args":["0","1"]},{"name":"all","args":["resourceId"]},{"name":"create","args":["resourceId","title"]},{"name":"edit","args":["resourceId","milestoneId"]},{"name":"issues","args":["resourceId","milestoneId"]},{"name":"mergeRequests","args":["resourceId","milestoneId"]},{"name":"show","args":["resourceId","milestoneId"]}],"ProjectSnippetAwardEmojis":[{"name":"constructor","args":["0","1"]},{"name":"all","args":["projectId","resourceIId"]},{"name":"award","args":["projectId","resourceIId","name"]},{"name":"remove","args":["projectId","resourceIId","awardId"]},{"name":"show","args":["projectId","resourceIId","awardId"]}],"ProjectSnippetDiscussions":[{"name":"constructor","args":["0","1"]},{"name":"addNote","args":["resourceId","resource2Id","discussionId","noteId","body"]},{"name":"all","args":["resourceId","resource2Id"]},{"name":"create","args":["resourceId","resource2Id","body",{}]},{"name":"editNote","args":["resourceId","resource2Id","discussionId","noteId",{}]},{"name":"removeNote","args":["resourceId","resource2Id","discussionId","noteId"]},{"name":"show","args":["resourceId","resource2Id","discussionId"]}],"ProjectSnippetNotes":[{"name":"constructor","args":["0","1"]},{"name":"all","args":["resourceId","resource2Id"]},{"name":"create","args":["resourceId","resource2Id","body"]},{"name":"edit","args":["resourceId","resource2Id","noteId","body"]},{"name":"remove","args":["resourceId","resource2Id","noteId"]},{"name":"show","args":["resourceId","resource2Id","noteId"]}],"ProjectSnippets":[{"name":"constructor","args":["0","1"]},{"name":"all","args":["projectId"]},{"name":"content","args":["projectId","snippetId"]},{"name":"create","args":["projectId","title","fileName","code","visibility"]},{"name":"edit","args":["projectId","snippetId"]},{"name":"remove","args":["projectId","snippetId"]},{"name":"show","args":["projectId","snippetId"]},{"name":"userAgentDetails","args":["projectId","snippetId"]}],"ProjectVariables":[{"name":"constructor","args":["0","1"]},{"name":"all","args":["resourceId"]},{"name":"create","args":["resourceId"]},{"name":"edit","args":["resourceId","keyId"]},{"name":"show","args":["resourceId","keyId"]},{"name":"remove","args":["resourceId","keyId"]}],"Projects":[{"name":"constructor","args":["0","1"]},{"name":"all","args":[]},{"name":"archive","args":["projectId"]},{"name":"create","args":[{}]},{"name":"edit","args":["projectId"]},{"name":"fork","args":["projectId",{}]},{"name":"forks","args":["projectId"]},{"name":"languages","args":["projectId"]},{"name":"mirrorPull","args":["projectId"]},{"name":"remove","args":["projectId"]},{"name":"removeFork","args":["projectId"]},{"name":"search","args":["projectName"]},{"name":"share","args":["projectId","groupId","groupAccess"]},{"name":"show","args":["projectId"]},{"name":"star","args":["projectId"]},{"name":"transfer","args":["projectId","namespaceId"]},{"name":"unarchive","args":["projectId"]},{"name":"unshare","args":["projectId","groupId"]},{"name":"unstar","args":["projectId"]},{"name":"upload","args":["projectId","content",{}]}],"ProtectedBranches":[{"name":"constructor","args":["0","1"]},{"name":"all","args":["projectId"]},{"name":"protect","args":["projectId","branchName"]},{"name":"show","args":["projectId","branchName"]},{"name":"unprotect","args":["projectId","branchName"]}],"ProtectedTags":[{"name":"constructor","args":["0","1"]},{"name":"all","args":["projectId"]},{"name":"protect","args":["projectId","tagName"]},{"name":"show","args":["projectId","tagName"]},{"name":"unprotect","args":["projectId","tagName"]}],"PushRules":[{"name":"constructor","args":["0","1"]},{"name":"create","args":["projectId"]},{"name":"edit","args":["projectId"]},{"name":"remove","args":["projectId"]},{"name":"show","args":["projectId"]}],"ReleaseLinks":[{"name":"constructor","args":["0","1"]},{"name":"all","args":["projectId","tagName"]},{"name":"create","args":["projectId","tagName","name","url"]},{"name":"edit","args":["projectId","tagName","linkId"]},{"name":"remove","args":["projectId","tagName","linkId"]},{"name":"show","args":["projectId","tagName","linkId"]}],"Releases":[{"name":"constructor","args":["0","1"]},{"name":"all","args":["projectId"]},{"name":"create","args":["projectId"]},{"name":"edit","args":["projectId","tagName"]},{"name":"remove","args":["projectId","tagName"]},{"name":"show","args":["projectId","tagName"]}],"Repositories":[{"name":"constructor","args":["0","1"]},{"name":"compare","args":["projectId","from","to"]},{"name":"contributors","args":["projectId"]},{"name":"mergeBase","args":["projectId","refs"]},{"name":"showArchive","args":["projectId",{"fileType":"tar.gz"}]},{"name":"showBlob","args":["projectId","sha"]},{"name":"showBlobRaw","args":["projectId","sha"]},{"name":"tree","args":["projectId"]}],"RepositoryFiles":[{"name":"constructor","args":["0","1"]},{"name":"create","args":["projectId","filePath","branch","content","commitMessage"]},{"name":"edit","args":["projectId","filePath","branch","content","commitMessage"]},{"name":"remove","args":["projectId","filePath","branch","commitMessage"]},{"name":"show","args":["projectId","filePath","ref"]},{"name":"showBlame","args":["projectId","filePath"]},{"name":"showRaw","args":["projectId","filePath"]}],"RepositorySubmodules":[{"name":"constructor","args":["0","1"]},{"name":"edit","args":["projectId","submodule","branch","commit_sha"]}],"Runners":[{"name":"constructor","args":["0","1"]},{"name":"all","args":[{}]},{"name":"allOwned","args":[]},{"name":"edit","args":["runnerId"]},{"name":"enable","args":["projectId","runnerId"]},{"name":"disable","args":["projectId","runnerId"]},{"name":"jobs","args":["runnerId"]},{"name":"remove","args":["runnerId"]},{"name":"show","args":["runnerId"]}],"Search":[{"name":"constructor","args":["0","1"]},{"name":"all","args":["scope","search",{}]}],"Services":[{"name":"constructor","args":["0","1"]},{"name":"all","args":["projectId"]},{"name":"edit","args":["projectId","serviceName"]},{"name":"remove","args":["projectId","serviceName"]},{"name":"show","args":["projectId","serviceName"]}],"SidekiqMetrics":[{"name":"constructor","args":["0","1"]},{"name":"queueMetrics","args":[]},{"name":"processMetrics","args":[]},{"name":"jobStats","args":[]},{"name":"compoundMetrics","args":[]}],"Snippets":[{"name":"constructor","args":["0","1"]},{"name":"all","args":[{"public":"p"}]},{"name":"content","args":["snippetId"]},{"name":"create","args":["title","fileName","content","visibility"]},{"name":"edit","args":["snippetId"]},{"name":"remove","args":["snippetId"]},{"name":"show","args":["snippetId"]},{"name":"userAgentDetails","args":["snippetId"]}],"SystemHooks":[{"name":"constructor","args":["0","1"]},{"name":"add","args":["url"]},{"name":"all","args":[]},{"name":"edit","args":["hookId","url"]},{"name":"remove","args":["hookId"]}],"Tags":[{"name":"constructor","args":["0","1"]},{"name":"all","args":["projectId"]},{"name":"create","args":["projectId","tagName","ref"]},{"name":"remove","args":["projectId","tagName"]},{"name":"show","args":["projectId","tagName"]}],"Todos":[{"name":"constructor","args":["0","1"]},{"name":"all","args":[]},{"name":"create","args":["projectId","resourceId","resourceName"]},{"name":"done","args":[{}]}],"Triggers":[{"name":"constructor","args":["0","1"]},{"name":"add","args":["projectId"]},{"name":"all","args":["projectId"]},{"name":"edit","args":["projectId","triggerId"]},{"name":"pipeline","args":["projectId","ref","token",{}]},{"name":"remove","args":["projectId","triggerId"]},{"name":"show","args":["projectId","triggerId"]}],"UserCustomAttributes":[{"name":"constructor","args":["0","1"]},{"name":"all","args":["resourceId"]},{"name":"set","args":["resourceId","customAttributeId","value"]},{"name":"remove","args":["resourceId","customAttributeId"]},{"name":"show","args":["resourceId","customAttributeId"]}],"UserEmails":[{"name":"constructor","args":["0","1"]},{"name":"all","args":[{}]},{"name":"add","args":["email",{}]},{"name":"show","args":["emailId"]},{"name":"remove","args":["emailId",{}]}],"UserGPGKeys":[{"name":"constructor","args":["0","1"]},{"name":"all","args":[{}]},{"name":"add","args":["key",{}]},{"name":"show","args":["keyId",{}]},{"name":"remove","args":["keyId",{}]}],"UserImpersonationTokens":[{"name":"constructor","args":["0","1"]},{"name":"all","args":["userId"]},{"name":"add","args":["userId","name","scopes","expiresAt"]},{"name":"show","args":["userId","tokenId"]},{"name":"revoke","args":["userId","tokenId"]}],"UserSSHKeys":[{"name":"constructor","args":["0","1"]},{"name":"all","args":[{}]},{"name":"create","args":["title","key",{}]},{"name":"show","args":["keyId",{}]},{"name":"remove","args":["keyId",{}]}],"Users":[{"name":"constructor","args":["0","1"]},{"name":"all","args":[]},{"name":"activities","args":[]},{"name":"projects","args":["userId"]},{"name":"block","args":["userId"]},{"name":"create","args":[]},{"name":"current","args":[]},{"name":"edit","args":["userId"]},{"name":"events","args":["userId"]},{"name":"search","args":["emailOrUsername"]},{"name":"show","args":["userId"]},{"name":"remove","args":["userId"]},{"name":"unblock","args":["userId"]},{"name":"username","args":["username"]}],"Version":[{"name":"constructor","args":["0","1"]},{"name":"show","args":[]}],"VulnerabilityFindings":[{"name":"constructor","args":["0","1"]},{"name":"all","args":["projectId"]}],"Wikis":[{"name":"constructor","args":["0","1"]},{"name":"all","args":["projectId"]},{"name":"create","args":["projectId"]},{"name":"edit","args":["projectId","slug"]},{"name":"show","args":["projectId","slug"]},{"name":"remove","args":["projectId","slug"]}]}');
+
+/***/ }),
+
 /***/ 9968:
 /***/ ((module) => {
 
 module.exports = JSON.parse('{"name":"dotenv","version":"16.0.3","description":"Loads environment variables from .env file","main":"lib/main.js","types":"lib/main.d.ts","exports":{".":{"require":"./lib/main.js","types":"./lib/main.d.ts","default":"./lib/main.js"},"./config":"./config.js","./config.js":"./config.js","./lib/env-options":"./lib/env-options.js","./lib/env-options.js":"./lib/env-options.js","./lib/cli-options":"./lib/cli-options.js","./lib/cli-options.js":"./lib/cli-options.js","./package.json":"./package.json"},"scripts":{"dts-check":"tsc --project tests/types/tsconfig.json","lint":"standard","lint-readme":"standard-markdown","pretest":"npm run lint && npm run dts-check","test":"tap tests/*.js --100 -Rspec","prerelease":"npm test","release":"standard-version"},"repository":{"type":"git","url":"git://github.com/motdotla/dotenv.git"},"keywords":["dotenv","env",".env","environment","variables","config","settings"],"readmeFilename":"README.md","license":"BSD-2-Clause","devDependencies":{"@types/node":"^17.0.9","decache":"^4.6.1","dtslint":"^3.7.0","sinon":"^12.0.1","standard":"^16.0.4","standard-markdown":"^7.1.0","standard-version":"^9.3.2","tap":"^15.1.6","tar":"^6.1.11","typescript":"^4.5.4"},"engines":{"node":">=12"}}');
+
+/***/ }),
+
+/***/ 3765:
+/***/ ((module) => {
+
+module.exports = JSON.parse('{"application/1d-interleaved-parityfec":{"source":"iana"},"application/3gpdash-qoe-report+xml":{"source":"iana","charset":"UTF-8","compressible":true},"application/3gpp-ims+xml":{"source":"iana","compressible":true},"application/3gpphal+json":{"source":"iana","compressible":true},"application/3gpphalforms+json":{"source":"iana","compressible":true},"application/a2l":{"source":"iana"},"application/ace+cbor":{"source":"iana"},"application/activemessage":{"source":"iana"},"application/activity+json":{"source":"iana","compressible":true},"application/alto-costmap+json":{"source":"iana","compressible":true},"application/alto-costmapfilter+json":{"source":"iana","compressible":true},"application/alto-directory+json":{"source":"iana","compressible":true},"application/alto-endpointcost+json":{"source":"iana","compressible":true},"application/alto-endpointcostparams+json":{"source":"iana","compressible":true},"application/alto-endpointprop+json":{"source":"iana","compressible":true},"application/alto-endpointpropparams+json":{"source":"iana","compressible":true},"application/alto-error+json":{"source":"iana","compressible":true},"application/alto-networkmap+json":{"source":"iana","compressible":true},"application/alto-networkmapfilter+json":{"source":"iana","compressible":true},"application/alto-updatestreamcontrol+json":{"source":"iana","compressible":true},"application/alto-updatestreamparams+json":{"source":"iana","compressible":true},"application/aml":{"source":"iana"},"application/andrew-inset":{"source":"iana","extensions":["ez"]},"application/applefile":{"source":"iana"},"application/applixware":{"source":"apache","extensions":["aw"]},"application/at+jwt":{"source":"iana"},"application/atf":{"source":"iana"},"application/atfx":{"source":"iana"},"application/atom+xml":{"source":"iana","compressible":true,"extensions":["atom"]},"application/atomcat+xml":{"source":"iana","compressible":true,"extensions":["atomcat"]},"application/atomdeleted+xml":{"source":"iana","compressible":true,"extensions":["atomdeleted"]},"application/atomicmail":{"source":"iana"},"application/atomsvc+xml":{"source":"iana","compressible":true,"extensions":["atomsvc"]},"application/atsc-dwd+xml":{"source":"iana","compressible":true,"extensions":["dwd"]},"application/atsc-dynamic-event-message":{"source":"iana"},"application/atsc-held+xml":{"source":"iana","compressible":true,"extensions":["held"]},"application/atsc-rdt+json":{"source":"iana","compressible":true},"application/atsc-rsat+xml":{"source":"iana","compressible":true,"extensions":["rsat"]},"application/atxml":{"source":"iana"},"application/auth-policy+xml":{"source":"iana","compressible":true},"application/bacnet-xdd+zip":{"source":"iana","compressible":false},"application/batch-smtp":{"source":"iana"},"application/bdoc":{"compressible":false,"extensions":["bdoc"]},"application/beep+xml":{"source":"iana","charset":"UTF-8","compressible":true},"application/calendar+json":{"source":"iana","compressible":true},"application/calendar+xml":{"source":"iana","compressible":true,"extensions":["xcs"]},"application/call-completion":{"source":"iana"},"application/cals-1840":{"source":"iana"},"application/captive+json":{"source":"iana","compressible":true},"application/cbor":{"source":"iana"},"application/cbor-seq":{"source":"iana"},"application/cccex":{"source":"iana"},"application/ccmp+xml":{"source":"iana","compressible":true},"application/ccxml+xml":{"source":"iana","compressible":true,"extensions":["ccxml"]},"application/cdfx+xml":{"source":"iana","compressible":true,"extensions":["cdfx"]},"application/cdmi-capability":{"source":"iana","extensions":["cdmia"]},"application/cdmi-container":{"source":"iana","extensions":["cdmic"]},"application/cdmi-domain":{"source":"iana","extensions":["cdmid"]},"application/cdmi-object":{"source":"iana","extensions":["cdmio"]},"application/cdmi-queue":{"source":"iana","extensions":["cdmiq"]},"application/cdni":{"source":"iana"},"application/cea":{"source":"iana"},"application/cea-2018+xml":{"source":"iana","compressible":true},"application/cellml+xml":{"source":"iana","compressible":true},"application/cfw":{"source":"iana"},"application/city+json":{"source":"iana","compressible":true},"application/clr":{"source":"iana"},"application/clue+xml":{"source":"iana","compressible":true},"application/clue_info+xml":{"source":"iana","compressible":true},"application/cms":{"source":"iana"},"application/cnrp+xml":{"source":"iana","compressible":true},"application/coap-group+json":{"source":"iana","compressible":true},"application/coap-payload":{"source":"iana"},"application/commonground":{"source":"iana"},"application/conference-info+xml":{"source":"iana","compressible":true},"application/cose":{"source":"iana"},"application/cose-key":{"source":"iana"},"application/cose-key-set":{"source":"iana"},"application/cpl+xml":{"source":"iana","compressible":true,"extensions":["cpl"]},"application/csrattrs":{"source":"iana"},"application/csta+xml":{"source":"iana","compressible":true},"application/cstadata+xml":{"source":"iana","compressible":true},"application/csvm+json":{"source":"iana","compressible":true},"application/cu-seeme":{"source":"apache","extensions":["cu"]},"application/cwt":{"source":"iana"},"application/cybercash":{"source":"iana"},"application/dart":{"compressible":true},"application/dash+xml":{"source":"iana","compressible":true,"extensions":["mpd"]},"application/dash-patch+xml":{"source":"iana","compressible":true,"extensions":["mpp"]},"application/dashdelta":{"source":"iana"},"application/davmount+xml":{"source":"iana","compressible":true,"extensions":["davmount"]},"application/dca-rft":{"source":"iana"},"application/dcd":{"source":"iana"},"application/dec-dx":{"source":"iana"},"application/dialog-info+xml":{"source":"iana","compressible":true},"application/dicom":{"source":"iana"},"application/dicom+json":{"source":"iana","compressible":true},"application/dicom+xml":{"source":"iana","compressible":true},"application/dii":{"source":"iana"},"application/dit":{"source":"iana"},"application/dns":{"source":"iana"},"application/dns+json":{"source":"iana","compressible":true},"application/dns-message":{"source":"iana"},"application/docbook+xml":{"source":"apache","compressible":true,"extensions":["dbk"]},"application/dots+cbor":{"source":"iana"},"application/dskpp+xml":{"source":"iana","compressible":true},"application/dssc+der":{"source":"iana","extensions":["dssc"]},"application/dssc+xml":{"source":"iana","compressible":true,"extensions":["xdssc"]},"application/dvcs":{"source":"iana"},"application/ecmascript":{"source":"iana","compressible":true,"extensions":["es","ecma"]},"application/edi-consent":{"source":"iana"},"application/edi-x12":{"source":"iana","compressible":false},"application/edifact":{"source":"iana","compressible":false},"application/efi":{"source":"iana"},"application/elm+json":{"source":"iana","charset":"UTF-8","compressible":true},"application/elm+xml":{"source":"iana","compressible":true},"application/emergencycalldata.cap+xml":{"source":"iana","charset":"UTF-8","compressible":true},"application/emergencycalldata.comment+xml":{"source":"iana","compressible":true},"application/emergencycalldata.control+xml":{"source":"iana","compressible":true},"application/emergencycalldata.deviceinfo+xml":{"source":"iana","compressible":true},"application/emergencycalldata.ecall.msd":{"source":"iana"},"application/emergencycalldata.providerinfo+xml":{"source":"iana","compressible":true},"application/emergencycalldata.serviceinfo+xml":{"source":"iana","compressible":true},"application/emergencycalldata.subscriberinfo+xml":{"source":"iana","compressible":true},"application/emergencycalldata.veds+xml":{"source":"iana","compressible":true},"application/emma+xml":{"source":"iana","compressible":true,"extensions":["emma"]},"application/emotionml+xml":{"source":"iana","compressible":true,"extensions":["emotionml"]},"application/encaprtp":{"source":"iana"},"application/epp+xml":{"source":"iana","compressible":true},"application/epub+zip":{"source":"iana","compressible":false,"extensions":["epub"]},"application/eshop":{"source":"iana"},"application/exi":{"source":"iana","extensions":["exi"]},"application/expect-ct-report+json":{"source":"iana","compressible":true},"application/express":{"source":"iana","extensions":["exp"]},"application/fastinfoset":{"source":"iana"},"application/fastsoap":{"source":"iana"},"application/fdt+xml":{"source":"iana","compressible":true,"extensions":["fdt"]},"application/fhir+json":{"source":"iana","charset":"UTF-8","compressible":true},"application/fhir+xml":{"source":"iana","charset":"UTF-8","compressible":true},"application/fido.trusted-apps+json":{"compressible":true},"application/fits":{"source":"iana"},"application/flexfec":{"source":"iana"},"application/font-sfnt":{"source":"iana"},"application/font-tdpfr":{"source":"iana","extensions":["pfr"]},"application/font-woff":{"source":"iana","compressible":false},"application/framework-attributes+xml":{"source":"iana","compressible":true},"application/geo+json":{"source":"iana","compressible":true,"extensions":["geojson"]},"application/geo+json-seq":{"source":"iana"},"application/geopackage+sqlite3":{"source":"iana"},"application/geoxacml+xml":{"source":"iana","compressible":true},"application/gltf-buffer":{"source":"iana"},"application/gml+xml":{"source":"iana","compressible":true,"extensions":["gml"]},"application/gpx+xml":{"source":"apache","compressible":true,"extensions":["gpx"]},"application/gxf":{"source":"apache","extensions":["gxf"]},"application/gzip":{"source":"iana","compressible":false,"extensions":["gz"]},"application/h224":{"source":"iana"},"application/held+xml":{"source":"iana","compressible":true},"application/hjson":{"extensions":["hjson"]},"application/http":{"source":"iana"},"application/hyperstudio":{"source":"iana","extensions":["stk"]},"application/ibe-key-request+xml":{"source":"iana","compressible":true},"application/ibe-pkg-reply+xml":{"source":"iana","compressible":true},"application/ibe-pp-data":{"source":"iana"},"application/iges":{"source":"iana"},"application/im-iscomposing+xml":{"source":"iana","charset":"UTF-8","compressible":true},"application/index":{"source":"iana"},"application/index.cmd":{"source":"iana"},"application/index.obj":{"source":"iana"},"application/index.response":{"source":"iana"},"application/index.vnd":{"source":"iana"},"application/inkml+xml":{"source":"iana","compressible":true,"extensions":["ink","inkml"]},"application/iotp":{"source":"iana"},"application/ipfix":{"source":"iana","extensions":["ipfix"]},"application/ipp":{"source":"iana"},"application/isup":{"source":"iana"},"application/its+xml":{"source":"iana","compressible":true,"extensions":["its"]},"application/java-archive":{"source":"apache","compressible":false,"extensions":["jar","war","ear"]},"application/java-serialized-object":{"source":"apache","compressible":false,"extensions":["ser"]},"application/java-vm":{"source":"apache","compressible":false,"extensions":["class"]},"application/javascript":{"source":"iana","charset":"UTF-8","compressible":true,"extensions":["js","mjs"]},"application/jf2feed+json":{"source":"iana","compressible":true},"application/jose":{"source":"iana"},"application/jose+json":{"source":"iana","compressible":true},"application/jrd+json":{"source":"iana","compressible":true},"application/jscalendar+json":{"source":"iana","compressible":true},"application/json":{"source":"iana","charset":"UTF-8","compressible":true,"extensions":["json","map"]},"application/json-patch+json":{"source":"iana","compressible":true},"application/json-seq":{"source":"iana"},"application/json5":{"extensions":["json5"]},"application/jsonml+json":{"source":"apache","compressible":true,"extensions":["jsonml"]},"application/jwk+json":{"source":"iana","compressible":true},"application/jwk-set+json":{"source":"iana","compressible":true},"application/jwt":{"source":"iana"},"application/kpml-request+xml":{"source":"iana","compressible":true},"application/kpml-response+xml":{"source":"iana","compressible":true},"application/ld+json":{"source":"iana","compressible":true,"extensions":["jsonld"]},"application/lgr+xml":{"source":"iana","compressible":true,"extensions":["lgr"]},"application/link-format":{"source":"iana"},"application/load-control+xml":{"source":"iana","compressible":true},"application/lost+xml":{"source":"iana","compressible":true,"extensions":["lostxml"]},"application/lostsync+xml":{"source":"iana","compressible":true},"application/lpf+zip":{"source":"iana","compressible":false},"application/lxf":{"source":"iana"},"application/mac-binhex40":{"source":"iana","extensions":["hqx"]},"application/mac-compactpro":{"source":"apache","extensions":["cpt"]},"application/macwriteii":{"source":"iana"},"application/mads+xml":{"source":"iana","compressible":true,"extensions":["mads"]},"application/manifest+json":{"source":"iana","charset":"UTF-8","compressible":true,"extensions":["webmanifest"]},"application/marc":{"source":"iana","extensions":["mrc"]},"application/marcxml+xml":{"source":"iana","compressible":true,"extensions":["mrcx"]},"application/mathematica":{"source":"iana","extensions":["ma","nb","mb"]},"application/mathml+xml":{"source":"iana","compressible":true,"extensions":["mathml"]},"application/mathml-content+xml":{"source":"iana","compressible":true},"application/mathml-presentation+xml":{"source":"iana","compressible":true},"application/mbms-associated-procedure-description+xml":{"source":"iana","compressible":true},"application/mbms-deregister+xml":{"source":"iana","compressible":true},"application/mbms-envelope+xml":{"source":"iana","compressible":true},"application/mbms-msk+xml":{"source":"iana","compressible":true},"application/mbms-msk-response+xml":{"source":"iana","compressible":true},"application/mbms-protection-description+xml":{"source":"iana","compressible":true},"application/mbms-reception-report+xml":{"source":"iana","compressible":true},"application/mbms-register+xml":{"source":"iana","compressible":true},"application/mbms-register-response+xml":{"source":"iana","compressible":true},"application/mbms-schedule+xml":{"source":"iana","compressible":true},"application/mbms-user-service-description+xml":{"source":"iana","compressible":true},"application/mbox":{"source":"iana","extensions":["mbox"]},"application/media-policy-dataset+xml":{"source":"iana","compressible":true,"extensions":["mpf"]},"application/media_control+xml":{"source":"iana","compressible":true},"application/mediaservercontrol+xml":{"source":"iana","compressible":true,"extensions":["mscml"]},"application/merge-patch+json":{"source":"iana","compressible":true},"application/metalink+xml":{"source":"apache","compressible":true,"extensions":["metalink"]},"application/metalink4+xml":{"source":"iana","compressible":true,"extensions":["meta4"]},"application/mets+xml":{"source":"iana","compressible":true,"extensions":["mets"]},"application/mf4":{"source":"iana"},"application/mikey":{"source":"iana"},"application/mipc":{"source":"iana"},"application/missing-blocks+cbor-seq":{"source":"iana"},"application/mmt-aei+xml":{"source":"iana","compressible":true,"extensions":["maei"]},"application/mmt-usd+xml":{"source":"iana","compressible":true,"extensions":["musd"]},"application/mods+xml":{"source":"iana","compressible":true,"extensions":["mods"]},"application/moss-keys":{"source":"iana"},"application/moss-signature":{"source":"iana"},"application/mosskey-data":{"source":"iana"},"application/mosskey-request":{"source":"iana"},"application/mp21":{"source":"iana","extensions":["m21","mp21"]},"application/mp4":{"source":"iana","extensions":["mp4s","m4p"]},"application/mpeg4-generic":{"source":"iana"},"application/mpeg4-iod":{"source":"iana"},"application/mpeg4-iod-xmt":{"source":"iana"},"application/mrb-consumer+xml":{"source":"iana","compressible":true},"application/mrb-publish+xml":{"source":"iana","compressible":true},"application/msc-ivr+xml":{"source":"iana","charset":"UTF-8","compressible":true},"application/msc-mixer+xml":{"source":"iana","charset":"UTF-8","compressible":true},"application/msword":{"source":"iana","compressible":false,"extensions":["doc","dot"]},"application/mud+json":{"source":"iana","compressible":true},"application/multipart-core":{"source":"iana"},"application/mxf":{"source":"iana","extensions":["mxf"]},"application/n-quads":{"source":"iana","extensions":["nq"]},"application/n-triples":{"source":"iana","extensions":["nt"]},"application/nasdata":{"source":"iana"},"application/news-checkgroups":{"source":"iana","charset":"US-ASCII"},"application/news-groupinfo":{"source":"iana","charset":"US-ASCII"},"application/news-transmission":{"source":"iana"},"application/nlsml+xml":{"source":"iana","compressible":true},"application/node":{"source":"iana","extensions":["cjs"]},"application/nss":{"source":"iana"},"application/oauth-authz-req+jwt":{"source":"iana"},"application/oblivious-dns-message":{"source":"iana"},"application/ocsp-request":{"source":"iana"},"application/ocsp-response":{"source":"iana"},"application/octet-stream":{"source":"iana","compressible":false,"extensions":["bin","dms","lrf","mar","so","dist","distz","pkg","bpk","dump","elc","deploy","exe","dll","deb","dmg","iso","img","msi","msp","msm","buffer"]},"application/oda":{"source":"iana","extensions":["oda"]},"application/odm+xml":{"source":"iana","compressible":true},"application/odx":{"source":"iana"},"application/oebps-package+xml":{"source":"iana","compressible":true,"extensions":["opf"]},"application/ogg":{"source":"iana","compressible":false,"extensions":["ogx"]},"application/omdoc+xml":{"source":"apache","compressible":true,"extensions":["omdoc"]},"application/onenote":{"source":"apache","extensions":["onetoc","onetoc2","onetmp","onepkg"]},"application/opc-nodeset+xml":{"source":"iana","compressible":true},"application/oscore":{"source":"iana"},"application/oxps":{"source":"iana","extensions":["oxps"]},"application/p21":{"source":"iana"},"application/p21+zip":{"source":"iana","compressible":false},"application/p2p-overlay+xml":{"source":"iana","compressible":true,"extensions":["relo"]},"application/parityfec":{"source":"iana"},"application/passport":{"source":"iana"},"application/patch-ops-error+xml":{"source":"iana","compressible":true,"extensions":["xer"]},"application/pdf":{"source":"iana","compressible":false,"extensions":["pdf"]},"application/pdx":{"source":"iana"},"application/pem-certificate-chain":{"source":"iana"},"application/pgp-encrypted":{"source":"iana","compressible":false,"extensions":["pgp"]},"application/pgp-keys":{"source":"iana","extensions":["asc"]},"application/pgp-signature":{"source":"iana","extensions":["asc","sig"]},"application/pics-rules":{"source":"apache","extensions":["prf"]},"application/pidf+xml":{"source":"iana","charset":"UTF-8","compressible":true},"application/pidf-diff+xml":{"source":"iana","charset":"UTF-8","compressible":true},"application/pkcs10":{"source":"iana","extensions":["p10"]},"application/pkcs12":{"source":"iana"},"application/pkcs7-mime":{"source":"iana","extensions":["p7m","p7c"]},"application/pkcs7-signature":{"source":"iana","extensions":["p7s"]},"application/pkcs8":{"source":"iana","extensions":["p8"]},"application/pkcs8-encrypted":{"source":"iana"},"application/pkix-attr-cert":{"source":"iana","extensions":["ac"]},"application/pkix-cert":{"source":"iana","extensions":["cer"]},"application/pkix-crl":{"source":"iana","extensions":["crl"]},"application/pkix-pkipath":{"source":"iana","extensions":["pkipath"]},"application/pkixcmp":{"source":"iana","extensions":["pki"]},"application/pls+xml":{"source":"iana","compressible":true,"extensions":["pls"]},"application/poc-settings+xml":{"source":"iana","charset":"UTF-8","compressible":true},"application/postscript":{"source":"iana","compressible":true,"extensions":["ai","eps","ps"]},"application/ppsp-tracker+json":{"source":"iana","compressible":true},"application/problem+json":{"source":"iana","compressible":true},"application/problem+xml":{"source":"iana","compressible":true},"application/provenance+xml":{"source":"iana","compressible":true,"extensions":["provx"]},"application/prs.alvestrand.titrax-sheet":{"source":"iana"},"application/prs.cww":{"source":"iana","extensions":["cww"]},"application/prs.cyn":{"source":"iana","charset":"7-BIT"},"application/prs.hpub+zip":{"source":"iana","compressible":false},"application/prs.nprend":{"source":"iana"},"application/prs.plucker":{"source":"iana"},"application/prs.rdf-xml-crypt":{"source":"iana"},"application/prs.xsf+xml":{"source":"iana","compressible":true},"application/pskc+xml":{"source":"iana","compressible":true,"extensions":["pskcxml"]},"application/pvd+json":{"source":"iana","compressible":true},"application/qsig":{"source":"iana"},"application/raml+yaml":{"compressible":true,"extensions":["raml"]},"application/raptorfec":{"source":"iana"},"application/rdap+json":{"source":"iana","compressible":true},"application/rdf+xml":{"source":"iana","compressible":true,"extensions":["rdf","owl"]},"application/reginfo+xml":{"source":"iana","compressible":true,"extensions":["rif"]},"application/relax-ng-compact-syntax":{"source":"iana","extensions":["rnc"]},"application/remote-printing":{"source":"iana"},"application/reputon+json":{"source":"iana","compressible":true},"application/resource-lists+xml":{"source":"iana","compressible":true,"extensions":["rl"]},"application/resource-lists-diff+xml":{"source":"iana","compressible":true,"extensions":["rld"]},"application/rfc+xml":{"source":"iana","compressible":true},"application/riscos":{"source":"iana"},"application/rlmi+xml":{"source":"iana","compressible":true},"application/rls-services+xml":{"source":"iana","compressible":true,"extensions":["rs"]},"application/route-apd+xml":{"source":"iana","compressible":true,"extensions":["rapd"]},"application/route-s-tsid+xml":{"source":"iana","compressible":true,"extensions":["sls"]},"application/route-usd+xml":{"source":"iana","compressible":true,"extensions":["rusd"]},"application/rpki-ghostbusters":{"source":"iana","extensions":["gbr"]},"application/rpki-manifest":{"source":"iana","extensions":["mft"]},"application/rpki-publication":{"source":"iana"},"application/rpki-roa":{"source":"iana","extensions":["roa"]},"application/rpki-updown":{"source":"iana"},"application/rsd+xml":{"source":"apache","compressible":true,"extensions":["rsd"]},"application/rss+xml":{"source":"apache","compressible":true,"extensions":["rss"]},"application/rtf":{"source":"iana","compressible":true,"extensions":["rtf"]},"application/rtploopback":{"source":"iana"},"application/rtx":{"source":"iana"},"application/samlassertion+xml":{"source":"iana","compressible":true},"application/samlmetadata+xml":{"source":"iana","compressible":true},"application/sarif+json":{"source":"iana","compressible":true},"application/sarif-external-properties+json":{"source":"iana","compressible":true},"application/sbe":{"source":"iana"},"application/sbml+xml":{"source":"iana","compressible":true,"extensions":["sbml"]},"application/scaip+xml":{"source":"iana","compressible":true},"application/scim+json":{"source":"iana","compressible":true},"application/scvp-cv-request":{"source":"iana","extensions":["scq"]},"application/scvp-cv-response":{"source":"iana","extensions":["scs"]},"application/scvp-vp-request":{"source":"iana","extensions":["spq"]},"application/scvp-vp-response":{"source":"iana","extensions":["spp"]},"application/sdp":{"source":"iana","extensions":["sdp"]},"application/secevent+jwt":{"source":"iana"},"application/senml+cbor":{"source":"iana"},"application/senml+json":{"source":"iana","compressible":true},"application/senml+xml":{"source":"iana","compressible":true,"extensions":["senmlx"]},"application/senml-etch+cbor":{"source":"iana"},"application/senml-etch+json":{"source":"iana","compressible":true},"application/senml-exi":{"source":"iana"},"application/sensml+cbor":{"source":"iana"},"application/sensml+json":{"source":"iana","compressible":true},"application/sensml+xml":{"source":"iana","compressible":true,"extensions":["sensmlx"]},"application/sensml-exi":{"source":"iana"},"application/sep+xml":{"source":"iana","compressible":true},"application/sep-exi":{"source":"iana"},"application/session-info":{"source":"iana"},"application/set-payment":{"source":"iana"},"application/set-payment-initiation":{"source":"iana","extensions":["setpay"]},"application/set-registration":{"source":"iana"},"application/set-registration-initiation":{"source":"iana","extensions":["setreg"]},"application/sgml":{"source":"iana"},"application/sgml-open-catalog":{"source":"iana"},"application/shf+xml":{"source":"iana","compressible":true,"extensions":["shf"]},"application/sieve":{"source":"iana","extensions":["siv","sieve"]},"application/simple-filter+xml":{"source":"iana","compressible":true},"application/simple-message-summary":{"source":"iana"},"application/simplesymbolcontainer":{"source":"iana"},"application/sipc":{"source":"iana"},"application/slate":{"source":"iana"},"application/smil":{"source":"iana"},"application/smil+xml":{"source":"iana","compressible":true,"extensions":["smi","smil"]},"application/smpte336m":{"source":"iana"},"application/soap+fastinfoset":{"source":"iana"},"application/soap+xml":{"source":"iana","compressible":true},"application/sparql-query":{"source":"iana","extensions":["rq"]},"application/sparql-results+xml":{"source":"iana","compressible":true,"extensions":["srx"]},"application/spdx+json":{"source":"iana","compressible":true},"application/spirits-event+xml":{"source":"iana","compressible":true},"application/sql":{"source":"iana"},"application/srgs":{"source":"iana","extensions":["gram"]},"application/srgs+xml":{"source":"iana","compressible":true,"extensions":["grxml"]},"application/sru+xml":{"source":"iana","compressible":true,"extensions":["sru"]},"application/ssdl+xml":{"source":"apache","compressible":true,"extensions":["ssdl"]},"application/ssml+xml":{"source":"iana","compressible":true,"extensions":["ssml"]},"application/stix+json":{"source":"iana","compressible":true},"application/swid+xml":{"source":"iana","compressible":true,"extensions":["swidtag"]},"application/tamp-apex-update":{"source":"iana"},"application/tamp-apex-update-confirm":{"source":"iana"},"application/tamp-community-update":{"source":"iana"},"application/tamp-community-update-confirm":{"source":"iana"},"application/tamp-error":{"source":"iana"},"application/tamp-sequence-adjust":{"source":"iana"},"application/tamp-sequence-adjust-confirm":{"source":"iana"},"application/tamp-status-query":{"source":"iana"},"application/tamp-status-response":{"source":"iana"},"application/tamp-update":{"source":"iana"},"application/tamp-update-confirm":{"source":"iana"},"application/tar":{"compressible":true},"application/taxii+json":{"source":"iana","compressible":true},"application/td+json":{"source":"iana","compressible":true},"application/tei+xml":{"source":"iana","compressible":true,"extensions":["tei","teicorpus"]},"application/tetra_isi":{"source":"iana"},"application/thraud+xml":{"source":"iana","compressible":true,"extensions":["tfi"]},"application/timestamp-query":{"source":"iana"},"application/timestamp-reply":{"source":"iana"},"application/timestamped-data":{"source":"iana","extensions":["tsd"]},"application/tlsrpt+gzip":{"source":"iana"},"application/tlsrpt+json":{"source":"iana","compressible":true},"application/tnauthlist":{"source":"iana"},"application/token-introspection+jwt":{"source":"iana"},"application/toml":{"compressible":true,"extensions":["toml"]},"application/trickle-ice-sdpfrag":{"source":"iana"},"application/trig":{"source":"iana","extensions":["trig"]},"application/ttml+xml":{"source":"iana","compressible":true,"extensions":["ttml"]},"application/tve-trigger":{"source":"iana"},"application/tzif":{"source":"iana"},"application/tzif-leap":{"source":"iana"},"application/ubjson":{"compressible":false,"extensions":["ubj"]},"application/ulpfec":{"source":"iana"},"application/urc-grpsheet+xml":{"source":"iana","compressible":true},"application/urc-ressheet+xml":{"source":"iana","compressible":true,"extensions":["rsheet"]},"application/urc-targetdesc+xml":{"source":"iana","compressible":true,"extensions":["td"]},"application/urc-uisocketdesc+xml":{"source":"iana","compressible":true},"application/vcard+json":{"source":"iana","compressible":true},"application/vcard+xml":{"source":"iana","compressible":true},"application/vemmi":{"source":"iana"},"application/vividence.scriptfile":{"source":"apache"},"application/vnd.1000minds.decision-model+xml":{"source":"iana","compressible":true,"extensions":["1km"]},"application/vnd.3gpp-prose+xml":{"source":"iana","compressible":true},"application/vnd.3gpp-prose-pc3ch+xml":{"source":"iana","compressible":true},"application/vnd.3gpp-v2x-local-service-information":{"source":"iana"},"application/vnd.3gpp.5gnas":{"source":"iana"},"application/vnd.3gpp.access-transfer-events+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.bsf+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.gmop+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.gtpc":{"source":"iana"},"application/vnd.3gpp.interworking-data":{"source":"iana"},"application/vnd.3gpp.lpp":{"source":"iana"},"application/vnd.3gpp.mc-signalling-ear":{"source":"iana"},"application/vnd.3gpp.mcdata-affiliation-command+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.mcdata-info+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.mcdata-payload":{"source":"iana"},"application/vnd.3gpp.mcdata-service-config+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.mcdata-signalling":{"source":"iana"},"application/vnd.3gpp.mcdata-ue-config+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.mcdata-user-profile+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.mcptt-affiliation-command+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.mcptt-floor-request+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.mcptt-info+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.mcptt-location-info+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.mcptt-mbms-usage-info+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.mcptt-service-config+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.mcptt-signed+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.mcptt-ue-config+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.mcptt-ue-init-config+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.mcptt-user-profile+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.mcvideo-affiliation-command+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.mcvideo-affiliation-info+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.mcvideo-info+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.mcvideo-location-info+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.mcvideo-mbms-usage-info+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.mcvideo-service-config+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.mcvideo-transmission-request+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.mcvideo-ue-config+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.mcvideo-user-profile+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.mid-call+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.ngap":{"source":"iana"},"application/vnd.3gpp.pfcp":{"source":"iana"},"application/vnd.3gpp.pic-bw-large":{"source":"iana","extensions":["plb"]},"application/vnd.3gpp.pic-bw-small":{"source":"iana","extensions":["psb"]},"application/vnd.3gpp.pic-bw-var":{"source":"iana","extensions":["pvb"]},"application/vnd.3gpp.s1ap":{"source":"iana"},"application/vnd.3gpp.sms":{"source":"iana"},"application/vnd.3gpp.sms+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.srvcc-ext+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.srvcc-info+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.state-and-event-info+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.ussd+xml":{"source":"iana","compressible":true},"application/vnd.3gpp2.bcmcsinfo+xml":{"source":"iana","compressible":true},"application/vnd.3gpp2.sms":{"source":"iana"},"application/vnd.3gpp2.tcap":{"source":"iana","extensions":["tcap"]},"application/vnd.3lightssoftware.imagescal":{"source":"iana"},"application/vnd.3m.post-it-notes":{"source":"iana","extensions":["pwn"]},"application/vnd.accpac.simply.aso":{"source":"iana","extensions":["aso"]},"application/vnd.accpac.simply.imp":{"source":"iana","extensions":["imp"]},"application/vnd.acucobol":{"source":"iana","extensions":["acu"]},"application/vnd.acucorp":{"source":"iana","extensions":["atc","acutc"]},"application/vnd.adobe.air-application-installer-package+zip":{"source":"apache","compressible":false,"extensions":["air"]},"application/vnd.adobe.flash.movie":{"source":"iana"},"application/vnd.adobe.formscentral.fcdt":{"source":"iana","extensions":["fcdt"]},"application/vnd.adobe.fxp":{"source":"iana","extensions":["fxp","fxpl"]},"application/vnd.adobe.partial-upload":{"source":"iana"},"application/vnd.adobe.xdp+xml":{"source":"iana","compressible":true,"extensions":["xdp"]},"application/vnd.adobe.xfdf":{"source":"iana","extensions":["xfdf"]},"application/vnd.aether.imp":{"source":"iana"},"application/vnd.afpc.afplinedata":{"source":"iana"},"application/vnd.afpc.afplinedata-pagedef":{"source":"iana"},"application/vnd.afpc.cmoca-cmresource":{"source":"iana"},"application/vnd.afpc.foca-charset":{"source":"iana"},"application/vnd.afpc.foca-codedfont":{"source":"iana"},"application/vnd.afpc.foca-codepage":{"source":"iana"},"application/vnd.afpc.modca":{"source":"iana"},"application/vnd.afpc.modca-cmtable":{"source":"iana"},"application/vnd.afpc.modca-formdef":{"source":"iana"},"application/vnd.afpc.modca-mediummap":{"source":"iana"},"application/vnd.afpc.modca-objectcontainer":{"source":"iana"},"application/vnd.afpc.modca-overlay":{"source":"iana"},"application/vnd.afpc.modca-pagesegment":{"source":"iana"},"application/vnd.age":{"source":"iana","extensions":["age"]},"application/vnd.ah-barcode":{"source":"iana"},"application/vnd.ahead.space":{"source":"iana","extensions":["ahead"]},"application/vnd.airzip.filesecure.azf":{"source":"iana","extensions":["azf"]},"application/vnd.airzip.filesecure.azs":{"source":"iana","extensions":["azs"]},"application/vnd.amadeus+json":{"source":"iana","compressible":true},"application/vnd.amazon.ebook":{"source":"apache","extensions":["azw"]},"application/vnd.amazon.mobi8-ebook":{"source":"iana"},"application/vnd.americandynamics.acc":{"source":"iana","extensions":["acc"]},"application/vnd.amiga.ami":{"source":"iana","extensions":["ami"]},"application/vnd.amundsen.maze+xml":{"source":"iana","compressible":true},"application/vnd.android.ota":{"source":"iana"},"application/vnd.android.package-archive":{"source":"apache","compressible":false,"extensions":["apk"]},"application/vnd.anki":{"source":"iana"},"application/vnd.anser-web-certificate-issue-initiation":{"source":"iana","extensions":["cii"]},"application/vnd.anser-web-funds-transfer-initiation":{"source":"apache","extensions":["fti"]},"application/vnd.antix.game-component":{"source":"iana","extensions":["atx"]},"application/vnd.apache.arrow.file":{"source":"iana"},"application/vnd.apache.arrow.stream":{"source":"iana"},"application/vnd.apache.thrift.binary":{"source":"iana"},"application/vnd.apache.thrift.compact":{"source":"iana"},"application/vnd.apache.thrift.json":{"source":"iana"},"application/vnd.api+json":{"source":"iana","compressible":true},"application/vnd.aplextor.warrp+json":{"source":"iana","compressible":true},"application/vnd.apothekende.reservation+json":{"source":"iana","compressible":true},"application/vnd.apple.installer+xml":{"source":"iana","compressible":true,"extensions":["mpkg"]},"application/vnd.apple.keynote":{"source":"iana","extensions":["key"]},"application/vnd.apple.mpegurl":{"source":"iana","extensions":["m3u8"]},"application/vnd.apple.numbers":{"source":"iana","extensions":["numbers"]},"application/vnd.apple.pages":{"source":"iana","extensions":["pages"]},"application/vnd.apple.pkpass":{"compressible":false,"extensions":["pkpass"]},"application/vnd.arastra.swi":{"source":"iana"},"application/vnd.aristanetworks.swi":{"source":"iana","extensions":["swi"]},"application/vnd.artisan+json":{"source":"iana","compressible":true},"application/vnd.artsquare":{"source":"iana"},"application/vnd.astraea-software.iota":{"source":"iana","extensions":["iota"]},"application/vnd.audiograph":{"source":"iana","extensions":["aep"]},"application/vnd.autopackage":{"source":"iana"},"application/vnd.avalon+json":{"source":"iana","compressible":true},"application/vnd.avistar+xml":{"source":"iana","compressible":true},"application/vnd.balsamiq.bmml+xml":{"source":"iana","compressible":true,"extensions":["bmml"]},"application/vnd.balsamiq.bmpr":{"source":"iana"},"application/vnd.banana-accounting":{"source":"iana"},"application/vnd.bbf.usp.error":{"source":"iana"},"application/vnd.bbf.usp.msg":{"source":"iana"},"application/vnd.bbf.usp.msg+json":{"source":"iana","compressible":true},"application/vnd.bekitzur-stech+json":{"source":"iana","compressible":true},"application/vnd.bint.med-content":{"source":"iana"},"application/vnd.biopax.rdf+xml":{"source":"iana","compressible":true},"application/vnd.blink-idb-value-wrapper":{"source":"iana"},"application/vnd.blueice.multipass":{"source":"iana","extensions":["mpm"]},"application/vnd.bluetooth.ep.oob":{"source":"iana"},"application/vnd.bluetooth.le.oob":{"source":"iana"},"application/vnd.bmi":{"source":"iana","extensions":["bmi"]},"application/vnd.bpf":{"source":"iana"},"application/vnd.bpf3":{"source":"iana"},"application/vnd.businessobjects":{"source":"iana","extensions":["rep"]},"application/vnd.byu.uapi+json":{"source":"iana","compressible":true},"application/vnd.cab-jscript":{"source":"iana"},"application/vnd.canon-cpdl":{"source":"iana"},"application/vnd.canon-lips":{"source":"iana"},"application/vnd.capasystems-pg+json":{"source":"iana","compressible":true},"application/vnd.cendio.thinlinc.clientconf":{"source":"iana"},"application/vnd.century-systems.tcp_stream":{"source":"iana"},"application/vnd.chemdraw+xml":{"source":"iana","compressible":true,"extensions":["cdxml"]},"application/vnd.chess-pgn":{"source":"iana"},"application/vnd.chipnuts.karaoke-mmd":{"source":"iana","extensions":["mmd"]},"application/vnd.ciedi":{"source":"iana"},"application/vnd.cinderella":{"source":"iana","extensions":["cdy"]},"application/vnd.cirpack.isdn-ext":{"source":"iana"},"application/vnd.citationstyles.style+xml":{"source":"iana","compressible":true,"extensions":["csl"]},"application/vnd.claymore":{"source":"iana","extensions":["cla"]},"application/vnd.cloanto.rp9":{"source":"iana","extensions":["rp9"]},"application/vnd.clonk.c4group":{"source":"iana","extensions":["c4g","c4d","c4f","c4p","c4u"]},"application/vnd.cluetrust.cartomobile-config":{"source":"iana","extensions":["c11amc"]},"application/vnd.cluetrust.cartomobile-config-pkg":{"source":"iana","extensions":["c11amz"]},"application/vnd.coffeescript":{"source":"iana"},"application/vnd.collabio.xodocuments.document":{"source":"iana"},"application/vnd.collabio.xodocuments.document-template":{"source":"iana"},"application/vnd.collabio.xodocuments.presentation":{"source":"iana"},"application/vnd.collabio.xodocuments.presentation-template":{"source":"iana"},"application/vnd.collabio.xodocuments.spreadsheet":{"source":"iana"},"application/vnd.collabio.xodocuments.spreadsheet-template":{"source":"iana"},"application/vnd.collection+json":{"source":"iana","compressible":true},"application/vnd.collection.doc+json":{"source":"iana","compressible":true},"application/vnd.collection.next+json":{"source":"iana","compressible":true},"application/vnd.comicbook+zip":{"source":"iana","compressible":false},"application/vnd.comicbook-rar":{"source":"iana"},"application/vnd.commerce-battelle":{"source":"iana"},"application/vnd.commonspace":{"source":"iana","extensions":["csp"]},"application/vnd.contact.cmsg":{"source":"iana","extensions":["cdbcmsg"]},"application/vnd.coreos.ignition+json":{"source":"iana","compressible":true},"application/vnd.cosmocaller":{"source":"iana","extensions":["cmc"]},"application/vnd.crick.clicker":{"source":"iana","extensions":["clkx"]},"application/vnd.crick.clicker.keyboard":{"source":"iana","extensions":["clkk"]},"application/vnd.crick.clicker.palette":{"source":"iana","extensions":["clkp"]},"application/vnd.crick.clicker.template":{"source":"iana","extensions":["clkt"]},"application/vnd.crick.clicker.wordbank":{"source":"iana","extensions":["clkw"]},"application/vnd.criticaltools.wbs+xml":{"source":"iana","compressible":true,"extensions":["wbs"]},"application/vnd.cryptii.pipe+json":{"source":"iana","compressible":true},"application/vnd.crypto-shade-file":{"source":"iana"},"application/vnd.cryptomator.encrypted":{"source":"iana"},"application/vnd.cryptomator.vault":{"source":"iana"},"application/vnd.ctc-posml":{"source":"iana","extensions":["pml"]},"application/vnd.ctct.ws+xml":{"source":"iana","compressible":true},"application/vnd.cups-pdf":{"source":"iana"},"application/vnd.cups-postscript":{"source":"iana"},"application/vnd.cups-ppd":{"source":"iana","extensions":["ppd"]},"application/vnd.cups-raster":{"source":"iana"},"application/vnd.cups-raw":{"source":"iana"},"application/vnd.curl":{"source":"iana"},"application/vnd.curl.car":{"source":"apache","extensions":["car"]},"application/vnd.curl.pcurl":{"source":"apache","extensions":["pcurl"]},"application/vnd.cyan.dean.root+xml":{"source":"iana","compressible":true},"application/vnd.cybank":{"source":"iana"},"application/vnd.cyclonedx+json":{"source":"iana","compressible":true},"application/vnd.cyclonedx+xml":{"source":"iana","compressible":true},"application/vnd.d2l.coursepackage1p0+zip":{"source":"iana","compressible":false},"application/vnd.d3m-dataset":{"source":"iana"},"application/vnd.d3m-problem":{"source":"iana"},"application/vnd.dart":{"source":"iana","compressible":true,"extensions":["dart"]},"application/vnd.data-vision.rdz":{"source":"iana","extensions":["rdz"]},"application/vnd.datapackage+json":{"source":"iana","compressible":true},"application/vnd.dataresource+json":{"source":"iana","compressible":true},"application/vnd.dbf":{"source":"iana","extensions":["dbf"]},"application/vnd.debian.binary-package":{"source":"iana"},"application/vnd.dece.data":{"source":"iana","extensions":["uvf","uvvf","uvd","uvvd"]},"application/vnd.dece.ttml+xml":{"source":"iana","compressible":true,"extensions":["uvt","uvvt"]},"application/vnd.dece.unspecified":{"source":"iana","extensions":["uvx","uvvx"]},"application/vnd.dece.zip":{"source":"iana","extensions":["uvz","uvvz"]},"application/vnd.denovo.fcselayout-link":{"source":"iana","extensions":["fe_launch"]},"application/vnd.desmume.movie":{"source":"iana"},"application/vnd.dir-bi.plate-dl-nosuffix":{"source":"iana"},"application/vnd.dm.delegation+xml":{"source":"iana","compressible":true},"application/vnd.dna":{"source":"iana","extensions":["dna"]},"application/vnd.document+json":{"source":"iana","compressible":true},"application/vnd.dolby.mlp":{"source":"apache","extensions":["mlp"]},"application/vnd.dolby.mobile.1":{"source":"iana"},"application/vnd.dolby.mobile.2":{"source":"iana"},"application/vnd.doremir.scorecloud-binary-document":{"source":"iana"},"application/vnd.dpgraph":{"source":"iana","extensions":["dpg"]},"application/vnd.dreamfactory":{"source":"iana","extensions":["dfac"]},"application/vnd.drive+json":{"source":"iana","compressible":true},"application/vnd.ds-keypoint":{"source":"apache","extensions":["kpxx"]},"application/vnd.dtg.local":{"source":"iana"},"application/vnd.dtg.local.flash":{"source":"iana"},"application/vnd.dtg.local.html":{"source":"iana"},"application/vnd.dvb.ait":{"source":"iana","extensions":["ait"]},"application/vnd.dvb.dvbisl+xml":{"source":"iana","compressible":true},"application/vnd.dvb.dvbj":{"source":"iana"},"application/vnd.dvb.esgcontainer":{"source":"iana"},"application/vnd.dvb.ipdcdftnotifaccess":{"source":"iana"},"application/vnd.dvb.ipdcesgaccess":{"source":"iana"},"application/vnd.dvb.ipdcesgaccess2":{"source":"iana"},"application/vnd.dvb.ipdcesgpdd":{"source":"iana"},"application/vnd.dvb.ipdcroaming":{"source":"iana"},"application/vnd.dvb.iptv.alfec-base":{"source":"iana"},"application/vnd.dvb.iptv.alfec-enhancement":{"source":"iana"},"application/vnd.dvb.notif-aggregate-root+xml":{"source":"iana","compressible":true},"application/vnd.dvb.notif-container+xml":{"source":"iana","compressible":true},"application/vnd.dvb.notif-generic+xml":{"source":"iana","compressible":true},"application/vnd.dvb.notif-ia-msglist+xml":{"source":"iana","compressible":true},"application/vnd.dvb.notif-ia-registration-request+xml":{"source":"iana","compressible":true},"application/vnd.dvb.notif-ia-registration-response+xml":{"source":"iana","compressible":true},"application/vnd.dvb.notif-init+xml":{"source":"iana","compressible":true},"application/vnd.dvb.pfr":{"source":"iana"},"application/vnd.dvb.service":{"source":"iana","extensions":["svc"]},"application/vnd.dxr":{"source":"iana"},"application/vnd.dynageo":{"source":"iana","extensions":["geo"]},"application/vnd.dzr":{"source":"iana"},"application/vnd.easykaraoke.cdgdownload":{"source":"iana"},"application/vnd.ecdis-update":{"source":"iana"},"application/vnd.ecip.rlp":{"source":"iana"},"application/vnd.eclipse.ditto+json":{"source":"iana","compressible":true},"application/vnd.ecowin.chart":{"source":"iana","extensions":["mag"]},"application/vnd.ecowin.filerequest":{"source":"iana"},"application/vnd.ecowin.fileupdate":{"source":"iana"},"application/vnd.ecowin.series":{"source":"iana"},"application/vnd.ecowin.seriesrequest":{"source":"iana"},"application/vnd.ecowin.seriesupdate":{"source":"iana"},"application/vnd.efi.img":{"source":"iana"},"application/vnd.efi.iso":{"source":"iana"},"application/vnd.emclient.accessrequest+xml":{"source":"iana","compressible":true},"application/vnd.enliven":{"source":"iana","extensions":["nml"]},"application/vnd.enphase.envoy":{"source":"iana"},"application/vnd.eprints.data+xml":{"source":"iana","compressible":true},"application/vnd.epson.esf":{"source":"iana","extensions":["esf"]},"application/vnd.epson.msf":{"source":"iana","extensions":["msf"]},"application/vnd.epson.quickanime":{"source":"iana","extensions":["qam"]},"application/vnd.epson.salt":{"source":"iana","extensions":["slt"]},"application/vnd.epson.ssf":{"source":"iana","extensions":["ssf"]},"application/vnd.ericsson.quickcall":{"source":"iana"},"application/vnd.espass-espass+zip":{"source":"iana","compressible":false},"application/vnd.eszigno3+xml":{"source":"iana","compressible":true,"extensions":["es3","et3"]},"application/vnd.etsi.aoc+xml":{"source":"iana","compressible":true},"application/vnd.etsi.asic-e+zip":{"source":"iana","compressible":false},"application/vnd.etsi.asic-s+zip":{"source":"iana","compressible":false},"application/vnd.etsi.cug+xml":{"source":"iana","compressible":true},"application/vnd.etsi.iptvcommand+xml":{"source":"iana","compressible":true},"application/vnd.etsi.iptvdiscovery+xml":{"source":"iana","compressible":true},"application/vnd.etsi.iptvprofile+xml":{"source":"iana","compressible":true},"application/vnd.etsi.iptvsad-bc+xml":{"source":"iana","compressible":true},"application/vnd.etsi.iptvsad-cod+xml":{"source":"iana","compressible":true},"application/vnd.etsi.iptvsad-npvr+xml":{"source":"iana","compressible":true},"application/vnd.etsi.iptvservice+xml":{"source":"iana","compressible":true},"application/vnd.etsi.iptvsync+xml":{"source":"iana","compressible":true},"application/vnd.etsi.iptvueprofile+xml":{"source":"iana","compressible":true},"application/vnd.etsi.mcid+xml":{"source":"iana","compressible":true},"application/vnd.etsi.mheg5":{"source":"iana"},"application/vnd.etsi.overload-control-policy-dataset+xml":{"source":"iana","compressible":true},"application/vnd.etsi.pstn+xml":{"source":"iana","compressible":true},"application/vnd.etsi.sci+xml":{"source":"iana","compressible":true},"application/vnd.etsi.simservs+xml":{"source":"iana","compressible":true},"application/vnd.etsi.timestamp-token":{"source":"iana"},"application/vnd.etsi.tsl+xml":{"source":"iana","compressible":true},"application/vnd.etsi.tsl.der":{"source":"iana"},"application/vnd.eu.kasparian.car+json":{"source":"iana","compressible":true},"application/vnd.eudora.data":{"source":"iana"},"application/vnd.evolv.ecig.profile":{"source":"iana"},"application/vnd.evolv.ecig.settings":{"source":"iana"},"application/vnd.evolv.ecig.theme":{"source":"iana"},"application/vnd.exstream-empower+zip":{"source":"iana","compressible":false},"application/vnd.exstream-package":{"source":"iana"},"application/vnd.ezpix-album":{"source":"iana","extensions":["ez2"]},"application/vnd.ezpix-package":{"source":"iana","extensions":["ez3"]},"application/vnd.f-secure.mobile":{"source":"iana"},"application/vnd.familysearch.gedcom+zip":{"source":"iana","compressible":false},"application/vnd.fastcopy-disk-image":{"source":"iana"},"application/vnd.fdf":{"source":"iana","extensions":["fdf"]},"application/vnd.fdsn.mseed":{"source":"iana","extensions":["mseed"]},"application/vnd.fdsn.seed":{"source":"iana","extensions":["seed","dataless"]},"application/vnd.ffsns":{"source":"iana"},"application/vnd.ficlab.flb+zip":{"source":"iana","compressible":false},"application/vnd.filmit.zfc":{"source":"iana"},"application/vnd.fints":{"source":"iana"},"application/vnd.firemonkeys.cloudcell":{"source":"iana"},"application/vnd.flographit":{"source":"iana","extensions":["gph"]},"application/vnd.fluxtime.clip":{"source":"iana","extensions":["ftc"]},"application/vnd.font-fontforge-sfd":{"source":"iana"},"application/vnd.framemaker":{"source":"iana","extensions":["fm","frame","maker","book"]},"application/vnd.frogans.fnc":{"source":"iana","extensions":["fnc"]},"application/vnd.frogans.ltf":{"source":"iana","extensions":["ltf"]},"application/vnd.fsc.weblaunch":{"source":"iana","extensions":["fsc"]},"application/vnd.fujifilm.fb.docuworks":{"source":"iana"},"application/vnd.fujifilm.fb.docuworks.binder":{"source":"iana"},"application/vnd.fujifilm.fb.docuworks.container":{"source":"iana"},"application/vnd.fujifilm.fb.jfi+xml":{"source":"iana","compressible":true},"application/vnd.fujitsu.oasys":{"source":"iana","extensions":["oas"]},"application/vnd.fujitsu.oasys2":{"source":"iana","extensions":["oa2"]},"application/vnd.fujitsu.oasys3":{"source":"iana","extensions":["oa3"]},"application/vnd.fujitsu.oasysgp":{"source":"iana","extensions":["fg5"]},"application/vnd.fujitsu.oasysprs":{"source":"iana","extensions":["bh2"]},"application/vnd.fujixerox.art-ex":{"source":"iana"},"application/vnd.fujixerox.art4":{"source":"iana"},"application/vnd.fujixerox.ddd":{"source":"iana","extensions":["ddd"]},"application/vnd.fujixerox.docuworks":{"source":"iana","extensions":["xdw"]},"application/vnd.fujixerox.docuworks.binder":{"source":"iana","extensions":["xbd"]},"application/vnd.fujixerox.docuworks.container":{"source":"iana"},"application/vnd.fujixerox.hbpl":{"source":"iana"},"application/vnd.fut-misnet":{"source":"iana"},"application/vnd.futoin+cbor":{"source":"iana"},"application/vnd.futoin+json":{"source":"iana","compressible":true},"application/vnd.fuzzysheet":{"source":"iana","extensions":["fzs"]},"application/vnd.genomatix.tuxedo":{"source":"iana","extensions":["txd"]},"application/vnd.gentics.grd+json":{"source":"iana","compressible":true},"application/vnd.geo+json":{"source":"iana","compressible":true},"application/vnd.geocube+xml":{"source":"iana","compressible":true},"application/vnd.geogebra.file":{"source":"iana","extensions":["ggb"]},"application/vnd.geogebra.slides":{"source":"iana"},"application/vnd.geogebra.tool":{"source":"iana","extensions":["ggt"]},"application/vnd.geometry-explorer":{"source":"iana","extensions":["gex","gre"]},"application/vnd.geonext":{"source":"iana","extensions":["gxt"]},"application/vnd.geoplan":{"source":"iana","extensions":["g2w"]},"application/vnd.geospace":{"source":"iana","extensions":["g3w"]},"application/vnd.gerber":{"source":"iana"},"application/vnd.globalplatform.card-content-mgt":{"source":"iana"},"application/vnd.globalplatform.card-content-mgt-response":{"source":"iana"},"application/vnd.gmx":{"source":"iana","extensions":["gmx"]},"application/vnd.google-apps.document":{"compressible":false,"extensions":["gdoc"]},"application/vnd.google-apps.presentation":{"compressible":false,"extensions":["gslides"]},"application/vnd.google-apps.spreadsheet":{"compressible":false,"extensions":["gsheet"]},"application/vnd.google-earth.kml+xml":{"source":"iana","compressible":true,"extensions":["kml"]},"application/vnd.google-earth.kmz":{"source":"iana","compressible":false,"extensions":["kmz"]},"application/vnd.gov.sk.e-form+xml":{"source":"iana","compressible":true},"application/vnd.gov.sk.e-form+zip":{"source":"iana","compressible":false},"application/vnd.gov.sk.xmldatacontainer+xml":{"source":"iana","compressible":true},"application/vnd.grafeq":{"source":"iana","extensions":["gqf","gqs"]},"application/vnd.gridmp":{"source":"iana"},"application/vnd.groove-account":{"source":"iana","extensions":["gac"]},"application/vnd.groove-help":{"source":"iana","extensions":["ghf"]},"application/vnd.groove-identity-message":{"source":"iana","extensions":["gim"]},"application/vnd.groove-injector":{"source":"iana","extensions":["grv"]},"application/vnd.groove-tool-message":{"source":"iana","extensions":["gtm"]},"application/vnd.groove-tool-template":{"source":"iana","extensions":["tpl"]},"application/vnd.groove-vcard":{"source":"iana","extensions":["vcg"]},"application/vnd.hal+json":{"source":"iana","compressible":true},"application/vnd.hal+xml":{"source":"iana","compressible":true,"extensions":["hal"]},"application/vnd.handheld-entertainment+xml":{"source":"iana","compressible":true,"extensions":["zmm"]},"application/vnd.hbci":{"source":"iana","extensions":["hbci"]},"application/vnd.hc+json":{"source":"iana","compressible":true},"application/vnd.hcl-bireports":{"source":"iana"},"application/vnd.hdt":{"source":"iana"},"application/vnd.heroku+json":{"source":"iana","compressible":true},"application/vnd.hhe.lesson-player":{"source":"iana","extensions":["les"]},"application/vnd.hl7cda+xml":{"source":"iana","charset":"UTF-8","compressible":true},"application/vnd.hl7v2+xml":{"source":"iana","charset":"UTF-8","compressible":true},"application/vnd.hp-hpgl":{"source":"iana","extensions":["hpgl"]},"application/vnd.hp-hpid":{"source":"iana","extensions":["hpid"]},"application/vnd.hp-hps":{"source":"iana","extensions":["hps"]},"application/vnd.hp-jlyt":{"source":"iana","extensions":["jlt"]},"application/vnd.hp-pcl":{"source":"iana","extensions":["pcl"]},"application/vnd.hp-pclxl":{"source":"iana","extensions":["pclxl"]},"application/vnd.httphone":{"source":"iana"},"application/vnd.hydrostatix.sof-data":{"source":"iana","extensions":["sfd-hdstx"]},"application/vnd.hyper+json":{"source":"iana","compressible":true},"application/vnd.hyper-item+json":{"source":"iana","compressible":true},"application/vnd.hyperdrive+json":{"source":"iana","compressible":true},"application/vnd.hzn-3d-crossword":{"source":"iana"},"application/vnd.ibm.afplinedata":{"source":"iana"},"application/vnd.ibm.electronic-media":{"source":"iana"},"application/vnd.ibm.minipay":{"source":"iana","extensions":["mpy"]},"application/vnd.ibm.modcap":{"source":"iana","extensions":["afp","listafp","list3820"]},"application/vnd.ibm.rights-management":{"source":"iana","extensions":["irm"]},"application/vnd.ibm.secure-container":{"source":"iana","extensions":["sc"]},"application/vnd.iccprofile":{"source":"iana","extensions":["icc","icm"]},"application/vnd.ieee.1905":{"source":"iana"},"application/vnd.igloader":{"source":"iana","extensions":["igl"]},"application/vnd.imagemeter.folder+zip":{"source":"iana","compressible":false},"application/vnd.imagemeter.image+zip":{"source":"iana","compressible":false},"application/vnd.immervision-ivp":{"source":"iana","extensions":["ivp"]},"application/vnd.immervision-ivu":{"source":"iana","extensions":["ivu"]},"application/vnd.ims.imsccv1p1":{"source":"iana"},"application/vnd.ims.imsccv1p2":{"source":"iana"},"application/vnd.ims.imsccv1p3":{"source":"iana"},"application/vnd.ims.lis.v2.result+json":{"source":"iana","compressible":true},"application/vnd.ims.lti.v2.toolconsumerprofile+json":{"source":"iana","compressible":true},"application/vnd.ims.lti.v2.toolproxy+json":{"source":"iana","compressible":true},"application/vnd.ims.lti.v2.toolproxy.id+json":{"source":"iana","compressible":true},"application/vnd.ims.lti.v2.toolsettings+json":{"source":"iana","compressible":true},"application/vnd.ims.lti.v2.toolsettings.simple+json":{"source":"iana","compressible":true},"application/vnd.informedcontrol.rms+xml":{"source":"iana","compressible":true},"application/vnd.informix-visionary":{"source":"iana"},"application/vnd.infotech.project":{"source":"iana"},"application/vnd.infotech.project+xml":{"source":"iana","compressible":true},"application/vnd.innopath.wamp.notification":{"source":"iana"},"application/vnd.insors.igm":{"source":"iana","extensions":["igm"]},"application/vnd.intercon.formnet":{"source":"iana","extensions":["xpw","xpx"]},"application/vnd.intergeo":{"source":"iana","extensions":["i2g"]},"application/vnd.intertrust.digibox":{"source":"iana"},"application/vnd.intertrust.nncp":{"source":"iana"},"application/vnd.intu.qbo":{"source":"iana","extensions":["qbo"]},"application/vnd.intu.qfx":{"source":"iana","extensions":["qfx"]},"application/vnd.iptc.g2.catalogitem+xml":{"source":"iana","compressible":true},"application/vnd.iptc.g2.conceptitem+xml":{"source":"iana","compressible":true},"application/vnd.iptc.g2.knowledgeitem+xml":{"source":"iana","compressible":true},"application/vnd.iptc.g2.newsitem+xml":{"source":"iana","compressible":true},"application/vnd.iptc.g2.newsmessage+xml":{"source":"iana","compressible":true},"application/vnd.iptc.g2.packageitem+xml":{"source":"iana","compressible":true},"application/vnd.iptc.g2.planningitem+xml":{"source":"iana","compressible":true},"application/vnd.ipunplugged.rcprofile":{"source":"iana","extensions":["rcprofile"]},"application/vnd.irepository.package+xml":{"source":"iana","compressible":true,"extensions":["irp"]},"application/vnd.is-xpr":{"source":"iana","extensions":["xpr"]},"application/vnd.isac.fcs":{"source":"iana","extensions":["fcs"]},"application/vnd.iso11783-10+zip":{"source":"iana","compressible":false},"application/vnd.jam":{"source":"iana","extensions":["jam"]},"application/vnd.japannet-directory-service":{"source":"iana"},"application/vnd.japannet-jpnstore-wakeup":{"source":"iana"},"application/vnd.japannet-payment-wakeup":{"source":"iana"},"application/vnd.japannet-registration":{"source":"iana"},"application/vnd.japannet-registration-wakeup":{"source":"iana"},"application/vnd.japannet-setstore-wakeup":{"source":"iana"},"application/vnd.japannet-verification":{"source":"iana"},"application/vnd.japannet-verification-wakeup":{"source":"iana"},"application/vnd.jcp.javame.midlet-rms":{"source":"iana","extensions":["rms"]},"application/vnd.jisp":{"source":"iana","extensions":["jisp"]},"application/vnd.joost.joda-archive":{"source":"iana","extensions":["joda"]},"application/vnd.jsk.isdn-ngn":{"source":"iana"},"application/vnd.kahootz":{"source":"iana","extensions":["ktz","ktr"]},"application/vnd.kde.karbon":{"source":"iana","extensions":["karbon"]},"application/vnd.kde.kchart":{"source":"iana","extensions":["chrt"]},"application/vnd.kde.kformula":{"source":"iana","extensions":["kfo"]},"application/vnd.kde.kivio":{"source":"iana","extensions":["flw"]},"application/vnd.kde.kontour":{"source":"iana","extensions":["kon"]},"application/vnd.kde.kpresenter":{"source":"iana","extensions":["kpr","kpt"]},"application/vnd.kde.kspread":{"source":"iana","extensions":["ksp"]},"application/vnd.kde.kword":{"source":"iana","extensions":["kwd","kwt"]},"application/vnd.kenameaapp":{"source":"iana","extensions":["htke"]},"application/vnd.kidspiration":{"source":"iana","extensions":["kia"]},"application/vnd.kinar":{"source":"iana","extensions":["kne","knp"]},"application/vnd.koan":{"source":"iana","extensions":["skp","skd","skt","skm"]},"application/vnd.kodak-descriptor":{"source":"iana","extensions":["sse"]},"application/vnd.las":{"source":"iana"},"application/vnd.las.las+json":{"source":"iana","compressible":true},"application/vnd.las.las+xml":{"source":"iana","compressible":true,"extensions":["lasxml"]},"application/vnd.laszip":{"source":"iana"},"application/vnd.leap+json":{"source":"iana","compressible":true},"application/vnd.liberty-request+xml":{"source":"iana","compressible":true},"application/vnd.llamagraphics.life-balance.desktop":{"source":"iana","extensions":["lbd"]},"application/vnd.llamagraphics.life-balance.exchange+xml":{"source":"iana","compressible":true,"extensions":["lbe"]},"application/vnd.logipipe.circuit+zip":{"source":"iana","compressible":false},"application/vnd.loom":{"source":"iana"},"application/vnd.lotus-1-2-3":{"source":"iana","extensions":["123"]},"application/vnd.lotus-approach":{"source":"iana","extensions":["apr"]},"application/vnd.lotus-freelance":{"source":"iana","extensions":["pre"]},"application/vnd.lotus-notes":{"source":"iana","extensions":["nsf"]},"application/vnd.lotus-organizer":{"source":"iana","extensions":["org"]},"application/vnd.lotus-screencam":{"source":"iana","extensions":["scm"]},"application/vnd.lotus-wordpro":{"source":"iana","extensions":["lwp"]},"application/vnd.macports.portpkg":{"source":"iana","extensions":["portpkg"]},"application/vnd.mapbox-vector-tile":{"source":"iana","extensions":["mvt"]},"application/vnd.marlin.drm.actiontoken+xml":{"source":"iana","compressible":true},"application/vnd.marlin.drm.conftoken+xml":{"source":"iana","compressible":true},"application/vnd.marlin.drm.license+xml":{"source":"iana","compressible":true},"application/vnd.marlin.drm.mdcf":{"source":"iana"},"application/vnd.mason+json":{"source":"iana","compressible":true},"application/vnd.maxar.archive.3tz+zip":{"source":"iana","compressible":false},"application/vnd.maxmind.maxmind-db":{"source":"iana"},"application/vnd.mcd":{"source":"iana","extensions":["mcd"]},"application/vnd.medcalcdata":{"source":"iana","extensions":["mc1"]},"application/vnd.mediastation.cdkey":{"source":"iana","extensions":["cdkey"]},"application/vnd.meridian-slingshot":{"source":"iana"},"application/vnd.mfer":{"source":"iana","extensions":["mwf"]},"application/vnd.mfmp":{"source":"iana","extensions":["mfm"]},"application/vnd.micro+json":{"source":"iana","compressible":true},"application/vnd.micrografx.flo":{"source":"iana","extensions":["flo"]},"application/vnd.micrografx.igx":{"source":"iana","extensions":["igx"]},"application/vnd.microsoft.portable-executable":{"source":"iana"},"application/vnd.microsoft.windows.thumbnail-cache":{"source":"iana"},"application/vnd.miele+json":{"source":"iana","compressible":true},"application/vnd.mif":{"source":"iana","extensions":["mif"]},"application/vnd.minisoft-hp3000-save":{"source":"iana"},"application/vnd.mitsubishi.misty-guard.trustweb":{"source":"iana"},"application/vnd.mobius.daf":{"source":"iana","extensions":["daf"]},"application/vnd.mobius.dis":{"source":"iana","extensions":["dis"]},"application/vnd.mobius.mbk":{"source":"iana","extensions":["mbk"]},"application/vnd.mobius.mqy":{"source":"iana","extensions":["mqy"]},"application/vnd.mobius.msl":{"source":"iana","extensions":["msl"]},"application/vnd.mobius.plc":{"source":"iana","extensions":["plc"]},"application/vnd.mobius.txf":{"source":"iana","extensions":["txf"]},"application/vnd.mophun.application":{"source":"iana","extensions":["mpn"]},"application/vnd.mophun.certificate":{"source":"iana","extensions":["mpc"]},"application/vnd.motorola.flexsuite":{"source":"iana"},"application/vnd.motorola.flexsuite.adsi":{"source":"iana"},"application/vnd.motorola.flexsuite.fis":{"source":"iana"},"application/vnd.motorola.flexsuite.gotap":{"source":"iana"},"application/vnd.motorola.flexsuite.kmr":{"source":"iana"},"application/vnd.motorola.flexsuite.ttc":{"source":"iana"},"application/vnd.motorola.flexsuite.wem":{"source":"iana"},"application/vnd.motorola.iprm":{"source":"iana"},"application/vnd.mozilla.xul+xml":{"source":"iana","compressible":true,"extensions":["xul"]},"application/vnd.ms-3mfdocument":{"source":"iana"},"application/vnd.ms-artgalry":{"source":"iana","extensions":["cil"]},"application/vnd.ms-asf":{"source":"iana"},"application/vnd.ms-cab-compressed":{"source":"iana","extensions":["cab"]},"application/vnd.ms-color.iccprofile":{"source":"apache"},"application/vnd.ms-excel":{"source":"iana","compressible":false,"extensions":["xls","xlm","xla","xlc","xlt","xlw"]},"application/vnd.ms-excel.addin.macroenabled.12":{"source":"iana","extensions":["xlam"]},"application/vnd.ms-excel.sheet.binary.macroenabled.12":{"source":"iana","extensions":["xlsb"]},"application/vnd.ms-excel.sheet.macroenabled.12":{"source":"iana","extensions":["xlsm"]},"application/vnd.ms-excel.template.macroenabled.12":{"source":"iana","extensions":["xltm"]},"application/vnd.ms-fontobject":{"source":"iana","compressible":true,"extensions":["eot"]},"application/vnd.ms-htmlhelp":{"source":"iana","extensions":["chm"]},"application/vnd.ms-ims":{"source":"iana","extensions":["ims"]},"application/vnd.ms-lrm":{"source":"iana","extensions":["lrm"]},"application/vnd.ms-office.activex+xml":{"source":"iana","compressible":true},"application/vnd.ms-officetheme":{"source":"iana","extensions":["thmx"]},"application/vnd.ms-opentype":{"source":"apache","compressible":true},"application/vnd.ms-outlook":{"compressible":false,"extensions":["msg"]},"application/vnd.ms-package.obfuscated-opentype":{"source":"apache"},"application/vnd.ms-pki.seccat":{"source":"apache","extensions":["cat"]},"application/vnd.ms-pki.stl":{"source":"apache","extensions":["stl"]},"application/vnd.ms-playready.initiator+xml":{"source":"iana","compressible":true},"application/vnd.ms-powerpoint":{"source":"iana","compressible":false,"extensions":["ppt","pps","pot"]},"application/vnd.ms-powerpoint.addin.macroenabled.12":{"source":"iana","extensions":["ppam"]},"application/vnd.ms-powerpoint.presentation.macroenabled.12":{"source":"iana","extensions":["pptm"]},"application/vnd.ms-powerpoint.slide.macroenabled.12":{"source":"iana","extensions":["sldm"]},"application/vnd.ms-powerpoint.slideshow.macroenabled.12":{"source":"iana","extensions":["ppsm"]},"application/vnd.ms-powerpoint.template.macroenabled.12":{"source":"iana","extensions":["potm"]},"application/vnd.ms-printdevicecapabilities+xml":{"source":"iana","compressible":true},"application/vnd.ms-printing.printticket+xml":{"source":"apache","compressible":true},"application/vnd.ms-printschematicket+xml":{"source":"iana","compressible":true},"application/vnd.ms-project":{"source":"iana","extensions":["mpp","mpt"]},"application/vnd.ms-tnef":{"source":"iana"},"application/vnd.ms-windows.devicepairing":{"source":"iana"},"application/vnd.ms-windows.nwprinting.oob":{"source":"iana"},"application/vnd.ms-windows.printerpairing":{"source":"iana"},"application/vnd.ms-windows.wsd.oob":{"source":"iana"},"application/vnd.ms-wmdrm.lic-chlg-req":{"source":"iana"},"application/vnd.ms-wmdrm.lic-resp":{"source":"iana"},"application/vnd.ms-wmdrm.meter-chlg-req":{"source":"iana"},"application/vnd.ms-wmdrm.meter-resp":{"source":"iana"},"application/vnd.ms-word.document.macroenabled.12":{"source":"iana","extensions":["docm"]},"application/vnd.ms-word.template.macroenabled.12":{"source":"iana","extensions":["dotm"]},"application/vnd.ms-works":{"source":"iana","extensions":["wps","wks","wcm","wdb"]},"application/vnd.ms-wpl":{"source":"iana","extensions":["wpl"]},"application/vnd.ms-xpsdocument":{"source":"iana","compressible":false,"extensions":["xps"]},"application/vnd.msa-disk-image":{"source":"iana"},"application/vnd.mseq":{"source":"iana","extensions":["mseq"]},"application/vnd.msign":{"source":"iana"},"application/vnd.multiad.creator":{"source":"iana"},"application/vnd.multiad.creator.cif":{"source":"iana"},"application/vnd.music-niff":{"source":"iana"},"application/vnd.musician":{"source":"iana","extensions":["mus"]},"application/vnd.muvee.style":{"source":"iana","extensions":["msty"]},"application/vnd.mynfc":{"source":"iana","extensions":["taglet"]},"application/vnd.nacamar.ybrid+json":{"source":"iana","compressible":true},"application/vnd.ncd.control":{"source":"iana"},"application/vnd.ncd.reference":{"source":"iana"},"application/vnd.nearst.inv+json":{"source":"iana","compressible":true},"application/vnd.nebumind.line":{"source":"iana"},"application/vnd.nervana":{"source":"iana"},"application/vnd.netfpx":{"source":"iana"},"application/vnd.neurolanguage.nlu":{"source":"iana","extensions":["nlu"]},"application/vnd.nimn":{"source":"iana"},"application/vnd.nintendo.nitro.rom":{"source":"iana"},"application/vnd.nintendo.snes.rom":{"source":"iana"},"application/vnd.nitf":{"source":"iana","extensions":["ntf","nitf"]},"application/vnd.noblenet-directory":{"source":"iana","extensions":["nnd"]},"application/vnd.noblenet-sealer":{"source":"iana","extensions":["nns"]},"application/vnd.noblenet-web":{"source":"iana","extensions":["nnw"]},"application/vnd.nokia.catalogs":{"source":"iana"},"application/vnd.nokia.conml+wbxml":{"source":"iana"},"application/vnd.nokia.conml+xml":{"source":"iana","compressible":true},"application/vnd.nokia.iptv.config+xml":{"source":"iana","compressible":true},"application/vnd.nokia.isds-radio-presets":{"source":"iana"},"application/vnd.nokia.landmark+wbxml":{"source":"iana"},"application/vnd.nokia.landmark+xml":{"source":"iana","compressible":true},"application/vnd.nokia.landmarkcollection+xml":{"source":"iana","compressible":true},"application/vnd.nokia.n-gage.ac+xml":{"source":"iana","compressible":true,"extensions":["ac"]},"application/vnd.nokia.n-gage.data":{"source":"iana","extensions":["ngdat"]},"application/vnd.nokia.n-gage.symbian.install":{"source":"iana","extensions":["n-gage"]},"application/vnd.nokia.ncd":{"source":"iana"},"application/vnd.nokia.pcd+wbxml":{"source":"iana"},"application/vnd.nokia.pcd+xml":{"source":"iana","compressible":true},"application/vnd.nokia.radio-preset":{"source":"iana","extensions":["rpst"]},"application/vnd.nokia.radio-presets":{"source":"iana","extensions":["rpss"]},"application/vnd.novadigm.edm":{"source":"iana","extensions":["edm"]},"application/vnd.novadigm.edx":{"source":"iana","extensions":["edx"]},"application/vnd.novadigm.ext":{"source":"iana","extensions":["ext"]},"application/vnd.ntt-local.content-share":{"source":"iana"},"application/vnd.ntt-local.file-transfer":{"source":"iana"},"application/vnd.ntt-local.ogw_remote-access":{"source":"iana"},"application/vnd.ntt-local.sip-ta_remote":{"source":"iana"},"application/vnd.ntt-local.sip-ta_tcp_stream":{"source":"iana"},"application/vnd.oasis.opendocument.chart":{"source":"iana","extensions":["odc"]},"application/vnd.oasis.opendocument.chart-template":{"source":"iana","extensions":["otc"]},"application/vnd.oasis.opendocument.database":{"source":"iana","extensions":["odb"]},"application/vnd.oasis.opendocument.formula":{"source":"iana","extensions":["odf"]},"application/vnd.oasis.opendocument.formula-template":{"source":"iana","extensions":["odft"]},"application/vnd.oasis.opendocument.graphics":{"source":"iana","compressible":false,"extensions":["odg"]},"application/vnd.oasis.opendocument.graphics-template":{"source":"iana","extensions":["otg"]},"application/vnd.oasis.opendocument.image":{"source":"iana","extensions":["odi"]},"application/vnd.oasis.opendocument.image-template":{"source":"iana","extensions":["oti"]},"application/vnd.oasis.opendocument.presentation":{"source":"iana","compressible":false,"extensions":["odp"]},"application/vnd.oasis.opendocument.presentation-template":{"source":"iana","extensions":["otp"]},"application/vnd.oasis.opendocument.spreadsheet":{"source":"iana","compressible":false,"extensions":["ods"]},"application/vnd.oasis.opendocument.spreadsheet-template":{"source":"iana","extensions":["ots"]},"application/vnd.oasis.opendocument.text":{"source":"iana","compressible":false,"extensions":["odt"]},"application/vnd.oasis.opendocument.text-master":{"source":"iana","extensions":["odm"]},"application/vnd.oasis.opendocument.text-template":{"source":"iana","extensions":["ott"]},"application/vnd.oasis.opendocument.text-web":{"source":"iana","extensions":["oth"]},"application/vnd.obn":{"source":"iana"},"application/vnd.ocf+cbor":{"source":"iana"},"application/vnd.oci.image.manifest.v1+json":{"source":"iana","compressible":true},"application/vnd.oftn.l10n+json":{"source":"iana","compressible":true},"application/vnd.oipf.contentaccessdownload+xml":{"source":"iana","compressible":true},"application/vnd.oipf.contentaccessstreaming+xml":{"source":"iana","compressible":true},"application/vnd.oipf.cspg-hexbinary":{"source":"iana"},"application/vnd.oipf.dae.svg+xml":{"source":"iana","compressible":true},"application/vnd.oipf.dae.xhtml+xml":{"source":"iana","compressible":true},"application/vnd.oipf.mippvcontrolmessage+xml":{"source":"iana","compressible":true},"application/vnd.oipf.pae.gem":{"source":"iana"},"application/vnd.oipf.spdiscovery+xml":{"source":"iana","compressible":true},"application/vnd.oipf.spdlist+xml":{"source":"iana","compressible":true},"application/vnd.oipf.ueprofile+xml":{"source":"iana","compressible":true},"application/vnd.oipf.userprofile+xml":{"source":"iana","compressible":true},"application/vnd.olpc-sugar":{"source":"iana","extensions":["xo"]},"application/vnd.oma-scws-config":{"source":"iana"},"application/vnd.oma-scws-http-request":{"source":"iana"},"application/vnd.oma-scws-http-response":{"source":"iana"},"application/vnd.oma.bcast.associated-procedure-parameter+xml":{"source":"iana","compressible":true},"application/vnd.oma.bcast.drm-trigger+xml":{"source":"iana","compressible":true},"application/vnd.oma.bcast.imd+xml":{"source":"iana","compressible":true},"application/vnd.oma.bcast.ltkm":{"source":"iana"},"application/vnd.oma.bcast.notification+xml":{"source":"iana","compressible":true},"application/vnd.oma.bcast.provisioningtrigger":{"source":"iana"},"application/vnd.oma.bcast.sgboot":{"source":"iana"},"application/vnd.oma.bcast.sgdd+xml":{"source":"iana","compressible":true},"application/vnd.oma.bcast.sgdu":{"source":"iana"},"application/vnd.oma.bcast.simple-symbol-container":{"source":"iana"},"application/vnd.oma.bcast.smartcard-trigger+xml":{"source":"iana","compressible":true},"application/vnd.oma.bcast.sprov+xml":{"source":"iana","compressible":true},"application/vnd.oma.bcast.stkm":{"source":"iana"},"application/vnd.oma.cab-address-book+xml":{"source":"iana","compressible":true},"application/vnd.oma.cab-feature-handler+xml":{"source":"iana","compressible":true},"application/vnd.oma.cab-pcc+xml":{"source":"iana","compressible":true},"application/vnd.oma.cab-subs-invite+xml":{"source":"iana","compressible":true},"application/vnd.oma.cab-user-prefs+xml":{"source":"iana","compressible":true},"application/vnd.oma.dcd":{"source":"iana"},"application/vnd.oma.dcdc":{"source":"iana"},"application/vnd.oma.dd2+xml":{"source":"iana","compressible":true,"extensions":["dd2"]},"application/vnd.oma.drm.risd+xml":{"source":"iana","compressible":true},"application/vnd.oma.group-usage-list+xml":{"source":"iana","compressible":true},"application/vnd.oma.lwm2m+cbor":{"source":"iana"},"application/vnd.oma.lwm2m+json":{"source":"iana","compressible":true},"application/vnd.oma.lwm2m+tlv":{"source":"iana"},"application/vnd.oma.pal+xml":{"source":"iana","compressible":true},"application/vnd.oma.poc.detailed-progress-report+xml":{"source":"iana","compressible":true},"application/vnd.oma.poc.final-report+xml":{"source":"iana","compressible":true},"application/vnd.oma.poc.groups+xml":{"source":"iana","compressible":true},"application/vnd.oma.poc.invocation-descriptor+xml":{"source":"iana","compressible":true},"application/vnd.oma.poc.optimized-progress-report+xml":{"source":"iana","compressible":true},"application/vnd.oma.push":{"source":"iana"},"application/vnd.oma.scidm.messages+xml":{"source":"iana","compressible":true},"application/vnd.oma.xcap-directory+xml":{"source":"iana","compressible":true},"application/vnd.omads-email+xml":{"source":"iana","charset":"UTF-8","compressible":true},"application/vnd.omads-file+xml":{"source":"iana","charset":"UTF-8","compressible":true},"application/vnd.omads-folder+xml":{"source":"iana","charset":"UTF-8","compressible":true},"application/vnd.omaloc-supl-init":{"source":"iana"},"application/vnd.onepager":{"source":"iana"},"application/vnd.onepagertamp":{"source":"iana"},"application/vnd.onepagertamx":{"source":"iana"},"application/vnd.onepagertat":{"source":"iana"},"application/vnd.onepagertatp":{"source":"iana"},"application/vnd.onepagertatx":{"source":"iana"},"application/vnd.openblox.game+xml":{"source":"iana","compressible":true,"extensions":["obgx"]},"application/vnd.openblox.game-binary":{"source":"iana"},"application/vnd.openeye.oeb":{"source":"iana"},"application/vnd.openofficeorg.extension":{"source":"apache","extensions":["oxt"]},"application/vnd.openstreetmap.data+xml":{"source":"iana","compressible":true,"extensions":["osm"]},"application/vnd.opentimestamps.ots":{"source":"iana"},"application/vnd.openxmlformats-officedocument.custom-properties+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.customxmlproperties+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.drawing+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.drawingml.chart+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.drawingml.chartshapes+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.drawingml.diagramcolors+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.drawingml.diagramdata+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.drawingml.diagramlayout+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.drawingml.diagramstyle+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.extended-properties+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.presentationml.commentauthors+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.presentationml.comments+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.presentationml.handoutmaster+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.presentationml.notesmaster+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.presentationml.notesslide+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.presentationml.presentation":{"source":"iana","compressible":false,"extensions":["pptx"]},"application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.presentationml.presprops+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.presentationml.slide":{"source":"iana","extensions":["sldx"]},"application/vnd.openxmlformats-officedocument.presentationml.slide+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.presentationml.slidelayout+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.presentationml.slidemaster+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.presentationml.slideshow":{"source":"iana","extensions":["ppsx"]},"application/vnd.openxmlformats-officedocument.presentationml.slideshow.main+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.presentationml.slideupdateinfo+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.presentationml.tablestyles+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.presentationml.tags+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.presentationml.template":{"source":"iana","extensions":["potx"]},"application/vnd.openxmlformats-officedocument.presentationml.template.main+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.presentationml.viewprops+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.spreadsheetml.calcchain+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.spreadsheetml.chartsheet+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.spreadsheetml.comments+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.spreadsheetml.connections+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.spreadsheetml.dialogsheet+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.spreadsheetml.externallink+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.spreadsheetml.pivotcachedefinition+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.spreadsheetml.pivotcacherecords+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.spreadsheetml.pivottable+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.spreadsheetml.querytable+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.spreadsheetml.revisionheaders+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.spreadsheetml.revisionlog+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.spreadsheetml.sharedstrings+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":{"source":"iana","compressible":false,"extensions":["xlsx"]},"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.spreadsheetml.sheetmetadata+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.spreadsheetml.table+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.spreadsheetml.tablesinglecells+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.spreadsheetml.template":{"source":"iana","extensions":["xltx"]},"application/vnd.openxmlformats-officedocument.spreadsheetml.template.main+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.spreadsheetml.usernames+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.spreadsheetml.volatiledependencies+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.theme+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.themeoverride+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.vmldrawing":{"source":"iana"},"application/vnd.openxmlformats-officedocument.wordprocessingml.comments+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.wordprocessingml.document":{"source":"iana","compressible":false,"extensions":["docx"]},"application/vnd.openxmlformats-officedocument.wordprocessingml.document.glossary+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.wordprocessingml.endnotes+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.wordprocessingml.fonttable+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.wordprocessingml.footnotes+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.wordprocessingml.settings+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.wordprocessingml.template":{"source":"iana","extensions":["dotx"]},"application/vnd.openxmlformats-officedocument.wordprocessingml.template.main+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.wordprocessingml.websettings+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-package.core-properties+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-package.digital-signature-xmlsignature+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-package.relationships+xml":{"source":"iana","compressible":true},"application/vnd.oracle.resource+json":{"source":"iana","compressible":true},"application/vnd.orange.indata":{"source":"iana"},"application/vnd.osa.netdeploy":{"source":"iana"},"application/vnd.osgeo.mapguide.package":{"source":"iana","extensions":["mgp"]},"application/vnd.osgi.bundle":{"source":"iana"},"application/vnd.osgi.dp":{"source":"iana","extensions":["dp"]},"application/vnd.osgi.subsystem":{"source":"iana","extensions":["esa"]},"application/vnd.otps.ct-kip+xml":{"source":"iana","compressible":true},"application/vnd.oxli.countgraph":{"source":"iana"},"application/vnd.pagerduty+json":{"source":"iana","compressible":true},"application/vnd.palm":{"source":"iana","extensions":["pdb","pqa","oprc"]},"application/vnd.panoply":{"source":"iana"},"application/vnd.paos.xml":{"source":"iana"},"application/vnd.patentdive":{"source":"iana"},"application/vnd.patientecommsdoc":{"source":"iana"},"application/vnd.pawaafile":{"source":"iana","extensions":["paw"]},"application/vnd.pcos":{"source":"iana"},"application/vnd.pg.format":{"source":"iana","extensions":["str"]},"application/vnd.pg.osasli":{"source":"iana","extensions":["ei6"]},"application/vnd.piaccess.application-licence":{"source":"iana"},"application/vnd.picsel":{"source":"iana","extensions":["efif"]},"application/vnd.pmi.widget":{"source":"iana","extensions":["wg"]},"application/vnd.poc.group-advertisement+xml":{"source":"iana","compressible":true},"application/vnd.pocketlearn":{"source":"iana","extensions":["plf"]},"application/vnd.powerbuilder6":{"source":"iana","extensions":["pbd"]},"application/vnd.powerbuilder6-s":{"source":"iana"},"application/vnd.powerbuilder7":{"source":"iana"},"application/vnd.powerbuilder7-s":{"source":"iana"},"application/vnd.powerbuilder75":{"source":"iana"},"application/vnd.powerbuilder75-s":{"source":"iana"},"application/vnd.preminet":{"source":"iana"},"application/vnd.previewsystems.box":{"source":"iana","extensions":["box"]},"application/vnd.proteus.magazine":{"source":"iana","extensions":["mgz"]},"application/vnd.psfs":{"source":"iana"},"application/vnd.publishare-delta-tree":{"source":"iana","extensions":["qps"]},"application/vnd.pvi.ptid1":{"source":"iana","extensions":["ptid"]},"application/vnd.pwg-multiplexed":{"source":"iana"},"application/vnd.pwg-xhtml-print+xml":{"source":"iana","compressible":true},"application/vnd.qualcomm.brew-app-res":{"source":"iana"},"application/vnd.quarantainenet":{"source":"iana"},"application/vnd.quark.quarkxpress":{"source":"iana","extensions":["qxd","qxt","qwd","qwt","qxl","qxb"]},"application/vnd.quobject-quoxdocument":{"source":"iana"},"application/vnd.radisys.moml+xml":{"source":"iana","compressible":true},"application/vnd.radisys.msml+xml":{"source":"iana","compressible":true},"application/vnd.radisys.msml-audit+xml":{"source":"iana","compressible":true},"application/vnd.radisys.msml-audit-conf+xml":{"source":"iana","compressible":true},"application/vnd.radisys.msml-audit-conn+xml":{"source":"iana","compressible":true},"application/vnd.radisys.msml-audit-dialog+xml":{"source":"iana","compressible":true},"application/vnd.radisys.msml-audit-stream+xml":{"source":"iana","compressible":true},"application/vnd.radisys.msml-conf+xml":{"source":"iana","compressible":true},"application/vnd.radisys.msml-dialog+xml":{"source":"iana","compressible":true},"application/vnd.radisys.msml-dialog-base+xml":{"source":"iana","compressible":true},"application/vnd.radisys.msml-dialog-fax-detect+xml":{"source":"iana","compressible":true},"application/vnd.radisys.msml-dialog-fax-sendrecv+xml":{"source":"iana","compressible":true},"application/vnd.radisys.msml-dialog-group+xml":{"source":"iana","compressible":true},"application/vnd.radisys.msml-dialog-speech+xml":{"source":"iana","compressible":true},"application/vnd.radisys.msml-dialog-transform+xml":{"source":"iana","compressible":true},"application/vnd.rainstor.data":{"source":"iana"},"application/vnd.rapid":{"source":"iana"},"application/vnd.rar":{"source":"iana","extensions":["rar"]},"application/vnd.realvnc.bed":{"source":"iana","extensions":["bed"]},"application/vnd.recordare.musicxml":{"source":"iana","extensions":["mxl"]},"application/vnd.recordare.musicxml+xml":{"source":"iana","compressible":true,"extensions":["musicxml"]},"application/vnd.renlearn.rlprint":{"source":"iana"},"application/vnd.resilient.logic":{"source":"iana"},"application/vnd.restful+json":{"source":"iana","compressible":true},"application/vnd.rig.cryptonote":{"source":"iana","extensions":["cryptonote"]},"application/vnd.rim.cod":{"source":"apache","extensions":["cod"]},"application/vnd.rn-realmedia":{"source":"apache","extensions":["rm"]},"application/vnd.rn-realmedia-vbr":{"source":"apache","extensions":["rmvb"]},"application/vnd.route66.link66+xml":{"source":"iana","compressible":true,"extensions":["link66"]},"application/vnd.rs-274x":{"source":"iana"},"application/vnd.ruckus.download":{"source":"iana"},"application/vnd.s3sms":{"source":"iana"},"application/vnd.sailingtracker.track":{"source":"iana","extensions":["st"]},"application/vnd.sar":{"source":"iana"},"application/vnd.sbm.cid":{"source":"iana"},"application/vnd.sbm.mid2":{"source":"iana"},"application/vnd.scribus":{"source":"iana"},"application/vnd.sealed.3df":{"source":"iana"},"application/vnd.sealed.csf":{"source":"iana"},"application/vnd.sealed.doc":{"source":"iana"},"application/vnd.sealed.eml":{"source":"iana"},"application/vnd.sealed.mht":{"source":"iana"},"application/vnd.sealed.net":{"source":"iana"},"application/vnd.sealed.ppt":{"source":"iana"},"application/vnd.sealed.tiff":{"source":"iana"},"application/vnd.sealed.xls":{"source":"iana"},"application/vnd.sealedmedia.softseal.html":{"source":"iana"},"application/vnd.sealedmedia.softseal.pdf":{"source":"iana"},"application/vnd.seemail":{"source":"iana","extensions":["see"]},"application/vnd.seis+json":{"source":"iana","compressible":true},"application/vnd.sema":{"source":"iana","extensions":["sema"]},"application/vnd.semd":{"source":"iana","extensions":["semd"]},"application/vnd.semf":{"source":"iana","extensions":["semf"]},"application/vnd.shade-save-file":{"source":"iana"},"application/vnd.shana.informed.formdata":{"source":"iana","extensions":["ifm"]},"application/vnd.shana.informed.formtemplate":{"source":"iana","extensions":["itp"]},"application/vnd.shana.informed.interchange":{"source":"iana","extensions":["iif"]},"application/vnd.shana.informed.package":{"source":"iana","extensions":["ipk"]},"application/vnd.shootproof+json":{"source":"iana","compressible":true},"application/vnd.shopkick+json":{"source":"iana","compressible":true},"application/vnd.shp":{"source":"iana"},"application/vnd.shx":{"source":"iana"},"application/vnd.sigrok.session":{"source":"iana"},"application/vnd.simtech-mindmapper":{"source":"iana","extensions":["twd","twds"]},"application/vnd.siren+json":{"source":"iana","compressible":true},"application/vnd.smaf":{"source":"iana","extensions":["mmf"]},"application/vnd.smart.notebook":{"source":"iana"},"application/vnd.smart.teacher":{"source":"iana","extensions":["teacher"]},"application/vnd.snesdev-page-table":{"source":"iana"},"application/vnd.software602.filler.form+xml":{"source":"iana","compressible":true,"extensions":["fo"]},"application/vnd.software602.filler.form-xml-zip":{"source":"iana"},"application/vnd.solent.sdkm+xml":{"source":"iana","compressible":true,"extensions":["sdkm","sdkd"]},"application/vnd.spotfire.dxp":{"source":"iana","extensions":["dxp"]},"application/vnd.spotfire.sfs":{"source":"iana","extensions":["sfs"]},"application/vnd.sqlite3":{"source":"iana"},"application/vnd.sss-cod":{"source":"iana"},"application/vnd.sss-dtf":{"source":"iana"},"application/vnd.sss-ntf":{"source":"iana"},"application/vnd.stardivision.calc":{"source":"apache","extensions":["sdc"]},"application/vnd.stardivision.draw":{"source":"apache","extensions":["sda"]},"application/vnd.stardivision.impress":{"source":"apache","extensions":["sdd"]},"application/vnd.stardivision.math":{"source":"apache","extensions":["smf"]},"application/vnd.stardivision.writer":{"source":"apache","extensions":["sdw","vor"]},"application/vnd.stardivision.writer-global":{"source":"apache","extensions":["sgl"]},"application/vnd.stepmania.package":{"source":"iana","extensions":["smzip"]},"application/vnd.stepmania.stepchart":{"source":"iana","extensions":["sm"]},"application/vnd.street-stream":{"source":"iana"},"application/vnd.sun.wadl+xml":{"source":"iana","compressible":true,"extensions":["wadl"]},"application/vnd.sun.xml.calc":{"source":"apache","extensions":["sxc"]},"application/vnd.sun.xml.calc.template":{"source":"apache","extensions":["stc"]},"application/vnd.sun.xml.draw":{"source":"apache","extensions":["sxd"]},"application/vnd.sun.xml.draw.template":{"source":"apache","extensions":["std"]},"application/vnd.sun.xml.impress":{"source":"apache","extensions":["sxi"]},"application/vnd.sun.xml.impress.template":{"source":"apache","extensions":["sti"]},"application/vnd.sun.xml.math":{"source":"apache","extensions":["sxm"]},"application/vnd.sun.xml.writer":{"source":"apache","extensions":["sxw"]},"application/vnd.sun.xml.writer.global":{"source":"apache","extensions":["sxg"]},"application/vnd.sun.xml.writer.template":{"source":"apache","extensions":["stw"]},"application/vnd.sus-calendar":{"source":"iana","extensions":["sus","susp"]},"application/vnd.svd":{"source":"iana","extensions":["svd"]},"application/vnd.swiftview-ics":{"source":"iana"},"application/vnd.sycle+xml":{"source":"iana","compressible":true},"application/vnd.syft+json":{"source":"iana","compressible":true},"application/vnd.symbian.install":{"source":"apache","extensions":["sis","sisx"]},"application/vnd.syncml+xml":{"source":"iana","charset":"UTF-8","compressible":true,"extensions":["xsm"]},"application/vnd.syncml.dm+wbxml":{"source":"iana","charset":"UTF-8","extensions":["bdm"]},"application/vnd.syncml.dm+xml":{"source":"iana","charset":"UTF-8","compressible":true,"extensions":["xdm"]},"application/vnd.syncml.dm.notification":{"source":"iana"},"application/vnd.syncml.dmddf+wbxml":{"source":"iana"},"application/vnd.syncml.dmddf+xml":{"source":"iana","charset":"UTF-8","compressible":true,"extensions":["ddf"]},"application/vnd.syncml.dmtnds+wbxml":{"source":"iana"},"application/vnd.syncml.dmtnds+xml":{"source":"iana","charset":"UTF-8","compressible":true},"application/vnd.syncml.ds.notification":{"source":"iana"},"application/vnd.tableschema+json":{"source":"iana","compressible":true},"application/vnd.tao.intent-module-archive":{"source":"iana","extensions":["tao"]},"application/vnd.tcpdump.pcap":{"source":"iana","extensions":["pcap","cap","dmp"]},"application/vnd.think-cell.ppttc+json":{"source":"iana","compressible":true},"application/vnd.tmd.mediaflex.api+xml":{"source":"iana","compressible":true},"application/vnd.tml":{"source":"iana"},"application/vnd.tmobile-livetv":{"source":"iana","extensions":["tmo"]},"application/vnd.tri.onesource":{"source":"iana"},"application/vnd.trid.tpt":{"source":"iana","extensions":["tpt"]},"application/vnd.triscape.mxs":{"source":"iana","extensions":["mxs"]},"application/vnd.trueapp":{"source":"iana","extensions":["tra"]},"application/vnd.truedoc":{"source":"iana"},"application/vnd.ubisoft.webplayer":{"source":"iana"},"application/vnd.ufdl":{"source":"iana","extensions":["ufd","ufdl"]},"application/vnd.uiq.theme":{"source":"iana","extensions":["utz"]},"application/vnd.umajin":{"source":"iana","extensions":["umj"]},"application/vnd.unity":{"source":"iana","extensions":["unityweb"]},"application/vnd.uoml+xml":{"source":"iana","compressible":true,"extensions":["uoml"]},"application/vnd.uplanet.alert":{"source":"iana"},"application/vnd.uplanet.alert-wbxml":{"source":"iana"},"application/vnd.uplanet.bearer-choice":{"source":"iana"},"application/vnd.uplanet.bearer-choice-wbxml":{"source":"iana"},"application/vnd.uplanet.cacheop":{"source":"iana"},"application/vnd.uplanet.cacheop-wbxml":{"source":"iana"},"application/vnd.uplanet.channel":{"source":"iana"},"application/vnd.uplanet.channel-wbxml":{"source":"iana"},"application/vnd.uplanet.list":{"source":"iana"},"application/vnd.uplanet.list-wbxml":{"source":"iana"},"application/vnd.uplanet.listcmd":{"source":"iana"},"application/vnd.uplanet.listcmd-wbxml":{"source":"iana"},"application/vnd.uplanet.signal":{"source":"iana"},"application/vnd.uri-map":{"source":"iana"},"application/vnd.valve.source.material":{"source":"iana"},"application/vnd.vcx":{"source":"iana","extensions":["vcx"]},"application/vnd.vd-study":{"source":"iana"},"application/vnd.vectorworks":{"source":"iana"},"application/vnd.vel+json":{"source":"iana","compressible":true},"application/vnd.verimatrix.vcas":{"source":"iana"},"application/vnd.veritone.aion+json":{"source":"iana","compressible":true},"application/vnd.veryant.thin":{"source":"iana"},"application/vnd.ves.encrypted":{"source":"iana"},"application/vnd.vidsoft.vidconference":{"source":"iana"},"application/vnd.visio":{"source":"iana","extensions":["vsd","vst","vss","vsw"]},"application/vnd.visionary":{"source":"iana","extensions":["vis"]},"application/vnd.vividence.scriptfile":{"source":"iana"},"application/vnd.vsf":{"source":"iana","extensions":["vsf"]},"application/vnd.wap.sic":{"source":"iana"},"application/vnd.wap.slc":{"source":"iana"},"application/vnd.wap.wbxml":{"source":"iana","charset":"UTF-8","extensions":["wbxml"]},"application/vnd.wap.wmlc":{"source":"iana","extensions":["wmlc"]},"application/vnd.wap.wmlscriptc":{"source":"iana","extensions":["wmlsc"]},"application/vnd.webturbo":{"source":"iana","extensions":["wtb"]},"application/vnd.wfa.dpp":{"source":"iana"},"application/vnd.wfa.p2p":{"source":"iana"},"application/vnd.wfa.wsc":{"source":"iana"},"application/vnd.windows.devicepairing":{"source":"iana"},"application/vnd.wmc":{"source":"iana"},"application/vnd.wmf.bootstrap":{"source":"iana"},"application/vnd.wolfram.mathematica":{"source":"iana"},"application/vnd.wolfram.mathematica.package":{"source":"iana"},"application/vnd.wolfram.player":{"source":"iana","extensions":["nbp"]},"application/vnd.wordperfect":{"source":"iana","extensions":["wpd"]},"application/vnd.wqd":{"source":"iana","extensions":["wqd"]},"application/vnd.wrq-hp3000-labelled":{"source":"iana"},"application/vnd.wt.stf":{"source":"iana","extensions":["stf"]},"application/vnd.wv.csp+wbxml":{"source":"iana"},"application/vnd.wv.csp+xml":{"source":"iana","compressible":true},"application/vnd.wv.ssp+xml":{"source":"iana","compressible":true},"application/vnd.xacml+json":{"source":"iana","compressible":true},"application/vnd.xara":{"source":"iana","extensions":["xar"]},"application/vnd.xfdl":{"source":"iana","extensions":["xfdl"]},"application/vnd.xfdl.webform":{"source":"iana"},"application/vnd.xmi+xml":{"source":"iana","compressible":true},"application/vnd.xmpie.cpkg":{"source":"iana"},"application/vnd.xmpie.dpkg":{"source":"iana"},"application/vnd.xmpie.plan":{"source":"iana"},"application/vnd.xmpie.ppkg":{"source":"iana"},"application/vnd.xmpie.xlim":{"source":"iana"},"application/vnd.yamaha.hv-dic":{"source":"iana","extensions":["hvd"]},"application/vnd.yamaha.hv-script":{"source":"iana","extensions":["hvs"]},"application/vnd.yamaha.hv-voice":{"source":"iana","extensions":["hvp"]},"application/vnd.yamaha.openscoreformat":{"source":"iana","extensions":["osf"]},"application/vnd.yamaha.openscoreformat.osfpvg+xml":{"source":"iana","compressible":true,"extensions":["osfpvg"]},"application/vnd.yamaha.remote-setup":{"source":"iana"},"application/vnd.yamaha.smaf-audio":{"source":"iana","extensions":["saf"]},"application/vnd.yamaha.smaf-phrase":{"source":"iana","extensions":["spf"]},"application/vnd.yamaha.through-ngn":{"source":"iana"},"application/vnd.yamaha.tunnel-udpencap":{"source":"iana"},"application/vnd.yaoweme":{"source":"iana"},"application/vnd.yellowriver-custom-menu":{"source":"iana","extensions":["cmp"]},"application/vnd.youtube.yt":{"source":"iana"},"application/vnd.zul":{"source":"iana","extensions":["zir","zirz"]},"application/vnd.zzazz.deck+xml":{"source":"iana","compressible":true,"extensions":["zaz"]},"application/voicexml+xml":{"source":"iana","compressible":true,"extensions":["vxml"]},"application/voucher-cms+json":{"source":"iana","compressible":true},"application/vq-rtcpxr":{"source":"iana"},"application/wasm":{"source":"iana","compressible":true,"extensions":["wasm"]},"application/watcherinfo+xml":{"source":"iana","compressible":true,"extensions":["wif"]},"application/webpush-options+json":{"source":"iana","compressible":true},"application/whoispp-query":{"source":"iana"},"application/whoispp-response":{"source":"iana"},"application/widget":{"source":"iana","extensions":["wgt"]},"application/winhlp":{"source":"apache","extensions":["hlp"]},"application/wita":{"source":"iana"},"application/wordperfect5.1":{"source":"iana"},"application/wsdl+xml":{"source":"iana","compressible":true,"extensions":["wsdl"]},"application/wspolicy+xml":{"source":"iana","compressible":true,"extensions":["wspolicy"]},"application/x-7z-compressed":{"source":"apache","compressible":false,"extensions":["7z"]},"application/x-abiword":{"source":"apache","extensions":["abw"]},"application/x-ace-compressed":{"source":"apache","extensions":["ace"]},"application/x-amf":{"source":"apache"},"application/x-apple-diskimage":{"source":"apache","extensions":["dmg"]},"application/x-arj":{"compressible":false,"extensions":["arj"]},"application/x-authorware-bin":{"source":"apache","extensions":["aab","x32","u32","vox"]},"application/x-authorware-map":{"source":"apache","extensions":["aam"]},"application/x-authorware-seg":{"source":"apache","extensions":["aas"]},"application/x-bcpio":{"source":"apache","extensions":["bcpio"]},"application/x-bdoc":{"compressible":false,"extensions":["bdoc"]},"application/x-bittorrent":{"source":"apache","extensions":["torrent"]},"application/x-blorb":{"source":"apache","extensions":["blb","blorb"]},"application/x-bzip":{"source":"apache","compressible":false,"extensions":["bz"]},"application/x-bzip2":{"source":"apache","compressible":false,"extensions":["bz2","boz"]},"application/x-cbr":{"source":"apache","extensions":["cbr","cba","cbt","cbz","cb7"]},"application/x-cdlink":{"source":"apache","extensions":["vcd"]},"application/x-cfs-compressed":{"source":"apache","extensions":["cfs"]},"application/x-chat":{"source":"apache","extensions":["chat"]},"application/x-chess-pgn":{"source":"apache","extensions":["pgn"]},"application/x-chrome-extension":{"extensions":["crx"]},"application/x-cocoa":{"source":"nginx","extensions":["cco"]},"application/x-compress":{"source":"apache"},"application/x-conference":{"source":"apache","extensions":["nsc"]},"application/x-cpio":{"source":"apache","extensions":["cpio"]},"application/x-csh":{"source":"apache","extensions":["csh"]},"application/x-deb":{"compressible":false},"application/x-debian-package":{"source":"apache","extensions":["deb","udeb"]},"application/x-dgc-compressed":{"source":"apache","extensions":["dgc"]},"application/x-director":{"source":"apache","extensions":["dir","dcr","dxr","cst","cct","cxt","w3d","fgd","swa"]},"application/x-doom":{"source":"apache","extensions":["wad"]},"application/x-dtbncx+xml":{"source":"apache","compressible":true,"extensions":["ncx"]},"application/x-dtbook+xml":{"source":"apache","compressible":true,"extensions":["dtb"]},"application/x-dtbresource+xml":{"source":"apache","compressible":true,"extensions":["res"]},"application/x-dvi":{"source":"apache","compressible":false,"extensions":["dvi"]},"application/x-envoy":{"source":"apache","extensions":["evy"]},"application/x-eva":{"source":"apache","extensions":["eva"]},"application/x-font-bdf":{"source":"apache","extensions":["bdf"]},"application/x-font-dos":{"source":"apache"},"application/x-font-framemaker":{"source":"apache"},"application/x-font-ghostscript":{"source":"apache","extensions":["gsf"]},"application/x-font-libgrx":{"source":"apache"},"application/x-font-linux-psf":{"source":"apache","extensions":["psf"]},"application/x-font-pcf":{"source":"apache","extensions":["pcf"]},"application/x-font-snf":{"source":"apache","extensions":["snf"]},"application/x-font-speedo":{"source":"apache"},"application/x-font-sunos-news":{"source":"apache"},"application/x-font-type1":{"source":"apache","extensions":["pfa","pfb","pfm","afm"]},"application/x-font-vfont":{"source":"apache"},"application/x-freearc":{"source":"apache","extensions":["arc"]},"application/x-futuresplash":{"source":"apache","extensions":["spl"]},"application/x-gca-compressed":{"source":"apache","extensions":["gca"]},"application/x-glulx":{"source":"apache","extensions":["ulx"]},"application/x-gnumeric":{"source":"apache","extensions":["gnumeric"]},"application/x-gramps-xml":{"source":"apache","extensions":["gramps"]},"application/x-gtar":{"source":"apache","extensions":["gtar"]},"application/x-gzip":{"source":"apache"},"application/x-hdf":{"source":"apache","extensions":["hdf"]},"application/x-httpd-php":{"compressible":true,"extensions":["php"]},"application/x-install-instructions":{"source":"apache","extensions":["install"]},"application/x-iso9660-image":{"source":"apache","extensions":["iso"]},"application/x-iwork-keynote-sffkey":{"extensions":["key"]},"application/x-iwork-numbers-sffnumbers":{"extensions":["numbers"]},"application/x-iwork-pages-sffpages":{"extensions":["pages"]},"application/x-java-archive-diff":{"source":"nginx","extensions":["jardiff"]},"application/x-java-jnlp-file":{"source":"apache","compressible":false,"extensions":["jnlp"]},"application/x-javascript":{"compressible":true},"application/x-keepass2":{"extensions":["kdbx"]},"application/x-latex":{"source":"apache","compressible":false,"extensions":["latex"]},"application/x-lua-bytecode":{"extensions":["luac"]},"application/x-lzh-compressed":{"source":"apache","extensions":["lzh","lha"]},"application/x-makeself":{"source":"nginx","extensions":["run"]},"application/x-mie":{"source":"apache","extensions":["mie"]},"application/x-mobipocket-ebook":{"source":"apache","extensions":["prc","mobi"]},"application/x-mpegurl":{"compressible":false},"application/x-ms-application":{"source":"apache","extensions":["application"]},"application/x-ms-shortcut":{"source":"apache","extensions":["lnk"]},"application/x-ms-wmd":{"source":"apache","extensions":["wmd"]},"application/x-ms-wmz":{"source":"apache","extensions":["wmz"]},"application/x-ms-xbap":{"source":"apache","extensions":["xbap"]},"application/x-msaccess":{"source":"apache","extensions":["mdb"]},"application/x-msbinder":{"source":"apache","extensions":["obd"]},"application/x-mscardfile":{"source":"apache","extensions":["crd"]},"application/x-msclip":{"source":"apache","extensions":["clp"]},"application/x-msdos-program":{"extensions":["exe"]},"application/x-msdownload":{"source":"apache","extensions":["exe","dll","com","bat","msi"]},"application/x-msmediaview":{"source":"apache","extensions":["mvb","m13","m14"]},"application/x-msmetafile":{"source":"apache","extensions":["wmf","wmz","emf","emz"]},"application/x-msmoney":{"source":"apache","extensions":["mny"]},"application/x-mspublisher":{"source":"apache","extensions":["pub"]},"application/x-msschedule":{"source":"apache","extensions":["scd"]},"application/x-msterminal":{"source":"apache","extensions":["trm"]},"application/x-mswrite":{"source":"apache","extensions":["wri"]},"application/x-netcdf":{"source":"apache","extensions":["nc","cdf"]},"application/x-ns-proxy-autoconfig":{"compressible":true,"extensions":["pac"]},"application/x-nzb":{"source":"apache","extensions":["nzb"]},"application/x-perl":{"source":"nginx","extensions":["pl","pm"]},"application/x-pilot":{"source":"nginx","extensions":["prc","pdb"]},"application/x-pkcs12":{"source":"apache","compressible":false,"extensions":["p12","pfx"]},"application/x-pkcs7-certificates":{"source":"apache","extensions":["p7b","spc"]},"application/x-pkcs7-certreqresp":{"source":"apache","extensions":["p7r"]},"application/x-pki-message":{"source":"iana"},"application/x-rar-compressed":{"source":"apache","compressible":false,"extensions":["rar"]},"application/x-redhat-package-manager":{"source":"nginx","extensions":["rpm"]},"application/x-research-info-systems":{"source":"apache","extensions":["ris"]},"application/x-sea":{"source":"nginx","extensions":["sea"]},"application/x-sh":{"source":"apache","compressible":true,"extensions":["sh"]},"application/x-shar":{"source":"apache","extensions":["shar"]},"application/x-shockwave-flash":{"source":"apache","compressible":false,"extensions":["swf"]},"application/x-silverlight-app":{"source":"apache","extensions":["xap"]},"application/x-sql":{"source":"apache","extensions":["sql"]},"application/x-stuffit":{"source":"apache","compressible":false,"extensions":["sit"]},"application/x-stuffitx":{"source":"apache","extensions":["sitx"]},"application/x-subrip":{"source":"apache","extensions":["srt"]},"application/x-sv4cpio":{"source":"apache","extensions":["sv4cpio"]},"application/x-sv4crc":{"source":"apache","extensions":["sv4crc"]},"application/x-t3vm-image":{"source":"apache","extensions":["t3"]},"application/x-tads":{"source":"apache","extensions":["gam"]},"application/x-tar":{"source":"apache","compressible":true,"extensions":["tar"]},"application/x-tcl":{"source":"apache","extensions":["tcl","tk"]},"application/x-tex":{"source":"apache","extensions":["tex"]},"application/x-tex-tfm":{"source":"apache","extensions":["tfm"]},"application/x-texinfo":{"source":"apache","extensions":["texinfo","texi"]},"application/x-tgif":{"source":"apache","extensions":["obj"]},"application/x-ustar":{"source":"apache","extensions":["ustar"]},"application/x-virtualbox-hdd":{"compressible":true,"extensions":["hdd"]},"application/x-virtualbox-ova":{"compressible":true,"extensions":["ova"]},"application/x-virtualbox-ovf":{"compressible":true,"extensions":["ovf"]},"application/x-virtualbox-vbox":{"compressible":true,"extensions":["vbox"]},"application/x-virtualbox-vbox-extpack":{"compressible":false,"extensions":["vbox-extpack"]},"application/x-virtualbox-vdi":{"compressible":true,"extensions":["vdi"]},"application/x-virtualbox-vhd":{"compressible":true,"extensions":["vhd"]},"application/x-virtualbox-vmdk":{"compressible":true,"extensions":["vmdk"]},"application/x-wais-source":{"source":"apache","extensions":["src"]},"application/x-web-app-manifest+json":{"compressible":true,"extensions":["webapp"]},"application/x-www-form-urlencoded":{"source":"iana","compressible":true},"application/x-x509-ca-cert":{"source":"iana","extensions":["der","crt","pem"]},"application/x-x509-ca-ra-cert":{"source":"iana"},"application/x-x509-next-ca-cert":{"source":"iana"},"application/x-xfig":{"source":"apache","extensions":["fig"]},"application/x-xliff+xml":{"source":"apache","compressible":true,"extensions":["xlf"]},"application/x-xpinstall":{"source":"apache","compressible":false,"extensions":["xpi"]},"application/x-xz":{"source":"apache","extensions":["xz"]},"application/x-zmachine":{"source":"apache","extensions":["z1","z2","z3","z4","z5","z6","z7","z8"]},"application/x400-bp":{"source":"iana"},"application/xacml+xml":{"source":"iana","compressible":true},"application/xaml+xml":{"source":"apache","compressible":true,"extensions":["xaml"]},"application/xcap-att+xml":{"source":"iana","compressible":true,"extensions":["xav"]},"application/xcap-caps+xml":{"source":"iana","compressible":true,"extensions":["xca"]},"application/xcap-diff+xml":{"source":"iana","compressible":true,"extensions":["xdf"]},"application/xcap-el+xml":{"source":"iana","compressible":true,"extensions":["xel"]},"application/xcap-error+xml":{"source":"iana","compressible":true},"application/xcap-ns+xml":{"source":"iana","compressible":true,"extensions":["xns"]},"application/xcon-conference-info+xml":{"source":"iana","compressible":true},"application/xcon-conference-info-diff+xml":{"source":"iana","compressible":true},"application/xenc+xml":{"source":"iana","compressible":true,"extensions":["xenc"]},"application/xhtml+xml":{"source":"iana","compressible":true,"extensions":["xhtml","xht"]},"application/xhtml-voice+xml":{"source":"apache","compressible":true},"application/xliff+xml":{"source":"iana","compressible":true,"extensions":["xlf"]},"application/xml":{"source":"iana","compressible":true,"extensions":["xml","xsl","xsd","rng"]},"application/xml-dtd":{"source":"iana","compressible":true,"extensions":["dtd"]},"application/xml-external-parsed-entity":{"source":"iana"},"application/xml-patch+xml":{"source":"iana","compressible":true},"application/xmpp+xml":{"source":"iana","compressible":true},"application/xop+xml":{"source":"iana","compressible":true,"extensions":["xop"]},"application/xproc+xml":{"source":"apache","compressible":true,"extensions":["xpl"]},"application/xslt+xml":{"source":"iana","compressible":true,"extensions":["xsl","xslt"]},"application/xspf+xml":{"source":"apache","compressible":true,"extensions":["xspf"]},"application/xv+xml":{"source":"iana","compressible":true,"extensions":["mxml","xhvml","xvml","xvm"]},"application/yang":{"source":"iana","extensions":["yang"]},"application/yang-data+json":{"source":"iana","compressible":true},"application/yang-data+xml":{"source":"iana","compressible":true},"application/yang-patch+json":{"source":"iana","compressible":true},"application/yang-patch+xml":{"source":"iana","compressible":true},"application/yin+xml":{"source":"iana","compressible":true,"extensions":["yin"]},"application/zip":{"source":"iana","compressible":false,"extensions":["zip"]},"application/zlib":{"source":"iana"},"application/zstd":{"source":"iana"},"audio/1d-interleaved-parityfec":{"source":"iana"},"audio/32kadpcm":{"source":"iana"},"audio/3gpp":{"source":"iana","compressible":false,"extensions":["3gpp"]},"audio/3gpp2":{"source":"iana"},"audio/aac":{"source":"iana"},"audio/ac3":{"source":"iana"},"audio/adpcm":{"source":"apache","extensions":["adp"]},"audio/amr":{"source":"iana","extensions":["amr"]},"audio/amr-wb":{"source":"iana"},"audio/amr-wb+":{"source":"iana"},"audio/aptx":{"source":"iana"},"audio/asc":{"source":"iana"},"audio/atrac-advanced-lossless":{"source":"iana"},"audio/atrac-x":{"source":"iana"},"audio/atrac3":{"source":"iana"},"audio/basic":{"source":"iana","compressible":false,"extensions":["au","snd"]},"audio/bv16":{"source":"iana"},"audio/bv32":{"source":"iana"},"audio/clearmode":{"source":"iana"},"audio/cn":{"source":"iana"},"audio/dat12":{"source":"iana"},"audio/dls":{"source":"iana"},"audio/dsr-es201108":{"source":"iana"},"audio/dsr-es202050":{"source":"iana"},"audio/dsr-es202211":{"source":"iana"},"audio/dsr-es202212":{"source":"iana"},"audio/dv":{"source":"iana"},"audio/dvi4":{"source":"iana"},"audio/eac3":{"source":"iana"},"audio/encaprtp":{"source":"iana"},"audio/evrc":{"source":"iana"},"audio/evrc-qcp":{"source":"iana"},"audio/evrc0":{"source":"iana"},"audio/evrc1":{"source":"iana"},"audio/evrcb":{"source":"iana"},"audio/evrcb0":{"source":"iana"},"audio/evrcb1":{"source":"iana"},"audio/evrcnw":{"source":"iana"},"audio/evrcnw0":{"source":"iana"},"audio/evrcnw1":{"source":"iana"},"audio/evrcwb":{"source":"iana"},"audio/evrcwb0":{"source":"iana"},"audio/evrcwb1":{"source":"iana"},"audio/evs":{"source":"iana"},"audio/flexfec":{"source":"iana"},"audio/fwdred":{"source":"iana"},"audio/g711-0":{"source":"iana"},"audio/g719":{"source":"iana"},"audio/g722":{"source":"iana"},"audio/g7221":{"source":"iana"},"audio/g723":{"source":"iana"},"audio/g726-16":{"source":"iana"},"audio/g726-24":{"source":"iana"},"audio/g726-32":{"source":"iana"},"audio/g726-40":{"source":"iana"},"audio/g728":{"source":"iana"},"audio/g729":{"source":"iana"},"audio/g7291":{"source":"iana"},"audio/g729d":{"source":"iana"},"audio/g729e":{"source":"iana"},"audio/gsm":{"source":"iana"},"audio/gsm-efr":{"source":"iana"},"audio/gsm-hr-08":{"source":"iana"},"audio/ilbc":{"source":"iana"},"audio/ip-mr_v2.5":{"source":"iana"},"audio/isac":{"source":"apache"},"audio/l16":{"source":"iana"},"audio/l20":{"source":"iana"},"audio/l24":{"source":"iana","compressible":false},"audio/l8":{"source":"iana"},"audio/lpc":{"source":"iana"},"audio/melp":{"source":"iana"},"audio/melp1200":{"source":"iana"},"audio/melp2400":{"source":"iana"},"audio/melp600":{"source":"iana"},"audio/mhas":{"source":"iana"},"audio/midi":{"source":"apache","extensions":["mid","midi","kar","rmi"]},"audio/mobile-xmf":{"source":"iana","extensions":["mxmf"]},"audio/mp3":{"compressible":false,"extensions":["mp3"]},"audio/mp4":{"source":"iana","compressible":false,"extensions":["m4a","mp4a"]},"audio/mp4a-latm":{"source":"iana"},"audio/mpa":{"source":"iana"},"audio/mpa-robust":{"source":"iana"},"audio/mpeg":{"source":"iana","compressible":false,"extensions":["mpga","mp2","mp2a","mp3","m2a","m3a"]},"audio/mpeg4-generic":{"source":"iana"},"audio/musepack":{"source":"apache"},"audio/ogg":{"source":"iana","compressible":false,"extensions":["oga","ogg","spx","opus"]},"audio/opus":{"source":"iana"},"audio/parityfec":{"source":"iana"},"audio/pcma":{"source":"iana"},"audio/pcma-wb":{"source":"iana"},"audio/pcmu":{"source":"iana"},"audio/pcmu-wb":{"source":"iana"},"audio/prs.sid":{"source":"iana"},"audio/qcelp":{"source":"iana"},"audio/raptorfec":{"source":"iana"},"audio/red":{"source":"iana"},"audio/rtp-enc-aescm128":{"source":"iana"},"audio/rtp-midi":{"source":"iana"},"audio/rtploopback":{"source":"iana"},"audio/rtx":{"source":"iana"},"audio/s3m":{"source":"apache","extensions":["s3m"]},"audio/scip":{"source":"iana"},"audio/silk":{"source":"apache","extensions":["sil"]},"audio/smv":{"source":"iana"},"audio/smv-qcp":{"source":"iana"},"audio/smv0":{"source":"iana"},"audio/sofa":{"source":"iana"},"audio/sp-midi":{"source":"iana"},"audio/speex":{"source":"iana"},"audio/t140c":{"source":"iana"},"audio/t38":{"source":"iana"},"audio/telephone-event":{"source":"iana"},"audio/tetra_acelp":{"source":"iana"},"audio/tetra_acelp_bb":{"source":"iana"},"audio/tone":{"source":"iana"},"audio/tsvcis":{"source":"iana"},"audio/uemclip":{"source":"iana"},"audio/ulpfec":{"source":"iana"},"audio/usac":{"source":"iana"},"audio/vdvi":{"source":"iana"},"audio/vmr-wb":{"source":"iana"},"audio/vnd.3gpp.iufp":{"source":"iana"},"audio/vnd.4sb":{"source":"iana"},"audio/vnd.audiokoz":{"source":"iana"},"audio/vnd.celp":{"source":"iana"},"audio/vnd.cisco.nse":{"source":"iana"},"audio/vnd.cmles.radio-events":{"source":"iana"},"audio/vnd.cns.anp1":{"source":"iana"},"audio/vnd.cns.inf1":{"source":"iana"},"audio/vnd.dece.audio":{"source":"iana","extensions":["uva","uvva"]},"audio/vnd.digital-winds":{"source":"iana","extensions":["eol"]},"audio/vnd.dlna.adts":{"source":"iana"},"audio/vnd.dolby.heaac.1":{"source":"iana"},"audio/vnd.dolby.heaac.2":{"source":"iana"},"audio/vnd.dolby.mlp":{"source":"iana"},"audio/vnd.dolby.mps":{"source":"iana"},"audio/vnd.dolby.pl2":{"source":"iana"},"audio/vnd.dolby.pl2x":{"source":"iana"},"audio/vnd.dolby.pl2z":{"source":"iana"},"audio/vnd.dolby.pulse.1":{"source":"iana"},"audio/vnd.dra":{"source":"iana","extensions":["dra"]},"audio/vnd.dts":{"source":"iana","extensions":["dts"]},"audio/vnd.dts.hd":{"source":"iana","extensions":["dtshd"]},"audio/vnd.dts.uhd":{"source":"iana"},"audio/vnd.dvb.file":{"source":"iana"},"audio/vnd.everad.plj":{"source":"iana"},"audio/vnd.hns.audio":{"source":"iana"},"audio/vnd.lucent.voice":{"source":"iana","extensions":["lvp"]},"audio/vnd.ms-playready.media.pya":{"source":"iana","extensions":["pya"]},"audio/vnd.nokia.mobile-xmf":{"source":"iana"},"audio/vnd.nortel.vbk":{"source":"iana"},"audio/vnd.nuera.ecelp4800":{"source":"iana","extensions":["ecelp4800"]},"audio/vnd.nuera.ecelp7470":{"source":"iana","extensions":["ecelp7470"]},"audio/vnd.nuera.ecelp9600":{"source":"iana","extensions":["ecelp9600"]},"audio/vnd.octel.sbc":{"source":"iana"},"audio/vnd.presonus.multitrack":{"source":"iana"},"audio/vnd.qcelp":{"source":"iana"},"audio/vnd.rhetorex.32kadpcm":{"source":"iana"},"audio/vnd.rip":{"source":"iana","extensions":["rip"]},"audio/vnd.rn-realaudio":{"compressible":false},"audio/vnd.sealedmedia.softseal.mpeg":{"source":"iana"},"audio/vnd.vmx.cvsd":{"source":"iana"},"audio/vnd.wave":{"compressible":false},"audio/vorbis":{"source":"iana","compressible":false},"audio/vorbis-config":{"source":"iana"},"audio/wav":{"compressible":false,"extensions":["wav"]},"audio/wave":{"compressible":false,"extensions":["wav"]},"audio/webm":{"source":"apache","compressible":false,"extensions":["weba"]},"audio/x-aac":{"source":"apache","compressible":false,"extensions":["aac"]},"audio/x-aiff":{"source":"apache","extensions":["aif","aiff","aifc"]},"audio/x-caf":{"source":"apache","compressible":false,"extensions":["caf"]},"audio/x-flac":{"source":"apache","extensions":["flac"]},"audio/x-m4a":{"source":"nginx","extensions":["m4a"]},"audio/x-matroska":{"source":"apache","extensions":["mka"]},"audio/x-mpegurl":{"source":"apache","extensions":["m3u"]},"audio/x-ms-wax":{"source":"apache","extensions":["wax"]},"audio/x-ms-wma":{"source":"apache","extensions":["wma"]},"audio/x-pn-realaudio":{"source":"apache","extensions":["ram","ra"]},"audio/x-pn-realaudio-plugin":{"source":"apache","extensions":["rmp"]},"audio/x-realaudio":{"source":"nginx","extensions":["ra"]},"audio/x-tta":{"source":"apache"},"audio/x-wav":{"source":"apache","extensions":["wav"]},"audio/xm":{"source":"apache","extensions":["xm"]},"chemical/x-cdx":{"source":"apache","extensions":["cdx"]},"chemical/x-cif":{"source":"apache","extensions":["cif"]},"chemical/x-cmdf":{"source":"apache","extensions":["cmdf"]},"chemical/x-cml":{"source":"apache","extensions":["cml"]},"chemical/x-csml":{"source":"apache","extensions":["csml"]},"chemical/x-pdb":{"source":"apache"},"chemical/x-xyz":{"source":"apache","extensions":["xyz"]},"font/collection":{"source":"iana","extensions":["ttc"]},"font/otf":{"source":"iana","compressible":true,"extensions":["otf"]},"font/sfnt":{"source":"iana"},"font/ttf":{"source":"iana","compressible":true,"extensions":["ttf"]},"font/woff":{"source":"iana","extensions":["woff"]},"font/woff2":{"source":"iana","extensions":["woff2"]},"image/aces":{"source":"iana","extensions":["exr"]},"image/apng":{"compressible":false,"extensions":["apng"]},"image/avci":{"source":"iana","extensions":["avci"]},"image/avcs":{"source":"iana","extensions":["avcs"]},"image/avif":{"source":"iana","compressible":false,"extensions":["avif"]},"image/bmp":{"source":"iana","compressible":true,"extensions":["bmp"]},"image/cgm":{"source":"iana","extensions":["cgm"]},"image/dicom-rle":{"source":"iana","extensions":["drle"]},"image/emf":{"source":"iana","extensions":["emf"]},"image/fits":{"source":"iana","extensions":["fits"]},"image/g3fax":{"source":"iana","extensions":["g3"]},"image/gif":{"source":"iana","compressible":false,"extensions":["gif"]},"image/heic":{"source":"iana","extensions":["heic"]},"image/heic-sequence":{"source":"iana","extensions":["heics"]},"image/heif":{"source":"iana","extensions":["heif"]},"image/heif-sequence":{"source":"iana","extensions":["heifs"]},"image/hej2k":{"source":"iana","extensions":["hej2"]},"image/hsj2":{"source":"iana","extensions":["hsj2"]},"image/ief":{"source":"iana","extensions":["ief"]},"image/jls":{"source":"iana","extensions":["jls"]},"image/jp2":{"source":"iana","compressible":false,"extensions":["jp2","jpg2"]},"image/jpeg":{"source":"iana","compressible":false,"extensions":["jpeg","jpg","jpe"]},"image/jph":{"source":"iana","extensions":["jph"]},"image/jphc":{"source":"iana","extensions":["jhc"]},"image/jpm":{"source":"iana","compressible":false,"extensions":["jpm"]},"image/jpx":{"source":"iana","compressible":false,"extensions":["jpx","jpf"]},"image/jxr":{"source":"iana","extensions":["jxr"]},"image/jxra":{"source":"iana","extensions":["jxra"]},"image/jxrs":{"source":"iana","extensions":["jxrs"]},"image/jxs":{"source":"iana","extensions":["jxs"]},"image/jxsc":{"source":"iana","extensions":["jxsc"]},"image/jxsi":{"source":"iana","extensions":["jxsi"]},"image/jxss":{"source":"iana","extensions":["jxss"]},"image/ktx":{"source":"iana","extensions":["ktx"]},"image/ktx2":{"source":"iana","extensions":["ktx2"]},"image/naplps":{"source":"iana"},"image/pjpeg":{"compressible":false},"image/png":{"source":"iana","compressible":false,"extensions":["png"]},"image/prs.btif":{"source":"iana","extensions":["btif"]},"image/prs.pti":{"source":"iana","extensions":["pti"]},"image/pwg-raster":{"source":"iana"},"image/sgi":{"source":"apache","extensions":["sgi"]},"image/svg+xml":{"source":"iana","compressible":true,"extensions":["svg","svgz"]},"image/t38":{"source":"iana","extensions":["t38"]},"image/tiff":{"source":"iana","compressible":false,"extensions":["tif","tiff"]},"image/tiff-fx":{"source":"iana","extensions":["tfx"]},"image/vnd.adobe.photoshop":{"source":"iana","compressible":true,"extensions":["psd"]},"image/vnd.airzip.accelerator.azv":{"source":"iana","extensions":["azv"]},"image/vnd.cns.inf2":{"source":"iana"},"image/vnd.dece.graphic":{"source":"iana","extensions":["uvi","uvvi","uvg","uvvg"]},"image/vnd.djvu":{"source":"iana","extensions":["djvu","djv"]},"image/vnd.dvb.subtitle":{"source":"iana","extensions":["sub"]},"image/vnd.dwg":{"source":"iana","extensions":["dwg"]},"image/vnd.dxf":{"source":"iana","extensions":["dxf"]},"image/vnd.fastbidsheet":{"source":"iana","extensions":["fbs"]},"image/vnd.fpx":{"source":"iana","extensions":["fpx"]},"image/vnd.fst":{"source":"iana","extensions":["fst"]},"image/vnd.fujixerox.edmics-mmr":{"source":"iana","extensions":["mmr"]},"image/vnd.fujixerox.edmics-rlc":{"source":"iana","extensions":["rlc"]},"image/vnd.globalgraphics.pgb":{"source":"iana"},"image/vnd.microsoft.icon":{"source":"iana","compressible":true,"extensions":["ico"]},"image/vnd.mix":{"source":"iana"},"image/vnd.mozilla.apng":{"source":"iana"},"image/vnd.ms-dds":{"compressible":true,"extensions":["dds"]},"image/vnd.ms-modi":{"source":"iana","extensions":["mdi"]},"image/vnd.ms-photo":{"source":"apache","extensions":["wdp"]},"image/vnd.net-fpx":{"source":"iana","extensions":["npx"]},"image/vnd.pco.b16":{"source":"iana","extensions":["b16"]},"image/vnd.radiance":{"source":"iana"},"image/vnd.sealed.png":{"source":"iana"},"image/vnd.sealedmedia.softseal.gif":{"source":"iana"},"image/vnd.sealedmedia.softseal.jpg":{"source":"iana"},"image/vnd.svf":{"source":"iana"},"image/vnd.tencent.tap":{"source":"iana","extensions":["tap"]},"image/vnd.valve.source.texture":{"source":"iana","extensions":["vtf"]},"image/vnd.wap.wbmp":{"source":"iana","extensions":["wbmp"]},"image/vnd.xiff":{"source":"iana","extensions":["xif"]},"image/vnd.zbrush.pcx":{"source":"iana","extensions":["pcx"]},"image/webp":{"source":"apache","extensions":["webp"]},"image/wmf":{"source":"iana","extensions":["wmf"]},"image/x-3ds":{"source":"apache","extensions":["3ds"]},"image/x-cmu-raster":{"source":"apache","extensions":["ras"]},"image/x-cmx":{"source":"apache","extensions":["cmx"]},"image/x-freehand":{"source":"apache","extensions":["fh","fhc","fh4","fh5","fh7"]},"image/x-icon":{"source":"apache","compressible":true,"extensions":["ico"]},"image/x-jng":{"source":"nginx","extensions":["jng"]},"image/x-mrsid-image":{"source":"apache","extensions":["sid"]},"image/x-ms-bmp":{"source":"nginx","compressible":true,"extensions":["bmp"]},"image/x-pcx":{"source":"apache","extensions":["pcx"]},"image/x-pict":{"source":"apache","extensions":["pic","pct"]},"image/x-portable-anymap":{"source":"apache","extensions":["pnm"]},"image/x-portable-bitmap":{"source":"apache","extensions":["pbm"]},"image/x-portable-graymap":{"source":"apache","extensions":["pgm"]},"image/x-portable-pixmap":{"source":"apache","extensions":["ppm"]},"image/x-rgb":{"source":"apache","extensions":["rgb"]},"image/x-tga":{"source":"apache","extensions":["tga"]},"image/x-xbitmap":{"source":"apache","extensions":["xbm"]},"image/x-xcf":{"compressible":false},"image/x-xpixmap":{"source":"apache","extensions":["xpm"]},"image/x-xwindowdump":{"source":"apache","extensions":["xwd"]},"message/cpim":{"source":"iana"},"message/delivery-status":{"source":"iana"},"message/disposition-notification":{"source":"iana","extensions":["disposition-notification"]},"message/external-body":{"source":"iana"},"message/feedback-report":{"source":"iana"},"message/global":{"source":"iana","extensions":["u8msg"]},"message/global-delivery-status":{"source":"iana","extensions":["u8dsn"]},"message/global-disposition-notification":{"source":"iana","extensions":["u8mdn"]},"message/global-headers":{"source":"iana","extensions":["u8hdr"]},"message/http":{"source":"iana","compressible":false},"message/imdn+xml":{"source":"iana","compressible":true},"message/news":{"source":"iana"},"message/partial":{"source":"iana","compressible":false},"message/rfc822":{"source":"iana","compressible":true,"extensions":["eml","mime"]},"message/s-http":{"source":"iana"},"message/sip":{"source":"iana"},"message/sipfrag":{"source":"iana"},"message/tracking-status":{"source":"iana"},"message/vnd.si.simp":{"source":"iana"},"message/vnd.wfa.wsc":{"source":"iana","extensions":["wsc"]},"model/3mf":{"source":"iana","extensions":["3mf"]},"model/e57":{"source":"iana"},"model/gltf+json":{"source":"iana","compressible":true,"extensions":["gltf"]},"model/gltf-binary":{"source":"iana","compressible":true,"extensions":["glb"]},"model/iges":{"source":"iana","compressible":false,"extensions":["igs","iges"]},"model/mesh":{"source":"iana","compressible":false,"extensions":["msh","mesh","silo"]},"model/mtl":{"source":"iana","extensions":["mtl"]},"model/obj":{"source":"iana","extensions":["obj"]},"model/step":{"source":"iana"},"model/step+xml":{"source":"iana","compressible":true,"extensions":["stpx"]},"model/step+zip":{"source":"iana","compressible":false,"extensions":["stpz"]},"model/step-xml+zip":{"source":"iana","compressible":false,"extensions":["stpxz"]},"model/stl":{"source":"iana","extensions":["stl"]},"model/vnd.collada+xml":{"source":"iana","compressible":true,"extensions":["dae"]},"model/vnd.dwf":{"source":"iana","extensions":["dwf"]},"model/vnd.flatland.3dml":{"source":"iana"},"model/vnd.gdl":{"source":"iana","extensions":["gdl"]},"model/vnd.gs-gdl":{"source":"apache"},"model/vnd.gs.gdl":{"source":"iana"},"model/vnd.gtw":{"source":"iana","extensions":["gtw"]},"model/vnd.moml+xml":{"source":"iana","compressible":true},"model/vnd.mts":{"source":"iana","extensions":["mts"]},"model/vnd.opengex":{"source":"iana","extensions":["ogex"]},"model/vnd.parasolid.transmit.binary":{"source":"iana","extensions":["x_b"]},"model/vnd.parasolid.transmit.text":{"source":"iana","extensions":["x_t"]},"model/vnd.pytha.pyox":{"source":"iana"},"model/vnd.rosette.annotated-data-model":{"source":"iana"},"model/vnd.sap.vds":{"source":"iana","extensions":["vds"]},"model/vnd.usdz+zip":{"source":"iana","compressible":false,"extensions":["usdz"]},"model/vnd.valve.source.compiled-map":{"source":"iana","extensions":["bsp"]},"model/vnd.vtu":{"source":"iana","extensions":["vtu"]},"model/vrml":{"source":"iana","compressible":false,"extensions":["wrl","vrml"]},"model/x3d+binary":{"source":"apache","compressible":false,"extensions":["x3db","x3dbz"]},"model/x3d+fastinfoset":{"source":"iana","extensions":["x3db"]},"model/x3d+vrml":{"source":"apache","compressible":false,"extensions":["x3dv","x3dvz"]},"model/x3d+xml":{"source":"iana","compressible":true,"extensions":["x3d","x3dz"]},"model/x3d-vrml":{"source":"iana","extensions":["x3dv"]},"multipart/alternative":{"source":"iana","compressible":false},"multipart/appledouble":{"source":"iana"},"multipart/byteranges":{"source":"iana"},"multipart/digest":{"source":"iana"},"multipart/encrypted":{"source":"iana","compressible":false},"multipart/form-data":{"source":"iana","compressible":false},"multipart/header-set":{"source":"iana"},"multipart/mixed":{"source":"iana"},"multipart/multilingual":{"source":"iana"},"multipart/parallel":{"source":"iana"},"multipart/related":{"source":"iana","compressible":false},"multipart/report":{"source":"iana"},"multipart/signed":{"source":"iana","compressible":false},"multipart/vnd.bint.med-plus":{"source":"iana"},"multipart/voice-message":{"source":"iana"},"multipart/x-mixed-replace":{"source":"iana"},"text/1d-interleaved-parityfec":{"source":"iana"},"text/cache-manifest":{"source":"iana","compressible":true,"extensions":["appcache","manifest"]},"text/calendar":{"source":"iana","extensions":["ics","ifb"]},"text/calender":{"compressible":true},"text/cmd":{"compressible":true},"text/coffeescript":{"extensions":["coffee","litcoffee"]},"text/cql":{"source":"iana"},"text/cql-expression":{"source":"iana"},"text/cql-identifier":{"source":"iana"},"text/css":{"source":"iana","charset":"UTF-8","compressible":true,"extensions":["css"]},"text/csv":{"source":"iana","compressible":true,"extensions":["csv"]},"text/csv-schema":{"source":"iana"},"text/directory":{"source":"iana"},"text/dns":{"source":"iana"},"text/ecmascript":{"source":"iana"},"text/encaprtp":{"source":"iana"},"text/enriched":{"source":"iana"},"text/fhirpath":{"source":"iana"},"text/flexfec":{"source":"iana"},"text/fwdred":{"source":"iana"},"text/gff3":{"source":"iana"},"text/grammar-ref-list":{"source":"iana"},"text/html":{"source":"iana","compressible":true,"extensions":["html","htm","shtml"]},"text/jade":{"extensions":["jade"]},"text/javascript":{"source":"iana","compressible":true},"text/jcr-cnd":{"source":"iana"},"text/jsx":{"compressible":true,"extensions":["jsx"]},"text/less":{"compressible":true,"extensions":["less"]},"text/markdown":{"source":"iana","compressible":true,"extensions":["markdown","md"]},"text/mathml":{"source":"nginx","extensions":["mml"]},"text/mdx":{"compressible":true,"extensions":["mdx"]},"text/mizar":{"source":"iana"},"text/n3":{"source":"iana","charset":"UTF-8","compressible":true,"extensions":["n3"]},"text/parameters":{"source":"iana","charset":"UTF-8"},"text/parityfec":{"source":"iana"},"text/plain":{"source":"iana","compressible":true,"extensions":["txt","text","conf","def","list","log","in","ini"]},"text/provenance-notation":{"source":"iana","charset":"UTF-8"},"text/prs.fallenstein.rst":{"source":"iana"},"text/prs.lines.tag":{"source":"iana","extensions":["dsc"]},"text/prs.prop.logic":{"source":"iana"},"text/raptorfec":{"source":"iana"},"text/red":{"source":"iana"},"text/rfc822-headers":{"source":"iana"},"text/richtext":{"source":"iana","compressible":true,"extensions":["rtx"]},"text/rtf":{"source":"iana","compressible":true,"extensions":["rtf"]},"text/rtp-enc-aescm128":{"source":"iana"},"text/rtploopback":{"source":"iana"},"text/rtx":{"source":"iana"},"text/sgml":{"source":"iana","extensions":["sgml","sgm"]},"text/shaclc":{"source":"iana"},"text/shex":{"source":"iana","extensions":["shex"]},"text/slim":{"extensions":["slim","slm"]},"text/spdx":{"source":"iana","extensions":["spdx"]},"text/strings":{"source":"iana"},"text/stylus":{"extensions":["stylus","styl"]},"text/t140":{"source":"iana"},"text/tab-separated-values":{"source":"iana","compressible":true,"extensions":["tsv"]},"text/troff":{"source":"iana","extensions":["t","tr","roff","man","me","ms"]},"text/turtle":{"source":"iana","charset":"UTF-8","extensions":["ttl"]},"text/ulpfec":{"source":"iana"},"text/uri-list":{"source":"iana","compressible":true,"extensions":["uri","uris","urls"]},"text/vcard":{"source":"iana","compressible":true,"extensions":["vcard"]},"text/vnd.a":{"source":"iana"},"text/vnd.abc":{"source":"iana"},"text/vnd.ascii-art":{"source":"iana"},"text/vnd.curl":{"source":"iana","extensions":["curl"]},"text/vnd.curl.dcurl":{"source":"apache","extensions":["dcurl"]},"text/vnd.curl.mcurl":{"source":"apache","extensions":["mcurl"]},"text/vnd.curl.scurl":{"source":"apache","extensions":["scurl"]},"text/vnd.debian.copyright":{"source":"iana","charset":"UTF-8"},"text/vnd.dmclientscript":{"source":"iana"},"text/vnd.dvb.subtitle":{"source":"iana","extensions":["sub"]},"text/vnd.esmertec.theme-descriptor":{"source":"iana","charset":"UTF-8"},"text/vnd.familysearch.gedcom":{"source":"iana","extensions":["ged"]},"text/vnd.ficlab.flt":{"source":"iana"},"text/vnd.fly":{"source":"iana","extensions":["fly"]},"text/vnd.fmi.flexstor":{"source":"iana","extensions":["flx"]},"text/vnd.gml":{"source":"iana"},"text/vnd.graphviz":{"source":"iana","extensions":["gv"]},"text/vnd.hans":{"source":"iana"},"text/vnd.hgl":{"source":"iana"},"text/vnd.in3d.3dml":{"source":"iana","extensions":["3dml"]},"text/vnd.in3d.spot":{"source":"iana","extensions":["spot"]},"text/vnd.iptc.newsml":{"source":"iana"},"text/vnd.iptc.nitf":{"source":"iana"},"text/vnd.latex-z":{"source":"iana"},"text/vnd.motorola.reflex":{"source":"iana"},"text/vnd.ms-mediapackage":{"source":"iana"},"text/vnd.net2phone.commcenter.command":{"source":"iana"},"text/vnd.radisys.msml-basic-layout":{"source":"iana"},"text/vnd.senx.warpscript":{"source":"iana"},"text/vnd.si.uricatalogue":{"source":"iana"},"text/vnd.sosi":{"source":"iana"},"text/vnd.sun.j2me.app-descriptor":{"source":"iana","charset":"UTF-8","extensions":["jad"]},"text/vnd.trolltech.linguist":{"source":"iana","charset":"UTF-8"},"text/vnd.wap.si":{"source":"iana"},"text/vnd.wap.sl":{"source":"iana"},"text/vnd.wap.wml":{"source":"iana","extensions":["wml"]},"text/vnd.wap.wmlscript":{"source":"iana","extensions":["wmls"]},"text/vtt":{"source":"iana","charset":"UTF-8","compressible":true,"extensions":["vtt"]},"text/x-asm":{"source":"apache","extensions":["s","asm"]},"text/x-c":{"source":"apache","extensions":["c","cc","cxx","cpp","h","hh","dic"]},"text/x-component":{"source":"nginx","extensions":["htc"]},"text/x-fortran":{"source":"apache","extensions":["f","for","f77","f90"]},"text/x-gwt-rpc":{"compressible":true},"text/x-handlebars-template":{"extensions":["hbs"]},"text/x-java-source":{"source":"apache","extensions":["java"]},"text/x-jquery-tmpl":{"compressible":true},"text/x-lua":{"extensions":["lua"]},"text/x-markdown":{"compressible":true,"extensions":["mkd"]},"text/x-nfo":{"source":"apache","extensions":["nfo"]},"text/x-opml":{"source":"apache","extensions":["opml"]},"text/x-org":{"compressible":true,"extensions":["org"]},"text/x-pascal":{"source":"apache","extensions":["p","pas"]},"text/x-processing":{"compressible":true,"extensions":["pde"]},"text/x-sass":{"extensions":["sass"]},"text/x-scss":{"extensions":["scss"]},"text/x-setext":{"source":"apache","extensions":["etx"]},"text/x-sfv":{"source":"apache","extensions":["sfv"]},"text/x-suse-ymp":{"compressible":true,"extensions":["ymp"]},"text/x-uuencode":{"source":"apache","extensions":["uu"]},"text/x-vcalendar":{"source":"apache","extensions":["vcs"]},"text/x-vcard":{"source":"apache","extensions":["vcf"]},"text/xml":{"source":"iana","compressible":true,"extensions":["xml"]},"text/xml-external-parsed-entity":{"source":"iana"},"text/yaml":{"compressible":true,"extensions":["yaml","yml"]},"video/1d-interleaved-parityfec":{"source":"iana"},"video/3gpp":{"source":"iana","extensions":["3gp","3gpp"]},"video/3gpp-tt":{"source":"iana"},"video/3gpp2":{"source":"iana","extensions":["3g2"]},"video/av1":{"source":"iana"},"video/bmpeg":{"source":"iana"},"video/bt656":{"source":"iana"},"video/celb":{"source":"iana"},"video/dv":{"source":"iana"},"video/encaprtp":{"source":"iana"},"video/ffv1":{"source":"iana"},"video/flexfec":{"source":"iana"},"video/h261":{"source":"iana","extensions":["h261"]},"video/h263":{"source":"iana","extensions":["h263"]},"video/h263-1998":{"source":"iana"},"video/h263-2000":{"source":"iana"},"video/h264":{"source":"iana","extensions":["h264"]},"video/h264-rcdo":{"source":"iana"},"video/h264-svc":{"source":"iana"},"video/h265":{"source":"iana"},"video/iso.segment":{"source":"iana","extensions":["m4s"]},"video/jpeg":{"source":"iana","extensions":["jpgv"]},"video/jpeg2000":{"source":"iana"},"video/jpm":{"source":"apache","extensions":["jpm","jpgm"]},"video/jxsv":{"source":"iana"},"video/mj2":{"source":"iana","extensions":["mj2","mjp2"]},"video/mp1s":{"source":"iana"},"video/mp2p":{"source":"iana"},"video/mp2t":{"source":"iana","extensions":["ts"]},"video/mp4":{"source":"iana","compressible":false,"extensions":["mp4","mp4v","mpg4"]},"video/mp4v-es":{"source":"iana"},"video/mpeg":{"source":"iana","compressible":false,"extensions":["mpeg","mpg","mpe","m1v","m2v"]},"video/mpeg4-generic":{"source":"iana"},"video/mpv":{"source":"iana"},"video/nv":{"source":"iana"},"video/ogg":{"source":"iana","compressible":false,"extensions":["ogv"]},"video/parityfec":{"source":"iana"},"video/pointer":{"source":"iana"},"video/quicktime":{"source":"iana","compressible":false,"extensions":["qt","mov"]},"video/raptorfec":{"source":"iana"},"video/raw":{"source":"iana"},"video/rtp-enc-aescm128":{"source":"iana"},"video/rtploopback":{"source":"iana"},"video/rtx":{"source":"iana"},"video/scip":{"source":"iana"},"video/smpte291":{"source":"iana"},"video/smpte292m":{"source":"iana"},"video/ulpfec":{"source":"iana"},"video/vc1":{"source":"iana"},"video/vc2":{"source":"iana"},"video/vnd.cctv":{"source":"iana"},"video/vnd.dece.hd":{"source":"iana","extensions":["uvh","uvvh"]},"video/vnd.dece.mobile":{"source":"iana","extensions":["uvm","uvvm"]},"video/vnd.dece.mp4":{"source":"iana"},"video/vnd.dece.pd":{"source":"iana","extensions":["uvp","uvvp"]},"video/vnd.dece.sd":{"source":"iana","extensions":["uvs","uvvs"]},"video/vnd.dece.video":{"source":"iana","extensions":["uvv","uvvv"]},"video/vnd.directv.mpeg":{"source":"iana"},"video/vnd.directv.mpeg-tts":{"source":"iana"},"video/vnd.dlna.mpeg-tts":{"source":"iana"},"video/vnd.dvb.file":{"source":"iana","extensions":["dvb"]},"video/vnd.fvt":{"source":"iana","extensions":["fvt"]},"video/vnd.hns.video":{"source":"iana"},"video/vnd.iptvforum.1dparityfec-1010":{"source":"iana"},"video/vnd.iptvforum.1dparityfec-2005":{"source":"iana"},"video/vnd.iptvforum.2dparityfec-1010":{"source":"iana"},"video/vnd.iptvforum.2dparityfec-2005":{"source":"iana"},"video/vnd.iptvforum.ttsavc":{"source":"iana"},"video/vnd.iptvforum.ttsmpeg2":{"source":"iana"},"video/vnd.motorola.video":{"source":"iana"},"video/vnd.motorola.videop":{"source":"iana"},"video/vnd.mpegurl":{"source":"iana","extensions":["mxu","m4u"]},"video/vnd.ms-playready.media.pyv":{"source":"iana","extensions":["pyv"]},"video/vnd.nokia.interleaved-multimedia":{"source":"iana"},"video/vnd.nokia.mp4vr":{"source":"iana"},"video/vnd.nokia.videovoip":{"source":"iana"},"video/vnd.objectvideo":{"source":"iana"},"video/vnd.radgamettools.bink":{"source":"iana"},"video/vnd.radgamettools.smacker":{"source":"iana"},"video/vnd.sealed.mpeg1":{"source":"iana"},"video/vnd.sealed.mpeg4":{"source":"iana"},"video/vnd.sealed.swf":{"source":"iana"},"video/vnd.sealedmedia.softseal.mov":{"source":"iana"},"video/vnd.uvvu.mp4":{"source":"iana","extensions":["uvu","uvvu"]},"video/vnd.vivo":{"source":"iana","extensions":["viv"]},"video/vnd.youtube.yt":{"source":"iana"},"video/vp8":{"source":"iana"},"video/vp9":{"source":"iana"},"video/webm":{"source":"apache","compressible":false,"extensions":["webm"]},"video/x-f4v":{"source":"apache","extensions":["f4v"]},"video/x-fli":{"source":"apache","extensions":["fli"]},"video/x-flv":{"source":"apache","compressible":false,"extensions":["flv"]},"video/x-m4v":{"source":"apache","extensions":["m4v"]},"video/x-matroska":{"source":"apache","compressible":false,"extensions":["mkv","mk3d","mks"]},"video/x-mng":{"source":"apache","extensions":["mng"]},"video/x-ms-asf":{"source":"apache","extensions":["asf","asx"]},"video/x-ms-vob":{"source":"apache","extensions":["vob"]},"video/x-ms-wm":{"source":"apache","extensions":["wm"]},"video/x-ms-wmv":{"source":"apache","compressible":false,"extensions":["wmv"]},"video/x-ms-wmx":{"source":"apache","extensions":["wmx"]},"video/x-ms-wvx":{"source":"apache","extensions":["wvx"]},"video/x-msvideo":{"source":"apache","extensions":["avi"]},"video/x-sgi-movie":{"source":"apache","extensions":["movie"]},"video/x-smv":{"source":"apache","extensions":["smv"]},"x-conference/x-cooltalk":{"source":"apache","extensions":["ice"]},"x-shader/x-fragment":{"compressible":true},"x-shader/x-vertex":{"compressible":true}}');
 
 /***/ }),
 
@@ -15391,6 +31805,8 @@ var __webpack_exports__ = {};
 
 // EXTERNAL MODULE: ./node_modules/dotenv/lib/main.js
 var main = __nccwpck_require__(2437);
+// EXTERNAL MODULE: ./node_modules/@gitbeaker/node/dist/index.js
+var dist = __nccwpck_require__(5849);
 // EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
 var core = __nccwpck_require__(2186);
 // EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
@@ -15457,7 +31873,7 @@ function dataUriToBuffer(uri) {
     buffer.charset = charset;
     return buffer;
 }
-/* harmony default export */ const dist = (dataUriToBuffer);
+/* harmony default export */ const data_uri_to_buffer_dist = (dataUriToBuffer);
 //# sourceMappingURL=index.js.map
 ;// CONCATENATED MODULE: external "node:util"
 const external_node_util_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:util");
@@ -17183,7 +33599,7 @@ async function fetch(url, options_) {
 		}
 
 		if (parsedURL.protocol === 'data:') {
-			const data = dist(request.url);
+			const data = data_uri_to_buffer_dist(request.url);
 			const response = new Response(data, {headers: {'Content-Type': data.typeFull}});
 			resolve(response);
 			return;
@@ -17700,8 +34116,6 @@ const ATLAN_INSTANCE_URL =
     core.getInput("ATLAN_INSTANCE_URL") || process.env.ATLAN_INSTANCE_URL;
 
 async function renderDownstreamAssetsComment(
-    octokit,
-    context,
     asset,
     downstreamAssets
 ) {
@@ -17757,7 +34171,7 @@ async function renderDownstreamAssetsComment(
     return comment
 }
 
-async function checkCommentExists(octokit, context) {
+async function checkCommentExistsOnGithub(octokit, context) {
     if (IS_DEV) return null;
 
     const {pull_request} = context.payload;
@@ -17772,7 +34186,21 @@ async function checkCommentExists(octokit, context) {
     );
 }
 
-async function createIssueComment(octokit, context, content, comment_id = null, forceNewComment = false) {
+async function checkCommentExistsOnGitlab(gitlab) {
+    const {CI_PROJECT_ID, CI_MERGE_REQUEST_IID} = process.env
+    // if (IS_DEV) return null;
+
+    const comments = await gitlab.MergeRequestNotes.all(
+        CI_PROJECT_ID,
+        CI_MERGE_REQUEST_IID,
+    );
+
+    return comments.find(
+        (comment) => comment.author.username === "Jaagrav" && comment.body.includes("<!-- ActionCommentIdentifier: atlan-dbt-action -->")
+    );
+}
+
+async function createIssueCommentOnGithub(octokit, context, content, comment_id = null, forceNewComment = false) {
     const {pull_request} = context.payload;
 
     content = `<!-- ActionCommentIdentifier: atlan-dbt-action -->
@@ -17792,7 +34220,25 @@ ${content}`
     return octokit.rest.issues.createComment(commentObj);
 }
 
-async function deleteComment(octokit, context, comment_id) {
+async function createIssueCommentOnGitlab(gitlab, content, comment_id = null, forceNewComment = false) {
+    const {CI_PROJECT_ID, CI_MERGE_REQUEST_IID} = process.env
+
+    content = `<!-- ActionCommentIdentifier: atlan-dbt-action -->
+${content}`
+
+    // if (IS_DEV) return content;
+
+    if (comment_id && !forceNewComment)
+        return await gitlab.MergeRequestNotes.edit(
+            CI_PROJECT_ID,
+            CI_MERGE_REQUEST_IID,
+            comment_id,
+            content
+        );
+    return await gitlab.MergeRequestNotes.create(CI_PROJECT_ID, CI_MERGE_REQUEST_IID, content)
+}
+
+async function deleteCommentOnGithub(octokit, context, comment_id) {
     const {pull_request} = context.payload;
 
     return octokit.rest.issues.deleteComment({
@@ -17801,8 +34247,14 @@ async function deleteComment(octokit, context, comment_id) {
         comment_id,
     });
 }
+
+async function deleteCommentOnGitlab(gitlab, comment_id) {
+    const {CI_PROJECT_ID, CI_MERGE_REQUEST_IID} = process.env
+
+    return await gitlab.MergeRequestNotes.remove(CI_PROJECT_ID, CI_MERGE_REQUEST_IID, comment_id)
+}
 ;// CONCATENATED MODULE: ./src/utils/file-system.js
-async function getFileContents(octokit, context, filePath) {
+async function getFileContentsFromGithub(octokit, context, filePath) {
     const {repository, pull_request} = context.payload,
         owner = repository.owner.login,
         repo = repository.name,
@@ -17821,7 +34273,7 @@ async function getFileContents(octokit, context, filePath) {
     return buff.toString("utf8");
 }
 
-async function getChangedFiles(octokit, context) {
+async function getChangedFilesFromGithub(octokit, context) {
     const {repository, pull_request} = context.payload,
         owner = repository.owner.login,
         repo = repository.name,
@@ -17863,9 +34315,9 @@ async function getChangedFiles(octokit, context) {
     return changedFiles
 }
 
-async function getAssetName({octokit, context, fileName, filePath}) {
+async function getAssetNameFromGithub({octokit, context, fileName, filePath}) {
     var regExp = /config\(.*alias=\'([^']+)\'.*\)/im;
-    var fileContents = await getFileContents(octokit, context, filePath);
+    var fileContents = await getFileContentsFromGithub(octokit, context, filePath);
 
     var matches = regExp.exec(fileContents);
 
@@ -17876,6 +34328,57 @@ async function getAssetName({octokit, context, fileName, filePath}) {
     return fileName;
 }
 
+async function getFileContentsFromGitlab(gitlab, filePath, headSHA) {
+    const {CI_PROJECT_ID} = process.env
+    const {content} = await gitlab.RepositoryFiles.show(CI_PROJECT_ID, filePath, headSHA);
+    const buff = Buffer.from(content, "base64")
+
+    return (buff.toString("utf8"))
+}
+
+async function getChangedFilesFromGitlab(gitlab) {
+    const {CI_PROJECT_ID, CI_MERGE_REQUEST_IID} = process.env
+
+    const {changes, diff_refs} = await gitlab.MergeRequests.changes(CI_PROJECT_ID, CI_MERGE_REQUEST_IID)
+
+    var changedFiles = changes.map(({new_path}) => {
+        try {
+            const [modelName] = new_path.match(/.*models\/(.*)\.sql/)[1].split('/').reverse()[0].split('.');
+
+            if (modelName) {
+                return {
+                    fileName: modelName,
+                    filePath: new_path,
+                    headSHA: diff_refs.head_sha
+                };
+            }
+        } catch (e) {
+
+        }
+    })
+
+    changedFiles = changedFiles
+        .filter((item, index) => {
+            return changedFiles.findIndex(obj => obj.fileName === item.fileName) === index;
+        })
+
+    console.log(changedFiles)
+
+    return changedFiles
+}
+
+async function getAssetNameFromGitlab({gitlab, fileName, filePath, headSHA}) {
+    var regExp = /config\(.*alias=\'([^']+)\'.*\)/im;
+    var fileContents = await getFileContentsFromGitlab(gitlab, filePath, headSHA);
+
+    var matches = regExp.exec(fileContents);
+
+    if (matches) {
+        return matches[1];
+    }
+
+    return fileName;
+}
 ;// CONCATENATED MODULE: ./src/utils/auth.js
 
 
@@ -17889,7 +34392,7 @@ const auth_ATLAN_INSTANCE_URL =
 const ATLAN_API_TOKEN =
     core.getInput("ATLAN_API_TOKEN") || process.env.ATLAN_API_TOKEN;
 
-async function auth(octokit, context) {
+async function auth() {
     var myHeaders = {
         authorization: `Bearer ${ATLAN_API_TOKEN}`,
         "content-type": "application/json",
@@ -17906,9 +34409,15 @@ async function auth(octokit, context) {
     ).catch((err) => {
     });
 
+    return response
+}
+
+async function authOnGithub(octokit, context) {
+    const response = await auth()
+
     if (response?.status === 401) {
         await
-            createIssueComment(octokit, context, `We couldn't connect to your Atlan Instance, please make sure to set the valid Atlan Bearer Token as \`ATLAN_API_TOKEN\` as this repository's action secret. 
+            createIssueCommentOnGithub(octokit, context, `We couldn't connect to your Atlan Instance, please make sure to set the valid Atlan Bearer Token as \`ATLAN_API_TOKEN\` as this repository's action secret. 
 
 Atlan Instance URL: ${auth_ATLAN_INSTANCE_URL}
 
@@ -17918,7 +34427,7 @@ Set your repository action secrets [here](https://github.com/${context.payload.r
 
     if (response === undefined) {
         await
-            createIssueComment(octokit, context, `We couldn't connect to your Atlan Instance, please make sure to set the valid Atlan Instance URL as \`ATLAN_INSTANCE_URL\` as this repository's action secret. 
+            createIssueCommentOnGithub(octokit, context, `We couldn't connect to your Atlan Instance, please make sure to set the valid Atlan Instance URL as \`ATLAN_INSTANCE_URL\` as this repository's action secret. 
 
 Atlan Instance URL: ${auth_ATLAN_INSTANCE_URL}
 
@@ -17955,7 +34464,7 @@ const get_downstream_assets_ATLAN_INSTANCE_URL =
 const get_downstream_assets_ATLAN_API_TOKEN =
     core.getInput("ATLAN_API_TOKEN") || process.env.ATLAN_API_TOKEN;
 
-async function getDownstreamAssets(asset, guid, octokit, context) {
+async function getDownstreamAssets(asset, guid) {
     var myHeaders = {
         authorization: `Bearer ${get_downstream_assets_ATLAN_API_TOKEN}`,
         "content-type": "application/json",
@@ -18008,7 +34517,7 @@ _Failed to fetch impacted assets._
             
 ${getImageURL("atlan-logo", 15, 15)} [View lineage in Atlan](${get_downstream_assets_ATLAN_INSTANCE_URL}/assets/${asset.guid}/lineage?utm_source=dbt_github_action)`;
 
-        sendSegmentEvent("dbt_ci_action_failure", {
+        sendSegmentEventOnGithub("dbt_ci_action_failure", {
             reason: 'failed_to_fetch_lineage',
             asset_guid: asset.guid,
             asset_name: asset.name,
@@ -18119,7 +34628,7 @@ async function getAsset({name}) {
         `${get_asset_ATLAN_INSTANCE_URL}/api/meta/search/indexsearch#findAssetByExactName`,
         requestOptions
     ).then((e) => e.json()).catch(err => {
-        sendSegmentEvent("dbt_ci_action_failure", {
+        sendSegmentEventOnGithub("dbt_ci_action_failure", {
             reason: 'failed_to_get_asset',
             asset_name: name,
             msg: err
@@ -18197,7 +34706,7 @@ async function createResource(guid, name, link) {
         requestOptions
     ).then((e) => e.json()).catch(err => {
         console.log(err)
-        sendSegmentEvent("dbt_ci_action_failure", {
+        sendSegmentEventOnGithub("dbt_ci_action_failure", {
             reason: 'failed_to_create_resource',
             asset_name: name,
             msg: err
@@ -18214,7 +34723,6 @@ async function createResource(guid, name, link) {
 
 
 
-
 main.config();
 
 const {IS_DEV: segment_IS_DEV} = process.env;
@@ -18223,30 +34731,16 @@ const segment_ATLAN_INSTANCE_URL =
 const segment_ATLAN_API_TOKEN =
     core.getInput("ATLAN_API_TOKEN") || process.env.ATLAN_API_TOKEN;
 
-async function sendSegmentEvent(action, properties) {
-    var myHeaders = {
+async function sendSegmentEvent(body) {
+    const myHeaders = {
         authorization: `Bearer ${segment_ATLAN_API_TOKEN}`,
         "content-type": "application/json",
     };
 
-    var domain = new URL(segment_ATLAN_INSTANCE_URL).hostname;
-
-    var raw = stringify({
-        category: "integration",
-        object: "github",
-        action,
-        userId: "atlan-annonymous-github",
-        properties: {
-            ...properties,
-            github_action_id: `https://github.com/${github.context.payload.repository.full_name}/actions/runs/${github.context.runId}`,
-            domain,
-        },
-    });
-
-    var requestOptions = {
+    const requestOptions = {
         method: "POST",
         headers: myHeaders,
-        body: raw,
+        body: body,
     };
 
     var response = null
@@ -18267,6 +34761,42 @@ async function sendSegmentEvent(action, properties) {
     return response;
 }
 
+async function sendSegmentEventOnGithub(action, properties) {
+    const domain = new URL(segment_ATLAN_INSTANCE_URL).hostname;
+
+    const raw = stringify({
+        category: "integration",
+        object: "github",
+        action,
+        userId: "atlan-annonymous-github",
+        properties: {
+            ...properties,
+            github_action_id: `https://github.com/${github.context.payload.repository.full_name}/actions/runs/${github.context.runId}`,
+            domain,
+        },
+    });
+
+    return sendSegmentEvent(raw)
+}
+
+async function sendSegmentEventOnGitlab(action, properties) {
+    const domain = new URL(segment_ATLAN_INSTANCE_URL).hostname;
+    const {CI_PROJECT_ID, CI_PIPELINE_ID} = process.env;
+
+    const raw = stringify({
+        category: "integration",
+        object: "gitlab",
+        action,
+        userId: "atlan-annonymous-github",
+        properties: {
+            ...properties,
+            gitlab_action_id: `https://gitlab.com/${CI_PROJECT_ID}/pipelines/${CI_PIPELINE_ID}`,
+            domain,
+        },
+    });
+
+    return sendSegmentEvent(raw)
+}
 ;// CONCATENATED MODULE: ./src/api/index.js
 
 
@@ -18277,14 +34807,15 @@ async function sendSegmentEvent(action, properties) {
 
 
 
-async function printDownstreamAssets({octokit, context}) {
-    const changedFiles = await getChangedFiles(octokit, context);
+
+async function printIAonGithub({octokit, context}) {
+    const changedFiles = await getChangedFilesFromGithub(octokit, context);
 
     let comments = ``;
     let totalChangedFiles = 0;
 
     for (const {fileName, filePath} of changedFiles) {
-        const assetName = await getAssetName({octokit, context, fileName, filePath});
+        const assetName = await getAssetNameFromGithub({octokit, context, fileName, filePath});
         const asset = await getAsset({name: assetName});
 
         if (asset.error) {
@@ -18295,7 +34826,7 @@ async function printDownstreamAssets({octokit, context}) {
 
         const {guid} = asset.attributes.sqlAsset;
         const timeStart = Date.now();
-        const downstreamAssets = await getDownstreamAssets(asset, guid, octokit, context);
+        const downstreamAssets = await getDownstreamAssets(asset, guid);
 
         if (totalChangedFiles !== 0)
             comments += '\n\n---\n\n';
@@ -18306,7 +34837,7 @@ async function printDownstreamAssets({octokit, context}) {
             continue;
         }
 
-        sendSegmentEvent("dbt_ci_action_downstream_unfurl", {
+        sendSegmentEventOnGithub("dbt_ci_action_downstream_unfurl", {
             asset_guid: asset.guid,
             asset_type: asset.typeName,
             downstream_count: downstreamAssets.length,
@@ -18314,8 +34845,6 @@ async function printDownstreamAssets({octokit, context}) {
         });
 
         const comment = await renderDownstreamAssetsComment(
-            octokit,
-            context,
             asset,
             downstreamAssets
         )
@@ -18330,30 +34859,92 @@ Here is your downstream impact analysis for **${totalChangedFiles} ${totalChange
     
 ${comments}`
 
-    const existingComment = await checkCommentExists(octokit, context);
+    const existingComment = await checkCommentExistsOnGithub(octokit, context);
 
     if (totalChangedFiles > 0)
-        await createIssueComment(octokit, context, comments, existingComment?.id)
+        await createIssueCommentOnGithub(octokit, context, comments, existingComment?.id)
 
     if (totalChangedFiles === 0 && existingComment)
-        await deleteComment(octokit, context, existingComment.id)
+        await deleteCommentOnGithub(octokit, context, existingComment.id)
 
     return totalChangedFiles;
 }
 
+async function printIAonGitlab({gitlab}) {
+    const changedFiles = await getChangedFilesFromGitlab(gitlab);
+
+    let comments = ``;
+    let totalChangedFiles = 0;
+
+    for (const {fileName, filePath, headSHA} of changedFiles) {
+        const assetName = await getAssetNameFromGitlab({gitlab, fileName, filePath, headSHA});
+        const asset = await getAsset({name: assetName});
+
+        if (asset.error) {
+            comments += asset.error;
+            totalChangedFiles++
+            continue;
+        }
+
+        const {guid} = asset.attributes.sqlAsset;
+        const timeStart = Date.now();
+        const downstreamAssets = await getDownstreamAssets(asset, guid);
+
+        if (totalChangedFiles !== 0)
+            comments += '\n\n---\n\n';
+
+        if (downstreamAssets.error) {
+            comments += downstreamAssets.error;
+            totalChangedFiles++
+            continue;
+        }
+
+        sendSegmentEventOnGitlab("dbt_ci_action_downstream_unfurl", {
+            asset_guid: asset.guid,
+            asset_type: asset.typeName,
+            downstream_count: downstreamAssets.length,
+            total_fetch_time: Date.now() - timeStart,
+        });
+
+        const comment = await renderDownstreamAssetsComment(
+            asset,
+            downstreamAssets
+        )
+
+        comments += comment;
+
+        totalChangedFiles++
+    }
+
+    comments = `### ${getImageURL("atlan-logo", 15, 15)} Atlan impact analysis
+Here is your downstream impact analysis for **${totalChangedFiles} ${totalChangedFiles > 1 ? "models" : "model"}** you have edited.    
+    
+${comments}`
+
+    const existingComment = await checkCommentExistsOnGitlab(gitlab);
+    console.log(existingComment)
+
+    if (totalChangedFiles > 0)
+        await createIssueCommentOnGitlab(gitlab, comments, existingComment?.id)
+
+    if (totalChangedFiles === 0 && existingComment)
+        await deleteCommentOnGitlab(gitlab, existingComment.id)
+
+    return totalChangedFiles
+}
 ;// CONCATENATED MODULE: ./src/main/set-resource-on-asset.js
 
 
 
-async function setResourceOnAsset({octokit, context}) {
-    const changedFiles = await getChangedFiles(octokit, context);
+async function setResourceGithub({octokit, context}) {
+    const changedFiles = await getChangedFilesFromGithub(octokit, context);
     const {pull_request} = context.payload;
     var totalChangedFiles = 0
 
     if (changedFiles.length === 0) return;
 
     for (const {fileName, filePath} of changedFiles) {
-        const assetName = await getAssetName({octokit, context, fileName, filePath});
+        const assetName = await getAssetNameFromGithub({octokit, context, fileName, filePath});
         const asset = await getAsset({name: assetName});
 
         if (!asset) continue;
@@ -18375,7 +34966,7 @@ async function setResourceOnAsset({octokit, context}) {
         totalChangedFiles++
     }
 
-    const comment = await createIssueComment(
+    const comment = await createIssueCommentOnGithub(
         octokit,
         context,
         `🎊 Congrats on the merge!
@@ -18389,6 +34980,47 @@ This pull request has been added as a resource to all the assets modified. ✅
     return totalChangedFiles
 }
 
+async function setResourceGitlab({gitlab, web_url}) {
+    const changedFiles = await getChangedFilesFromGitlab(gitlab);
+    var totalChangedFiles = 0
+
+    if (changedFiles.length === 0) return;
+
+    for (const {fileName, filePath, headSHA} of changedFiles) {
+        const assetName = await getAssetNameFromGitlab({gitlab, fileName, filePath, headSHA});
+        const asset = await getAsset({name: assetName});
+
+        if (!asset) continue;
+
+        const {guid: modelGuid} = asset;
+        const {guid: tableAssetGuid} = asset.attributes.sqlAsset;
+
+        await createResource(
+            modelGuid,
+            "Pull Request on GitHub",
+            web_url
+        );
+        await createResource(
+            tableAssetGuid,
+            "Pull Request on GitHub",
+            web_url
+        );
+
+        totalChangedFiles++
+    }
+
+    const comment = await createIssueCommentOnGitlab(
+        gitlab,
+        `🎊 Congrats on the merge!
+  
+This pull request has been added as a resource to all the assets modified. ✅
+`,
+        null,
+        true
+    );
+
+    return totalChangedFiles
+}
 ;// CONCATENATED MODULE: ./src/main/index.js
 
 
@@ -18402,40 +35034,92 @@ This pull request has been added as a resource to all the assets modified. ✅
 
 
 
+
+
+
 main.config();
 
 const GITHUB_TOKEN = core.getInput("GITHUB_TOKEN") || process.env.GITHUB_TOKEN;
+const GITLAB_TOKEN = process.env.GITLAB_TOKEN;
 
-async function run() {
+async function runOnGithub() {
+    console.log("Run Github")
+
     const timeStart = Date.now();
     const {context} = github;
     const octokit = github.getOctokit(GITHUB_TOKEN);
     const {pull_request} = context.payload;
     const {state, merged} = pull_request;
 
-    if (!await auth(octokit, context)) throw {message: 'Wrong API Token'}
+    if (!await authOnGithub(octokit, context)) throw {message: 'Wrong API Token'}
 
     let total_assets = 0;
 
     if (state === "open") {
-        total_assets = await printDownstreamAssets({octokit, context});
+        total_assets = await printIAonGithub({octokit, context});
     } else if (state === "closed") {
-        if (merged) total_assets = await setResourceOnAsset({octokit, context});
+        if (merged) total_assets = await setResourceGithub({octokit, context});
     }
 
     if (total_assets !== 0)
-        sendSegmentEvent("dbt_ci_action_run", {
+        sendSegmentEventOnGithub("dbt_ci_action_run", {
             asset_count: total_assets,
             total_time: Date.now() - timeStart,
         });
 }
 
-run().catch((err) => {
-    sendSegmentEvent("dbt_ci_action_failure", {
-        reason: 'failed_to_run_action',
-        msg: err
+async function runOnGitlab() {
+    const timeStart = Date.now();
+    console.log("Run Gitlab")
+
+    const gitlab = new dist/* Gitlab */.YU({
+        host: 'https://gitlab.com',
+        token: GITLAB_TOKEN,
     });
 
+    const {CI_PROJECT_ID, CI_MERGE_REQUEST_IID} = process.env
+
+    // if (!await authOnGitlab(octokit, context)) throw {message: 'Wrong API Token'}
+
+    const {state, web_url} = await gitlab.MergeRequests.show(CI_PROJECT_ID, CI_MERGE_REQUEST_IID)
+
+    let total_assets = 0;
+
+    if (state === "opened") {
+        total_assets = await printIAonGitlab({gitlab});
+    } else if (state === "merged") {
+        total_assets = await setResourceGitlab({gitlab, web_url});
+    }
+
+    if (total_assets !== 0)
+        sendSegmentEventOnGitlab("dbt_ci_action_run", {
+            asset_count: total_assets,
+            total_time: Date.now() - timeStart,
+        });
+}
+
+async function run() {
+    if (GITHUB_TOKEN) {
+        await runOnGithub()
+    }
+    if (GITLAB_TOKEN) {
+        await runOnGitlab()
+    }
+}
+
+run().catch((err) => {
+    if (GITHUB_TOKEN) {
+        sendSegmentEventOnGithub("dbt_ci_action_failure", {
+            reason: 'failed_to_run_action',
+            msg: err
+        });
+    }
+    if (GITLAB_TOKEN) {
+        sendSegmentEventOnGitlab("dbt_ci_action_failure", {
+            reason: 'failed_to_run_action',
+            msg: err
+        });
+    }
     core.setFailed(err.message);
 });
 

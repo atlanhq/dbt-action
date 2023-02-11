@@ -1,8 +1,8 @@
 import fetch from "node-fetch";
 import core from "@actions/core";
 import dotenv from "dotenv";
-import {sendSegmentEvent} from "./index.js";
-import {createIssueComment, getConnectorImage, getCertificationImage, getImageURL} from "../utils/index.js";
+import {sendSegmentEventOnGithub} from "./index.js";
+import {createIssueCommentOnGithub, getConnectorImage, getCertificationImage, getImageURL} from "../utils/index.js";
 import stringify from 'json-stringify-safe';
 
 dotenv.config();
@@ -12,7 +12,7 @@ const ATLAN_INSTANCE_URL =
 const ATLAN_API_TOKEN =
     core.getInput("ATLAN_API_TOKEN") || process.env.ATLAN_API_TOKEN;
 
-export default async function getDownstreamAssets(asset, guid, octokit, context) {
+export default async function getDownstreamAssets(asset, guid) {
     var myHeaders = {
         authorization: `Bearer ${ATLAN_API_TOKEN}`,
         "content-type": "application/json",
@@ -65,7 +65,7 @@ _Failed to fetch impacted assets._
             
 ${getImageURL("atlan-logo", 15, 15)} [View lineage in Atlan](${ATLAN_INSTANCE_URL}/assets/${asset.guid}/lineage?utm_source=dbt_github_action)`;
 
-        sendSegmentEvent("dbt_ci_action_failure", {
+        sendSegmentEventOnGithub("dbt_ci_action_failure", {
             reason: 'failed_to_fetch_lineage',
             asset_guid: asset.guid,
             asset_name: asset.name,

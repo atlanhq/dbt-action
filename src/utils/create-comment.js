@@ -9,9 +9,7 @@ const {IS_DEV} = process.env;
 const ATLAN_INSTANCE_URL =
     core.getInput("ATLAN_INSTANCE_URL") || process.env.ATLAN_INSTANCE_URL;
 
-export default async function renderDownstreamAssetsComment(
-    octokit,
-    context,
+export async function renderDownstreamAssetsComment(
     asset,
     downstreamAssets
 ) {
@@ -67,7 +65,7 @@ export default async function renderDownstreamAssetsComment(
     return comment
 }
 
-export async function checkCommentExists(octokit, context) {
+export async function checkCommentExistsOnGithub(octokit, context) {
     if (IS_DEV) return null;
 
     const {pull_request} = context.payload;
@@ -82,7 +80,21 @@ export async function checkCommentExists(octokit, context) {
     );
 }
 
-export async function createIssueComment(octokit, context, content, comment_id = null, forceNewComment = false) {
+export async function checkCommentExistsOnGitlab(gitlab) {
+    const {CI_PROJECT_ID, CI_MERGE_REQUEST_IID} = process.env
+    if (IS_DEV) return null;
+
+    const comments = await gitlab.MergeRequestNotes.all(
+        CI_PROJECT_ID,
+        CI_MERGE_REQUEST_IID,
+    );
+
+    return comments.find(
+        (comment) => comment.author.username === "Jaagrav" && comment.body.includes("<!-- ActionCommentIdentifier: atlan-dbt-action -->")
+    );
+}
+
+export async function createIssueCommentOnGithub(octokit, context, content, comment_id = null, forceNewComment = false) {
     const {pull_request} = context.payload;
 
     content = `<!-- ActionCommentIdentifier: atlan-dbt-action -->
@@ -102,7 +114,25 @@ ${content}`
     return octokit.rest.issues.createComment(commentObj);
 }
 
-export async function deleteComment(octokit, context, comment_id) {
+export async function createIssueCommentOnGitlab(gitlab, content, comment_id = null, forceNewComment = false) {
+    const {CI_PROJECT_ID, CI_MERGE_REQUEST_IID} = process.env
+
+    content = `<!-- ActionCommentIdentifier: atlan-dbt-action -->
+${content}`
+
+    if (IS_DEV) return content;
+
+    if (comment_id && !forceNewComment)
+        return await gitlab.MergeRequestNotes.edit(
+            CI_PROJECT_ID,
+            CI_MERGE_REQUEST_IID,
+            comment_id,
+            content
+        );
+    return await gitlab.MergeRequestNotes.create(CI_PROJECT_ID, CI_MERGE_REQUEST_IID, content)
+}
+
+export async function deleteCommentOnGithub(octokit, context, comment_id) {
     const {pull_request} = context.payload;
 
     return octokit.rest.issues.deleteComment({
@@ -110,4 +140,10 @@ export async function deleteComment(octokit, context, comment_id) {
         issue_number: pull_request.number,
         comment_id,
     });
+}
+
+export async function deleteCommentOnGitlab(gitlab, comment_id) {
+    const {CI_PROJECT_ID, CI_MERGE_REQUEST_IID} = process.env
+
+    return await gitlab.MergeRequestNotes.remove(CI_PROJECT_ID, CI_MERGE_REQUEST_IID, comment_id)
 }

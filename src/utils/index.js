@@ -5,14 +5,22 @@ export {
 } from "./get-image-url.js";
 export {default as hostedImages} from "./hosted-images.js";
 export {
-    default as renderDownstreamAssetsComment,
-    createIssueComment, checkCommentExists, deleteComment
+    renderDownstreamAssetsComment,
+    createIssueCommentOnGithub,
+    checkCommentExistsOnGithub,
+    deleteCommentOnGithub,
+    createIssueCommentOnGitlab,
+    checkCommentExistsOnGitlab,
+    deleteCommentOnGitlab
 } from "./create-comment.js";
 export {
-    getFileContents,
-    getChangedFiles,
-    getAssetName,
+    getFileContentsFromGithub,
+    getChangedFilesFromGithub,
+    getAssetNameFromGithub,
+    getChangedFilesFromGitlab,
+    getFileContentsFromGitlab,
+    getAssetNameFromGitlab
 } from "./file-system.js";
 export {
-    default as auth
+    authOnGithub, authOnGitlab
 } from "./auth.js"

@@ -3,3 +3,5 @@ node_modules/
 event.json
 .idea
 .DS_Store
+.env.github
+.env.gitlab

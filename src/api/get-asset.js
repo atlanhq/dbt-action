@@ -1,7 +1,7 @@
 import fetch from "node-fetch";
 import core from "@actions/core";
 import dotenv from "dotenv";
-import {sendSegmentEvent} from "./index.js";
+import {sendSegmentEventOnGithub} from "./index.js";
 import stringify from 'json-stringify-safe';
 
 dotenv.config();
@@ -71,7 +71,7 @@ export default async function getAsset({name}) {
         `${ATLAN_INSTANCE_URL}/api/meta/search/indexsearch#findAssetByExactName`,
         requestOptions
     ).then((e) => e.json()).catch(err => {
-        sendSegmentEvent("dbt_ci_action_failure", {
+        sendSegmentEventOnGithub("dbt_ci_action_failure", {
             reason: 'failed_to_get_asset',
             asset_name: name,
             msg: err
