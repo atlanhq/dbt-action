@@ -12,7 +12,7 @@ const ATLAN_INSTANCE_URL =
 const ATLAN_API_TOKEN =
     core.getInput("ATLAN_API_TOKEN") || process.env.ATLAN_API_TOKEN;
 
-export async function sendSegmentEvent(body) {
+export async function sendSegmentEvent(action, body) {
     const myHeaders = {
         authorization: `Bearer ${ATLAN_API_TOKEN}`,
         "content-type": "application/json",
@@ -32,7 +32,7 @@ export async function sendSegmentEvent(body) {
             requestOptions
         )
             .then(() => {
-                console.log("send segment event", action, raw);
+                console.log("send segment event", action, body);
             })
             .catch((err) => {
                 console.log("couldn't send segment event", err);
@@ -57,7 +57,7 @@ export async function sendSegmentEventOnGithub(action, properties) {
         },
     });
 
-    return sendSegmentEvent(raw)
+    return sendSegmentEvent(action, raw)
 }
 
 export async function sendSegmentEventOnGitlab(action, properties) {
@@ -76,5 +76,5 @@ export async function sendSegmentEventOnGitlab(action, properties) {
         },
     });
 
-    return sendSegmentEvent(raw)
+    return sendSegmentEvent(action, raw)
 }
