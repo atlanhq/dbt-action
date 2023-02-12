@@ -73,17 +73,17 @@ export async function getAssetNameFromGithub({octokit, context, fileName, filePa
 }
 
 export async function getFileContentsFromGitlab(gitlab, filePath, headSHA) {
-    const {CI_PROJECT_ID} = process.env
-    const {content} = await gitlab.RepositoryFiles.show(CI_PROJECT_ID, filePath, headSHA);
+    const {CI_PROJECT_PATH} = process.env
+    const {content} = await gitlab.RepositoryFiles.show(CI_PROJECT_PATH, filePath, headSHA);
     const buff = Buffer.from(content, "base64")
 
     return (buff.toString("utf8"))
 }
 
 export async function getChangedFilesFromGitlab(gitlab) {
-    const {CI_PROJECT_ID, CI_MERGE_REQUEST_IID} = process.env
+    const {CI_PROJECT_PATH, CI_MERGE_REQUEST_IID} = process.env
 
-    const {changes, diff_refs} = await gitlab.MergeRequests.changes(CI_PROJECT_ID, CI_MERGE_REQUEST_IID)
+    const {changes, diff_refs} = await gitlab.MergeRequests.changes(CI_PROJECT_PATH, CI_MERGE_REQUEST_IID)
     var changedFiles = changes.map(({new_path}) => {
         try {
             const [modelName] = new_path.match(/.*models\/(.*)\.sql/)[1].split('/').reverse()[0].split('.');

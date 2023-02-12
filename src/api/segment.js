@@ -62,7 +62,7 @@ export async function sendSegmentEventOnGithub(action, properties) {
 
 export async function sendSegmentEventOnGitlab(action, properties) {
     const domain = new URL(ATLAN_INSTANCE_URL).hostname;
-    const {CI_PROJECT_ID, CI_PIPELINE_ID} = process.env;
+    const {CI_PROJECT_PATH, CI_PIPELINE_ID} = process.env;
 
     const raw = stringify({
         category: "integration",
@@ -71,7 +71,7 @@ export async function sendSegmentEventOnGitlab(action, properties) {
         userId: "atlan-annonymous-github",
         properties: {
             ...properties,
-            gitlab_action_id: `https://gitlab.com/${CI_PROJECT_ID}/pipelines/${CI_PIPELINE_ID}`,
+            gitlab_action_id: `https://gitlab.com/${CI_PROJECT_PATH}/pipelines/${CI_PIPELINE_ID}`,
             domain,
         },
     });

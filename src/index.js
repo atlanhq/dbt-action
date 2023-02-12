@@ -49,11 +49,11 @@ async function runOnGitlab() {
         token: GITLAB_TOKEN,
     });
 
-    const {CI_PROJECT_ID, CI_MERGE_REQUEST_IID} = process.env
+    const {CI_PROJECT_PATH, CI_MERGE_REQUEST_IID} = process.env
 
     if (!await authOnGitlab(gitlab)) throw {message: 'Wrong API Token'}
 
-    const {state, web_url} = await gitlab.MergeRequests.show(CI_PROJECT_ID, CI_MERGE_REQUEST_IID)
+    const {state, web_url} = await gitlab.MergeRequests.show(CI_PROJECT_PATH, CI_MERGE_REQUEST_IID)
 
     let total_assets = 0;
 

@@ -34187,11 +34187,11 @@ async function checkCommentExistsOnGithub(octokit, context) {
 }
 
 async function checkCommentExistsOnGitlab(gitlab) {
-    const {CI_PROJECT_ID, CI_MERGE_REQUEST_IID} = process.env
+    const {CI_PROJECT_PATH, CI_MERGE_REQUEST_IID} = process.env
     if (IS_DEV) return null;
 
     const comments = await gitlab.MergeRequestNotes.all(
-        CI_PROJECT_ID,
+        CI_PROJECT_PATH,
         CI_MERGE_REQUEST_IID,
     );
 
@@ -34221,7 +34221,7 @@ ${content}`
 }
 
 async function create_comment_createIssueCommentOnGitlab(gitlab, content, comment_id = null, forceNewComment = false) {
-    const {CI_PROJECT_ID, CI_MERGE_REQUEST_IID} = process.env
+    const {CI_PROJECT_PATH, CI_MERGE_REQUEST_IID} = process.env
 
     content = `<!-- ActionCommentIdentifier: atlan-dbt-action -->
 ${content}`
@@ -34232,12 +34232,12 @@ ${content}`
 
     if (comment_id && !forceNewComment)
         return await gitlab.MergeRequestNotes.edit(
-            CI_PROJECT_ID,
+            CI_PROJECT_PATH,
             CI_MERGE_REQUEST_IID,
             comment_id,
             content
         );
-    return await gitlab.MergeRequestNotes.create(CI_PROJECT_ID, CI_MERGE_REQUEST_IID, content)
+    return await gitlab.MergeRequestNotes.create(CI_PROJECT_PATH, CI_MERGE_REQUEST_IID, content)
 }
 
 async function deleteCommentOnGithub(octokit, context, comment_id) {
@@ -34251,9 +34251,9 @@ async function deleteCommentOnGithub(octokit, context, comment_id) {
 }
 
 async function deleteCommentOnGitlab(gitlab, comment_id) {
-    const {CI_PROJECT_ID, CI_MERGE_REQUEST_IID} = process.env
+    const {CI_PROJECT_PATH, CI_MERGE_REQUEST_IID} = process.env
 
-    return await gitlab.MergeRequestNotes.remove(CI_PROJECT_ID, CI_MERGE_REQUEST_IID, comment_id)
+    return await gitlab.MergeRequestNotes.remove(CI_PROJECT_PATH, CI_MERGE_REQUEST_IID, comment_id)
 }
 ;// CONCATENATED MODULE: ./src/utils/file-system.js
 async function getFileContentsFromGithub(octokit, context, filePath) {
@@ -34331,17 +34331,17 @@ async function getAssetNameFromGithub({octokit, context, fileName, filePath}) {
 }
 
 async function getFileContentsFromGitlab(gitlab, filePath, headSHA) {
-    const {CI_PROJECT_ID} = process.env
-    const {content} = await gitlab.RepositoryFiles.show(CI_PROJECT_ID, filePath, headSHA);
+    const {CI_PROJECT_PATH} = process.env
+    const {content} = await gitlab.RepositoryFiles.show(CI_PROJECT_PATH, filePath, headSHA);
     const buff = Buffer.from(content, "base64")
 
     return (buff.toString("utf8"))
 }
 
 async function getChangedFilesFromGitlab(gitlab) {
-    const {CI_PROJECT_ID, CI_MERGE_REQUEST_IID} = process.env
+    const {CI_PROJECT_PATH, CI_MERGE_REQUEST_IID} = process.env
 
-    const {changes, diff_refs} = await gitlab.MergeRequests.changes(CI_PROJECT_ID, CI_MERGE_REQUEST_IID)
+    const {changes, diff_refs} = await gitlab.MergeRequests.changes(CI_PROJECT_PATH, CI_MERGE_REQUEST_IID)
     var changedFiles = changes.map(({new_path}) => {
         try {
             const [modelName] = new_path.match(/.*models\/(.*)\.sql/)[1].split('/').reverse()[0].split('.');
@@ -34811,7 +34811,7 @@ async function sendSegmentEventOnGithub(action, properties) {
 
 async function sendSegmentEventOnGitlab(action, properties) {
     const domain = new URL(segment_ATLAN_INSTANCE_URL).hostname;
-    const {CI_PROJECT_ID, CI_PIPELINE_ID} = process.env;
+    const {CI_PROJECT_PATH, CI_PIPELINE_ID} = process.env;
 
     const raw = stringify({
         category: "integration",
@@ -34820,7 +34820,7 @@ async function sendSegmentEventOnGitlab(action, properties) {
         userId: "atlan-annonymous-github",
         properties: {
             ...properties,
-            gitlab_action_id: `https://gitlab.com/${CI_PROJECT_ID}/pipelines/${CI_PIPELINE_ID}`,
+            gitlab_action_id: `https://gitlab.com/${CI_PROJECT_PATH}/pipelines/${CI_PIPELINE_ID}`,
             domain,
         },
     });
@@ -35106,11 +35106,11 @@ async function runOnGitlab() {
         token: GITLAB_TOKEN,
     });
 
-    const {CI_PROJECT_ID, CI_MERGE_REQUEST_IID} = process.env
+    const {CI_PROJECT_PATH, CI_MERGE_REQUEST_IID} = process.env
 
     if (!await authOnGitlab(gitlab)) throw {message: 'Wrong API Token'}
 
-    const {state, web_url} = await gitlab.MergeRequests.show(CI_PROJECT_ID, CI_MERGE_REQUEST_IID)
+    const {state, web_url} = await gitlab.MergeRequests.show(CI_PROJECT_PATH, CI_MERGE_REQUEST_IID)
 
     let total_assets = 0;
 

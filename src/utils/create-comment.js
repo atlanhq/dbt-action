@@ -81,11 +81,11 @@ export async function checkCommentExistsOnGithub(octokit, context) {
 }
 
 export async function checkCommentExistsOnGitlab(gitlab) {
-    const {CI_PROJECT_ID, CI_MERGE_REQUEST_IID} = process.env
+    const {CI_PROJECT_PATH, CI_MERGE_REQUEST_IID} = process.env
     if (IS_DEV) return null;
 
     const comments = await gitlab.MergeRequestNotes.all(
-        CI_PROJECT_ID,
+        CI_PROJECT_PATH,
         CI_MERGE_REQUEST_IID,
     );
 
@@ -115,7 +115,7 @@ ${content}`
 }
 
 export async function createIssueCommentOnGitlab(gitlab, content, comment_id = null, forceNewComment = false) {
-    const {CI_PROJECT_ID, CI_MERGE_REQUEST_IID} = process.env
+    const {CI_PROJECT_PATH, CI_MERGE_REQUEST_IID} = process.env
 
     content = `<!-- ActionCommentIdentifier: atlan-dbt-action -->
 ${content}`
@@ -126,12 +126,12 @@ ${content}`
 
     if (comment_id && !forceNewComment)
         return await gitlab.MergeRequestNotes.edit(
-            CI_PROJECT_ID,
+            CI_PROJECT_PATH,
             CI_MERGE_REQUEST_IID,
             comment_id,
             content
         );
-    return await gitlab.MergeRequestNotes.create(CI_PROJECT_ID, CI_MERGE_REQUEST_IID, content)
+    return await gitlab.MergeRequestNotes.create(CI_PROJECT_PATH, CI_MERGE_REQUEST_IID, content)
 }
 
 export async function deleteCommentOnGithub(octokit, context, comment_id) {
@@ -145,7 +145,7 @@ export async function deleteCommentOnGithub(octokit, context, comment_id) {
 }
 
 export async function deleteCommentOnGitlab(gitlab, comment_id) {
-    const {CI_PROJECT_ID, CI_MERGE_REQUEST_IID} = process.env
+    const {CI_PROJECT_PATH, CI_MERGE_REQUEST_IID} = process.env
 
-    return await gitlab.MergeRequestNotes.remove(CI_PROJECT_ID, CI_MERGE_REQUEST_IID, comment_id)
+    return await gitlab.MergeRequestNotes.remove(CI_PROJECT_PATH, CI_MERGE_REQUEST_IID, comment_id)
 }
