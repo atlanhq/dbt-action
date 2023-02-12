@@ -59,12 +59,12 @@ Set your repository action secrets [here](https://github.com/${context.payload.r
     return true
 }
 
-export async function authOnGitlab() {
+export async function authOnGitlab(gitlab) {
     const response = await auth()
 
     if (response?.status === 401) {
         await
-            createIssueCommentOnGithub(octokit, context, `We couldn't connect to your Atlan Instance, please make sure to set the valid Atlan Bearer Token as \`ATLAN_API_TOKEN\` as this repository's action secret. 
+            createIssueCommentOnGitlab(gitlab, `We couldn't connect to your Atlan Instance, please make sure to set the valid Atlan Bearer Token as \`ATLAN_API_TOKEN\` as this repository's action secret. 
 
 Atlan Instance URL: ${ATLAN_INSTANCE_URL}
 
@@ -74,7 +74,7 @@ Set your repository action secrets [here](https://github.com/${context.payload.r
 
     if (response === undefined) {
         await
-            createIssueCommentOnGithub(octokit, context, `We couldn't connect to your Atlan Instance, please make sure to set the valid Atlan Instance URL as \`ATLAN_INSTANCE_URL\` as this repository's action secret. 
+            createIssueCommentOnGitlab(gitlab, `We couldn't connect to your Atlan Instance, please make sure to set the valid Atlan Instance URL as \`ATLAN_INSTANCE_URL\` as this repository's action secret. 
 
 Atlan Instance URL: ${ATLAN_INSTANCE_URL}
 

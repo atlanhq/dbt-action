@@ -51,7 +51,7 @@ async function runOnGitlab() {
 
     const {CI_PROJECT_ID, CI_MERGE_REQUEST_IID} = process.env
 
-    if (!await authOnGitlab(octokit, context)) throw {message: 'Wrong API Token'}
+    if (!await authOnGitlab(gitlab)) throw {message: 'Wrong API Token'}
 
     const {state, web_url} = await gitlab.MergeRequests.show(CI_PROJECT_ID, CI_MERGE_REQUEST_IID)
 
