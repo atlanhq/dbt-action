@@ -120,6 +120,8 @@ export async function createIssueCommentOnGitlab(gitlab, content, comment_id = n
     content = `<!-- ActionCommentIdentifier: atlan-dbt-action -->
 ${content}`
 
+    console.log(content)
+    
     if (IS_DEV) return content;
 
     if (comment_id && !forceNewComment)

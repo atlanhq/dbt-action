@@ -1,7 +1,7 @@
 import fetch from "node-fetch";
 import dotenv from "dotenv";
 import core from "@actions/core";
-import {createIssueCommentOnGithub} from "./create-comment.js";
+import {createIssueCommentOnGithub} from "./index.js";
 
 dotenv.config();
 

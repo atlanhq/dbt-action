@@ -34188,7 +34188,7 @@ async function checkCommentExistsOnGithub(octokit, context) {
 
 async function checkCommentExistsOnGitlab(gitlab) {
     const {CI_PROJECT_ID, CI_MERGE_REQUEST_IID} = process.env
-    // if (IS_DEV) return null;
+    if (IS_DEV) return null;
 
     const comments = await gitlab.MergeRequestNotes.all(
         CI_PROJECT_ID,
@@ -34220,13 +34220,15 @@ ${content}`
     return octokit.rest.issues.createComment(commentObj);
 }
 
-async function createIssueCommentOnGitlab(gitlab, content, comment_id = null, forceNewComment = false) {
+async function create_comment_createIssueCommentOnGitlab(gitlab, content, comment_id = null, forceNewComment = false) {
     const {CI_PROJECT_ID, CI_MERGE_REQUEST_IID} = process.env
 
     content = `<!-- ActionCommentIdentifier: atlan-dbt-action -->
 ${content}`
 
-    // if (IS_DEV) return content;
+    console.log(content)
+    
+    if (IS_DEV) return content;
 
     if (comment_id && !forceNewComment)
         return await gitlab.MergeRequestNotes.edit(
@@ -34340,7 +34342,6 @@ async function getChangedFilesFromGitlab(gitlab) {
     const {CI_PROJECT_ID, CI_MERGE_REQUEST_IID} = process.env
 
     const {changes, diff_refs} = await gitlab.MergeRequests.changes(CI_PROJECT_ID, CI_MERGE_REQUEST_IID)
-
     var changedFiles = changes.map(({new_path}) => {
         try {
             const [modelName] = new_path.match(/.*models\/(.*)\.sql/)[1].split('/').reverse()[0].split('.');
@@ -34355,7 +34356,7 @@ async function getChangedFilesFromGitlab(gitlab) {
         } catch (e) {
 
         }
-    })
+    }).filter((i) => i !== undefined)
 
     changedFiles = changedFiles
         .filter((item, index) => {
@@ -34428,6 +34429,35 @@ Set your repository action secrets [here](https://github.com/${context.payload.r
     if (response === undefined) {
         await
             createIssueCommentOnGithub(octokit, context, `We couldn't connect to your Atlan Instance, please make sure to set the valid Atlan Instance URL as \`ATLAN_INSTANCE_URL\` as this repository's action secret. 
+
+Atlan Instance URL: ${auth_ATLAN_INSTANCE_URL}
+
+Make sure your Atlan Instance URL is set in the following format.
+\`https://tenant.atlan.com\`
+
+Set your repository action secrets [here](https://github.com/${context.payload.repository.full_name}/settings/secrets/actions). For more information on how to setup the Atlan dbt Action, please read the [setup documentation here](https://github.com/atlanhq/dbt-action/blob/main/README.md).`)
+        return false
+    }
+
+    return true
+}
+
+async function authOnGitlab(gitlab) {
+    const response = await auth()
+
+    if (response?.status === 401) {
+        await
+            createIssueCommentOnGitlab(gitlab, `We couldn't connect to your Atlan Instance, please make sure to set the valid Atlan Bearer Token as \`ATLAN_API_TOKEN\` as this repository's action secret. 
+
+Atlan Instance URL: ${auth_ATLAN_INSTANCE_URL}
+
+Set your repository action secrets [here](https://github.com/${context.payload.repository.full_name}/settings/secrets/actions). For more information on how to setup the Atlan dbt Action, please read the [setup documentation here](https://github.com/atlanhq/dbt-action/blob/main/README.md).`)
+        return false
+    }
+
+    if (response === undefined) {
+        await
+            createIssueCommentOnGitlab(gitlab, `We couldn't connect to your Atlan Instance, please make sure to set the valid Atlan Instance URL as \`ATLAN_INSTANCE_URL\` as this repository's action secret. 
 
 Atlan Instance URL: ${auth_ATLAN_INSTANCE_URL}
 
@@ -34917,15 +34947,14 @@ async function printIAonGitlab({gitlab}) {
     }
 
     comments = `### ${getImageURL("atlan-logo", 15, 15)} Atlan impact analysis
-Here is your downstream impact analysis for **${totalChangedFiles} ${totalChangedFiles > 1 ? "models" : "model"}** you have edited.    
-    
+Here is your downstream impact analysis for **${totalChangedFiles} ${totalChangedFiles > 1 ? "models" : "model"}** you have edited.
+
 ${comments}`
 
     const existingComment = await checkCommentExistsOnGitlab(gitlab);
-    console.log(existingComment)
 
     if (totalChangedFiles > 0)
-        await createIssueCommentOnGitlab(gitlab, comments, existingComment?.id)
+        await create_comment_createIssueCommentOnGitlab(gitlab, comments, existingComment?.id)
 
     if (totalChangedFiles === 0 && existingComment)
         await deleteCommentOnGitlab(gitlab, existingComment.id)
@@ -35009,7 +35038,7 @@ async function setResourceGitlab({gitlab, web_url}) {
         totalChangedFiles++
     }
 
-    const comment = await createIssueCommentOnGitlab(
+    const comment = await create_comment_createIssueCommentOnGitlab(
         gitlab,
         `🎊 Congrats on the merge!
   
@@ -35079,7 +35108,7 @@ async function runOnGitlab() {
 
     const {CI_PROJECT_ID, CI_MERGE_REQUEST_IID} = process.env
 
-    // if (!await authOnGitlab(octokit, context)) throw {message: 'Wrong API Token'}
+    if (!await authOnGitlab(gitlab)) throw {message: 'Wrong API Token'}
 
     const {state, web_url} = await gitlab.MergeRequests.show(CI_PROJECT_ID, CI_MERGE_REQUEST_IID)
 

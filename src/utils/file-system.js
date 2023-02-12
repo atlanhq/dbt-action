@@ -84,7 +84,6 @@ export async function getChangedFilesFromGitlab(gitlab) {
     const {CI_PROJECT_ID, CI_MERGE_REQUEST_IID} = process.env
 
     const {changes, diff_refs} = await gitlab.MergeRequests.changes(CI_PROJECT_ID, CI_MERGE_REQUEST_IID)
-
     var changedFiles = changes.map(({new_path}) => {
         try {
             const [modelName] = new_path.match(/.*models\/(.*)\.sql/)[1].split('/').reverse()[0].split('.');
@@ -99,7 +98,7 @@ export async function getChangedFilesFromGitlab(gitlab) {
         } catch (e) {
 
         }
-    })
+    }).filter((i) => i !== undefined)
 
     changedFiles = changedFiles
         .filter((item, index) => {

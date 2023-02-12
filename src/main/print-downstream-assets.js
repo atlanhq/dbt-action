@@ -124,12 +124,11 @@ export async function printIAonGitlab({gitlab}) {
     }
 
     comments = `### ${getImageURL("atlan-logo", 15, 15)} Atlan impact analysis
-Here is your downstream impact analysis for **${totalChangedFiles} ${totalChangedFiles > 1 ? "models" : "model"}** you have edited.    
-    
+Here is your downstream impact analysis for **${totalChangedFiles} ${totalChangedFiles > 1 ? "models" : "model"}** you have edited.
+
 ${comments}`
 
     const existingComment = await checkCommentExistsOnGitlab(gitlab);
-    console.log(existingComment)
 
     if (totalChangedFiles > 0)
         await createIssueCommentOnGitlab(gitlab, comments, existingComment?.id)
