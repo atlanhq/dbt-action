@@ -34761,7 +34761,7 @@ const segment_ATLAN_INSTANCE_URL =
 const segment_ATLAN_API_TOKEN =
     core.getInput("ATLAN_API_TOKEN") || process.env.ATLAN_API_TOKEN;
 
-async function sendSegmentEvent(body) {
+async function sendSegmentEvent(action, body) {
     const myHeaders = {
         authorization: `Bearer ${segment_ATLAN_API_TOKEN}`,
         "content-type": "application/json",
@@ -34781,7 +34781,7 @@ async function sendSegmentEvent(body) {
             requestOptions
         )
             .then(() => {
-                console.log("send segment event", action, raw);
+                console.log("send segment event", action, body);
             })
             .catch((err) => {
                 console.log("couldn't send segment event", err);
@@ -34806,12 +34806,12 @@ async function sendSegmentEventOnGithub(action, properties) {
         },
     });
 
-    return sendSegmentEvent(raw)
+    return sendSegmentEvent(action, raw)
 }
 
 async function sendSegmentEventOnGitlab(action, properties) {
     const domain = new URL(segment_ATLAN_INSTANCE_URL).hostname;
-    const {CI_PROJECT_PATH, CI_PIPELINE_ID} = process.env;
+    const {CI_PROJECT_PATH, CI_JOB_URL} = process.env;
 
     const raw = stringify({
         category: "integration",
@@ -34820,12 +34820,12 @@ async function sendSegmentEventOnGitlab(action, properties) {
         userId: "atlan-annonymous-github",
         properties: {
             ...properties,
-            gitlab_action_id: `https://gitlab.com/${CI_PROJECT_PATH}/pipelines/${CI_PIPELINE_ID}`,
+            gitlab_job_id: CI_JOB_URL,
             domain,
         },
     });
 
-    return sendSegmentEvent(raw)
+    return sendSegmentEvent(action, raw)
 }
 ;// CONCATENATED MODULE: ./src/api/index.js
 
