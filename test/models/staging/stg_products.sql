@@ -26,7 +26,7 @@ renamed as (
         end is_food_item,
 
         case
-            when type = 'beverage' then 1
+            when type = 'beverage' then 0
             else 0
         end is_drink_item
 
