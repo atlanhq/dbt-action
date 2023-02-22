@@ -1,5 +1,5 @@
 
-{{ config(materialized='table') }}
+{{ config(alias='fct_sales') }}
 
 with orders as (
 
