@@ -29,7 +29,6 @@ order_items_summary as (
 
     select
         order_id,
-
         sum(products.is_food_item) as count_food_items,
         sum(products.is_drink_item) as count_drink_items,
         count(*) as count_items,
