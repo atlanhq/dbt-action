@@ -1,5 +1,5 @@
 
-{{ config(alias='stg_locations') }}
+{{ config(alias='fct_sales') }}
 
 with source as (
 
