@@ -1,16 +1,12 @@
 import fetch from "node-fetch";
-import core from "@actions/core";
-import dotenv from "dotenv";
 import {sendSegmentEvent} from "./index.js";
-import {createIssueComment, getConnectorImage, getCertificationImage, getImageURL} from "../utils/index.js";
+import {getAPIToken, getInstanceUrl, getConnectorImage, getCertificationImage, getImageURL} from "../utils/index.js";
 import stringify from 'json-stringify-safe';
 
-dotenv.config();
-
 const ATLAN_INSTANCE_URL =
-    core.getInput("ATLAN_INSTANCE_URL") || process.env.ATLAN_INSTANCE_URL;
+    getInstanceUrl();
 const ATLAN_API_TOKEN =
-    core.getInput("ATLAN_API_TOKEN") || process.env.ATLAN_API_TOKEN;
+    getAPIToken();
 
 export default async function getDownstreamAssets(asset, guid, octokit, context) {
     var myHeaders = {
@@ -55,7 +51,7 @@ export default async function getDownstreamAssets(asset, guid, octokit, context)
     var handleError = (err) => {
         const comment = `### ${getConnectorImage(asset.attributes.connectorName)} [${
             asset.displayText
-        }](${ATLAN_INSTANCE_URL}/assets/${asset.guid}?utm_source=dbt_github_action) ${
+        }](${ATLAN_INSTANCE_URL}/assets/${asset.guid}/overview?utm_source=dbt_github_action) ${
             asset.attributes?.certificateStatus
                 ? getCertificationImage(asset.attributes.certificateStatus)
                 : ""
@@ -63,7 +59,7 @@ export default async function getDownstreamAssets(asset, guid, octokit, context)
             
 _Failed to fetch impacted assets._
             
-${getImageURL("atlan-logo", 15, 15)} [View lineage in Atlan](${ATLAN_INSTANCE_URL}/assets/${asset.guid}/lineage?utm_source=dbt_github_action)`;
+${getImageURL("atlan-logo", 15, 15)} [View lineage in Atlan](${ATLAN_INSTANCE_URL}/assets/${asset.guid}/lineage/overview?utm_source=dbt_github_action)`;
 
         sendSegmentEvent("dbt_ci_action_failure", {
             reason: 'failed_to_fetch_lineage',
