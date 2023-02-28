@@ -6,8 +6,10 @@ import {
 import {
     renderDownstreamAssetsComment,
     getChangedFiles,
-    getAssetName, createIssueComment, checkCommentExists, deleteComment, getImageURL
+    getAssetName, createIssueComment, checkCommentExists, deleteComment, getImageURL, getInstanceUrl
 } from "../utils/index.js";
+
+const ATLAN_INSTANCE_URL = getInstanceUrl()
 
 export default async function printDownstreamAssets({octokit, context}) {
     const changedFiles = await getChangedFiles(octokit, context);

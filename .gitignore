@@ -1,4 +1,6 @@
 .env
+.env.gitlab
+.env.github
 node_modules/
 event.json
 .idea

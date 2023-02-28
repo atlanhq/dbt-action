@@ -17687,7 +17687,25 @@ function getCertificationImage(certificationStatus) {
     },
 });
 
+;// CONCATENATED MODULE: ./src/utils/get-environment-variables.js
+
+
+
+main.config();
+
+const {IS_DEV, ATLAN_INSTANCE_URL, ATLAN_API_TOKEN} = process.env;
+
+const isDev = () => IS_DEV === "true";
+const getInstanceUrl = () => {
+    if (ATLAN_INSTANCE_URL) return new URL(ATLAN_INSTANCE_URL).origin;
+    return new URL(core.getInput("ATLAN_INSTANCE_URL")).origin;
+};
+const getAPIToken = () => {
+    if (ATLAN_API_TOKEN) return ATLAN_API_TOKEN;
+    return core.getInput("ATLAN_API_TOKEN");
+}
 ;// CONCATENATED MODULE: ./src/utils/create-comment.js
+
 
 
 
@@ -17695,9 +17713,9 @@ function getCertificationImage(certificationStatus) {
 
 main.config();
 
-const {IS_DEV} = process.env;
-const ATLAN_INSTANCE_URL =
-    core.getInput("ATLAN_INSTANCE_URL") || process.env.ATLAN_INSTANCE_URL;
+const create_comment_IS_DEV = isDev();
+const create_comment_ATLAN_INSTANCE_URL =
+    getInstanceUrl();
 
 async function renderDownstreamAssetsComment(
     octokit,
@@ -17715,7 +17733,7 @@ async function renderDownstreamAssetsComment(
             return [
                 guid, displayText, attributes.connectorName, readableTypeName, attributes?.userDescription || attributes?.description || "", attributes?.certificateStatus || "", [...attributes?.ownerUsers, ...attributes?.ownerGroups] || [], meanings.map(
                     ({displayText, termGuid}) =>
-                        `[${displayText}](${ATLAN_INSTANCE_URL}/assets/${termGuid}?utm_source=dbt_github_action)`
+                        `[${displayText}](${create_comment_ATLAN_INSTANCE_URL}/assets/${termGuid}/overview?utm_source=dbt_github_action)`
                 )
                     ?.join(", ") || " ", attributes?.sourceURL || ""
             ];
@@ -17731,7 +17749,7 @@ async function renderDownstreamAssetsComment(
                 ? getCertificationImage(certificateStatus)
                 : "";
 
-        return [`${connectorImage} [${displayText}](${ATLAN_INSTANCE_URL}/assets/${guid}?utm_source=dbt_github_action) ${certificationImage}`,
+        return [`${connectorImage} [${displayText}](${create_comment_ATLAN_INSTANCE_URL}/assets/${guid}/overview?utm_source=dbt_github_action) ${certificationImage}`,
             `\`${typeName}\``,
             description,
             owners.join(", ") || " ",
@@ -17739,26 +17757,37 @@ async function renderDownstreamAssetsComment(
             sourceUrl ? `[Open in ${connectorName}](${sourceUrl})` : " "]
     })
 
-    const comment = `### ${getConnectorImage(asset.attributes.connectorName)} [${
+    const assetInfo = `### ${getConnectorImage(asset.attributes.connectorName)} [${
         asset.displayText
-    }](${ATLAN_INSTANCE_URL}/assets/${asset.guid}?utm_source=dbt_github_action) ${
+    }](${create_comment_ATLAN_INSTANCE_URL}/assets/${asset.guid}/overview?utm_source=dbt_github_action) ${
         asset.attributes?.certificateStatus
             ? getCertificationImage(asset.attributes.certificateStatus)
             : ""
-    }
-        
-  **${downstreamAssets.length} downstream assets** 👇
-  Name | Type | Description | Owners | Terms | Source URL
-  --- | --- | --- | --- | --- | ---
-  ${rows.map((row) => row.map(i => i.replace(/\|/g, "•").replace(/\n/g, "")).join(" | ")).join("\n")}
-  
-  ${getImageURL("atlan-logo", 15, 15)} [View asset in Atlan](${ATLAN_INSTANCE_URL}/assets/${asset.guid}?utm_source=dbt_github_action)`;
+    }`
 
-    return comment
+    const downstreamTable = `**${downstreamAssets.length} downstream assets** 👇
+Name | Type | Description | Owners | Terms | Source URL
+--- | --- | --- | --- | --- | ---
+${rows.map((row) => row.map(i => i.replace(/\|/g, "•").replace(/\n/g, "")).join(" | ")).join("\n")}`
+
+    const viewAssetButton = `${getImageURL("atlan-logo", 15, 15)} [View asset in Atlan](${create_comment_ATLAN_INSTANCE_URL}/assets/${asset.guid}/overview?utm_source=dbt_github_action)`
+
+    if (downstreamAssets.length > 0)
+        return `${assetInfo}
+        
+${downstreamTable}
+
+${viewAssetButton}`;
+
+    return `${assetInfo}
+        
+No downstream assets found.
+
+${viewAssetButton}`
 }
 
 async function checkCommentExists(octokit, context) {
-    if (IS_DEV) return null;
+    if (create_comment_IS_DEV) return null;
 
     const {pull_request} = context.payload;
 
@@ -17786,7 +17815,7 @@ ${content}`
 
     console.log(content)
 
-    if (IS_DEV) return content;
+    if (create_comment_IS_DEV) return content;
 
     if (comment_id && !forceNewComment) return octokit.rest.issues.updateComment({...commentObj, comment_id});
     return octokit.rest.issues.createComment(commentObj);
@@ -17881,17 +17910,14 @@ async function getAssetName({octokit, context, fileName, filePath}) {
 
 
 
-
-main.config();
-
 const auth_ATLAN_INSTANCE_URL =
-    core.getInput("ATLAN_INSTANCE_URL") || process.env.ATLAN_INSTANCE_URL;
-const ATLAN_API_TOKEN =
-    core.getInput("ATLAN_API_TOKEN") || process.env.ATLAN_API_TOKEN;
+    getInstanceUrl()
+const auth_ATLAN_API_TOKEN =
+    getAPIToken();
 
 async function auth(octokit, context) {
     var myHeaders = {
-        authorization: `Bearer ${ATLAN_API_TOKEN}`,
+        authorization: `Bearer ${auth_ATLAN_API_TOKEN}`,
         "content-type": "application/json",
     };
 
@@ -17906,13 +17932,17 @@ async function auth(octokit, context) {
     ).catch((err) => {
     });
 
+    const existingComment = await checkCommentExists(octokit, context);
+
+    console.log("Existing Comment", existingComment)
+
     if (response?.status === 401) {
         await
             createIssueComment(octokit, context, `We couldn't connect to your Atlan Instance, please make sure to set the valid Atlan Bearer Token as \`ATLAN_API_TOKEN\` as this repository's action secret. 
 
 Atlan Instance URL: ${auth_ATLAN_INSTANCE_URL}
 
-Set your repository action secrets [here](https://github.com/${context.payload.repository.full_name}/settings/secrets/actions). For more information on how to setup the Atlan dbt Action, please read the [setup documentation here](https://github.com/atlanhq/dbt-action/blob/main/README.md).`)
+Set your repository action secrets [here](https://github.com/${context.payload.repository.full_name}/settings/secrets/actions). For more information on how to setup the Atlan dbt Action, please read the [setup documentation here](https://github.com/atlanhq/dbt-action/blob/main/README.md).`, existingComment?.id)
         return false
     }
 
@@ -17925,7 +17955,7 @@ Atlan Instance URL: ${auth_ATLAN_INSTANCE_URL}
 Make sure your Atlan Instance URL is set in the following format.
 \`https://tenant.atlan.com\`
 
-Set your repository action secrets [here](https://github.com/${context.payload.repository.full_name}/settings/secrets/actions). For more information on how to setup the Atlan dbt Action, please read the [setup documentation here](https://github.com/atlanhq/dbt-action/blob/main/README.md).`)
+Set your repository action secrets [here](https://github.com/${context.payload.repository.full_name}/settings/secrets/actions). For more information on how to setup the Atlan dbt Action, please read the [setup documentation here](https://github.com/atlanhq/dbt-action/blob/main/README.md).`, existingComment?.id)
         return false
     }
 
@@ -17946,14 +17976,10 @@ var stringify = __nccwpck_require__(7073);
 
 
 
-
-
-main.config();
-
 const get_downstream_assets_ATLAN_INSTANCE_URL =
-    core.getInput("ATLAN_INSTANCE_URL") || process.env.ATLAN_INSTANCE_URL;
+    getInstanceUrl();
 const get_downstream_assets_ATLAN_API_TOKEN =
-    core.getInput("ATLAN_API_TOKEN") || process.env.ATLAN_API_TOKEN;
+    getAPIToken();
 
 async function getDownstreamAssets(asset, guid, octokit, context) {
     var myHeaders = {
@@ -17998,7 +18024,7 @@ async function getDownstreamAssets(asset, guid, octokit, context) {
     var handleError = (err) => {
         const comment = `### ${getConnectorImage(asset.attributes.connectorName)} [${
             asset.displayText
-        }](${get_downstream_assets_ATLAN_INSTANCE_URL}/assets/${asset.guid}?utm_source=dbt_github_action) ${
+        }](${get_downstream_assets_ATLAN_INSTANCE_URL}/assets/${asset.guid}/overview?utm_source=dbt_github_action) ${
             asset.attributes?.certificateStatus
                 ? getCertificationImage(asset.attributes.certificateStatus)
                 : ""
@@ -18006,7 +18032,7 @@ async function getDownstreamAssets(asset, guid, octokit, context) {
             
 _Failed to fetch impacted assets._
             
-${getImageURL("atlan-logo", 15, 15)} [View lineage in Atlan](${get_downstream_assets_ATLAN_INSTANCE_URL}/assets/${asset.guid}/lineage?utm_source=dbt_github_action)`;
+${getImageURL("atlan-logo", 15, 15)} [View lineage in Atlan](${get_downstream_assets_ATLAN_INSTANCE_URL}/assets/${asset.guid}/lineage/overview?utm_source=dbt_github_action)`;
 
         sendSegmentEvent("dbt_ci_action_failure", {
             reason: 'failed_to_fetch_lineage',
@@ -18051,13 +18077,10 @@ ${getImageURL("atlan-logo", 15, 15)} [View lineage in Atlan](${get_downstream_as
 
 
 
-
-main.config();
-
 const get_asset_ATLAN_INSTANCE_URL =
-    core.getInput("ATLAN_INSTANCE_URL") || process.env.ATLAN_INSTANCE_URL;
+    getInstanceUrl();
 const get_asset_ATLAN_API_TOKEN =
-    core.getInput("ATLAN_API_TOKEN") || process.env.ATLAN_API_TOKEN;
+    getAPIToken();
 
 async function getAsset({name}) {
     var myHeaders = {
@@ -18153,13 +18176,10 @@ const parse = uuid_dist/* parse */.Qc;
 
 
 
-
-main.config();
-
 const create_resource_ATLAN_INSTANCE_URL =
-    core.getInput("ATLAN_INSTANCE_URL") || process.env.ATLAN_INSTANCE_URL;
+    getInstanceUrl();
 const create_resource_ATLAN_API_TOKEN =
-    core.getInput("ATLAN_API_TOKEN") || process.env.ATLAN_API_TOKEN;
+    getAPIToken();
 
 async function createResource(guid, name, link) {
     var myHeaders = {
@@ -18213,15 +18233,11 @@ async function createResource(guid, name, link) {
 
 
 
-
-
-main.config();
-
-const {IS_DEV: segment_IS_DEV} = process.env;
+const segment_IS_DEV = isDev();
 const segment_ATLAN_INSTANCE_URL =
-    core.getInput("ATLAN_INSTANCE_URL") || process.env.ATLAN_INSTANCE_URL;
+    getInstanceUrl();
 const segment_ATLAN_API_TOKEN =
-    core.getInput("ATLAN_API_TOKEN") || process.env.ATLAN_API_TOKEN;
+    getAPIToken();
 
 async function sendSegmentEvent(action, properties) {
     var myHeaders = {
@@ -18276,6 +18292,8 @@ async function sendSegmentEvent(action, properties) {
 ;// CONCATENATED MODULE: ./src/main/print-downstream-assets.js
 
 
+
+const print_downstream_assets_ATLAN_INSTANCE_URL = getInstanceUrl()
 
 async function printDownstreamAssets({octokit, context}) {
     const changedFiles = await getChangedFiles(octokit, context);

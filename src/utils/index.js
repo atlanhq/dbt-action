@@ -16,3 +16,8 @@ export {
 export {
     default as auth
 } from "./auth.js"
+export {
+    getAPIToken,
+    getInstanceUrl,
+    isDev
+} from "./get-environment-variables.js"
