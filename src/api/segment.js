@@ -1,17 +1,13 @@
 import fetch from "node-fetch";
-import core from "@actions/core";
-import dotenv from "dotenv";
 import {context} from "@actions/github";
 import stringify from 'json-stringify-safe';
+import {isDev, getAPIToken, getInstanceUrl} from "../utils/index.js";
 
-
-dotenv.config();
-
-const {IS_DEV} = process.env;
+const IS_DEV = isDev();
 const ATLAN_INSTANCE_URL =
-    core.getInput("ATLAN_INSTANCE_URL") || process.env.ATLAN_INSTANCE_URL;
+    getInstanceUrl();
 const ATLAN_API_TOKEN =
-    core.getInput("ATLAN_API_TOKEN") || process.env.ATLAN_API_TOKEN;
+    getAPIToken();
 
 export default async function sendSegmentEvent(action, properties) {
     var myHeaders = {
