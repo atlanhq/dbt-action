@@ -17708,11 +17708,6 @@ const getAPIToken = () => {
 
 
 
-
-
-
-main.config();
-
 const create_comment_IS_DEV = isDev();
 const create_comment_ATLAN_INSTANCE_URL =
     getInstanceUrl();
