@@ -119,4 +119,12 @@ export default {
         alt: "Connector Tableau",
         url: "https://assets.atlan.com/assets/tableau.svg",
     },
+    "connector-mode": {
+        alt: "Connector Mode",
+        url: "https://iili.io/HVTAlgs.png"
+    },
+    "connector-sigma": {
+        alt: "Connector Sigma",
+        url: "https://iili.io/HVTA1dG.png"
+    }
 };

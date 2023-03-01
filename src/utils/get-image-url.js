@@ -5,6 +5,7 @@ export function getImageURL(name, height = 20, width = 20) {
         return `<img src="${hostedImages[name].url}" alt="${hostedImages[name].alt}" height="${height}" width="${width}"/>`;
     } catch (e) {
         console.log(name);
+        return '';
     }
 }
 

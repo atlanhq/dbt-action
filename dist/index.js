@@ -17552,6 +17552,7 @@ function getImageURL(name, height = 20, width = 20) {
         return `<img src="${hosted_images[name].url}" alt="${hosted_images[name].alt}" height="${height}" width="${width}"/>`;
     } catch (e) {
         console.log(name);
+        return '';
     }
 }
 
@@ -17685,6 +17686,14 @@ function getCertificationImage(certificationStatus) {
         alt: "Connector Tableau",
         url: "https://assets.atlan.com/assets/tableau.svg",
     },
+    "connector-mode": {
+        alt: "Connector Mode",
+        url: "https://iili.io/HVTAlgs.png"
+    },
+    "connector-sigma": {
+        alt: "Connector Sigma",
+        url: "https://iili.io/HVTA1dG.png"
+    }
 });
 
 ;// CONCATENATED MODULE: ./src/utils/get-environment-variables.js
