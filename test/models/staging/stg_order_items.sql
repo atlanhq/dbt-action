@@ -1,5 +1,5 @@
 
-{{ config(alias='stg_order_items') }}
+{{ config(alias='stg_order_lines') }}
 
 with source as (
 
