@@ -13,7 +13,7 @@ renamed as (
 
         ----------  ids
         id as order_item_id,
-        order_id,
+        order_id as purchase_id,
 
         ---------- properties
         sku as product_id
