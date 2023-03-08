@@ -66,15 +66,14 @@ export async function getChangedFiles(octokit, context) {
 }
 
 export async function getAssetName({octokit, context, fileName, filePath}) {
-    var regExp = /^{{\s*config\((?=[^)]*alias='([^']+)')[^}]*\)\s*}}$/im;
+    var regExp = /^{{\s*config\((?=[^)]*alias\s*=\s*'([^']+)')(?:[^)}]*,[^)}]*)?\)\s*}}$/im;
     var fileContents = await getFileContents(octokit, context, filePath);
 
     if (fileContents) {
         var matches = regExp.exec(fileContents);
 
         if (matches) {
-            console.log("New alias = ", matches[1])
-            return matches[1];
+            return matches[1].trim();
         }
     }
 
