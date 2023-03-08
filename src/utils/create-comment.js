@@ -53,10 +53,12 @@ export default async function renderDownstreamAssetsComment(
             : ""
     }`
 
-    const downstreamTable = `**${downstreamAssets.length} downstream assets** 👇
+    const downstreamTable = `<details><summary><b>${downstreamAssets.length} downstream assets 👇</b></summary><br/>
+
 Name | Type | Description | Owners | Terms | Source URL
 --- | --- | --- | --- | --- | ---
-${rows.map((row) => row.map(i => i.replace(/\|/g, "•").replace(/\n/g, "")).join(" | ")).join("\n")}`
+${rows.map((row) => row.map(i => i.replace(/\|/g, "•").replace(/\n/g, "")).join(" | ")).join("\n")}
+</details>`
 
     const viewAssetButton = `${getImageURL("atlan-logo", 15, 15)} [View asset in Atlan](${ATLAN_INSTANCE_URL}/assets/${asset.guid}/overview?utm_source=dbt_github_action)`
 
