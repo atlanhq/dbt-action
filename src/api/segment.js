@@ -48,6 +48,8 @@ export default async function sendSegmentEvent(action, properties) {
             .catch((err) => {
                 console.log("couldn't send segment event", err);
             });
+    } else {
+        console.log("send segment event", action, raw);
     }
 
     return response;
