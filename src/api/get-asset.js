@@ -75,8 +75,15 @@ export default async function getAsset({name}) {
         });
     });
 
-    if (response?.entities?.length > 0) return response.entities[0];
-    return {
-        error: `❌ Model with name ${name} not found <br><br>`,
-    };
+    if (!response?.entities?.length)
+        return {
+            error: `❌ Model with name **${name}** could not be found or is deleted <br><br>`,
+        };
+
+    if (!response?.entities[0]?.attributes?.sqlAsset?.guid)
+        return {
+            error: `❌ Model with name [${name}](${ATLAN_INSTANCE_URL}/assets/${response.entities[0].guid}/overview?utm_source=dbt_github_action) does not materialise any asset <br><br>`,
+        }
+
+    return response.entities[0];
 }

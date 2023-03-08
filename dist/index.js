@@ -17769,10 +17769,12 @@ async function renderDownstreamAssetsComment(
             : ""
     }`
 
-    const downstreamTable = `**${downstreamAssets.length} downstream assets** 👇
+    const downstreamTable = `<details><summary><b>${downstreamAssets.length} downstream assets 👇</b></summary><br/>
+
 Name | Type | Description | Owners | Terms | Source URL
 --- | --- | --- | --- | --- | ---
-${rows.map((row) => row.map(i => i.replace(/\|/g, "•").replace(/\n/g, "")).join(" | ")).join("\n")}`
+${rows.map((row) => row.map(i => i.replace(/\|/g, "•").replace(/\n/g, "")).join(" | ")).join("\n")}
+</details>`
 
     const viewAssetButton = `${getImageURL("atlan-logo", 15, 15)} [View asset in Atlan](${create_comment_ATLAN_INSTANCE_URL}/assets/${asset.guid}/overview?utm_source=dbt_github_action)`
 
@@ -17842,14 +17844,20 @@ async function getFileContents(octokit, context, filePath) {
         head_sha = pull_request.head.sha;
 
     const res = await octokit.request(
-            `GET /repos/${owner}/${repo}/contents/${filePath}?ref=${head_sha}`,
-            {
-                owner,
-                repo,
-                path: filePath,
-            }
-        ),
-        buff = Buffer.from(res.data.content, "base64");
+        `GET /repos/${owner}/${repo}/contents/${filePath}?ref=${head_sha}`,
+        {
+            owner,
+            repo,
+            path: filePath,
+        }
+    ).catch(e => {
+        console.log("Error fetching file contents: ", e)
+        return null
+    });
+
+    if (!res?.data?.content) return null
+
+    const buff = Buffer.from(res.data.content, "base64");
 
     return buff.toString("utf8");
 }
@@ -17897,13 +17905,15 @@ async function getChangedFiles(octokit, context) {
 }
 
 async function getAssetName({octokit, context, fileName, filePath}) {
-    var regExp = /config\(.*alias=\'([^']+)\'.*\)/im;
+    var regExp = /^{{\s*config\((?=[^)]*alias\s*=\s*'([^']+)')(?:[^)}]*,[^)}]*)?\)\s*}}$/im;
     var fileContents = await getFileContents(octokit, context, filePath);
 
-    var matches = regExp.exec(fileContents);
+    if (fileContents) {
+        var matches = regExp.exec(fileContents);
 
-    if (matches) {
-        return matches[1];
+        if (matches) {
+            return matches[1].trim();
+        }
     }
 
     return fileName;
@@ -18153,10 +18163,17 @@ async function getAsset({name}) {
         });
     });
 
-    if (response?.entities?.length > 0) return response.entities[0];
-    return {
-        error: `❌ Model with name ${name} not found <br><br>`,
-    };
+    if (!response?.entities?.length)
+        return {
+            error: `❌ Model with name **${name}** could not be found or is deleted <br><br>`,
+        };
+
+    if (!response?.entities[0]?.attributes?.sqlAsset?.guid)
+        return {
+            error: `❌ Model with name [${name}](${get_asset_ATLAN_INSTANCE_URL}/assets/${response.entities[0].guid}/overview?utm_source=dbt_github_action) does not materialise any asset <br><br>`,
+        }
+
+    return response.entities[0];
 }
 
 // EXTERNAL MODULE: ./node_modules/uuid/dist/index.js
@@ -18282,6 +18299,8 @@ async function sendSegmentEvent(action, properties) {
             .catch((err) => {
                 console.log("couldn't send segment event", err);
             });
+    } else {
+        console.log("send segment event", action, raw);
     }
 
     return response;
@@ -18297,17 +18316,17 @@ async function sendSegmentEvent(action, properties) {
 
 
 
-const print_downstream_assets_ATLAN_INSTANCE_URL = getInstanceUrl()
-
 async function printDownstreamAssets({octokit, context}) {
     const changedFiles = await getChangedFiles(octokit, context);
-
     let comments = ``;
     let totalChangedFiles = 0;
 
     for (const {fileName, filePath} of changedFiles) {
         const assetName = await getAssetName({octokit, context, fileName, filePath});
         const asset = await getAsset({name: assetName});
+
+        if (totalChangedFiles !== 0)
+            comments += '\n\n---\n\n';
 
         if (asset.error) {
             comments += asset.error;
@@ -18318,9 +18337,6 @@ async function printDownstreamAssets({octokit, context}) {
         const {guid} = asset.attributes.sqlAsset;
         const timeStart = Date.now();
         const downstreamAssets = await getDownstreamAssets(asset, guid, octokit, context);
-
-        if (totalChangedFiles !== 0)
-            comments += '\n\n---\n\n';
 
         if (downstreamAssets.error) {
             comments += downstreamAssets.error;

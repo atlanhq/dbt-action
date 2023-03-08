@@ -5,14 +5,20 @@ export async function getFileContents(octokit, context, filePath) {
         head_sha = pull_request.head.sha;
 
     const res = await octokit.request(
-            `GET /repos/${owner}/${repo}/contents/${filePath}?ref=${head_sha}`,
-            {
-                owner,
-                repo,
-                path: filePath,
-            }
-        ),
-        buff = Buffer.from(res.data.content, "base64");
+        `GET /repos/${owner}/${repo}/contents/${filePath}?ref=${head_sha}`,
+        {
+            owner,
+            repo,
+            path: filePath,
+        }
+    ).catch(e => {
+        console.log("Error fetching file contents: ", e)
+        return null
+    });
+
+    if (!res?.data?.content) return null
+
+    const buff = Buffer.from(res.data.content, "base64");
 
     return buff.toString("utf8");
 }
@@ -60,13 +66,15 @@ export async function getChangedFiles(octokit, context) {
 }
 
 export async function getAssetName({octokit, context, fileName, filePath}) {
-    var regExp = /config\(.*alias=\'([^']+)\'.*\)/im;
+    var regExp = /^{{\s*config\((?=[^)]*alias\s*=\s*'([^']+)')(?:[^)}]*,[^)}]*)?\)\s*}}$/im;
     var fileContents = await getFileContents(octokit, context, filePath);
 
-    var matches = regExp.exec(fileContents);
+    if (fileContents) {
+        var matches = regExp.exec(fileContents);
 
-    if (matches) {
-        return matches[1];
+        if (matches) {
+            return matches[1].trim();
+        }
     }
 
     return fileName;
