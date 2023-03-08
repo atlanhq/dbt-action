@@ -1,15 +1,12 @@
 import fetch from "node-fetch";
-import core from "@actions/core";
-import dotenv from "dotenv";
 import {sendSegmentEvent} from "./index.js";
 import stringify from 'json-stringify-safe';
-
-dotenv.config();
+import {getAPIToken, getInstanceUrl} from "../utils/index.js";
 
 const ATLAN_INSTANCE_URL =
-    core.getInput("ATLAN_INSTANCE_URL") || process.env.ATLAN_INSTANCE_URL;
+    getInstanceUrl();
 const ATLAN_API_TOKEN =
-    core.getInput("ATLAN_API_TOKEN") || process.env.ATLAN_API_TOKEN;
+    getAPIToken();
 
 export default async function getAsset({name}) {
     var myHeaders = {
@@ -78,8 +75,15 @@ export default async function getAsset({name}) {
         });
     });
 
-    if (response?.entities?.length > 0) return response.entities[0];
-    return {
-        error: `❌ Model with name ${name} not found <br><br>`,
-    };
+    if (!response?.entities?.length)
+        return {
+            error: `❌ Model with name **${name}** could not be found or is deleted <br><br>`,
+        };
+
+    if (!response?.entities[0]?.attributes?.sqlAsset?.guid)
+        return {
+            error: `❌ Model with name [${name}](${ATLAN_INSTANCE_URL}/assets/${response.entities[0].guid}/overview?utm_source=dbt_github_action) does not materialise any asset <br><br>`,
+        }
+
+    return response.entities[0];
 }

@@ -1,13 +1,9 @@
-import dotenv from "dotenv";
-import core from "@actions/core";
-
 import {getCertificationImage, getConnectorImage, getImageURL,} from "./index.js";
+import {getInstanceUrl, isDev} from "./get-environment-variables.js";
 
-dotenv.config();
-
-const {IS_DEV} = process.env;
+const IS_DEV = isDev();
 const ATLAN_INSTANCE_URL =
-    core.getInput("ATLAN_INSTANCE_URL") || process.env.ATLAN_INSTANCE_URL;
+    getInstanceUrl();
 
 export default async function renderDownstreamAssetsComment(
     octokit,
@@ -25,7 +21,7 @@ export default async function renderDownstreamAssetsComment(
             return [
                 guid, displayText, attributes.connectorName, readableTypeName, attributes?.userDescription || attributes?.description || "", attributes?.certificateStatus || "", [...attributes?.ownerUsers, ...attributes?.ownerGroups] || [], meanings.map(
                     ({displayText, termGuid}) =>
-                        `[${displayText}](${ATLAN_INSTANCE_URL}/assets/${termGuid}?utm_source=dbt_github_action)`
+                        `[${displayText}](${ATLAN_INSTANCE_URL}/assets/${termGuid}/overview?utm_source=dbt_github_action)`
                 )
                     ?.join(", ") || " ", attributes?.sourceURL || ""
             ];
@@ -41,7 +37,7 @@ export default async function renderDownstreamAssetsComment(
                 ? getCertificationImage(certificateStatus)
                 : "";
 
-        return [`${connectorImage} [${displayText}](${ATLAN_INSTANCE_URL}/assets/${guid}?utm_source=dbt_github_action) ${certificationImage}`,
+        return [`${connectorImage} [${displayText}](${ATLAN_INSTANCE_URL}/assets/${guid}/overview?utm_source=dbt_github_action) ${certificationImage}`,
             `\`${typeName}\``,
             description,
             owners.join(", ") || " ",
@@ -49,22 +45,35 @@ export default async function renderDownstreamAssetsComment(
             sourceUrl ? `[Open in ${connectorName}](${sourceUrl})` : " "]
     })
 
-    const comment = `### ${getConnectorImage(asset.attributes.connectorName)} [${
+    const assetInfo = `### ${getConnectorImage(asset.attributes.connectorName)} [${
         asset.displayText
-    }](${ATLAN_INSTANCE_URL}/assets/${asset.guid}?utm_source=dbt_github_action) ${
+    }](${ATLAN_INSTANCE_URL}/assets/${asset.guid}/overview?utm_source=dbt_github_action) ${
         asset.attributes?.certificateStatus
             ? getCertificationImage(asset.attributes.certificateStatus)
             : ""
-    }
-        
-  **${downstreamAssets.length} downstream assets** 👇
-  Name | Type | Description | Owners | Terms | Source URL
-  --- | --- | --- | --- | --- | ---
-  ${rows.map((row) => row.map(i => i.replace(/\|/g, "•").replace(/\n/g, "")).join(" | ")).join("\n")}
-  
-  ${getImageURL("atlan-logo", 15, 15)} [View asset in Atlan](${ATLAN_INSTANCE_URL}/assets/${asset.guid}?utm_source=dbt_github_action)`;
+    }`
 
-    return comment
+    const downstreamTable = `<details><summary><b>${downstreamAssets.length} downstream assets 👇</b></summary><br/>
+
+Name | Type | Description | Owners | Terms | Source URL
+--- | --- | --- | --- | --- | ---
+${rows.map((row) => row.map(i => i.replace(/\|/g, "•").replace(/\n/g, "")).join(" | ")).join("\n")}
+</details>`
+
+    const viewAssetButton = `${getImageURL("atlan-logo", 15, 15)} [View asset in Atlan](${ATLAN_INSTANCE_URL}/assets/${asset.guid}/overview?utm_source=dbt_github_action)`
+
+    if (downstreamAssets.length > 0)
+        return `${assetInfo}
+        
+${downstreamTable}
+
+${viewAssetButton}`;
+
+    return `${assetInfo}
+        
+No downstream assets found.
+
+${viewAssetButton}`
 }
 
 export async function checkCommentExists(octokit, context) {

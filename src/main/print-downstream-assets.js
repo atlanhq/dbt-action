@@ -11,13 +11,15 @@ import {
 
 export default async function printDownstreamAssets({octokit, context}) {
     const changedFiles = await getChangedFiles(octokit, context);
-
     let comments = ``;
     let totalChangedFiles = 0;
 
     for (const {fileName, filePath} of changedFiles) {
         const assetName = await getAssetName({octokit, context, fileName, filePath});
         const asset = await getAsset({name: assetName});
+
+        if (totalChangedFiles !== 0)
+            comments += '\n\n---\n\n';
 
         if (asset.error) {
             comments += asset.error;
@@ -28,9 +30,6 @@ export default async function printDownstreamAssets({octokit, context}) {
         const {guid} = asset.attributes.sqlAsset;
         const timeStart = Date.now();
         const downstreamAssets = await getDownstreamAssets(asset, guid, octokit, context);
-
-        if (totalChangedFiles !== 0)
-            comments += '\n\n---\n\n';
 
         if (downstreamAssets.error) {
             comments += downstreamAssets.error;
