@@ -21,7 +21,7 @@ renamed as (
 
         ---------- derived
         case
-            when type = 'jaffle' then 1
+            when type = 'food' then 1
             else 0
         end is_food_item,
 
