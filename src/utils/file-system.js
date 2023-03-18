@@ -16,7 +16,7 @@ export async function getFileContents(octokit, context, filePath) {
         return null
     });
 
-    if (!res?.data?.content) return null
+    if (!res) return null
 
     const buff = Buffer.from(res.data.content, "base64");
 
