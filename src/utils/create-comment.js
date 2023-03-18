@@ -9,21 +9,28 @@ export default async function renderDownstreamAssetsComment(
     octokit,
     context,
     asset,
-    downstreamAssets
+    downstreamAssets,
+    classifications
 ) {
     let impactedData = downstreamAssets.map(
-        ({displayText, guid, typeName, attributes, meanings}) => {
+        ({displayText, guid, typeName, attributes, meanings, classificationNames}) => {
             let readableTypeName = typeName
-                .toLowerCase()
-                .replace(attributes.connectorName, "")
-                .toUpperCase();
+                    .toLowerCase()
+                    .replace(attributes.connectorName, "")
+                    .toUpperCase(),
+                classificationsObj = classifications.filter(({name}) => classificationNames.includes(name));
             readableTypeName = readableTypeName.charAt(0).toUpperCase() + readableTypeName.slice(1).toLowerCase()
+
             return [
                 guid, displayText, attributes.connectorName, readableTypeName, attributes?.userDescription || attributes?.description || "", attributes?.certificateStatus || "", [...attributes?.ownerUsers, ...attributes?.ownerGroups] || [], meanings.map(
                     ({displayText, termGuid}) =>
-                        `[${displayText}](${ATLAN_INSTANCE_URL}/assets/${termGuid}/overview?utm_source=dbt_github_action)`
+                        `[${displayText}](${ATLAN_INSTANCE_URL}/assets/${termGuid}/overview?utm_source=dbt_github_action)`,
                 )
-                    ?.join(", ") || " ", attributes?.sourceURL || ""
+                    ?.join(", ") || " ",
+                classificationsObj?.map(({
+                                             name,
+                                             displayName
+                                         }) => `[${displayName}](${ATLAN_INSTANCE_URL}/governance/classifications/${name}?utm_source=dbt_github_action)`)?.join(', ') || " ", attributes?.sourceURL || ""
             ];
         }
     );
@@ -31,7 +38,7 @@ export default async function renderDownstreamAssetsComment(
     impactedData = impactedData.sort((a, b) => a[3].localeCompare(b[3])); // Sort by typeName
     impactedData = impactedData.sort((a, b) => a[2].localeCompare(b[2])); // Sort by connectorName
 
-    let rows = impactedData.map(([guid, displayText, connectorName, typeName, description, certificateStatus, owners, meanings, sourceUrl]) => {
+    let rows = impactedData.map(([guid, displayText, connectorName, typeName, description, certificateStatus, owners, meanings, classifications, sourceUrl]) => {
         const connectorImage = getConnectorImage(connectorName),
             certificationImage = certificateStatus
                 ? getCertificationImage(certificateStatus)
@@ -42,6 +49,7 @@ export default async function renderDownstreamAssetsComment(
             description,
             owners.join(", ") || " ",
             meanings,
+            classifications,
             sourceUrl ? `[Open in ${connectorName}](${sourceUrl})` : " "]
     })
 
@@ -55,8 +63,8 @@ export default async function renderDownstreamAssetsComment(
 
     const downstreamTable = `<details><summary><b>${downstreamAssets.length} downstream assets 👇</b></summary><br/>
 
-Name | Type | Description | Owners | Terms | Source URL
---- | --- | --- | --- | --- | ---
+Name | Type | Description | Owners | Terms | Classifications | Source URL
+--- | --- | --- | --- | --- | --- | ---       
 ${rows.map((row) => row.map(i => i.replace(/\|/g, "•").replace(/\n/g, "")).join(" | ")).join("\n")}
 </details>`
 
