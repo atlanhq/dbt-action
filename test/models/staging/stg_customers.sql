@@ -3,7 +3,7 @@
 
 with source as (
 
-    select * from fivetran.dbt_demo_data_dbt_demo_data.customers
+    select count(*) from fivetran.dbt_demo_data_dbt_demo_data.customers
 ),
 
 renamed as (
