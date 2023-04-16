@@ -49,11 +49,11 @@ export default async function getAsset({name}) {
                                 "name.keyword": name,
                             },
                         },
-                        environment ? {
-                            "term": {
+                        ...(environment ? [{
+                            term: {
                                 "assetDbtEnvironmentName.keyword": environment
                             }
-                        } : null,
+                        }] : []),
                     ],
                 },
             },
