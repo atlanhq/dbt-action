@@ -12,6 +12,9 @@ inputs:
   ATLAN_INSTANCE_URL:
     description: "Atlan instance URL"
     required: true
+  DBT_ENVIRONMENT_BRANCH_MAP:
+    description: "List of environments"
+    required: false
   IGNORE_MODEL_ALIAS_MATCHING:
     description: "Ignore model alias matching"
     required: false
