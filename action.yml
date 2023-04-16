@@ -12,6 +12,9 @@ inputs:
   ATLAN_INSTANCE_URL:
     description: "Atlan instance URL"
     required: true
+  DBT_ENVIRONMENT_BRANCH_MAP:
+    description: "List of environments"
+    required: false
 
 runs:
   using: "node16"

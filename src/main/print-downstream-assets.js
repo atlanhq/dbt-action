@@ -27,7 +27,7 @@ export default async function printDownstreamAssets({octokit, context}) {
             continue;
         }
 
-        const {guid} = asset.attributes.sqlAsset;
+        const {guid} = asset.attributes.dbtModelSqlAssets[0];
         const timeStart = Date.now();
         const downstreamAssets = await getDownstreamAssets(asset, guid, octokit, context);
 
