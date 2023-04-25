@@ -27,9 +27,9 @@ export default async function printDownstreamAssets({octokit, context}) {
             continue;
         }
 
-        const {guid} = asset.attributes.dbtModelSqlAssets[0];
+        const materialisedAsset = asset.attributes.dbtModelSqlAssets[0];
         const timeStart = Date.now();
-        const downstreamAssets = await getDownstreamAssets(asset, guid, octokit, context);
+        const downstreamAssets = await getDownstreamAssets(asset, materialisedAsset.guid, octokit, context);
 
         if (downstreamAssets.error) {
             comments += downstreamAssets.error;
@@ -50,6 +50,7 @@ export default async function printDownstreamAssets({octokit, context}) {
             octokit,
             context,
             asset,
+            materialisedAsset,
             downstreamAssets,
             classifications
         )
