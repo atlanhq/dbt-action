@@ -36,9 +36,9 @@ Its a new model and not present in Atlan yet, you'll see the downstream impact f
             continue;
         }
 
-        const {guid} = asset.attributes.dbtModelSqlAssets[0];
+        const materialisedAsset = asset.attributes.dbtModelSqlAssets[0];
         const timeStart = Date.now();
-        const downstreamAssets = await getDownstreamAssets(asset, guid, octokit, context);
+        const downstreamAssets = await getDownstreamAssets(asset, materialisedAsset.guid, octokit, context);
 
         if (downstreamAssets.error) {
             comments += downstreamAssets.error;
@@ -59,6 +59,7 @@ Its a new model and not present in Atlan yet, you'll see the downstream impact f
             octokit,
             context,
             asset,
+            materialisedAsset,
             downstreamAssets,
             classifications
         )

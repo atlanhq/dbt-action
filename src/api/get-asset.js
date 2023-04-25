@@ -78,7 +78,9 @@ export default async function getAsset({name}) {
             "name",
             "description",
             "assetDbtProjectName",
-            "assetDbtEnvironmentName"
+            "assetDbtEnvironmentName",
+            "connectorName",
+            "certificateStatus",
         ]
     });
 
