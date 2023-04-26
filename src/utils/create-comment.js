@@ -30,7 +30,7 @@ export default async function renderDownstreamAssetsComment(
                 classificationsObj?.map(({
                                              name,
                                              displayName
-                                         }) => `[${displayName}](${ATLAN_INSTANCE_URL}/governance/classifications/${name}?utm_source=dbt_github_action)`)?.join(', ') || " ", attributes?.sourceURL || ""
+                                         }) => `\`${displayName}\``)?.join(', ') || " ", attributes?.sourceURL || ""
             ];
         }
     );
