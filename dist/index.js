@@ -17725,21 +17725,28 @@ async function renderDownstreamAssetsComment(
     octokit,
     context,
     asset,
-    downstreamAssets
+    downstreamAssets,
+    classifications
 ) {
     let impactedData = downstreamAssets.map(
-        ({displayText, guid, typeName, attributes, meanings}) => {
+        ({displayText, guid, typeName, attributes, meanings, classificationNames}) => {
             let readableTypeName = typeName
-                .toLowerCase()
-                .replace(attributes.connectorName, "")
-                .toUpperCase();
+                    .toLowerCase()
+                    .replace(attributes.connectorName, "")
+                    .toUpperCase(),
+                classificationsObj = classifications.filter(({name}) => classificationNames.includes(name));
             readableTypeName = readableTypeName.charAt(0).toUpperCase() + readableTypeName.slice(1).toLowerCase()
+
             return [
                 guid, displayText, attributes.connectorName, readableTypeName, attributes?.userDescription || attributes?.description || "", attributes?.certificateStatus || "", [...attributes?.ownerUsers, ...attributes?.ownerGroups] || [], meanings.map(
                     ({displayText, termGuid}) =>
-                        `[${displayText}](${create_comment_ATLAN_INSTANCE_URL}/assets/${termGuid}/overview?utm_source=dbt_github_action)`
+                        `[${displayText}](${create_comment_ATLAN_INSTANCE_URL}/assets/${termGuid}/overview?utm_source=dbt_github_action)`,
                 )
-                    ?.join(", ") || " ", attributes?.sourceURL || ""
+                    ?.join(", ") || " ",
+                classificationsObj?.map(({
+                                             name,
+                                             displayName
+                                         }) => `\`${displayName}\``)?.join(', ') || " ", attributes?.sourceURL || ""
             ];
         }
     );
@@ -17747,7 +17754,7 @@ async function renderDownstreamAssetsComment(
     impactedData = impactedData.sort((a, b) => a[3].localeCompare(b[3])); // Sort by typeName
     impactedData = impactedData.sort((a, b) => a[2].localeCompare(b[2])); // Sort by connectorName
 
-    let rows = impactedData.map(([guid, displayText, connectorName, typeName, description, certificateStatus, owners, meanings, sourceUrl]) => {
+    let rows = impactedData.map(([guid, displayText, connectorName, typeName, description, certificateStatus, owners, meanings, classifications, sourceUrl]) => {
         const connectorImage = getConnectorImage(connectorName),
             certificationImage = certificateStatus
                 ? getCertificationImage(certificateStatus)
@@ -17758,6 +17765,7 @@ async function renderDownstreamAssetsComment(
             description,
             owners.join(", ") || " ",
             meanings,
+            classifications,
             sourceUrl ? `[Open in ${connectorName}](${sourceUrl})` : " "]
     })
 
@@ -17771,8 +17779,8 @@ async function renderDownstreamAssetsComment(
 
     const downstreamTable = `<details><summary><b>${downstreamAssets.length} downstream assets 👇</b></summary><br/>
 
-Name | Type | Description | Owners | Terms | Source URL
---- | --- | --- | --- | --- | ---
+Name | Type | Description | Owners | Terms | Classifications | Source URL
+--- | --- | --- | --- | --- | --- | ---       
 ${rows.map((row) => row.map(i => i.replace(/\|/g, "•").replace(/\n/g, "")).join(" | ")).join("\n")}
 </details>`
 
@@ -17855,7 +17863,7 @@ async function getFileContents(octokit, context, filePath) {
         return null
     });
 
-    if (!res?.data?.content) return null
+    if (!res) return null
 
     const buff = Buffer.from(res.data.content, "base64");
 
@@ -17905,7 +17913,7 @@ async function getChangedFiles(octokit, context) {
 }
 
 async function getAssetName({octokit, context, fileName, filePath}) {
-    var regExp = /^{{\s*config\((?=[^)]*alias\s*=\s*'([^']+)')(?:[^)}]*,[^)}]*)?\)\s*}}$/im;
+    var regExp = /{{\s*config\s*\(\s*(?:[^,]*,)*\s*alias\s*=\s*['"]([^'"]+)['"](?:\s*,[^,]*)*\s*\)\s*}}/im;
     var fileContents = await getFileContents(octokit, context, filePath);
 
     if (fileContents) {
@@ -18091,6 +18099,8 @@ ${getImageURL("atlan-logo", 15, 15)} [View lineage in Atlan](${get_downstream_as
 
 
 
+
+
 const get_asset_ATLAN_INSTANCE_URL =
     getInstanceUrl();
 const get_asset_ATLAN_API_TOKEN =
@@ -18105,7 +18115,7 @@ async function getAsset({name}) {
     var raw = stringify({
         dsl: {
             from: 0,
-            size: 1,
+            size: 21,
             query: {
                 bool: {
                     must: [
@@ -18142,8 +18152,14 @@ async function getAsset({name}) {
             "ownerGroups",
             "classificationNames",
             "meanings",
-            "sqlAsset",
+            "dbtModelSqlAssets",
         ],
+        relationAttributes: [
+            "name",
+            "description",
+            "assetDbtProjectName",
+            "assetDbtEnvironmentName"
+        ]
     });
 
     var requestOptions = {
@@ -18168,7 +18184,7 @@ async function getAsset({name}) {
             error: `❌ Model with name **${name}** could not be found or is deleted <br><br>`,
         };
 
-    if (!response?.entities[0]?.attributes?.sqlAsset?.guid)
+    if (!response?.entities[0]?.attributes?.dbtModelSqlAssets?.length > 0)
         return {
             error: `❌ Model with name [${name}](${get_asset_ATLAN_INSTANCE_URL}/assets/${response.entities[0].guid}/overview?utm_source=dbt_github_action) does not materialise any asset <br><br>`,
         }
@@ -18176,6 +18192,41 @@ async function getAsset({name}) {
     return response.entities[0];
 }
 
+;// CONCATENATED MODULE: ./src/api/get-classifications.js
+
+
+
+
+
+const get_classifications_ATLAN_INSTANCE_URL =
+    getInstanceUrl();
+const get_classifications_ATLAN_API_TOKEN =
+    getAPIToken();
+
+async function getClassifications() {
+    var myHeaders = {
+        Authorization: `Bearer ${get_classifications_ATLAN_API_TOKEN}`,
+        "Content-Type": "application/json",
+    };
+
+    var requestOptions = {
+        method: 'GET',
+        headers: myHeaders,
+        redirect: 'follow'
+    };
+
+    var response = await fetch(
+        `${get_classifications_ATLAN_INSTANCE_URL}/api/meta/types/typedefs?type=classification`,
+        requestOptions
+    ).then((e) => e.json()).catch(err => {
+        sendSegmentEvent("dbt_ci_action_failure", {
+            reason: 'failed_to_get_classifications',
+            msg: err
+        });
+    });
+
+    return response?.classificationDefs;
+}
 // EXTERNAL MODULE: ./node_modules/uuid/dist/index.js
 var uuid_dist = __nccwpck_require__(5840);
 ;// CONCATENATED MODULE: ./node_modules/uuid/wrapper.mjs
@@ -18245,6 +18296,8 @@ async function createResource(guid, name, link) {
         });
     })
 
+    console.log("Created Resource:", response)
+
     return response;
 }
 
@@ -18312,6 +18365,7 @@ async function sendSegmentEvent(action, properties) {
 
 
 
+
 ;// CONCATENATED MODULE: ./src/main/print-downstream-assets.js
 
 
@@ -18334,7 +18388,7 @@ async function printDownstreamAssets({octokit, context}) {
             continue;
         }
 
-        const {guid} = asset.attributes.sqlAsset;
+        const {guid} = asset.attributes.dbtModelSqlAssets[0];
         const timeStart = Date.now();
         const downstreamAssets = await getDownstreamAssets(asset, guid, octokit, context);
 
@@ -18351,11 +18405,14 @@ async function printDownstreamAssets({octokit, context}) {
             total_fetch_time: Date.now() - timeStart,
         });
 
+        const classifications = await getClassifications();
+
         const comment = await renderDownstreamAssetsComment(
             octokit,
             context,
             asset,
-            downstreamAssets
+            downstreamAssets,
+            classifications
         )
 
         comments += comment;
@@ -18397,7 +18454,7 @@ async function setResourceOnAsset({octokit, context}) {
         if (!asset) continue;
 
         const {guid: modelGuid} = asset;
-        const {guid: tableAssetGuid} = asset.attributes.sqlAsset;
+        const {guid: tableAssetGuid} = asset.attributes.dbtModelSqlAssets[0];
 
         await createResource(
             modelGuid,

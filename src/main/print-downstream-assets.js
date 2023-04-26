@@ -1,5 +1,5 @@
 import {
-    getAsset,
+    getAsset, getClassifications,
     getDownstreamAssets,
     sendSegmentEvent,
 } from "../api/index.js";
@@ -27,7 +27,7 @@ export default async function printDownstreamAssets({octokit, context}) {
             continue;
         }
 
-        const {guid} = asset.attributes.sqlAsset;
+        const {guid} = asset.attributes.dbtModelSqlAssets[0];
         const timeStart = Date.now();
         const downstreamAssets = await getDownstreamAssets(asset, guid, octokit, context);
 
@@ -44,11 +44,14 @@ export default async function printDownstreamAssets({octokit, context}) {
             total_fetch_time: Date.now() - timeStart,
         });
 
+        const classifications = await getClassifications();
+
         const comment = await renderDownstreamAssetsComment(
             octokit,
             context,
             asset,
-            downstreamAssets
+            downstreamAssets,
+            classifications
         )
 
         comments += comment;
