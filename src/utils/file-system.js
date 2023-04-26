@@ -66,7 +66,7 @@ export async function getChangedFiles(octokit, context) {
 }
 
 export async function getAssetName({octokit, context, fileName, filePath}) {
-    var regExp = /^{{\s*config\((?=[^)]*alias\s*=\s*'([^']+)')(?:[^)}]*,[^)}]*)?\)\s*}}$/im;
+    var regExp = /{{\s*config\s*\(\s*(?:[^,]*,)*\s*alias\s*=\s*['"]([^'"]+)['"](?:\s*,[^,]*)*\s*\)\s*}}/im;
     var fileContents = await getFileContents(octokit, context, filePath);
 
     if (fileContents) {

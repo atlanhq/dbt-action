@@ -2,6 +2,8 @@ import fetch from "node-fetch";
 import {sendSegmentEvent} from "./index.js";
 import stringify from 'json-stringify-safe';
 import {getAPIToken, getInstanceUrl} from "../utils/index.js";
+import core from "@actions/core";
+import {context} from "@actions/github";
 
 const ATLAN_INSTANCE_URL =
     getInstanceUrl();
@@ -17,7 +19,7 @@ export default async function getAsset({name}) {
     var raw = stringify({
         dsl: {
             from: 0,
-            size: 1,
+            size: 21,
             query: {
                 bool: {
                     must: [
@@ -54,8 +56,14 @@ export default async function getAsset({name}) {
             "ownerGroups",
             "classificationNames",
             "meanings",
-            "sqlAsset",
+            "dbtModelSqlAssets",
         ],
+        relationAttributes: [
+            "name",
+            "description",
+            "assetDbtProjectName",
+            "assetDbtEnvironmentName"
+        ]
     });
 
     var requestOptions = {
@@ -80,7 +88,7 @@ export default async function getAsset({name}) {
             error: `❌ Model with name **${name}** could not be found or is deleted <br><br>`,
         };
 
-    if (!response?.entities[0]?.attributes?.sqlAsset?.guid)
+    if (!response?.entities[0]?.attributes?.dbtModelSqlAssets?.length > 0)
         return {
             error: `❌ Model with name [${name}](${ATLAN_INSTANCE_URL}/assets/${response.entities[0].guid}/overview?utm_source=dbt_github_action) does not materialise any asset <br><br>`,
         }

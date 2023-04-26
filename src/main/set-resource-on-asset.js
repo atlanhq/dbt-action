@@ -19,7 +19,7 @@ export default async function setResourceOnAsset({octokit, context}) {
         if (!asset) continue;
 
         const {guid: modelGuid} = asset;
-        const {guid: tableAssetGuid} = asset.attributes.sqlAsset;
+        const {guid: tableAssetGuid} = asset.attributes.dbtModelSqlAssets[0];
 
         await createResource(
             modelGuid,
