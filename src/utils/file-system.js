@@ -39,7 +39,7 @@ export async function getChangedFiles(octokit, context) {
     );
 
     var changedFiles = res.data
-        .map(({filename}) => {
+        .map(({filename, status}) => {
             try {
                 const [modelName] = filename.match(/.*models\/(.*)\.sql/)[1].split('/').reverse()[0].split('.');
 
@@ -47,6 +47,7 @@ export async function getChangedFiles(octokit, context) {
                     return {
                         fileName: modelName,
                         filePath: filename,
+                        status
                     };
                 }
             } catch (e) {
