@@ -13,8 +13,6 @@ export default async function renderDownstreamAssetsComment(
     downstreamAssets,
     classifications
 ) {
-    console.log('Materialised asset', materialisedAsset)
-
     let impactedData = downstreamAssets.map(
         ({displayText, guid, typeName, attributes, meanings, classificationNames}) => {
             let readableTypeName = typeName

@@ -25,7 +25,7 @@ jobs:
           ATLAN_INSTANCE_URL: ${{secrets.ATLAN_INSTANCE_URL}}
           ATLAN_API_TOKEN: ${{secrets.ATLAN_API_TOKEN}}
           DBT_ENVIRONMENT_BRANCH_MAP: |
-            main: Wide World Importers PE1
-            beta: DBT-DEMO-PROD
+            main: DBT-DEMO-PROD
+            beta: Wide World Importers PE1
             test-action: Wide World Importers PE1
           IGNORE_MODEL_ALIAS_MATCHING: true
