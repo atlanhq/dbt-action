@@ -6,7 +6,7 @@ import {
 import {
     renderDownstreamAssetsComment,
     getChangedFiles,
-    getAssetName, createIssueComment, checkCommentExists, deleteComment, getImageURL
+    getAssetName, createIssueComment, checkCommentExists, deleteComment, getImageURL, getConnectorImage
 } from "../utils/index.js";
 
 export default async function printDownstreamAssets({octokit, context}) {
@@ -14,12 +14,19 @@ export default async function printDownstreamAssets({octokit, context}) {
     let comments = ``;
     let totalChangedFiles = 0;
 
-    for (const {fileName, filePath} of changedFiles) {
+    for (const {fileName, filePath, status} of changedFiles) {
         const assetName = await getAssetName({octokit, context, fileName, filePath});
         const asset = await getAsset({name: assetName});
 
         if (totalChangedFiles !== 0)
             comments += '\n\n---\n\n';
+
+        if (status === "added") {
+            comments += `### ${getConnectorImage('dbt')} <b>${fileName}</b> 🆕
+Its a new model and not present in Atlan yet, you'll see the downstream impact for it after its present in Atlan.`
+            totalChangedFiles++
+            continue;
+        }
 
         if (asset.error) {
             comments += asset.error;
