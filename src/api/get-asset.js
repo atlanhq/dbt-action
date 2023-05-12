@@ -11,6 +11,17 @@ const ATLAN_API_TOKEN =
     getAPIToken();
 
 export default async function getAsset({name}) {
+    const environments = core.getInput('DBT_ENVIRONMENT_BRANCH_MAP') ?
+        core.getInput('DBT_ENVIRONMENT_BRANCH_MAP').trim()?.split('\n')?.map(i => i.split(':').map(i => i.trim())) : []
+
+    let environment = null;
+    for (const [baseBranchName, environmentName] of environments) {
+        if (baseBranchName === context.payload.pull_request.base.ref) {
+            environment = environmentName
+            break;
+        }
+    }
+
     var myHeaders = {
         Authorization: `Bearer ${ATLAN_API_TOKEN}`,
         "Content-Type": "application/json",
@@ -38,6 +49,11 @@ export default async function getAsset({name}) {
                                 "name.keyword": name,
                             },
                         },
+                        ...(environment ? [{
+                            term: {
+                                "assetDbtEnvironmentName.keyword": environment
+                            }
+                        }] : []),
                     ],
                 },
             },
@@ -62,7 +78,9 @@ export default async function getAsset({name}) {
             "name",
             "description",
             "assetDbtProjectName",
-            "assetDbtEnvironmentName"
+            "assetDbtEnvironmentName",
+            "connectorName",
+            "certificateStatus",
         ]
     });
 
