@@ -17834,8 +17834,6 @@ async function renderDownstreamAssetsComment(
     downstreamAssets,
     classifications
 ) {
-    console.log('Materialised asset', materialisedAsset)
-
     let impactedData = downstreamAssets.map(
         ({displayText, guid, typeName, attributes, meanings, classificationNames}) => {
             let readableTypeName = typeName
@@ -17854,7 +17852,7 @@ async function renderDownstreamAssetsComment(
                 classificationsObj?.map(({
                                              name,
                                              displayName
-                                         }) => `[${displayName}](${create_comment_ATLAN_INSTANCE_URL}/governance/classifications/${name}?utm_source=dbt_github_action)`)?.join(', ') || " ", attributes?.sourceURL || ""
+                                         }) => `\`${displayName}\``)?.join(', ') || " ", attributes?.sourceURL || ""
             ];
         }
     );
@@ -18002,7 +18000,7 @@ async function getChangedFiles(octokit, context) {
     );
 
     var changedFiles = res.data
-        .map(({filename}) => {
+        .map(({filename, status}) => {
             try {
                 const [modelName] = filename.match(/.*models\/(.*)\.sql/)[1].split('/').reverse()[0].split('.');
 
@@ -18010,6 +18008,7 @@ async function getChangedFiles(octokit, context) {
                     return {
                         fileName: modelName,
                         filePath: filename,
+                        status
                     };
                 }
             } catch (e) {
@@ -18430,6 +18429,8 @@ async function createResource(guid, name, link) {
         });
     })
 
+    console.log("Created Resource:", response)
+
     return response;
 }
 
@@ -18507,12 +18508,19 @@ async function printDownstreamAssets({octokit, context}) {
     let comments = ``;
     let totalChangedFiles = 0;
 
-    for (const {fileName, filePath} of changedFiles) {
+    for (const {fileName, filePath, status} of changedFiles) {
         const assetName = await getAssetName({octokit, context, fileName, filePath});
         const asset = await getAsset({name: assetName});
 
         if (totalChangedFiles !== 0)
             comments += '\n\n---\n\n';
+
+        if (status === "added") {
+            comments += `### ${getConnectorImage('dbt')} <b>${fileName}</b> 🆕
+Its a new model and not present in Atlan yet, you'll see the downstream impact for it after its present in Atlan.`
+            totalChangedFiles++
+            continue;
+        }
 
         if (asset.error) {
             comments += asset.error;
