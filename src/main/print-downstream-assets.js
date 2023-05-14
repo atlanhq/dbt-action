@@ -8,6 +8,7 @@ import {
     getChangedFiles,
     getAssetName, createIssueComment, checkCommentExists, deleteComment, getImageURL, getConnectorImage
 } from "../utils/index.js";
+import {isIgnoreModelAliasMatching} from "../utils/get-environment-variables.js";
 
 export default async function printDownstreamAssets({octokit, context}) {
     const changedFiles = await getChangedFiles(octokit, context);
@@ -15,7 +16,9 @@ export default async function printDownstreamAssets({octokit, context}) {
     let totalChangedFiles = 0;
 
     for (const {fileName, filePath, status} of changedFiles) {
-        const assetName = await getAssetName({octokit, context, fileName, filePath});
+        const aliasName = await getAssetName({octokit, context, fileName, filePath});
+        const assetName = isIgnoreModelAliasMatching() ? fileName : aliasName;
+        console.log("Ignore Model Alias Matching?", isIgnoreModelAliasMatching())
         const asset = await getAsset({name: assetName});
 
         if (totalChangedFiles !== 0)

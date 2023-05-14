@@ -28,3 +28,4 @@ jobs:
             main: DBT-DEMO-PROD
             beta: Wide World Importers PE1
             test-action: Wide World Importers PE1
+          IGNORE_MODEL_ALIAS_MATCHING: true
