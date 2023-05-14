@@ -60,7 +60,7 @@ export async function getChangedFiles(octokit, context) {
             return changedFiles.findIndex(obj => obj.fileName === item.fileName) === index;
         })
 
-    console.log(changedFiles)
+    console.log("Changed Files: ", changedFiles)
 
     return changedFiles
 }

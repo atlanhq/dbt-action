@@ -12,7 +12,10 @@ inputs:
   ATLAN_INSTANCE_URL:
     description: "Atlan instance URL"
     required: true
-
+  IGNORE_MODEL_ALIAS_MATCHING:
+    description: "Ignore model alias matching"
+    required: false
+    default: false
 runs:
   using: "node16"
   main: "dist/index.js"

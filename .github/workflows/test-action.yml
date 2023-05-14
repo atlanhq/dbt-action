@@ -24,3 +24,4 @@ jobs:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
           ATLAN_INSTANCE_URL: ${{secrets.ATLAN_INSTANCE_URL}}
           ATLAN_API_TOKEN: ${{secrets.ATLAN_API_TOKEN}}
+          IGNORE_MODEL_ALIAS_MATCHING: true
