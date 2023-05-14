@@ -2,8 +2,8 @@ import fetch from "node-fetch";
 import {sendSegmentEvent} from "./index.js";
 import stringify from 'json-stringify-safe';
 import {getAPIToken, getInstanceUrl} from "../utils/index.js";
-import core from "@actions/core";
 import {context} from "@actions/github";
+import {getEnvironments} from "../utils/get-environment-variables.js";
 
 const ATLAN_INSTANCE_URL =
     getInstanceUrl();
@@ -11,8 +11,7 @@ const ATLAN_API_TOKEN =
     getAPIToken();
 
 export default async function getAsset({name}) {
-    const environments = core.getInput('DBT_ENVIRONMENT_BRANCH_MAP') ?
-        core.getInput('DBT_ENVIRONMENT_BRANCH_MAP').trim()?.split('\n')?.map(i => i.split(':').map(i => i.trim())) : []
+    const environments = getEnvironments();
 
     let environment = null;
     for (const [baseBranchName, environmentName] of environments) {
