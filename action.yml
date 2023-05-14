@@ -15,7 +15,10 @@ inputs:
   DBT_ENVIRONMENT_BRANCH_MAP:
     description: "List of environments"
     required: false
-
+  IGNORE_MODEL_ALIAS_MATCHING:
+    description: "Ignore model alias matching"
+    required: false
+    default: false
 runs:
   using: "node16"
   main: "dist/index.js"
