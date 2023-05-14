@@ -9,6 +9,7 @@ export default async function renderDownstreamAssetsComment(
     octokit,
     context,
     asset,
+    materialisedAsset,
     downstreamAssets,
     classifications
 ) {
@@ -59,7 +60,14 @@ export default async function renderDownstreamAssetsComment(
         asset.attributes?.certificateStatus
             ? getCertificationImage(asset.attributes.certificateStatus)
             : ""
-    }`
+    }
+Materialised asset: ${getConnectorImage(materialisedAsset.attributes.connectorName)} [${
+        materialisedAsset.attributes.name
+    }](${ATLAN_INSTANCE_URL}/assets/${materialisedAsset.guid}/overview?utm_source=dbt_github_action) ${
+        materialisedAsset.attributes?.certificateStatus
+            ? getCertificationImage(materialisedAsset.attributes.certificateStatus)
+            : ""
+    } | Environment Name: \`${materialisedAsset.attributes.assetDbtEnvironmentName}\` | Project Name: \`${materialisedAsset.attributes.assetDbtProjectName}\``
 
     const downstreamTable = `<details><summary><b>${downstreamAssets.length} downstream assets 👇</b></summary><br/>
 
