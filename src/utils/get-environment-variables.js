@@ -14,4 +14,8 @@ export const getAPIToken = () => {
     if (ATLAN_API_TOKEN) return ATLAN_API_TOKEN;
     return core.getInput("ATLAN_API_TOKEN");
 }
+export const getEnvironments = () => {
+    return core.getInput('DBT_ENVIRONMENT_BRANCH_MAP') ?
+        core.getInput('DBT_ENVIRONMENT_BRANCH_MAP').trim()?.split('\n')?.map(i => i.split(':').map(i => i.trim())) : []
+}
 export const isIgnoreModelAliasMatching = () => core.getInput("IGNORE_MODEL_ALIAS_MATCHING") === "true";
