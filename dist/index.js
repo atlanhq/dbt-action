@@ -17807,7 +17807,7 @@ function getCertificationImage(certificationStatus) {
 
 main.config();
 
-const {IS_DEV, ATLAN_INSTANCE_URL, ATLAN_API_TOKEN} = process.env;
+const {IS_DEV, ATLAN_INSTANCE_URL, ATLAN_API_TOKEN, IGNORE_MODEL_ALIAS_MATCHING} = process.env;
 
 const isDev = () => IS_DEV === "true";
 const getInstanceUrl = () => {
@@ -17818,6 +17818,11 @@ const getAPIToken = () => {
     if (ATLAN_API_TOKEN) return ATLAN_API_TOKEN;
     return core.getInput("ATLAN_API_TOKEN");
 }
+const getEnvironments = () => {
+    return core.getInput('DBT_ENVIRONMENT_BRANCH_MAP') ?
+        core.getInput('DBT_ENVIRONMENT_BRANCH_MAP').trim()?.split('\n')?.map(i => i.split(':').map(i => i.trim())) : []
+}
+const isIgnoreModelAliasMatching = () => core.getInput("IGNORE_MODEL_ALIAS_MATCHING") === "true";
 ;// CONCATENATED MODULE: ./src/utils/create-comment.js
 
 
@@ -17881,17 +17886,16 @@ async function renderDownstreamAssetsComment(
         asset.attributes?.certificateStatus
             ? getCertificationImage(asset.attributes.certificateStatus)
             : ""
-    }`
-
-    const downstreamTable = `<details><summary><b>${downstreamAssets.length} downstream assets 👇</b></summary><br/>
-
+    }
 Materialised asset: ${getConnectorImage(materialisedAsset.attributes.connectorName)} [${
         materialisedAsset.attributes.name
     }](${create_comment_ATLAN_INSTANCE_URL}/assets/${materialisedAsset.guid}/overview?utm_source=dbt_github_action) ${
         materialisedAsset.attributes?.certificateStatus
             ? getCertificationImage(materialisedAsset.attributes.certificateStatus)
             : ""
-    } | Environment Name: \`${materialisedAsset.attributes.assetDbtEnvironmentName}\` | Project Name: \`${materialisedAsset.attributes.assetDbtProjectName}\`
+    } | Environment Name: \`${materialisedAsset.attributes.assetDbtEnvironmentName}\` | Project Name: \`${materialisedAsset.attributes.assetDbtProjectName}\``
+
+    const downstreamTable = `<details><summary><b>${downstreamAssets.length} downstream assets 👇</b></summary><br/>
 
 Name | Type | Description | Owners | Terms | Classifications | Source URL
 --- | --- | --- | --- | --- | --- | ---       
@@ -18022,7 +18026,7 @@ async function getChangedFiles(octokit, context) {
             return changedFiles.findIndex(obj => obj.fileName === item.fileName) === index;
         })
 
-    console.log(changedFiles)
+    console.log("Changed Files: ", changedFiles)
 
     return changedFiles
 }
@@ -18222,8 +18226,7 @@ const get_asset_ATLAN_API_TOKEN =
     getAPIToken();
 
 async function getAsset({name}) {
-    const environments = core.getInput('DBT_ENVIRONMENT_BRANCH_MAP') ?
-        core.getInput('DBT_ENVIRONMENT_BRANCH_MAP').trim()?.split('\n')?.map(i => i.split(':').map(i => i.trim())) : []
+    const environments = getEnvironments();
 
     let environment = null;
     for (const [baseBranchName, environmentName] of environments) {
@@ -18503,13 +18506,15 @@ async function sendSegmentEvent(action, properties) {
 
 
 
+
 async function printDownstreamAssets({octokit, context}) {
     const changedFiles = await getChangedFiles(octokit, context);
     let comments = ``;
     let totalChangedFiles = 0;
 
     for (const {fileName, filePath, status} of changedFiles) {
-        const assetName = await getAssetName({octokit, context, fileName, filePath});
+        const aliasName = await getAssetName({octokit, context, fileName, filePath});
+        const assetName = isIgnoreModelAliasMatching() ? fileName : aliasName;
         const asset = await getAsset({name: assetName});
 
         if (totalChangedFiles !== 0)
