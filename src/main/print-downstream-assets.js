@@ -18,7 +18,6 @@ export default async function printDownstreamAssets({octokit, context}) {
     for (const {fileName, filePath} of changedFiles) {
         const aliasName = await getAssetName({octokit, context, fileName, filePath});
         const assetName = isIgnoreModelAliasMatching() ? fileName : aliasName;
-        console.log("Ignore Model Alias Matching?", isIgnoreModelAliasMatching())
         const asset = await getAsset({name: assetName});
 
         if (totalChangedFiles !== 0)
