@@ -1,14 +1,13 @@
 import fetch from "node-fetch";
-import core from "@actions/core";
-import dotenv from "dotenv";
 import {context} from "@actions/github";
+import stringify from 'json-stringify-safe';
+import {isDev, getAPIToken, getInstanceUrl} from "../utils/index.js";
 
-dotenv.config();
-
+const IS_DEV = isDev();
 const ATLAN_INSTANCE_URL =
-    core.getInput("ATLAN_INSTANCE_URL") || process.env.ATLAN_INSTANCE_URL;
+    getInstanceUrl();
 const ATLAN_API_TOKEN =
-    core.getInput("ATLAN_API_TOKEN") || process.env.ATLAN_API_TOKEN;
+    getAPIToken();
 
 export default async function sendSegmentEvent(action, properties) {
     var myHeaders = {
@@ -18,7 +17,7 @@ export default async function sendSegmentEvent(action, properties) {
 
     var domain = new URL(ATLAN_INSTANCE_URL).hostname;
 
-    var raw = JSON.stringify({
+    var raw = stringify({
         category: "integration",
         object: "github",
         action,
@@ -36,16 +35,22 @@ export default async function sendSegmentEvent(action, properties) {
         body: raw,
     };
 
-    var response = await fetch(
-        `${ATLAN_INSTANCE_URL}/api/service/segment/track`,
-        requestOptions
-    )
-        .then(() => {
-            console.log("send segment event", action, raw);
-        })
-        .catch((err) => {
-            console.log("couldn't send segment event", err);
-        });
+    var response = null
+
+    if (!IS_DEV) {
+        response = await fetch(
+            `${ATLAN_INSTANCE_URL}/api/service/segment/track`,
+            requestOptions
+        )
+            .then(() => {
+                console.log("send segment event", action, raw);
+            })
+            .catch((err) => {
+                console.log("couldn't send segment event", err);
+            });
+    } else {
+        console.log("send segment event", action, raw);
+    }
 
     return response;
 }

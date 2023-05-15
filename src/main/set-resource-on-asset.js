@@ -1,6 +1,6 @@
 import {getAsset, createResource} from "../api/index.js";
 import {
-    createCustomComment,
+    createIssueComment,
     getChangedFiles,
     getAssetName,
 } from "../utils/index.js";
@@ -12,14 +12,14 @@ export default async function setResourceOnAsset({octokit, context}) {
 
     if (changedFiles.length === 0) return;
 
-    changedFiles.forEach(async ({fileName, filePath}) => {
-        const assetName = await getAssetName(octokit, context, fileName, filePath);
+    for (const {fileName, filePath} of changedFiles) {
+        const assetName = await getAssetName({octokit, context, fileName, filePath});
         const asset = await getAsset({name: assetName});
 
-        if (!asset) return;
+        if (!asset) continue;
 
         const {guid: modelGuid} = asset;
-        const {guid: tableAssetGuid} = asset.attributes.sqlAsset;
+        const {guid: tableAssetGuid} = asset.attributes.dbtModelSqlAssets[0];
 
         await createResource(
             modelGuid,
@@ -33,17 +33,18 @@ export default async function setResourceOnAsset({octokit, context}) {
         );
 
         totalChangedFiles++
-    });
+    }
 
-    const comment = await createCustomComment(
+    const comment = await createIssueComment(
         octokit,
         context,
         `🎊 Congrats on the merge!
   
 This pull request has been added as a resource to all the assets modified. ✅
-`
+`,
+        null,
+        true
     );
-    console.log(comment);
 
     return totalChangedFiles
 }

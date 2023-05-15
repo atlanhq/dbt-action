@@ -5,14 +5,20 @@ export async function getFileContents(octokit, context, filePath) {
         head_sha = pull_request.head.sha;
 
     const res = await octokit.request(
-            `GET /repos/${owner}/${repo}/contents/${filePath}?ref=${head_sha}`,
-            {
-                owner,
-                repo,
-                path: filePath,
-            }
-        ),
-        buff = Buffer.from(res.data.content, "base64");
+        `GET /repos/${owner}/${repo}/contents/${filePath}?ref=${head_sha}`,
+        {
+            owner,
+            repo,
+            path: filePath,
+        }
+    ).catch(e => {
+        console.log("Error fetching file contents: ", e)
+        return null
+    });
+
+    if (!res) return null
+
+    const buff = Buffer.from(res.data.content, "base64");
 
     return buff.toString("utf8");
 }
@@ -32,27 +38,44 @@ export async function getChangedFiles(octokit, context) {
         }
     );
 
-    return res.data
-        .map(({filename}) => {
-            const fileNameRegEx = /.*\/models\/.*\/(.*)\.sql/gm,
-                matches = fileNameRegEx.exec(filename);
-            if (matches) {
-                return {
-                    fileName: matches[1],
-                    filePath: filename,
-                };
+    var changedFiles = res.data
+        .map(({filename, status}) => {
+            try {
+                const [modelName] = filename.match(/.*models\/(.*)\.sql/)[1].split('/').reverse()[0].split('.');
+
+                if (modelName) {
+                    return {
+                        fileName: modelName,
+                        filePath: filename,
+                        status
+                    };
+                }
+            } catch (e) {
+
             }
         })
-        .filter((i) => i !== undefined);
+        .filter((i) => i !== undefined)
+
+    changedFiles = changedFiles
+        .filter((item, index) => {
+            return changedFiles.findIndex(obj => obj.fileName === item.fileName) === index;
+        })
+
+    console.log("Changed Files: ", changedFiles)
+
+    return changedFiles
 }
 
 export async function getAssetName({octokit, context, fileName, filePath}) {
-    var regExp = /config\(.*alias=\'([^']+)\'.*\)/im;
+    var regExp = /{{\s*config\s*\(\s*(?:[^,]*,)*\s*alias\s*=\s*['"]([^'"]+)['"](?:\s*,[^,]*)*\s*\)\s*}}/im;
     var fileContents = await getFileContents(octokit, context, filePath);
-    var matches = regExp.exec(fileContents);
 
-    if (matches) {
-        return matches[1];
+    if (fileContents) {
+        var matches = regExp.exec(fileContents);
+
+        if (matches) {
+            return matches[1].trim();
+        }
     }
 
     return fileName;

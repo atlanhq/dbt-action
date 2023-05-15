@@ -1,15 +1,13 @@
 import {v4 as uuidv4} from "uuid";
 import fetch from "node-fetch";
-import core from "@actions/core";
-import dotenv from "dotenv";
 import {sendSegmentEvent} from "./index.js";
-
-dotenv.config();
+import stringify from 'json-stringify-safe';
+import {getAPIToken, getInstanceUrl} from "../utils/index.js";
 
 const ATLAN_INSTANCE_URL =
-    core.getInput("ATLAN_INSTANCE_URL") || process.env.ATLAN_INSTANCE_URL;
+    getInstanceUrl();
 const ATLAN_API_TOKEN =
-    core.getInput("ATLAN_API_TOKEN") || process.env.ATLAN_API_TOKEN;
+    getAPIToken();
 
 export default async function createResource(guid, name, link) {
     var myHeaders = {
@@ -17,7 +15,7 @@ export default async function createResource(guid, name, link) {
         "Content-Type": "application/json",
     };
 
-    var raw = JSON.stringify({
+    var raw = stringify({
         entities: [
             {
                 typeName: "Link",
@@ -53,6 +51,8 @@ export default async function createResource(guid, name, link) {
             msg: err
         });
     })
+
+    console.log("Created Resource:", response)
 
     return response;
 }

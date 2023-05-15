@@ -17,7 +17,7 @@
   ],
   "scripts": {
     "build": "ncc build src/index.js -o dist",
-    "start": "npm run build && act pull_request --container-architecture linux/amd64 --secret-file .env -e event.json",
+    "start": "npm run build && act pull_request --container-architecture linux/amd64 --secret-file .env -e event.json --insecure-secrets",
     "sync": "git pull && git push"
   },
   "author": "Jaagrav Seal <jaagrav.seal@atlan.com> (https://atlan.com/)",
@@ -31,6 +31,7 @@
     "@actions/github": "^5.1.1",
     "@vercel/ncc": "^0.34.0",
     "dotenv": "^16.0.3",
+    "json-stringify-safe": "^5.0.1",
     "node-fetch": "^3.3.0",
     "uuid": "^9.0.0"
   }

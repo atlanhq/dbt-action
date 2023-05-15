@@ -1,15 +1,12 @@
 import fetch from "node-fetch";
-import core from "@actions/core";
-import dotenv from "dotenv";
 import {sendSegmentEvent} from "./index.js";
-import {createCustomComment, getConnectorImage, getCertificationImage} from "../utils/index.js";
-
-dotenv.config();
+import {getAPIToken, getInstanceUrl, getConnectorImage, getCertificationImage, getImageURL} from "../utils/index.js";
+import stringify from 'json-stringify-safe';
 
 const ATLAN_INSTANCE_URL =
-    core.getInput("ATLAN_INSTANCE_URL") || process.env.ATLAN_INSTANCE_URL;
+    getInstanceUrl();
 const ATLAN_API_TOKEN =
-    core.getInput("ATLAN_API_TOKEN") || process.env.ATLAN_API_TOKEN;
+    getAPIToken();
 
 export default async function getDownstreamAssets(asset, guid, octokit, context) {
     var myHeaders = {
@@ -17,7 +14,7 @@ export default async function getDownstreamAssets(asset, guid, octokit, context)
         "content-type": "application/json",
     };
 
-    var raw = JSON.stringify({
+    var raw = stringify({
         depth: 21,
         guid: guid,
         hideProcess: true,
@@ -51,20 +48,18 @@ export default async function getDownstreamAssets(asset, guid, octokit, context)
         body: raw,
     };
 
-    var handleError = async (err) => {
-        const comment = `## ${getConnectorImage(asset.attributes.connectorName)} [${
+    var handleError = (err) => {
+        const comment = `### ${getConnectorImage(asset.attributes.connectorName)} [${
             asset.displayText
-        }](${ATLAN_INSTANCE_URL}/assets/${asset.guid}?utm_source=dbt_github_action) ${
+        }](${ATLAN_INSTANCE_URL}/assets/${asset.guid}/overview?utm_source=dbt_github_action) ${
             asset.attributes?.certificateStatus
                 ? getCertificationImage(asset.attributes.certificateStatus)
                 : ""
         }
             
-❌ Failed to fetch downstream impacted assets.
+_Failed to fetch impacted assets._
             
-[See lineage on Atlan.](${ATLAN_INSTANCE_URL}/assets/${asset.guid}/lineage?utm_source=dbt_github_action)`;
-
-        createCustomComment(octokit, context, comment)
+${getImageURL("atlan-logo", 15, 15)} [View lineage in Atlan](${ATLAN_INSTANCE_URL}/assets/${asset.guid}/lineage/overview?utm_source=dbt_github_action)`;
 
         sendSegmentEvent("dbt_ci_action_failure", {
             reason: 'failed_to_fetch_lineage',
@@ -73,18 +68,26 @@ export default async function getDownstreamAssets(asset, guid, octokit, context)
             asset_typeName: asset.typeName,
             msg: err
         });
+
+        return comment
     }
 
     var response = await fetch(
         `${ATLAN_INSTANCE_URL}/api/meta/lineage/getlineage`,
         requestOptions
-    ).then((e) => e.json()).catch((err) => {
-        handleError(err)
+    ).then((e) => {
+        if (e.status === 200) {
+            return e.json();
+        } else {
+            throw e;
+        }
+    }).catch((err) => {
+        return {
+            error: handleError(err)
+        }
     });
 
-    if (!!response.error) {
-        handleError(response.error)
-    }
+    if (response.error) return response;
 
     if (!response?.relations) return [];
 

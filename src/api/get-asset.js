@@ -1,25 +1,35 @@
 import fetch from "node-fetch";
-import core from "@actions/core";
-import dotenv from "dotenv";
 import {sendSegmentEvent} from "./index.js";
-
-dotenv.config();
+import stringify from 'json-stringify-safe';
+import {getAPIToken, getInstanceUrl} from "../utils/index.js";
+import {context} from "@actions/github";
+import {getEnvironments} from "../utils/get-environment-variables.js";
 
 const ATLAN_INSTANCE_URL =
-    core.getInput("ATLAN_INSTANCE_URL") || process.env.ATLAN_INSTANCE_URL;
+    getInstanceUrl();
 const ATLAN_API_TOKEN =
-    core.getInput("ATLAN_API_TOKEN") || process.env.ATLAN_API_TOKEN;
+    getAPIToken();
 
 export default async function getAsset({name}) {
+    const environments = getEnvironments();
+
+    let environment = null;
+    for (const [baseBranchName, environmentName] of environments) {
+        if (baseBranchName === context.payload.pull_request.base.ref) {
+            environment = environmentName
+            break;
+        }
+    }
+
     var myHeaders = {
         Authorization: `Bearer ${ATLAN_API_TOKEN}`,
         "Content-Type": "application/json",
     };
 
-    var raw = JSON.stringify({
+    var raw = stringify({
         dsl: {
             from: 0,
-            size: 1,
+            size: 21,
             query: {
                 bool: {
                     must: [
@@ -38,6 +48,11 @@ export default async function getAsset({name}) {
                                 "name.keyword": name,
                             },
                         },
+                        ...(environment ? [{
+                            term: {
+                                "assetDbtEnvironmentName.keyword": environment
+                            }
+                        }] : []),
                     ],
                 },
             },
@@ -56,8 +71,16 @@ export default async function getAsset({name}) {
             "ownerGroups",
             "classificationNames",
             "meanings",
-            "sqlAsset",
+            "dbtModelSqlAssets",
         ],
+        relationAttributes: [
+            "name",
+            "description",
+            "assetDbtProjectName",
+            "assetDbtEnvironmentName",
+            "connectorName",
+            "certificateStatus",
+        ]
     });
 
     var requestOptions = {
@@ -77,6 +100,15 @@ export default async function getAsset({name}) {
         });
     });
 
-    if (response?.entities?.length > 0) return response.entities[0];
-    return null;
+    if (!response?.entities?.length)
+        return {
+            error: `❌ Model with name **${name}** could not be found or is deleted <br><br>`,
+        };
+
+    if (!response?.entities[0]?.attributes?.dbtModelSqlAssets?.length > 0)
+        return {
+            error: `❌ Model with name [${name}](${ATLAN_INSTANCE_URL}/assets/${response.entities[0].guid}/overview?utm_source=dbt_github_action) does not materialise any asset <br><br>`,
+        }
+
+    return response.entities[0];
 }
