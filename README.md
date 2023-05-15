@@ -61,19 +61,20 @@ After you've completed the configuration above, create a pull request with a cha
 
 ## Inputs
 
-| Name                          | Description                                                                                                                                                                          | Required | Default |
-| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------- | ------- |
-| `GITHUB_TOKEN`                | Needed to write comments on PRs to print all the downstream assets. https://dev.to/github/the-githubtoken-in-github-actions-how-it-works-change-permissions-customizations-3cgp      | true     |
-| `ATLAN_INSTANCE_URL`          | Needed for making API requests to the user's tenant.                                                                                                                                 | true     |
-| `ATLAN_API_TOKEN`             | Needed for authenticating API requests to the user's tenant. https://ask.atlan.com/hc/en-us/articles/8312649180049                                                                   | true     |
-| `DBT_ENVIRONMENT_BRANCH_MAP`  | A mapping of dbt environments to branches separated by newlines. For example, <br><br>main: DBT-DEMO-PROD<br>beta: Wide World Importers PE1<br>test-action: Wide World Importers PE1 | false    |
-| `IGNORE_MODEL_ALIAS_MATCHING` | If set to true, the action will ignore model alias matching if there is an alias set in the config of a model SQL.                                                                   | false    | false   |
+| Name                          | Description                                                                                                                                                                                                                                                                                                                     | Required | Default |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ------- |
+| `GITHUB_TOKEN`                | Needed to write comments on PRs to print all the downstream assets. https://dev.to/github/the-githubtoken-in-github-actions-how-it-works-change-permissions-customizations-3cgp                                                                                                                                                 | true     |
+| `ATLAN_INSTANCE_URL`          | Needed for making API requests to the user's tenant.                                                                                                                                                                                                                                                                            | true     |
+| `ATLAN_API_TOKEN`             | Needed for authenticating API requests to the user's tenant. https://ask.atlan.com/hc/en-us/articles/8312649180049                                                                                                                                                                                                              | true     |
+| `DBT_ENVIRONMENT_BRANCH_MAP`  | Map Github branch with specific dbt environment, if you do this - Atlan Github action will pick lineage for that specific environment from Atlan.You can provide the mapping like `branch name`: `dbt environment name`. <br><br>main: DBT-DEMO-PROD<br>beta: Wide World Importers PE1<br>test-action: Wide World Importers PE1 | false    |
+| `IGNORE_MODEL_ALIAS_MATCHING` | By default the action checks if there's an alias defined for a model in the code and looks for the relevant asset in Atlan using that alias. You can turn off matching alias name using this variable.                                                                                                                          | false    | false   |
 
 ## FAQs
 
 ### Action does not get the model from the correct environment?
 
-In case there are multiple dbt models in your Atlan instance with the same name but in different environments, the action may get the wrong model. To fix this, you can use the `DBT_ENVIRONMENT_BRANCH_MAP` input to map dbt environments to branches. For example, if you have a dbt environment called `main` and a branch called `Production`, you can add the following to your workflow file:
+In case there are multiple dbt models in your Atlan instance with the same name but in different environments, the action may get the wrong model. To fix this, you can map Github branch with specific dbt environment, if you do this - Atlan Github action will pick lineage for that specific environment from Atlan.
+You can provide the mapping like `branch name`: `dbt nvironment name`
 
 ```diff
 jobs:
@@ -88,13 +89,13 @@ jobs:
           ATLAN_INSTANCE_URL: ${{secrets.ATLAN_INSTANCE_URL}}
           ATLAN_API_TOKEN: ${{secrets.ATLAN_API_TOKEN}}
 +         DBT_ENVIRONMENT_BRANCH_MAP: |
-+           main: Production
-+           beta: Development
++           main: dbt-prod
++           beta: dbt-test
 ```
 
 ### Action gets model by alias and not by model name?
 
-In case there is a model in your dbt project with an alias set in the config, the action will get the model by the alias and not the model name. To fix this, you can set the `IGNORE_MODEL_ALIAS_MATCHING` input to true. For example:
+By default the action checks if there's an alias defined for a model in the code and looks for the relevant asset in Atlan using that alias. You can turn off matching alias name using this input `IGNORE_MODEL_ALIAS_MATCHING` input to true. For example:
 
 ```diff
 jobs:
