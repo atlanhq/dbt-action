@@ -2,8 +2,8 @@ import fetch from "node-fetch";
 import {sendSegmentEvent} from "./index.js";
 import stringify from 'json-stringify-safe';
 import {getAPIToken, getInstanceUrl} from "../utils/index.js";
-import core from "@actions/core";
 import {context} from "@actions/github";
+import {getEnvironments} from "../utils/get-environment-variables.js";
 
 const ATLAN_INSTANCE_URL =
     getInstanceUrl();
@@ -11,6 +11,16 @@ const ATLAN_API_TOKEN =
     getAPIToken();
 
 export default async function getAsset({name}) {
+    const environments = getEnvironments();
+
+    let environment = null;
+    for (const [baseBranchName, environmentName] of environments) {
+        if (baseBranchName === context.payload.pull_request.base.ref) {
+            environment = environmentName
+            break;
+        }
+    }
+
     var myHeaders = {
         Authorization: `Bearer ${ATLAN_API_TOKEN}`,
         "Content-Type": "application/json",
@@ -38,6 +48,11 @@ export default async function getAsset({name}) {
                                 "name.keyword": name,
                             },
                         },
+                        ...(environment ? [{
+                            term: {
+                                "assetDbtEnvironmentName.keyword": environment
+                            }
+                        }] : []),
                     ],
                 },
             },
@@ -62,7 +77,9 @@ export default async function getAsset({name}) {
             "name",
             "description",
             "assetDbtProjectName",
-            "assetDbtEnvironmentName"
+            "assetDbtEnvironmentName",
+            "connectorName",
+            "certificateStatus",
         ]
     });
 
