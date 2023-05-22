@@ -4,6 +4,7 @@ import {getInstanceUrl, isDev} from "./get-environment-variables.js";
 const IS_DEV = isDev();
 const ATLAN_INSTANCE_URL =
     getInstanceUrl();
+const ASSETS_LIMIT = 100;
 
 export default async function renderDownstreamAssetsComment(
     octokit,
@@ -13,7 +14,7 @@ export default async function renderDownstreamAssetsComment(
     downstreamAssets,
     classifications
 ) {
-    let impactedData = downstreamAssets.map(
+    let impactedData = downstreamAssets.slice(0, ASSETS_LIMIT).map(
         ({displayText, guid, typeName, attributes, meanings, classificationNames}) => {
             let readableTypeName = typeName
                     .toLowerCase()
@@ -74,6 +75,9 @@ Materialised asset: ${getConnectorImage(materialisedAsset.attributes.connectorNa
 Name | Type | Description | Owners | Terms | Classifications | Source URL
 --- | --- | --- | --- | --- | --- | ---       
 ${rows.map((row) => row.map(i => i.replace(/\|/g, "•").replace(/\n/g, "")).join(" | ")).join("\n")}
+
+${downstreamAssets.length > ASSETS_LIMIT ? `[+${downstreamAssets.length - ASSETS_LIMIT} assets more](${ATLAN_INSTANCE_URL}/assets/${materialisedAsset.guid}/lineage?utm_source=dbt_github_action)` : ""}
+
 </details>`
 
     const viewAssetButton = `${getImageURL("atlan-logo", 15, 15)} [View asset in Atlan](${ATLAN_INSTANCE_URL}/assets/${asset.guid}/overview?utm_source=dbt_github_action)`
@@ -119,7 +123,7 @@ ${content}`
         body: content,
     };
 
-    console.log(content)
+    console.log(content, content.length)
 
     if (IS_DEV) return content;
 
