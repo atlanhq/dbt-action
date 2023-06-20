@@ -4,7 +4,6 @@ import {getInstanceUrl, isDev} from "./get-environment-variables.js";
 const IS_DEV = isDev();
 const ATLAN_INSTANCE_URL =
     getInstanceUrl();
-const ASSETS_LIMIT = 100;
 
 export default async function renderDownstreamAssetsComment(
     octokit,
@@ -14,7 +13,7 @@ export default async function renderDownstreamAssetsComment(
     downstreamAssets,
     classifications
 ) {
-    let impactedData = downstreamAssets.slice(0, ASSETS_LIMIT).map(
+    let impactedData = downstreamAssets.entities.map(
         ({displayText, guid, typeName, attributes, meanings, classificationNames}) => {
             let readableTypeName = typeName
                     .toLowerCase()
@@ -48,7 +47,7 @@ export default async function renderDownstreamAssetsComment(
 
         return [`${connectorImage} [${displayText}](${ATLAN_INSTANCE_URL}/assets/${guid}/overview?utm_source=dbt_github_action) ${certificationImage}`,
             `\`${typeName}\``,
-            description,
+            description.length > 100 ? description.substring(0, 100) + '...' : description,
             owners.join(", ") || " ",
             meanings,
             classifications,
@@ -70,19 +69,19 @@ Materialised asset: ${getConnectorImage(materialisedAsset.attributes.connectorNa
             : ""
     } | Environment Name: \`${materialisedAsset.attributes.assetDbtEnvironmentName}\` | Project Name: \`${materialisedAsset.attributes.assetDbtProjectName}\``
 
-    const downstreamTable = `<details><summary><b>${downstreamAssets.length} downstream assets 👇</b></summary><br/>
+    const downstreamTable = `<details><summary><b>${downstreamAssets.entityCount} downstream assets 👇</b></summary><br/>
 
 Name | Type | Description | Owners | Terms | Classifications | Source URL
 --- | --- | --- | --- | --- | --- | ---       
 ${rows.map((row) => row.map(i => i.replace(/\|/g, "•").replace(/\n/g, "")).join(" | ")).join("\n")}
 
-${downstreamAssets.length > ASSETS_LIMIT ? `[+${downstreamAssets.length - ASSETS_LIMIT} assets more](${ATLAN_INSTANCE_URL}/assets/${materialisedAsset.guid}/lineage?utm_source=dbt_github_action)` : ""}
+${downstreamAssets.entities.length < downstreamAssets.entityCount ? `[+${downstreamAssets.entityCount - downstreamAssets.entities.length} assets more](${ATLAN_INSTANCE_URL}/assets/${materialisedAsset.guid}/lineage?utm_source=dbt_github_action)` : ""}
 
 </details>`
 
     const viewAssetButton = `${getImageURL("atlan-logo", 15, 15)} [View asset in Atlan](${ATLAN_INSTANCE_URL}/assets/${asset.guid}/overview?utm_source=dbt_github_action)`
 
-    if (downstreamAssets.length > 0)
+    if (downstreamAssets.entities.length > 0)
         return `${assetInfo}
         
 ${downstreamTable}

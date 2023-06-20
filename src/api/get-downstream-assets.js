@@ -7,24 +7,36 @@ const ATLAN_INSTANCE_URL =
     getInstanceUrl();
 const ATLAN_API_TOKEN =
     getAPIToken();
+const ASSETS_LIMIT = 100;
 
-export default async function getDownstreamAssets(asset, guid, octokit, context) {
+export default async function getDownstreamAssets(asset, guid, totalModifiedFiles) {
     var myHeaders = {
         authorization: `Bearer ${ATLAN_API_TOKEN}`,
         "content-type": "application/json",
     };
 
     var raw = stringify({
-        depth: 21,
-        guid: guid,
-        hideProcess: true,
-        allowDeletedProcess: false,
-        entityFilters: {
-            attributeName: "__state",
-            operator: "eq",
-            attributeValue: "ACTIVE",
+        "guid": guid,
+        "size": Math.round(ASSETS_LIMIT / totalModifiedFiles),
+        "from": 0,
+        "depth": 21,
+        "direction": "OUTPUT",
+        "entityFilters": {
+            "condition": "AND",
+            "criterion": [
+                {
+                    "attributeName": "__typeName",
+                    "operator": "not_contains",
+                    "attributeValue": "Process"
+                },
+                {
+                    "attributeName": "__state",
+                    "operator": "eq",
+                    "attributeValue": "ACTIVE"
+                }
+            ]
         },
-        attributes: [
+        "attributes": [
             "name",
             "description",
             "userDescription",
@@ -37,9 +49,10 @@ export default async function getDownstreamAssets(asset, guid, octokit, context)
             "ownerUsers",
             "ownerGroups",
             "classificationNames",
-            "meanings",
+            "meanings"
         ],
-        direction: "OUTPUT",
+        "excludeMeanings": false,
+        "excludeClassifications": false
     });
 
     var requestOptions = {
@@ -73,7 +86,7 @@ ${getImageURL("atlan-logo", 15, 15)} [View lineage in Atlan](${ATLAN_INSTANCE_UR
     }
 
     var response = await fetch(
-        `${ATLAN_INSTANCE_URL}/api/meta/lineage/getlineage`,
+        `${ATLAN_INSTANCE_URL}/api/meta/lineage/list`,
         requestOptions
     ).then((e) => {
         if (e.status === 200) {
@@ -89,11 +102,5 @@ ${getImageURL("atlan-logo", 15, 15)} [View lineage in Atlan](${ATLAN_INSTANCE_UR
 
     if (response.error) return response;
 
-    if (!response?.relations) return [];
-
-    const relations = response.relations.map(({toEntityId}) => toEntityId);
-
-    return relations
-        .filter((id, index) => relations.indexOf(id) === index)
-        .map((id) => response.guidEntityMap[id]);
+    return response;
 }

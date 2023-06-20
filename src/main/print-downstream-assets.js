@@ -38,7 +38,8 @@ Its a new model and not present in Atlan yet, you'll see the downstream impact f
 
         const materialisedAsset = asset.attributes.dbtModelSqlAssets[0];
         const timeStart = Date.now();
-        const downstreamAssets = await getDownstreamAssets(asset, materialisedAsset.guid, octokit, context);
+        const totalModifiedFiles = changedFiles.filter(i => i.status === "modified").length
+        const downstreamAssets = await getDownstreamAssets(asset, materialisedAsset.guid, totalModifiedFiles);
 
         if (downstreamAssets.error) {
             comments += downstreamAssets.error;
@@ -49,7 +50,7 @@ Its a new model and not present in Atlan yet, you'll see the downstream impact f
         sendSegmentEvent("dbt_ci_action_downstream_unfurl", {
             asset_guid: asset.guid,
             asset_type: asset.typeName,
-            downstream_count: downstreamAssets.length,
+            downstream_count: downstreamAssets.entities.length,
             total_fetch_time: Date.now() - timeStart,
         });
 
