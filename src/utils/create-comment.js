@@ -5,6 +5,14 @@ const IS_DEV = isDev();
 const ATLAN_INSTANCE_URL =
     getInstanceUrl();
 
+export function truncate(value) {
+    if (typeof value === 'string')
+        return value.length > 100 ? value.substring(0, 100) + "..." : value;
+    if (Array.isArray(value))
+        return value.length > 10 ? value.slice(0, 10).join(", ") + "..." : value.join(", ");
+    return ""
+}
+
 export default async function renderDownstreamAssetsComment(
     octokit,
     context,
@@ -39,19 +47,18 @@ export default async function renderDownstreamAssetsComment(
 
             return [
                 guid,
-                displayText,
-                attributes.connectorName,
-                readableTypeName,
-                attributes?.userDescription || attributes?.description || "",
+                truncate(displayText),
+                truncate(attributes.connectorName),
+                truncate(readableTypeName),
+                truncate(attributes?.userDescription || attributes?.description || ""),
                 attributes?.certificateStatus || "",
-                [...attributes?.ownerUsers, ...attributes?.ownerGroups] || [],
-                meanings.map(({displayText, termGuid}) =>
+                truncate([...attributes?.ownerUsers, ...attributes?.ownerGroups] || []),
+                truncate(meanings.map(({displayText, termGuid}) =>
                     `[${displayText}](${ATLAN_INSTANCE_URL}/assets/${termGuid}/overview?utm_source=dbt_github_action)`
-                )
-                    ?.join(", ") || " ",
-                classificationsObj?.map(({name, displayName}) =>
+                )),
+                truncate(classificationsObj?.map(({name, displayName}) =>
                     `\`${displayName}\``
-                )?.join(', ') || " ",
+                )),
                 attributes?.sourceURL || ""
             ];
         }
@@ -71,8 +78,8 @@ export default async function renderDownstreamAssetsComment(
             return [
                 `${connectorImage} [${displayText}](${ATLAN_INSTANCE_URL}/assets/${guid}/overview?utm_source=dbt_github_action) ${certificationImage}`,
                 `\`${typeName}\``,
-                description.length > 100 ? description.substring(0, 100) + '...' : description,
-                owners.join(", ") || " ",
+                description,
+                owners,
                 meanings,
                 classifications,
                 sourceUrl ? `[Open in ${connectorName}](${sourceUrl})` : " "
