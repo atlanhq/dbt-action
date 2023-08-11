@@ -87,6 +87,8 @@ export default async function renderDownstreamAssetsComment(
         }
     );
 
+    const environmentName = materialisedAsset?.attributes?.assetDbtEnvironmentName
+    const projectName = materialisedAsset?.attributes?.assetDbtProjectName
     // Generating asset information
     const assetInfo = `### ${getConnectorImage(asset.attributes.connectorName)} [${
         asset.displayText
@@ -101,7 +103,7 @@ Materialised asset: ${getConnectorImage(materialisedAsset.attributes.connectorNa
         materialisedAsset.attributes?.certificateStatus
             ? getCertificationImage(materialisedAsset.attributes.certificateStatus)
             : ""
-    } | Environment Name: \`${materialisedAsset.attributes.assetDbtEnvironmentName}\` | Project Name: \`${materialisedAsset.attributes.assetDbtProjectName}\``;
+    }${environmentName ? ` | Environment Name: \`${environmentName}\`` : ''}${projectName ? ` | Project Name: \`${projectName}\`` : ''}`;
 
     // Generating the downstream table
     const downstreamTable = `<details><summary><b>${downstreamAssets.entityCount} downstream assets 👇</b></summary><br/>
