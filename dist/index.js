@@ -17913,6 +17913,8 @@ async function renderDownstreamAssetsComment(
         }
     );
 
+    const environmentName = materialisedAsset?.attributes?.assetDbtEnvironmentName
+    const projectName = materialisedAsset?.attributes?.assetDbtProjectName
     // Generating asset information
     const assetInfo = `### ${getConnectorImage(asset.attributes.connectorName)} [${
         asset.displayText
@@ -17927,7 +17929,7 @@ Materialised asset: ${getConnectorImage(materialisedAsset.attributes.connectorNa
         materialisedAsset.attributes?.certificateStatus
             ? getCertificationImage(materialisedAsset.attributes.certificateStatus)
             : ""
-    } | Environment Name: \`${materialisedAsset.attributes.assetDbtEnvironmentName}\` | Project Name: \`${materialisedAsset.attributes.assetDbtProjectName}\``;
+    }${environmentName ? ` | Environment Name: \`${environmentName}\`` : ''}${projectName ? ` | Project Name: \`${projectName}\`` : ''}`;
 
     // Generating the downstream table
     const downstreamTable = `<details><summary><b>${downstreamAssets.entityCount} downstream assets 👇</b></summary><br/>
@@ -18174,7 +18176,7 @@ async function getDownstreamAssets(asset, guid, totalModifiedFiles) {
 
     var raw = stringify({
         "guid": guid,
-        "size": Math.round(ASSETS_LIMIT / totalModifiedFiles),
+        "size": Math.max(Math.ceil(ASSETS_LIMIT / totalModifiedFiles), 1),
         "from": 0,
         "depth": 21,
         "direction": "OUTPUT",
@@ -18557,128 +18559,148 @@ async function sendSegmentEvent(action, properties) {
 
 
 
-async function printDownstreamAssets({octokit, context}) {
-    const changedFiles = await getChangedFiles(octokit, context);
-    let comments = ``;
-    let totalChangedFiles = 0;
+async function printDownstreamAssets({ octokit, context }) {
+  const changedFiles = await getChangedFiles(octokit, context);
+  let comments = ``;
+  let totalChangedFiles = 0;
 
-    for (const {fileName, filePath, status} of changedFiles) {
-        const aliasName = await getAssetName({octokit, context, fileName, filePath});
-        const assetName = isIgnoreModelAliasMatching() ? fileName : aliasName;
-        const asset = await getAsset({name: assetName});
+  for (const { fileName, filePath, status } of changedFiles) {
+    const aliasName = await getAssetName({
+      octokit,
+      context,
+      fileName,
+      filePath,
+    });
+    const assetName = isIgnoreModelAliasMatching() ? fileName : aliasName;
+    const asset = await getAsset({ name: assetName });
 
-        if (totalChangedFiles !== 0)
-            comments += '\n\n---\n\n';
+    if (totalChangedFiles !== 0) comments += "\n\n---\n\n";
 
-        if (status === "added") {
-            comments += `### ${getConnectorImage('dbt')} <b>${fileName}</b> 🆕
-Its a new model and not present in Atlan yet, you'll see the downstream impact for it after its present in Atlan.`
-            totalChangedFiles++
-            continue;
-        }
-
-        if (asset.error) {
-            comments += asset.error;
-            totalChangedFiles++
-            continue;
-        }
-
-        const materialisedAsset = asset.attributes.dbtModelSqlAssets[0];
-        const timeStart = Date.now();
-        const totalModifiedFiles = changedFiles.filter(i => i.status === "modified").length
-        const downstreamAssets = await getDownstreamAssets(asset, materialisedAsset.guid, totalModifiedFiles);
-
-        if (downstreamAssets.error) {
-            comments += downstreamAssets.error;
-            totalChangedFiles++
-            continue;
-        }
-
-        sendSegmentEvent("dbt_ci_action_downstream_unfurl", {
-            asset_guid: asset.guid,
-            asset_type: asset.typeName,
-            downstream_count: downstreamAssets.entities.length,
-            total_fetch_time: Date.now() - timeStart,
-        });
-
-        const classifications = await getClassifications();
-
-        const comment = await renderDownstreamAssetsComment(
-            octokit,
-            context,
-            asset,
-            materialisedAsset,
-            downstreamAssets,
-            classifications
-        )
-
-        comments += comment;
-
-        totalChangedFiles++
+    if (status === "added") {
+      comments += `### ${getConnectorImage("dbt")} <b>${fileName}</b> 🆕
+Its a new model and not present in Atlan yet, you'll see the downstream impact for it after its present in Atlan.`;
+      totalChangedFiles++;
+      continue;
     }
 
-    comments = `### ${getImageURL("atlan-logo", 15, 15)} Atlan impact analysis
-Here is your downstream impact analysis for **${totalChangedFiles} ${totalChangedFiles > 1 ? "models" : "model"}** you have edited.    
+    if (asset.error) {
+      comments += asset.error;
+      totalChangedFiles++;
+      continue;
+    }
+
+    const materialisedAsset = asset.attributes.dbtModelSqlAssets[0];
+    const timeStart = Date.now();
+    const totalModifiedFiles = changedFiles.filter(
+      (i) => i.status === "modified"
+    ).length;
+    const downstreamAssets = await getDownstreamAssets(
+      asset,
+      materialisedAsset.guid,
+      totalModifiedFiles
+    );
+
+    if (downstreamAssets.error) {
+      comments += downstreamAssets.error;
+      totalChangedFiles++;
+      continue;
+    }
+
+    sendSegmentEvent("dbt_ci_action_downstream_unfurl", {
+      asset_guid: asset.guid,
+      asset_type: asset.typeName,
+      downstream_count: downstreamAssets.entities.length,
+      total_fetch_time: Date.now() - timeStart,
+    });
+
+    const classifications = await getClassifications();
+
+    const comment = await renderDownstreamAssetsComment(
+      octokit,
+      context,
+      asset,
+      materialisedAsset,
+      downstreamAssets,
+      classifications
+    );
+
+    comments += comment;
+
+    totalChangedFiles++;
+  }
+
+  comments = `### ${getImageURL("atlan-logo", 15, 15)} Atlan impact analysis
+Here is your downstream impact analysis for **${totalChangedFiles} ${
+    totalChangedFiles > 1 ? "models" : "model"
+  }** you have edited.    
     
-${comments}`
+${comments}`;
 
-    const existingComment = await checkCommentExists(octokit, context);
+  const existingComment = await checkCommentExists(octokit, context);
 
-    if (totalChangedFiles > 0)
-        await createIssueComment(octokit, context, comments, existingComment?.id)
+  if (totalChangedFiles > 0)
+    await createIssueComment(octokit, context, comments, existingComment?.id);
 
-    if (totalChangedFiles === 0 && existingComment)
-        await deleteComment(octokit, context, existingComment.id)
+  if (totalChangedFiles === 0 && existingComment)
+    await deleteComment(octokit, context, existingComment.id);
 
-    return totalChangedFiles;
+  return totalChangedFiles;
 }
 
 ;// CONCATENATED MODULE: ./src/main/set-resource-on-asset.js
 
 
 
-async function setResourceOnAsset({octokit, context}) {
-    const changedFiles = await getChangedFiles(octokit, context);
-    const {pull_request} = context.payload;
-    var totalChangedFiles = 0
+async function setResourceOnAsset({ octokit, context }) {
+  const changedFiles = await getChangedFiles(octokit, context);
+  const { pull_request } = context.payload;
+  var totalChangedFiles = 0;
 
-    if (changedFiles.length === 0) return;
+  if (changedFiles.length === 0) return;
 
-    for (const {fileName, filePath} of changedFiles) {
-        const assetName = await getAssetName({octokit, context, fileName, filePath});
-        const asset = await getAsset({name: assetName});
+  for (const { fileName, filePath } of changedFiles) {
+    const assetName = await getAssetName({
+      octokit,
+      context,
+      fileName,
+      filePath,
+    });
+    const asset = await getAsset({ name: assetName });
 
-        if (!asset) continue;
+    if (asset.error) continue;
 
-        const {guid: modelGuid} = asset;
-        const {guid: tableAssetGuid} = asset.attributes.dbtModelSqlAssets[0];
+    const { guid: modelGuid } = asset;
+    const { guid: tableAssetGuid } = asset?.attributes?.dbtModelSqlAssets?.[0];
 
-        await createResource(
-            modelGuid,
-            "Pull Request on GitHub",
-            pull_request.html_url
-        );
-        await createResource(
-            tableAssetGuid,
-            "Pull Request on GitHub",
-            pull_request.html_url
-        );
+    if (modelGuid)
+      await createResource(
+        modelGuid,
+        "Pull Request on GitHub",
+        pull_request.html_url
+      );
 
-        totalChangedFiles++
-    }
+    if (tableAssetGuid)
+      await createResource(
+        tableAssetGuid,
+        "Pull Request on GitHub",
+        pull_request.html_url
+      );
 
-    const comment = await createIssueComment(
-        octokit,
-        context,
-        `🎊 Congrats on the merge!
+    totalChangedFiles++;
+  }
+
+  const comment = await createIssueComment(
+    octokit,
+    context,
+    `🎊 Congrats on the merge!
   
 This pull request has been added as a resource to all the assets modified. ✅
 `,
-        null,
-        true
-    );
+    null,
+    true
+  );
 
-    return totalChangedFiles
+  return totalChangedFiles;
 }
 
 ;// CONCATENATED MODULE: ./src/main/index.js
