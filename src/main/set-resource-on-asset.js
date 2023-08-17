@@ -1,50 +1,58 @@
-import {getAsset, createResource} from "../api/index.js";
+import { getAsset, createResource } from "../api/index.js";
 import {
-    createIssueComment,
-    getChangedFiles,
-    getAssetName,
+  createIssueComment,
+  getChangedFiles,
+  getAssetName,
 } from "../utils/index.js";
 
-export default async function setResourceOnAsset({octokit, context}) {
-    const changedFiles = await getChangedFiles(octokit, context);
-    const {pull_request} = context.payload;
-    var totalChangedFiles = 0
+export default async function setResourceOnAsset({ octokit, context }) {
+  const changedFiles = await getChangedFiles(octokit, context);
+  const { pull_request } = context.payload;
+  var totalChangedFiles = 0;
 
-    if (changedFiles.length === 0) return;
+  if (changedFiles.length === 0) return;
 
-    for (const {fileName, filePath} of changedFiles) {
-        const assetName = await getAssetName({octokit, context, fileName, filePath});
-        const asset = await getAsset({name: assetName});
+  for (const { fileName, filePath } of changedFiles) {
+    const assetName = await getAssetName({
+      octokit,
+      context,
+      fileName,
+      filePath,
+    });
+    const asset = await getAsset({ name: assetName });
 
-        if (!asset) continue;
+    if (asset.error) continue;
 
-        const {guid: modelGuid} = asset;
-        const {guid: tableAssetGuid} = asset.attributes.dbtModelSqlAssets[0];
+    const { guid: modelGuid } = asset;
+    const { guid: tableAssetGuid } = asset?.attributes?.dbtModelSqlAssets?.[0];
 
-        await createResource(
-            modelGuid,
-            "Pull Request on GitHub",
-            pull_request.html_url
-        );
-        await createResource(
-            tableAssetGuid,
-            "Pull Request on GitHub",
-            pull_request.html_url
-        );
+    if (modelGuid)
+      await createResource(
+        modelGuid,
+        "Pull Request on GitHub",
+        pull_request.html_url
+      );
 
-        totalChangedFiles++
-    }
+    if (tableAssetGuid)
+      await createResource(
+        tableAssetGuid,
+        "Pull Request on GitHub",
+        pull_request.html_url
+      );
 
-    const comment = await createIssueComment(
-        octokit,
-        context,
-        `🎊 Congrats on the merge!
+    totalChangedFiles++;
+  }
+
+  const comment = await createIssueComment(
+    octokit,
+    context,
+    `🎊 Congrats on the merge!
   
 This pull request has been added as a resource to all the assets modified. ✅
 `,
-        null,
-        true
-    );
+    null,
+    true
+  );
 
-    return totalChangedFiles
+  return totalChangedFiles;
 }

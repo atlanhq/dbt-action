@@ -17,7 +17,7 @@ export default async function getDownstreamAssets(asset, guid, totalModifiedFile
 
     var raw = stringify({
         "guid": guid,
-        "size": Math.round(ASSETS_LIMIT / totalModifiedFiles),
+        "size": Math.max(Math.ceil(ASSETS_LIMIT / totalModifiedFiles), 1),
         "from": 0,
         "depth": 21,
         "direction": "OUTPUT",
