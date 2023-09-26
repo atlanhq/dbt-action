@@ -14,7 +14,7 @@ export {
     getAssetName,
 } from "./file-system.js";
 export {
-    default as auth
+    auth
 } from "./auth.js"
 export {
     getAPIToken,

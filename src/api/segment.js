@@ -1,56 +1,41 @@
 import fetch from "node-fetch";
-import {context} from "@actions/github";
-import stringify from 'json-stringify-safe';
-import {isDev, getAPIToken, getInstanceUrl} from "../utils/index.js";
+import core from "@actions/core";
+import dotenv from "dotenv";
 
-const IS_DEV = isDev();
+dotenv.config();
+
+const { IS_DEV } = process.env;
 const ATLAN_INSTANCE_URL =
-    getInstanceUrl();
+  core.getInput("ATLAN_INSTANCE_URL") || process.env.ATLAN_INSTANCE_URL;
 const ATLAN_API_TOKEN =
-    getAPIToken();
+  core.getInput("ATLAN_API_TOKEN") || process.env.ATLAN_API_TOKEN;
 
-export default async function sendSegmentEvent(action, properties) {
-    var myHeaders = {
-        authorization: `Bearer ${ATLAN_API_TOKEN}`,
-        "content-type": "application/json",
-    };
+export async function sendSegmentEvent(action, body) {
+  const myHeaders = {
+    authorization: `Bearer ${ATLAN_API_TOKEN}`,
+    "content-type": "application/json",
+  };
 
-    var domain = new URL(ATLAN_INSTANCE_URL).hostname;
+  const requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: body,
+  };
 
-    var raw = stringify({
-        category: "integration",
-        object: "github",
-        action,
-        userId: "atlan-annonymous-github",
-        properties: {
-            ...properties,
-            github_action_id: `https://github.com/${context.payload.repository.full_name}/actions/runs/${context.runId}`,
-            domain,
-        },
-    });
+  var response = null;
 
-    var requestOptions = {
-        method: "POST",
-        headers: myHeaders,
-        body: raw,
-    };
+  if (!IS_DEV) {
+    response = await fetch(
+      `${ATLAN_INSTANCE_URL}/api/service/segment/track`,
+      requestOptions
+    )
+      .then(() => {
+        console.log("send segment event", action, body);
+      })
+      .catch((err) => {
+        console.log("couldn't send segment event", err);
+      });
+  }
 
-    var response = null
-
-    if (!IS_DEV) {
-        response = await fetch(
-            `${ATLAN_INSTANCE_URL}/api/service/segment/track`,
-            requestOptions
-        )
-            .then(() => {
-                console.log("send segment event", action, raw);
-            })
-            .catch((err) => {
-                console.log("couldn't send segment event", err);
-            });
-    } else {
-        console.log("send segment event", action, raw);
-    }
-
-    return response;
+  return response;
 }
