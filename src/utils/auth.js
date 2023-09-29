@@ -10,7 +10,7 @@ const ATLAN_API_TOKEN =
   core.getInput("ATLAN_API_TOKEN") || process.env.ATLAN_API_TOKEN;
 
 export async function auth() {
-  //Dont Change Anything
+  //Done
   var myHeaders = {
     authorization: `Bearer ${ATLAN_API_TOKEN}`,
     "content-type": "application/json",

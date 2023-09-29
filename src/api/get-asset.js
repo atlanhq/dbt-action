@@ -11,9 +11,11 @@ const ATLAN_API_TOKEN =
   core.getInput("ATLAN_API_TOKEN") || process.env.ATLAN_API_TOKEN;
 
 export default async function getAsset({
-  //Incomplete
+  //Done
   name,
   sendSegmentEventOfIntegration,
+  environment,
+  integration,
 }) {
   var myHeaders = {
     Authorization: `Bearer ${ATLAN_API_TOKEN}`,
@@ -23,7 +25,7 @@ export default async function getAsset({
   var raw = stringify({
     dsl: {
       from: 0,
-      size: 1,
+      size: 21,
       query: {
         bool: {
           must: [
@@ -42,6 +44,15 @@ export default async function getAsset({
                 "name.keyword": name,
               },
             },
+            ...(environment
+              ? [
+                  {
+                    term: {
+                      "assetDbtEnvironmentName.keyword": environment,
+                    },
+                  },
+                ]
+              : []),
           ],
         },
       },
@@ -60,7 +71,15 @@ export default async function getAsset({
       "ownerGroups",
       "classificationNames",
       "meanings",
-      "sqlAsset",
+      "dbtModelSqlAssets",
+    ],
+    relationAttributes: [
+      "name",
+      "description",
+      "assetDbtProjectName",
+      "assetDbtEnvironmentName",
+      "connectorName",
+      "certificateStatus",
     ],
   });
 
@@ -83,8 +102,15 @@ export default async function getAsset({
       });
     });
 
-  if (response?.entities?.length > 0) return response.entities[0];
-  return {
-    error: `❌ Model with name ${name} not found <br><br>`,
-  };
+  if (!response?.entities?.length)
+    return {
+      error: `❌ Model with name **${name}** could not be found or is deleted <br><br>`,
+    };
+
+  if (!response?.entities[0]?.attributes?.dbtModelSqlAssets?.length > 0)
+    return {
+      error: `❌ Model with name [${name}](${ATLAN_INSTANCE_URL}/assets/${response.entities[0].guid}/overview?utm_source=dbt_${integration}_action) does not materialise any asset <br><br>`,
+    };
+
+  return response.entities[0];
 }

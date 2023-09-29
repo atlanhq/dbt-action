@@ -15,27 +15,38 @@ const ATLAN_INSTANCE_URL =
 const ATLAN_API_TOKEN =
   core.getInput("ATLAN_API_TOKEN") || process.env.ATLAN_API_TOKEN;
 
-export default async function getDownstreamAssets(
+export default async function getDownstreamAssets( //Done
   asset,
   guid,
+  totalModifiedFiles,
   sendSegmentEventOfIntegration,
   integration
 ) {
-  //Import SendSegmentEvent function
   var myHeaders = {
     authorization: `Bearer ${ATLAN_API_TOKEN}`,
     "content-type": "application/json",
   };
 
   var raw = stringify({
-    depth: 21,
     guid: guid,
-    hideProcess: true,
-    allowDeletedProcess: false,
+    size: Math.max(Math.ceil(ASSETS_LIMIT / totalModifiedFiles), 1),
+    from: 0,
+    depth: 21,
+    direction: "OUTPUT",
     entityFilters: {
-      attributeName: "__state",
-      operator: "eq",
-      attributeValue: "ACTIVE",
+      condition: "AND",
+      criterion: [
+        {
+          attributeName: "__typeName",
+          operator: "not_contains",
+          attributeValue: "Process",
+        },
+        {
+          attributeName: "__state",
+          operator: "eq",
+          attributeValue: "ACTIVE",
+        },
+      ],
     },
     attributes: [
       "name",
@@ -52,7 +63,8 @@ export default async function getDownstreamAssets(
       "classificationNames",
       "meanings",
     ],
-    direction: "OUTPUT",
+    excludeMeanings: false,
+    excludeClassifications: false,
   });
 
   var requestOptions = {
@@ -66,8 +78,7 @@ export default async function getDownstreamAssets(
       asset.attributes.connectorName
     )} [${asset.displayText}](${ATLAN_INSTANCE_URL}/assets/${
       asset.guid
-    }?utm_source=dbt_${integration}_action) ${
-      //Change it based on Integration name
+    }/overview?utm_source=dbt_${integration}_action) ${
       asset.attributes?.certificateStatus
         ? getCertificationImage(asset.attributes.certificateStatus)
         : ""
@@ -81,7 +92,7 @@ ${getImageURL(
   15
 )} [View lineage in Atlan](${ATLAN_INSTANCE_URL}/assets/${
       asset.guid
-    }/lineage?utm_source=dbt_${integration}_action)`;
+    }/lineage/overview?utm_source=dbt_${integration}_action)`;
 
     sendSegmentEventOfIntegration("dbt_ci_action_failure", {
       reason: "failed_to_fetch_lineage",
@@ -95,7 +106,7 @@ ${getImageURL(
   };
 
   var response = await fetch(
-    `${ATLAN_INSTANCE_URL}/api/meta/lineage/getlineage`,
+    `${ATLAN_INSTANCE_URL}/api/meta/lineage/list`,
     requestOptions
   )
     .then((e) => {
@@ -113,11 +124,5 @@ ${getImageURL(
 
   if (response.error) return response;
 
-  if (!response?.relations) return [];
-
-  const relations = response.relations.map(({ toEntityId }) => toEntityId);
-
-  return relations
-    .filter((id, index) => relations.indexOf(id) === index)
-    .map((id) => response.guidEntityMap[id]);
+  return response;
 }

@@ -2,17 +2,22 @@
 import dotenv from "dotenv"; // Check do we actually need it or not
 import IntegrationInterface from "./contract/contract.js";
 import github from "@actions/github";
+import { isIgnoreModelAliasMatching } from "../../src/utils/get-environment-variables.js";
+import { getConnectorImage } from "../../src/utils/get-image-url.js";
+import { getEnvironments } from "../../src/utils/get-environment-variables.js";
 import {
   getAsset,
   getDownstreamAssets,
   sendSegmentEvent,
   createResource,
+  getClassifications,
 } from "../../src/api/index.js";
-import {
-  renderDownstreamAssetsComment,
-  getImageURL,
-  auth,
-} from "../../src/utils/index.js";
+import { getImageURL, auth } from "../../src/utils/index.js";
+import { isDev } from "../../src/utils/get-environment-variables.js";
+import { truncate } from "../../src/utils/create-comment.js";
+import { getInstanceUrl } from "../../src/utils/get-environment-variables.js";
+const IS_DEV = isDev();
+const ATLAN_INSTANCE_URL = getInstanceUrl();
 
 dotenv.config();
 
@@ -22,6 +27,8 @@ export default class GitHubIntegration extends IntegrationInterface {
   }
 
   async run() {
+    //Done
+    //Complete
     console.log("Run Github");
     const timeStart = Date.now();
     const { context } = github;
@@ -30,6 +37,8 @@ export default class GitHubIntegration extends IntegrationInterface {
     const { state, merged } = pull_request;
 
     if (!(await this.authIntegration({ octokit, context }))) {
+      //DONE
+      //Complete
       throw { message: "Wrong API Token" };
     }
 
@@ -43,6 +52,7 @@ export default class GitHubIntegration extends IntegrationInterface {
 
     if (total_assets !== 0) {
       this.sendSegmentEventOfIntegration("dbt_ci_action_run", {
+        //Complete
         asset_count: total_assets,
         total_time: Date.now() - timeStart,
       });
@@ -50,30 +60,47 @@ export default class GitHubIntegration extends IntegrationInterface {
   }
 
   async printDownstreamAssets({ octokit, context }) {
-    // Implementation for printing impact on GitHub
-    // Use this.token to access the token
-
-    const changedFiles = await this.getChangedFiles({ octokit, context }); // Complete
-
+    //Done
+    const changedFiles = await this.getChangedFiles(octokit, context); //Complete
     let comments = ``;
     let totalChangedFiles = 0;
 
-    for (const { fileName, filePath } of changedFiles) {
-      const assetName = await this.getAssetName({
-        // Complete
+    for (const { fileName, filePath, status } of changedFiles) {
+      const aliasName = await this.getAssetName({
+        //Complete
         octokit,
         context,
         fileName,
         filePath,
       });
+      const assetName = isIgnoreModelAliasMatching() ? fileName : aliasName; //Complete
+
+      const environments = getEnvironments();
+
+      let environment = null;
+      for (const [baseBranchName, environmentName] of environments) {
+        if (baseBranchName === context.payload.pull_request.base.ref) {
+          environment = environmentName;
+          break;
+        }
+      }
+
       const asset = await getAsset({
-        //Complete
+        //Done
         name: assetName,
         sendSegmentEventOfIntegration: this.sendSegmentEventOfIntegration,
+        environment: environment,
+        integration: "github",
       });
-      // TODO :- When we call getAsset we are always sending segment event to github. We have to resolve this.
-      // Either we can pass that function to getAsset function to resolve this. Or check for better alternatives.
-      // If we pass the function we can simply write getAsset({name: assetName}, this.sendSegmentEvent)
+
+      if (totalChangedFiles !== 0) comments += "\n\n---\n\n";
+
+      if (status === "added") {
+        comments += `### ${getConnectorImage("dbt")} <b>${fileName}</b> 🆕
+Its a new model and not present in Atlan yet, you'll see the downstream impact for it after its present in Atlan.`;
+        totalChangedFiles++;
+        continue;
+      }
 
       if (asset.error) {
         comments += asset.error;
@@ -81,17 +108,17 @@ export default class GitHubIntegration extends IntegrationInterface {
         continue;
       }
 
-      const { guid } = asset.attributes.sqlAsset;
+      const materialisedAsset = asset.attributes.dbtModelSqlAssets[0];
       const timeStart = Date.now();
+      const totalModifiedFiles = changedFiles.filter(
+        (i) => i.status === "modified"
+      ).length;
       const downstreamAssets = await getDownstreamAssets(
         //Complete
         asset,
-        guid,
-        this.sendSegmentEventOfIntegration,
-        "github"
+        materialisedAsset.guid,
+        totalModifiedFiles
       );
-
-      if (totalChangedFiles !== 0) comments += "\n\n---\n\n";
 
       if (downstreamAssets.error) {
         comments += downstreamAssets.error;
@@ -100,13 +127,21 @@ export default class GitHubIntegration extends IntegrationInterface {
       }
 
       this.sendSegmentEventOfIntegration("dbt_ci_action_downstream_unfurl", {
+        //Complete
         asset_guid: asset.guid,
         asset_type: asset.typeName,
-        downstream_count: downstreamAssets.length,
+        downstream_count: downstreamAssets.entities.length,
         total_fetch_time: Date.now() - timeStart,
       });
-      // WHICH CODE TO PICKUP ONE IN THE BETA OR IN THE GITLAB BRANCH
+
+      const classifications = await getClassifications({
+        //Complete
+        sendSegmentEventOfIntegration: this.sendSegmentEventOfIntegration,
+      });
+
       const comment = await this.renderDownstreamAssetsComment({
+        //Done
+        //Complete
         octokit,
         context,
         asset,
@@ -127,19 +162,20 @@ Here is your downstream impact analysis for **${totalChangedFiles} ${
     
 ${comments}`;
 
-    const existingComment = await this.checkCommentExists({ octokit, context });
+    const existingComment = await this.checkCommentExists({ octokit, context }); //Complete
 
-    if (totalChangedFiles > 0) {
+    if (totalChangedFiles > 0)
       await this.createIssueComment({
+        //Complete
         octokit,
         context,
         content: comments,
         comment_id: existingComment?.id,
       });
-    }
 
     if (totalChangedFiles === 0 && existingComment)
       await this.deleteComment({
+        //Complete
         octokit,
         context,
         comment_id: existingComment.id,
@@ -149,11 +185,9 @@ ${comments}`;
   }
 
   async setResourceOnAsset({ octokit, context }) {
-    //COMPLETE
-    // Implementation for setting resources on GitHub
-    // Use this.token to access the token
-
-    const changedFiles = await this.getChangedFiles({ octokit, context });
+    //Done
+    //Complete
+    const changedFiles = await this.getChangedFiles({ octokit, context }); //Complete
     const { pull_request } = context.payload;
     var totalChangedFiles = 0;
 
@@ -167,33 +201,54 @@ ${comments}`;
         fileName,
         filePath,
       });
+
+      const environments = getEnvironments();
+
+      let environment = null;
+      for (const [baseBranchName, environmentName] of environments) {
+        if (baseBranchName === context.payload.pull_request.base.ref) {
+          environment = environmentName;
+          break;
+        }
+      }
+
       const asset = await getAsset({
+        //Done
         name: assetName,
         sendSegmentEventOfIntegration: this.sendSegmentEventOfIntegration,
+        environment: environment,
+        integration: "github",
       });
 
-      if (!asset) continue;
+      if (asset.error) continue;
 
       const { guid: modelGuid } = asset;
-      const { guid: tableAssetGuid } = asset.attributes.sqlAsset;
+      const { guid: tableAssetGuid } =
+        asset?.attributes?.dbtModelSqlAssets?.[0];
 
-      await createResource(
-        modelGuid,
-        "Pull Request on GitHub",
-        pull_request.html_url,
-        this.sendSegmentEventOfIntegration
-      );
-      await createResource(
-        tableAssetGuid,
-        "Pull Request on GitHub",
-        pull_request.html_url,
-        this.sendSegmentEventOfIntegration
-      );
+      if (modelGuid)
+        await createResource(
+          //Complete
+          modelGuid,
+          "Pull Request on GitHub",
+          pull_request.html_url,
+          this.sendSegmentEventOfIntegration
+        );
+
+      if (tableAssetGuid)
+        await createResource(
+          //Complete
+          tableAssetGuid,
+          "Pull Request on GitHub",
+          pull_request.html_url,
+          this.sendSegmentEventOfIntegration
+        );
 
       totalChangedFiles++;
     }
 
     const comment = await this.createIssueComment({
+      //Complete
       octokit,
       context,
       content: `🎊 Congrats on the merge!
@@ -208,18 +263,15 @@ This pull request has been added as a resource to all the assets modified. ✅
   }
 
   async authIntegration({ octokit, context }) {
+    //DONE
     //COMPLETE
-    // IMPORT ATLAN INSTANCE
-    // Implement your auth logic here
     const response = await auth();
-    // Need to change the route we are passing in createIssueComment.
-    const existingComment = await checkCommentExists(octokit, context);
+    const existingComment = await this.checkCommentExists({ octokit, context });
 
     console.log("Existing Comment", existingComment);
 
     if (response?.status === 401) {
       await this.createIssueComment(
-        // Check how u are calling this createIssueComment function
         octokit,
         context,
         `We couldn't connect to your Atlan Instance, please make sure to set the valid Atlan Bearer Token as \`ATLAN_API_TOKEN\` as this repository's action secret. 
@@ -253,8 +305,8 @@ Set your repository action secrets [here](https://github.com/${context.payload.r
   }
 
   async sendSegmentEventOfIntegration({ action, properties }) {
-    //COMPLETE
-    // Implement your sendSegmentEvent logic here
+    //Done
+    //FullyComplete
     // IMPORT ATLAN_INSTANCE_URL.
     const domain = new URL(ATLAN_INSTANCE_URL).hostname;
 
@@ -274,7 +326,8 @@ Set your repository action secrets [here](https://github.com/${context.payload.r
   }
 
   async getChangedFiles({ octokit, context }) {
-    //Complete
+    //Done
+    //FullyComplete
     const { repository, pull_request } = context.payload,
       owner = repository.owner.login,
       repo = repository.name,
@@ -322,10 +375,15 @@ Set your repository action secrets [here](https://github.com/${context.payload.r
   }
 
   async getAssetName({ octokit, context, fileName, filePath }) {
-    // Complete
+    //Done
+    // FullyComplete
     var regExp =
       /{{\s*config\s*\(\s*(?:[^,]*,)*\s*alias\s*=\s*['"]([^'"]+)['"](?:\s*,[^,]*)*\s*\)\s*}}/im;
-    var fileContents = await this.getFileContents(octokit, context, filePath);
+    var fileContents = await this.getFileContents({
+      octokit,
+      context,
+      filePath,
+    });
 
     if (fileContents) {
       var matches = regExp.exec(fileContents);
@@ -339,7 +397,8 @@ Set your repository action secrets [here](https://github.com/${context.payload.r
   }
 
   async getFileContents({ octokit, context, filePath }) {
-    // Complete
+    //Done
+    // FullyComplete
     const { repository, pull_request } = context.payload,
       owner = repository.owner.login,
       repo = repository.name,
@@ -367,7 +426,8 @@ Set your repository action secrets [here](https://github.com/${context.payload.r
   }
 
   async checkCommentExists({ octokit, context }) {
-    //COMPLETE
+    //Done
+    //FullyComplete
     if (IS_DEV) return null;
 
     const { pull_request } = context.payload;
@@ -387,7 +447,8 @@ Set your repository action secrets [here](https://github.com/${context.payload.r
   }
 
   async createIssueComment({
-    // COMPLETE
+    //Done
+    // FullyComplete
     octokit,
     context,
     content,
@@ -405,7 +466,7 @@ ${content}`;
       body: content,
     };
 
-    console.log(content);
+    console.log(content, content.length);
 
     if (IS_DEV) return content;
 
@@ -415,7 +476,8 @@ ${content}`;
   }
 
   async deleteComment({ octokit, context, comment_id }) {
-    //COMPLETE
+    //Done
+    //FullyComplete
     const { pull_request } = context.payload;
 
     return octokit.rest.issues.deleteComment({
@@ -426,6 +488,8 @@ ${content}`;
   }
 
   async renderDownstreamAssetsComment({
+    //Done
+    //FullyComplete
     octokit,
     context,
     asset,

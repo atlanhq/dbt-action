@@ -23,7 +23,6 @@ export async function sendSegmentEvent(action, body) {
   };
 
   var response = null;
-
   if (!IS_DEV) {
     response = await fetch(
       `${ATLAN_INSTANCE_URL}/api/service/segment/track`,
@@ -35,6 +34,8 @@ export async function sendSegmentEvent(action, body) {
       .catch((err) => {
         console.log("couldn't send segment event", err);
       });
+  } else {
+    console.log("send segment event", action, body);
   }
 
   return response;

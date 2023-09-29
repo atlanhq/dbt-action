@@ -10,8 +10,12 @@ import {
   sendSegmentEvent,
 } from "../../src/api/index.js";
 import { getImageURL, auth } from "../../src/utils/index.js";
-
+import { getGitLabEnvironments } from "../../src/utils/get-environment-variables.js";
+import { getConnectorImage } from "../../src/utils/index.js";
+import { getCertificationImage } from "../../src/utils/index.js";
 dotenv.config();
+const ATLAN_INSTANCE_URL = process.env.ATLAN_INSTANCE_URL;
+const { IS_DEV } = process.env;
 
 export default class GitLabIntegration extends IntegrationInterface {
   constructor(token) {
@@ -19,6 +23,7 @@ export default class GitLabIntegration extends IntegrationInterface {
   }
 
   async run() {
+    //Done
     console.log("Run Gitlab");
     const timeStart = Date.now();
 
@@ -30,9 +35,10 @@ export default class GitLabIntegration extends IntegrationInterface {
     const { CI_PROJECT_PATH, CI_MERGE_REQUEST_IID } = process.env;
 
     if (!(await this.authIntegration({ gitlab })))
+      //Done
       throw { message: "Wrong API Token" };
 
-    const { state, web_url } = await gitlab.MergeRequests.show(
+    const { state, web_url, source_branch } = await gitlab.MergeRequests.show(
       CI_PROJECT_PATH,
       CI_MERGE_REQUEST_IID
     );
@@ -40,9 +46,16 @@ export default class GitLabIntegration extends IntegrationInterface {
     let total_assets = 0;
 
     if (state === "opened") {
-      total_assets = await this.printDownstreamAssets({ gitlab });
+      total_assets = await this.printDownstreamAssets({
+        gitlab,
+        source_branch,
+      });
     } else if (state === "merged") {
-      total_assets = await this.setResourceOnAsset({ gitlab, web_url });
+      total_assets = await this.setResourceOnAsset({
+        gitlab,
+        web_url,
+        source_branch,
+      });
     }
 
     if (total_assets !== 0)
@@ -52,7 +65,8 @@ export default class GitLabIntegration extends IntegrationInterface {
       });
   }
 
-  async printDownstreamAssets({ gitlab }) {
+  async printDownstreamAssets({ gitlab, source_branch }) {
+    //Done
     // Implementation for printing impact on GitHub
     // Use this.token to access the token
     const changedFiles = await this.getChangedFiles({ gitlab }); //Complete
@@ -68,14 +82,24 @@ export default class GitLabIntegration extends IntegrationInterface {
         filePath,
         headSHA,
       });
+
+      const environments = getGitLabEnvironments();
+
+      let environment = null;
+      for (const [baseBranchName, environmentName] of environments) {
+        if (baseBranchName === source_branch) {
+          environment = environmentName;
+          break;
+        }
+      }
+
       const asset = await getAsset({
-        //Incomplete
+        //Complete
         name: assetName,
         sendSegmentEventOfIntegration: this.sendSegmentEventOfIntegration,
+        environment: environment,
+        integration: "gitlab",
       });
-      // TODO :- When we call getAsset we are always sending segment event to github. We have to resolve this.
-      // Either we can pass that function to getAsset function to resolve this. Or check for better alternatives.
-      // If we pass the function we can simply write getAsset({name: assetName}, this.sendSegmentEvent)
 
       if (asset.error) {
         comments += asset.error;
@@ -83,12 +107,19 @@ export default class GitLabIntegration extends IntegrationInterface {
         continue;
       }
 
+      //Cross-check this part once with Jaagrav.
+
+      const totalModifiedFiles = changedFiles.filter(
+        (i) => i.status === "modified"
+      ).length;
+
       const { guid } = asset.attributes.sqlAsset;
       const timeStart = Date.now();
       const downstreamAssets = await getDownstreamAssets(
-        //Incomplete
+        //Done
         asset,
         guid,
+        totalModifiedFiles,
         this.sendSegmentEventOfIntegration,
         "gitlab"
       );
@@ -143,10 +174,11 @@ ${comments}`;
     return totalChangedFiles;
   }
 
-  async setResourceOnAsset({ gitlab, web_url }) {
+  async setResourceOnAsset({ gitlab, web_url, source_branch }) {
+    //Done
     // Implementation for setting resources on GitHub
     // Use this.token to access the token
-    const changedFiles = await this.getChangedFiles({ gitlab });
+    const changedFiles = await this.getChangedFiles({ gitlab }); //Done
     var totalChangedFiles = 0;
 
     if (changedFiles.length === 0) return;
@@ -158,10 +190,23 @@ ${comments}`;
         filePath,
         headSHA,
       });
+
+      const environments = getGitLabEnvironments();
+
+      let environment = null;
+      for (const [baseBranchName, environmentName] of environments) {
+        if (baseBranchName === source_branch) {
+          environment = environmentName;
+          break;
+        }
+      }
+
       const asset = await getAsset({
-        //Incomplete
+        //Done
         name: assetName,
         sendSegmentEventOfIntegration: this.sendSegmentEventOfIntegration,
+        environment: environment,
+        integration: "gitlab",
       });
 
       if (!asset) continue;
@@ -170,6 +215,7 @@ ${comments}`;
       const { guid: tableAssetGuid } = asset.attributes.sqlAsset;
 
       await createResource(
+        //Done
         //Complete
         modelGuid,
         "Pull Request on GitLab",
@@ -177,6 +223,7 @@ ${comments}`;
         this.sendSegmentEventOfIntegration
       );
       await createResource(
+        //Done
         tableAssetGuid,
         "Pull Request on GitLab",
         web_url,
@@ -187,6 +234,7 @@ ${comments}`;
     }
 
     const comment = await this.createIssueComment({
+      //Done
       //Complete
       gitlab,
       content: `🎊 Congrats on the merge!
@@ -201,19 +249,16 @@ This pull request has been added as a resource to all the assets modified. ✅
   }
 
   async authIntegration({ gitlab }) {
-    //Incomplete
-    // Implement your auth logic here
-    // IMPORT ATLAN INSTANCE URL
+    //Done
     const response = await auth();
-    // Inside this if condition check github secrets is mentioned
+
     if (response?.status === 401) {
+      //Complete
       await this.createIssueComment(
         gitlab,
-        `We couldn't connect to your Atlan Instance, please make sure to set the valid Atlan Bearer Token as \`ATLAN_API_TOKEN\` as this repository's action secret. 
+        `We couldn't connect to your Atlan Instance, please make sure to set the valid Atlan Bearer Token as \`ATLAN_API_TOKEN\` in your .gitlab-ci.yml file. 
 
-Atlan Instance URL: ${ATLAN_INSTANCE_URL}
-
-Set your repository action secrets [here](https://github.com/${context.payload.repository.full_name}/settings/secrets/actions). For more information on how to setup the Atlan dbt Action, please read the [setup documentation here](https://github.com/atlanhq/dbt-action/blob/main/README.md).`
+Atlan Instance URL: ${ATLAN_INSTANCE_URL}`
       );
       return false;
     }
@@ -221,14 +266,14 @@ Set your repository action secrets [here](https://github.com/${context.payload.r
     if (response === undefined) {
       await this.createIssueComment(
         gitlab,
-        `We couldn't connect to your Atlan Instance, please make sure to set the valid Atlan Instance URL as \`ATLAN_INSTANCE_URL\` as this repository's action secret. 
+        `We couldn't connect to your Atlan Instance, please make sure to set the valid Atlan Instance URL as \`ATLAN_INSTANCE_URL\` in your .gitlab-ci.yml file. 
 
 Atlan Instance URL: ${ATLAN_INSTANCE_URL}
 
 Make sure your Atlan Instance URL is set in the following format.
 \`https://tenant.atlan.com\`
 
-Set your repository action secrets [here](https://github.com/${context.payload.repository.full_name}/settings/secrets/actions). For more information on how to setup the Atlan dbt Action, please read the [setup documentation here](https://github.com/atlanhq/dbt-action/blob/main/README.md).`
+`
       );
       return false;
     }
@@ -237,6 +282,7 @@ Set your repository action secrets [here](https://github.com/${context.payload.r
   }
 
   async createIssueComment({
+    //Done
     //Complete
     gitlab,
     content,
@@ -267,6 +313,7 @@ ${content}`;
   }
 
   async sendSegmentEventOfIntegration({ action, properties }) {
+    //Done
     //Complete
     // Implement your sendSegmentEvent logic here
     // IMPORT ATLAN_INSTANCE_URL.
@@ -289,6 +336,7 @@ ${content}`;
   }
 
   async getChangedFiles({ gitlab }) {
+    //Done
     //Complete
     const { CI_PROJECT_PATH, CI_MERGE_REQUEST_IID } = process.env;
 
@@ -297,7 +345,7 @@ ${content}`;
       CI_MERGE_REQUEST_IID
     );
     var changedFiles = changes
-      .map(({ new_path }) => {
+      .map(({ new_path, old_path }) => {
         try {
           const [modelName] = new_path
             .match(/.*models\/(.*)\.sql/)[1]
@@ -305,12 +353,32 @@ ${content}`;
             .reverse()[0]
             .split(".");
 
+          //Cross-check this with Jaagrav. ###
           if (modelName) {
-            return {
-              fileName: modelName,
-              filePath: new_path,
-              headSHA: diff_refs.head_sha,
-            };
+            if (old_path === null) {
+              return {
+                fileName: modelName,
+                filePath: new_path,
+                headSHA: diff_refs.head_sha,
+                status: "added",
+              };
+            } else if (new_path !== old_path) {
+              // File is renamed or moved
+              return {
+                fileName: modelName,
+                filePath: new_path,
+                headSHA: diff_refs.head_sha,
+                status: "renamed_or_moved",
+              };
+            } else {
+              // File is modified
+              return {
+                fileName: modelName,
+                filePath: new_path,
+                headSHA: diff_refs.head_sha,
+                status: "modified",
+              };
+            }
           }
         } catch (e) {}
       })
@@ -329,6 +397,7 @@ ${content}`;
   }
 
   async getAssetName({ gitlab, fileName, filePath, headSHA }) {
+    //Done
     //Complete
     var regExp = /config\(.*alias=\'([^']+)\'.*\)/im;
     var fileContents = await this.getFileContents({
@@ -347,6 +416,7 @@ ${content}`;
   }
 
   async getFileContents({ gitlab, filePath, headSHA }) {
+    //Done
     //Complete
     const { CI_PROJECT_PATH } = process.env;
     const { content } = await gitlab.RepositoryFiles.show(
@@ -360,6 +430,7 @@ ${content}`;
   }
 
   async checkCommentExists({ gitlab }) {
+    //Done
     //Complete
     const { CI_PROJECT_PATH, CI_MERGE_REQUEST_IID } = process.env;
     if (IS_DEV) return null;
@@ -380,6 +451,7 @@ ${content}`;
   }
 
   async deleteComment({ gitlab, comment_id }) {
+    //Done
     //Complete
     const { CI_PROJECT_PATH, CI_MERGE_REQUEST_IID } = process.env;
 
@@ -391,6 +463,7 @@ ${content}`;
   }
 
   async renderDownstreamAssetsComment({ asset, downstreamAssets }) {
+    //Done
     let impactedData = downstreamAssets.map(
       ({ displayText, guid, typeName, attributes, meanings }) => {
         let readableTypeName = typeName

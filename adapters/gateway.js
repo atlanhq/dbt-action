@@ -5,5 +5,5 @@ export async function runAction(token, integrationModule) {
     return;
   }
   const integration = new integrationModule(token);
-  await integration.run();
+  await integration.run(); // Add error part
 }

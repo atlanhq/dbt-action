@@ -1,13 +1,12 @@
 import { v4 as uuidv4 } from "uuid";
 import fetch from "node-fetch";
-import { sendSegmentEvent } from "./index.js";
 import stringify from "json-stringify-safe";
 import { getAPIToken, getInstanceUrl } from "../utils/index.js";
 
 const ATLAN_INSTANCE_URL = getInstanceUrl();
 const ATLAN_API_TOKEN = getAPIToken();
 
-export default async function createResource(
+export default async function createResource( //Done
   guid,
   name,
   link,
