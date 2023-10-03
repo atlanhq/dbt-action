@@ -5,6 +5,7 @@ import github from "@actions/github";
 import { isIgnoreModelAliasMatching } from "../../src/utils/get-environment-variables.js";
 import { getConnectorImage } from "../../src/utils/get-image-url.js";
 import { getEnvironments } from "../../src/utils/get-environment-variables.js";
+import stringify from "json-stringify-safe";
 import {
   getAsset,
   getDownstreamAssets,
@@ -16,6 +17,7 @@ import { getImageURL, auth } from "../../src/utils/index.js";
 import { isDev } from "../../src/utils/get-environment-variables.js";
 import { truncate } from "../../src/utils/create-comment.js";
 import { getInstanceUrl } from "../../src/utils/get-environment-variables.js";
+
 const IS_DEV = isDev();
 const ATLAN_INSTANCE_URL = getInstanceUrl();
 
@@ -30,12 +32,18 @@ export default class GitHubIntegration extends IntegrationInterface {
     //Done
     //Complete
     console.log("Run Github");
+    console.log(IS_DEV);
     const timeStart = Date.now();
     const { context } = github;
+    console.log("Context:", context);
     const octokit = github.getOctokit(this.token);
-    const { pull_request } = context.payload;
-    const { state, merged } = pull_request;
+    const { pull_request } = context?.payload;
+    console.log(pull_request, "hii");
 
+    console.log("Interesting");
+    const { state, merged } = pull_request;
+    console.log("state", state);
+    console.log("merged", merged);
     if (!(await this.authIntegration({ octokit, context }))) {
       //DONE
       //Complete
@@ -43,10 +51,11 @@ export default class GitHubIntegration extends IntegrationInterface {
     }
 
     let total_assets = 0;
-
+    console.log("After auth Integration");
     if (state === "open") {
       total_assets = await this.printDownstreamAssets({ octokit, context });
     } else if (state === "closed" && merged) {
+      console.log("Hmm");
       total_assets = await this.setResourceOnAsset({ octokit, context });
     }
 
@@ -61,7 +70,8 @@ export default class GitHubIntegration extends IntegrationInterface {
 
   async printDownstreamAssets({ octokit, context }) {
     //Done
-    const changedFiles = await this.getChangedFiles(octokit, context); //Complete
+    console.log("Brother");
+    const changedFiles = await this.getChangedFiles({ octokit, context }); //Complete
     let comments = ``;
     let totalChangedFiles = 0;
 
@@ -74,7 +84,7 @@ export default class GitHubIntegration extends IntegrationInterface {
         filePath,
       });
       const assetName = isIgnoreModelAliasMatching() ? fileName : aliasName; //Complete
-
+      console.log("acha2");
       const environments = getEnvironments();
 
       let environment = null;
@@ -84,7 +94,7 @@ export default class GitHubIntegration extends IntegrationInterface {
           break;
         }
       }
-
+      console.log("Before getAsset");
       const asset = await getAsset({
         //Done
         name: assetName,
@@ -92,40 +102,41 @@ export default class GitHubIntegration extends IntegrationInterface {
         environment: environment,
         integration: "github",
       });
-
+      console.log("After getAsset");
       if (totalChangedFiles !== 0) comments += "\n\n---\n\n";
-
+      console.log("Status: ", status);
       if (status === "added") {
         comments += `### ${getConnectorImage("dbt")} <b>${fileName}</b> 🆕
 Its a new model and not present in Atlan yet, you'll see the downstream impact for it after its present in Atlan.`;
         totalChangedFiles++;
         continue;
       }
-
+      console.log("Before filtering");
+      console.log("Asset", asset);
       if (asset.error) {
         comments += asset.error;
         totalChangedFiles++;
         continue;
       }
-
       const materialisedAsset = asset.attributes.dbtModelSqlAssets[0];
       const timeStart = Date.now();
       const totalModifiedFiles = changedFiles.filter(
         (i) => i.status === "modified"
       ).length;
+      console.log("Before getDownstreamAssets");
       const downstreamAssets = await getDownstreamAssets(
         //Complete
         asset,
         materialisedAsset.guid,
         totalModifiedFiles
       );
-
+      console.log("After getDownstreamAssets");
       if (downstreamAssets.error) {
         comments += downstreamAssets.error;
         totalChangedFiles++;
         continue;
       }
-
+      console.log("At line 139 after getDownstreamAssets in printDownstream");
       this.sendSegmentEventOfIntegration("dbt_ci_action_downstream_unfurl", {
         //Complete
         asset_guid: asset.guid,
@@ -133,6 +144,7 @@ Its a new model and not present in Atlan yet, you'll see the downstream impact f
         downstream_count: downstreamAssets.entities.length,
         total_fetch_time: Date.now() - timeStart,
       });
+      console.log("At line 147 after getDownstreamAssets in printDownstream");
 
       const classifications = await getClassifications({
         //Complete
@@ -158,8 +170,8 @@ Its a new model and not present in Atlan yet, you'll see the downstream impact f
     comments = `### ${getImageURL("atlan-logo", 15, 15)} Atlan impact analysis
 Here is your downstream impact analysis for **${totalChangedFiles} ${
       totalChangedFiles > 1 ? "models" : "model"
-    }** you have edited.    
-    
+    }** you have edited.
+
 ${comments}`;
 
     const existingComment = await this.checkCommentExists({ octokit, context }); //Complete
@@ -252,7 +264,7 @@ ${comments}`;
       octokit,
       context,
       content: `🎊 Congrats on the merge!
-  
+
 This pull request has been added as a resource to all the assets modified. ✅
 `,
       comment_id: null,
@@ -265,30 +277,33 @@ This pull request has been added as a resource to all the assets modified. ✅
   async authIntegration({ octokit, context }) {
     //DONE
     //COMPLETE
+    console.log("Here is Context:", context);
     const response = await auth();
+    console.log("Inside authIntegration befor comment exists");
     const existingComment = await this.checkCommentExists({ octokit, context });
 
     console.log("Existing Comment", existingComment);
 
     if (response?.status === 401) {
-      await this.createIssueComment(
+      console.log("Inside authIntegration befor createIssueComment");
+      await this.createIssueComment({
         octokit,
         context,
-        `We couldn't connect to your Atlan Instance, please make sure to set the valid Atlan Bearer Token as \`ATLAN_API_TOKEN\` as this repository's action secret. 
+        content: `We couldn't connect to your Atlan Instance, please make sure to set the valid Atlan Bearer Token as \`ATLAN_API_TOKEN\` as this repository's action secret.
 
 Atlan Instance URL: ${ATLAN_INSTANCE_URL}
 
 Set your repository action secrets [here](https://github.com/${context.payload.repository.full_name}/settings/secrets/actions). For more information on how to setup the Atlan dbt Action, please read the [setup documentation here](https://github.com/atlanhq/dbt-action/blob/main/README.md).`,
-        existingComment?.id
-      );
+        comment_id: existingComment?.id,
+      });
       return false;
     }
 
     if (response === undefined) {
-      await this.createIssueComment(
+      await this.createIssueComment({
         octokit,
         context,
-        `We couldn't connect to your Atlan Instance, please make sure to set the valid Atlan Instance URL as \`ATLAN_INSTANCE_URL\` as this repository's action secret. 
+        content: `We couldn't connect to your Atlan Instance, please make sure to set the valid Atlan Instance URL as \`ATLAN_INSTANCE_URL\` as this repository's action secret.
 
 Atlan Instance URL: ${ATLAN_INSTANCE_URL}
 
@@ -296,8 +311,8 @@ Make sure your Atlan Instance URL is set in the following format.
 \`https://tenant.atlan.com\`
 
 Set your repository action secrets [here](https://github.com/${context.payload.repository.full_name}/settings/secrets/actions). For more information on how to setup the Atlan dbt Action, please read the [setup documentation here](https://github.com/atlanhq/dbt-action/blob/main/README.md).`,
-        existingComment?.id
-      );
+        comment_id: existingComment?.id,
+      });
       return false;
     }
 
@@ -317,7 +332,8 @@ Set your repository action secrets [here](https://github.com/${context.payload.r
       userId: "atlan-annonymous-github",
       properties: {
         ...properties,
-        github_action_id: `https://github.com/${context.payload.repository.full_name}/actions/runs/${context.runId}`,
+        //get context for this
+        // github_action_id: `https://github.com/${context.payload.repository.full_name}/actions/runs/${context.runId}`,
         domain,
       },
     });
@@ -455,8 +471,10 @@ Set your repository action secrets [here](https://github.com/${context.payload.r
     comment_id = null,
     forceNewComment = false,
   }) {
-    const { pull_request } = context.payload;
-
+    console.log("Inside CreateIssue:", context);
+    console.log("Inside CreateIssue Comment");
+    const { pull_request } = context?.payload || {};
+    console.log("Inside CreateIssue Comment");
     content = `<!-- ActionCommentIdentifier: atlan-dbt-action -->
 ${content}`;
 
@@ -467,6 +485,7 @@ ${content}`;
     };
 
     console.log(content, content.length);
+    console.log("Inside CreateIssue Comment Complete");
 
     if (IS_DEV) return content;
 
@@ -617,7 +636,7 @@ Materialised asset: ${getConnectorImage(
     } downstream assets 👇</b></summary><br/>
 
 Name | Type | Description | Owners | Terms | Classifications | Source URL
---- | --- | --- | --- | --- | --- | ---       
+--- | --- | --- | --- | --- | --- | ---
 ${rows
   .map((row) =>
     row.map((i) => i.replace(/\|/g, "•").replace(/\n/g, "")).join(" | ")
@@ -644,13 +663,13 @@ ${
     // Generating the final comment based on the presence of downstream assets
     if (downstreamAssets.entities.length > 0) {
       return `${assetInfo}
-      
+
 ${downstreamTable}
 
 ${viewAssetButton}`;
     } else {
       return `${assetInfo}
-      
+
 No downstream assets found.
 
 ${viewAssetButton}`;

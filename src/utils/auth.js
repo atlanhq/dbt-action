@@ -11,6 +11,7 @@ const ATLAN_API_TOKEN =
 
 export async function auth() {
   //Done
+  console.log("Inside auth in utils.js");
   var myHeaders = {
     authorization: `Bearer ${ATLAN_API_TOKEN}`,
     "content-type": "application/json",
@@ -25,6 +26,6 @@ export async function auth() {
     `${ATLAN_INSTANCE_URL}/api/meta`,
     requestOptions
   ).catch((err) => {});
-
+  console.log("Completed auth in utils.js");
   return response;
 }

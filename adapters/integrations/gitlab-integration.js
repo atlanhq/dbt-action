@@ -2,7 +2,7 @@
 import dotenv from "dotenv";
 
 import IntegrationInterface from "./contract/contract.js";
-import { Gitlab } from "@gitbeaker/node";
+import { Gitlab } from "@gitbeaker/rest";
 import {
   createResource,
   getAsset,
@@ -13,6 +13,8 @@ import { getImageURL, auth } from "../../src/utils/index.js";
 import { getGitLabEnvironments } from "../../src/utils/get-environment-variables.js";
 import { getConnectorImage } from "../../src/utils/index.js";
 import { getCertificationImage } from "../../src/utils/index.js";
+import stringify from "json-stringify-safe";
+
 dotenv.config();
 const ATLAN_INSTANCE_URL = process.env.ATLAN_INSTANCE_URL;
 const { IS_DEV } = process.env;
@@ -238,7 +240,7 @@ ${comments}`;
       //Complete
       gitlab,
       content: `🎊 Congrats on the merge!
-  
+
 This pull request has been added as a resource to all the assets modified. ✅
 `,
       comment_id: null,
@@ -256,7 +258,7 @@ This pull request has been added as a resource to all the assets modified. ✅
       //Complete
       await this.createIssueComment(
         gitlab,
-        `We couldn't connect to your Atlan Instance, please make sure to set the valid Atlan Bearer Token as \`ATLAN_API_TOKEN\` in your .gitlab-ci.yml file. 
+        `We couldn't connect to your Atlan Instance, please make sure to set the valid Atlan Bearer Token as \`ATLAN_API_TOKEN\` in your .gitlab-ci.yml file.
 
 Atlan Instance URL: ${ATLAN_INSTANCE_URL}`
       );
@@ -266,7 +268,7 @@ Atlan Instance URL: ${ATLAN_INSTANCE_URL}`
     if (response === undefined) {
       await this.createIssueComment(
         gitlab,
-        `We couldn't connect to your Atlan Instance, please make sure to set the valid Atlan Instance URL as \`ATLAN_INSTANCE_URL\` in your .gitlab-ci.yml file. 
+        `We couldn't connect to your Atlan Instance, please make sure to set the valid Atlan Instance URL as \`ATLAN_INSTANCE_URL\` in your .gitlab-ci.yml file.
 
 Atlan Instance URL: ${ATLAN_INSTANCE_URL}
 
@@ -532,7 +534,7 @@ ${content}`;
         ? getCertificationImage(asset.attributes.certificateStatus)
         : ""
     }
-          
+
     **${downstreamAssets.length} downstream assets** 👇
     Name | Type | Description | Owners | Terms | Source URL
     --- | --- | --- | --- | --- | ---
@@ -541,7 +543,7 @@ ${content}`;
         row.map((i) => i.replace(/\|/g, "•").replace(/\n/g, "")).join(" | ")
       )
       .join("\n")}
-    
+
     ${getImageURL(
       "atlan-logo",
       15,

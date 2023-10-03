@@ -16,7 +16,7 @@
     "dbt-action"
   ],
   "scripts": {
-    "build": "ncc build src/index.js -o dist",
+    "build": "ncc build adapters/index.js -o dist",
     "start": "npm run build && act pull_request --container-architecture linux/amd64 --secret-file .env -e event.json --insecure-secrets",
     "sync": "git pull && git push"
   },
@@ -29,6 +29,7 @@
   "dependencies": {
     "@actions/core": "^1.10.0",
     "@actions/github": "^5.1.1",
+    "@gitbeaker/rest": "^39.17.0",
     "@vercel/ncc": "^0.34.0",
     "dotenv": "^16.0.3",
     "json-stringify-safe": "^5.0.1",

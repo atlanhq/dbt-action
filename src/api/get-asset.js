@@ -88,17 +88,20 @@ export default async function getAsset({
     headers: myHeaders,
     body: raw,
   };
-
+  console.log("Before SendSegmentEventOfIntegration");
   var response = await fetch(
     `${ATLAN_INSTANCE_URL}/api/meta/search/indexsearch#findAssetByExactName`,
     requestOptions
   )
     .then((e) => e.json())
     .catch((err) => {
-      sendSegmentEventOfIntegration("dbt_ci_action_failure", {
-        reason: "failed_to_get_asset",
-        asset_name: name,
-        msg: err,
+      sendSegmentEventOfIntegration({
+        action: "dbt_ci_action_failure",
+        properties: {
+          reason: "failed_to_get_asset",
+          asset_name: name,
+          msg: err,
+        },
       });
     });
 
