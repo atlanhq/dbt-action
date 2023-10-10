@@ -6943,6 +6943,82 @@ function removeHook(state, name, method) {
 
 /***/ }),
 
+/***/ 8803:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+
+var GetIntrinsic = __nccwpck_require__(4538);
+
+var callBind = __nccwpck_require__(2977);
+
+var $indexOf = callBind(GetIntrinsic('String.prototype.indexOf'));
+
+module.exports = function callBoundIntrinsic(name, allowMissing) {
+	var intrinsic = GetIntrinsic(name, !!allowMissing);
+	if (typeof intrinsic === 'function' && $indexOf(name, '.prototype.') > -1) {
+		return callBind(intrinsic);
+	}
+	return intrinsic;
+};
+
+
+/***/ }),
+
+/***/ 2977:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+
+var bind = __nccwpck_require__(8334);
+var GetIntrinsic = __nccwpck_require__(4538);
+
+var $apply = GetIntrinsic('%Function.prototype.apply%');
+var $call = GetIntrinsic('%Function.prototype.call%');
+var $reflectApply = GetIntrinsic('%Reflect.apply%', true) || bind.call($call, $apply);
+
+var $gOPD = GetIntrinsic('%Object.getOwnPropertyDescriptor%', true);
+var $defineProperty = GetIntrinsic('%Object.defineProperty%', true);
+var $max = GetIntrinsic('%Math.max%');
+
+if ($defineProperty) {
+	try {
+		$defineProperty({}, 'a', { value: 1 });
+	} catch (e) {
+		// IE 8 has a broken defineProperty
+		$defineProperty = null;
+	}
+}
+
+module.exports = function callBind(originalFunction) {
+	var func = $reflectApply(bind, $call, arguments);
+	if ($gOPD && $defineProperty) {
+		var desc = $gOPD(func, 'length');
+		if (desc.configurable) {
+			// original length, plus the receiver, minus any additional arguments (after the receiver)
+			$defineProperty(
+				func,
+				'length',
+				{ value: 1 + $max(0, originalFunction.length - (arguments.length - 1)) }
+			);
+		}
+	}
+	return func;
+};
+
+var applyBind = function applyBind() {
+	return $reflectApply(bind, $apply, arguments);
+};
+
+if ($defineProperty) {
+	$defineProperty(module.exports, 'apply', { value: applyBind });
+} else {
+	module.exports.apply = applyBind;
+}
+
+
+/***/ }),
+
 /***/ 8932:
 /***/ ((__unused_webpack_module, exports) => {
 
@@ -7089,6 +7165,534 @@ module.exports = DotenvModule
 
 /***/ }),
 
+/***/ 9320:
+/***/ ((module) => {
+
+
+
+/* eslint no-invalid-this: 1 */
+
+var ERROR_MESSAGE = 'Function.prototype.bind called on incompatible ';
+var slice = Array.prototype.slice;
+var toStr = Object.prototype.toString;
+var funcType = '[object Function]';
+
+module.exports = function bind(that) {
+    var target = this;
+    if (typeof target !== 'function' || toStr.call(target) !== funcType) {
+        throw new TypeError(ERROR_MESSAGE + target);
+    }
+    var args = slice.call(arguments, 1);
+
+    var bound;
+    var binder = function () {
+        if (this instanceof bound) {
+            var result = target.apply(
+                this,
+                args.concat(slice.call(arguments))
+            );
+            if (Object(result) === result) {
+                return result;
+            }
+            return this;
+        } else {
+            return target.apply(
+                that,
+                args.concat(slice.call(arguments))
+            );
+        }
+    };
+
+    var boundLength = Math.max(0, target.length - args.length);
+    var boundArgs = [];
+    for (var i = 0; i < boundLength; i++) {
+        boundArgs.push('$' + i);
+    }
+
+    bound = Function('binder', 'return function (' + boundArgs.join(',') + '){ return binder.apply(this,arguments); }')(binder);
+
+    if (target.prototype) {
+        var Empty = function Empty() {};
+        Empty.prototype = target.prototype;
+        bound.prototype = new Empty();
+        Empty.prototype = null;
+    }
+
+    return bound;
+};
+
+
+/***/ }),
+
+/***/ 8334:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+
+var implementation = __nccwpck_require__(9320);
+
+module.exports = Function.prototype.bind || implementation;
+
+
+/***/ }),
+
+/***/ 4538:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+
+var undefined;
+
+var $SyntaxError = SyntaxError;
+var $Function = Function;
+var $TypeError = TypeError;
+
+// eslint-disable-next-line consistent-return
+var getEvalledConstructor = function (expressionSyntax) {
+	try {
+		return $Function('"use strict"; return (' + expressionSyntax + ').constructor;')();
+	} catch (e) {}
+};
+
+var $gOPD = Object.getOwnPropertyDescriptor;
+if ($gOPD) {
+	try {
+		$gOPD({}, '');
+	} catch (e) {
+		$gOPD = null; // this is IE 8, which has a broken gOPD
+	}
+}
+
+var throwTypeError = function () {
+	throw new $TypeError();
+};
+var ThrowTypeError = $gOPD
+	? (function () {
+		try {
+			// eslint-disable-next-line no-unused-expressions, no-caller, no-restricted-properties
+			arguments.callee; // IE 8 does not throw here
+			return throwTypeError;
+		} catch (calleeThrows) {
+			try {
+				// IE 8 throws on Object.getOwnPropertyDescriptor(arguments, '')
+				return $gOPD(arguments, 'callee').get;
+			} catch (gOPDthrows) {
+				return throwTypeError;
+			}
+		}
+	}())
+	: throwTypeError;
+
+var hasSymbols = __nccwpck_require__(587)();
+var hasProto = __nccwpck_require__(5894)();
+
+var getProto = Object.getPrototypeOf || (
+	hasProto
+		? function (x) { return x.__proto__; } // eslint-disable-line no-proto
+		: null
+);
+
+var needsEval = {};
+
+var TypedArray = typeof Uint8Array === 'undefined' || !getProto ? undefined : getProto(Uint8Array);
+
+var INTRINSICS = {
+	'%AggregateError%': typeof AggregateError === 'undefined' ? undefined : AggregateError,
+	'%Array%': Array,
+	'%ArrayBuffer%': typeof ArrayBuffer === 'undefined' ? undefined : ArrayBuffer,
+	'%ArrayIteratorPrototype%': hasSymbols && getProto ? getProto([][Symbol.iterator]()) : undefined,
+	'%AsyncFromSyncIteratorPrototype%': undefined,
+	'%AsyncFunction%': needsEval,
+	'%AsyncGenerator%': needsEval,
+	'%AsyncGeneratorFunction%': needsEval,
+	'%AsyncIteratorPrototype%': needsEval,
+	'%Atomics%': typeof Atomics === 'undefined' ? undefined : Atomics,
+	'%BigInt%': typeof BigInt === 'undefined' ? undefined : BigInt,
+	'%BigInt64Array%': typeof BigInt64Array === 'undefined' ? undefined : BigInt64Array,
+	'%BigUint64Array%': typeof BigUint64Array === 'undefined' ? undefined : BigUint64Array,
+	'%Boolean%': Boolean,
+	'%DataView%': typeof DataView === 'undefined' ? undefined : DataView,
+	'%Date%': Date,
+	'%decodeURI%': decodeURI,
+	'%decodeURIComponent%': decodeURIComponent,
+	'%encodeURI%': encodeURI,
+	'%encodeURIComponent%': encodeURIComponent,
+	'%Error%': Error,
+	'%eval%': eval, // eslint-disable-line no-eval
+	'%EvalError%': EvalError,
+	'%Float32Array%': typeof Float32Array === 'undefined' ? undefined : Float32Array,
+	'%Float64Array%': typeof Float64Array === 'undefined' ? undefined : Float64Array,
+	'%FinalizationRegistry%': typeof FinalizationRegistry === 'undefined' ? undefined : FinalizationRegistry,
+	'%Function%': $Function,
+	'%GeneratorFunction%': needsEval,
+	'%Int8Array%': typeof Int8Array === 'undefined' ? undefined : Int8Array,
+	'%Int16Array%': typeof Int16Array === 'undefined' ? undefined : Int16Array,
+	'%Int32Array%': typeof Int32Array === 'undefined' ? undefined : Int32Array,
+	'%isFinite%': isFinite,
+	'%isNaN%': isNaN,
+	'%IteratorPrototype%': hasSymbols && getProto ? getProto(getProto([][Symbol.iterator]())) : undefined,
+	'%JSON%': typeof JSON === 'object' ? JSON : undefined,
+	'%Map%': typeof Map === 'undefined' ? undefined : Map,
+	'%MapIteratorPrototype%': typeof Map === 'undefined' || !hasSymbols || !getProto ? undefined : getProto(new Map()[Symbol.iterator]()),
+	'%Math%': Math,
+	'%Number%': Number,
+	'%Object%': Object,
+	'%parseFloat%': parseFloat,
+	'%parseInt%': parseInt,
+	'%Promise%': typeof Promise === 'undefined' ? undefined : Promise,
+	'%Proxy%': typeof Proxy === 'undefined' ? undefined : Proxy,
+	'%RangeError%': RangeError,
+	'%ReferenceError%': ReferenceError,
+	'%Reflect%': typeof Reflect === 'undefined' ? undefined : Reflect,
+	'%RegExp%': RegExp,
+	'%Set%': typeof Set === 'undefined' ? undefined : Set,
+	'%SetIteratorPrototype%': typeof Set === 'undefined' || !hasSymbols || !getProto ? undefined : getProto(new Set()[Symbol.iterator]()),
+	'%SharedArrayBuffer%': typeof SharedArrayBuffer === 'undefined' ? undefined : SharedArrayBuffer,
+	'%String%': String,
+	'%StringIteratorPrototype%': hasSymbols && getProto ? getProto(''[Symbol.iterator]()) : undefined,
+	'%Symbol%': hasSymbols ? Symbol : undefined,
+	'%SyntaxError%': $SyntaxError,
+	'%ThrowTypeError%': ThrowTypeError,
+	'%TypedArray%': TypedArray,
+	'%TypeError%': $TypeError,
+	'%Uint8Array%': typeof Uint8Array === 'undefined' ? undefined : Uint8Array,
+	'%Uint8ClampedArray%': typeof Uint8ClampedArray === 'undefined' ? undefined : Uint8ClampedArray,
+	'%Uint16Array%': typeof Uint16Array === 'undefined' ? undefined : Uint16Array,
+	'%Uint32Array%': typeof Uint32Array === 'undefined' ? undefined : Uint32Array,
+	'%URIError%': URIError,
+	'%WeakMap%': typeof WeakMap === 'undefined' ? undefined : WeakMap,
+	'%WeakRef%': typeof WeakRef === 'undefined' ? undefined : WeakRef,
+	'%WeakSet%': typeof WeakSet === 'undefined' ? undefined : WeakSet
+};
+
+if (getProto) {
+	try {
+		null.error; // eslint-disable-line no-unused-expressions
+	} catch (e) {
+		// https://github.com/tc39/proposal-shadowrealm/pull/384#issuecomment-1364264229
+		var errorProto = getProto(getProto(e));
+		INTRINSICS['%Error.prototype%'] = errorProto;
+	}
+}
+
+var doEval = function doEval(name) {
+	var value;
+	if (name === '%AsyncFunction%') {
+		value = getEvalledConstructor('async function () {}');
+	} else if (name === '%GeneratorFunction%') {
+		value = getEvalledConstructor('function* () {}');
+	} else if (name === '%AsyncGeneratorFunction%') {
+		value = getEvalledConstructor('async function* () {}');
+	} else if (name === '%AsyncGenerator%') {
+		var fn = doEval('%AsyncGeneratorFunction%');
+		if (fn) {
+			value = fn.prototype;
+		}
+	} else if (name === '%AsyncIteratorPrototype%') {
+		var gen = doEval('%AsyncGenerator%');
+		if (gen && getProto) {
+			value = getProto(gen.prototype);
+		}
+	}
+
+	INTRINSICS[name] = value;
+
+	return value;
+};
+
+var LEGACY_ALIASES = {
+	'%ArrayBufferPrototype%': ['ArrayBuffer', 'prototype'],
+	'%ArrayPrototype%': ['Array', 'prototype'],
+	'%ArrayProto_entries%': ['Array', 'prototype', 'entries'],
+	'%ArrayProto_forEach%': ['Array', 'prototype', 'forEach'],
+	'%ArrayProto_keys%': ['Array', 'prototype', 'keys'],
+	'%ArrayProto_values%': ['Array', 'prototype', 'values'],
+	'%AsyncFunctionPrototype%': ['AsyncFunction', 'prototype'],
+	'%AsyncGenerator%': ['AsyncGeneratorFunction', 'prototype'],
+	'%AsyncGeneratorPrototype%': ['AsyncGeneratorFunction', 'prototype', 'prototype'],
+	'%BooleanPrototype%': ['Boolean', 'prototype'],
+	'%DataViewPrototype%': ['DataView', 'prototype'],
+	'%DatePrototype%': ['Date', 'prototype'],
+	'%ErrorPrototype%': ['Error', 'prototype'],
+	'%EvalErrorPrototype%': ['EvalError', 'prototype'],
+	'%Float32ArrayPrototype%': ['Float32Array', 'prototype'],
+	'%Float64ArrayPrototype%': ['Float64Array', 'prototype'],
+	'%FunctionPrototype%': ['Function', 'prototype'],
+	'%Generator%': ['GeneratorFunction', 'prototype'],
+	'%GeneratorPrototype%': ['GeneratorFunction', 'prototype', 'prototype'],
+	'%Int8ArrayPrototype%': ['Int8Array', 'prototype'],
+	'%Int16ArrayPrototype%': ['Int16Array', 'prototype'],
+	'%Int32ArrayPrototype%': ['Int32Array', 'prototype'],
+	'%JSONParse%': ['JSON', 'parse'],
+	'%JSONStringify%': ['JSON', 'stringify'],
+	'%MapPrototype%': ['Map', 'prototype'],
+	'%NumberPrototype%': ['Number', 'prototype'],
+	'%ObjectPrototype%': ['Object', 'prototype'],
+	'%ObjProto_toString%': ['Object', 'prototype', 'toString'],
+	'%ObjProto_valueOf%': ['Object', 'prototype', 'valueOf'],
+	'%PromisePrototype%': ['Promise', 'prototype'],
+	'%PromiseProto_then%': ['Promise', 'prototype', 'then'],
+	'%Promise_all%': ['Promise', 'all'],
+	'%Promise_reject%': ['Promise', 'reject'],
+	'%Promise_resolve%': ['Promise', 'resolve'],
+	'%RangeErrorPrototype%': ['RangeError', 'prototype'],
+	'%ReferenceErrorPrototype%': ['ReferenceError', 'prototype'],
+	'%RegExpPrototype%': ['RegExp', 'prototype'],
+	'%SetPrototype%': ['Set', 'prototype'],
+	'%SharedArrayBufferPrototype%': ['SharedArrayBuffer', 'prototype'],
+	'%StringPrototype%': ['String', 'prototype'],
+	'%SymbolPrototype%': ['Symbol', 'prototype'],
+	'%SyntaxErrorPrototype%': ['SyntaxError', 'prototype'],
+	'%TypedArrayPrototype%': ['TypedArray', 'prototype'],
+	'%TypeErrorPrototype%': ['TypeError', 'prototype'],
+	'%Uint8ArrayPrototype%': ['Uint8Array', 'prototype'],
+	'%Uint8ClampedArrayPrototype%': ['Uint8ClampedArray', 'prototype'],
+	'%Uint16ArrayPrototype%': ['Uint16Array', 'prototype'],
+	'%Uint32ArrayPrototype%': ['Uint32Array', 'prototype'],
+	'%URIErrorPrototype%': ['URIError', 'prototype'],
+	'%WeakMapPrototype%': ['WeakMap', 'prototype'],
+	'%WeakSetPrototype%': ['WeakSet', 'prototype']
+};
+
+var bind = __nccwpck_require__(8334);
+var hasOwn = __nccwpck_require__(6339);
+var $concat = bind.call(Function.call, Array.prototype.concat);
+var $spliceApply = bind.call(Function.apply, Array.prototype.splice);
+var $replace = bind.call(Function.call, String.prototype.replace);
+var $strSlice = bind.call(Function.call, String.prototype.slice);
+var $exec = bind.call(Function.call, RegExp.prototype.exec);
+
+/* adapted from https://github.com/lodash/lodash/blob/4.17.15/dist/lodash.js#L6735-L6744 */
+var rePropName = /[^%.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["'])((?:(?!\2)[^\\]|\\.)*?)\2)\]|(?=(?:\.|\[\])(?:\.|\[\]|%$))/g;
+var reEscapeChar = /\\(\\)?/g; /** Used to match backslashes in property paths. */
+var stringToPath = function stringToPath(string) {
+	var first = $strSlice(string, 0, 1);
+	var last = $strSlice(string, -1);
+	if (first === '%' && last !== '%') {
+		throw new $SyntaxError('invalid intrinsic syntax, expected closing `%`');
+	} else if (last === '%' && first !== '%') {
+		throw new $SyntaxError('invalid intrinsic syntax, expected opening `%`');
+	}
+	var result = [];
+	$replace(string, rePropName, function (match, number, quote, subString) {
+		result[result.length] = quote ? $replace(subString, reEscapeChar, '$1') : number || match;
+	});
+	return result;
+};
+/* end adaptation */
+
+var getBaseIntrinsic = function getBaseIntrinsic(name, allowMissing) {
+	var intrinsicName = name;
+	var alias;
+	if (hasOwn(LEGACY_ALIASES, intrinsicName)) {
+		alias = LEGACY_ALIASES[intrinsicName];
+		intrinsicName = '%' + alias[0] + '%';
+	}
+
+	if (hasOwn(INTRINSICS, intrinsicName)) {
+		var value = INTRINSICS[intrinsicName];
+		if (value === needsEval) {
+			value = doEval(intrinsicName);
+		}
+		if (typeof value === 'undefined' && !allowMissing) {
+			throw new $TypeError('intrinsic ' + name + ' exists, but is not available. Please file an issue!');
+		}
+
+		return {
+			alias: alias,
+			name: intrinsicName,
+			value: value
+		};
+	}
+
+	throw new $SyntaxError('intrinsic ' + name + ' does not exist!');
+};
+
+module.exports = function GetIntrinsic(name, allowMissing) {
+	if (typeof name !== 'string' || name.length === 0) {
+		throw new $TypeError('intrinsic name must be a non-empty string');
+	}
+	if (arguments.length > 1 && typeof allowMissing !== 'boolean') {
+		throw new $TypeError('"allowMissing" argument must be a boolean');
+	}
+
+	if ($exec(/^%?[^%]*%?$/, name) === null) {
+		throw new $SyntaxError('`%` may not be present anywhere but at the beginning and end of the intrinsic name');
+	}
+	var parts = stringToPath(name);
+	var intrinsicBaseName = parts.length > 0 ? parts[0] : '';
+
+	var intrinsic = getBaseIntrinsic('%' + intrinsicBaseName + '%', allowMissing);
+	var intrinsicRealName = intrinsic.name;
+	var value = intrinsic.value;
+	var skipFurtherCaching = false;
+
+	var alias = intrinsic.alias;
+	if (alias) {
+		intrinsicBaseName = alias[0];
+		$spliceApply(parts, $concat([0, 1], alias));
+	}
+
+	for (var i = 1, isOwn = true; i < parts.length; i += 1) {
+		var part = parts[i];
+		var first = $strSlice(part, 0, 1);
+		var last = $strSlice(part, -1);
+		if (
+			(
+				(first === '"' || first === "'" || first === '`')
+				|| (last === '"' || last === "'" || last === '`')
+			)
+			&& first !== last
+		) {
+			throw new $SyntaxError('property names with quotes must have matching quotes');
+		}
+		if (part === 'constructor' || !isOwn) {
+			skipFurtherCaching = true;
+		}
+
+		intrinsicBaseName += '.' + part;
+		intrinsicRealName = '%' + intrinsicBaseName + '%';
+
+		if (hasOwn(INTRINSICS, intrinsicRealName)) {
+			value = INTRINSICS[intrinsicRealName];
+		} else if (value != null) {
+			if (!(part in value)) {
+				if (!allowMissing) {
+					throw new $TypeError('base intrinsic for ' + name + ' exists, but the property is not available.');
+				}
+				return void undefined;
+			}
+			if ($gOPD && (i + 1) >= parts.length) {
+				var desc = $gOPD(value, part);
+				isOwn = !!desc;
+
+				// By convention, when a data property is converted to an accessor
+				// property to emulate a data property that does not suffer from
+				// the override mistake, that accessor's getter is marked with
+				// an `originalValue` property. Here, when we detect this, we
+				// uphold the illusion by pretending to see that original data
+				// property, i.e., returning the value rather than the getter
+				// itself.
+				if (isOwn && 'get' in desc && !('originalValue' in desc.get)) {
+					value = desc.get;
+				} else {
+					value = value[part];
+				}
+			} else {
+				isOwn = hasOwn(value, part);
+				value = value[part];
+			}
+
+			if (isOwn && !skipFurtherCaching) {
+				INTRINSICS[intrinsicRealName] = value;
+			}
+		}
+	}
+	return value;
+};
+
+
+/***/ }),
+
+/***/ 5894:
+/***/ ((module) => {
+
+
+
+var test = {
+	foo: {}
+};
+
+var $Object = Object;
+
+module.exports = function hasProto() {
+	return { __proto__: test }.foo === test.foo && !({ __proto__: null } instanceof $Object);
+};
+
+
+/***/ }),
+
+/***/ 587:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+
+var origSymbol = typeof Symbol !== 'undefined' && Symbol;
+var hasSymbolSham = __nccwpck_require__(7747);
+
+module.exports = function hasNativeSymbols() {
+	if (typeof origSymbol !== 'function') { return false; }
+	if (typeof Symbol !== 'function') { return false; }
+	if (typeof origSymbol('foo') !== 'symbol') { return false; }
+	if (typeof Symbol('bar') !== 'symbol') { return false; }
+
+	return hasSymbolSham();
+};
+
+
+/***/ }),
+
+/***/ 7747:
+/***/ ((module) => {
+
+
+
+/* eslint complexity: [2, 18], max-statements: [2, 33] */
+module.exports = function hasSymbols() {
+	if (typeof Symbol !== 'function' || typeof Object.getOwnPropertySymbols !== 'function') { return false; }
+	if (typeof Symbol.iterator === 'symbol') { return true; }
+
+	var obj = {};
+	var sym = Symbol('test');
+	var symObj = Object(sym);
+	if (typeof sym === 'string') { return false; }
+
+	if (Object.prototype.toString.call(sym) !== '[object Symbol]') { return false; }
+	if (Object.prototype.toString.call(symObj) !== '[object Symbol]') { return false; }
+
+	// temp disabled per https://github.com/ljharb/object.assign/issues/17
+	// if (sym instanceof Symbol) { return false; }
+	// temp disabled per https://github.com/WebReflection/get-own-property-symbols/issues/4
+	// if (!(symObj instanceof Symbol)) { return false; }
+
+	// if (typeof Symbol.prototype.toString !== 'function') { return false; }
+	// if (String(sym) !== Symbol.prototype.toString.call(sym)) { return false; }
+
+	var symVal = 42;
+	obj[sym] = symVal;
+	for (sym in obj) { return false; } // eslint-disable-line no-restricted-syntax, no-unreachable-loop
+	if (typeof Object.keys === 'function' && Object.keys(obj).length !== 0) { return false; }
+
+	if (typeof Object.getOwnPropertyNames === 'function' && Object.getOwnPropertyNames(obj).length !== 0) { return false; }
+
+	var syms = Object.getOwnPropertySymbols(obj);
+	if (syms.length !== 1 || syms[0] !== sym) { return false; }
+
+	if (!Object.prototype.propertyIsEnumerable.call(obj, sym)) { return false; }
+
+	if (typeof Object.getOwnPropertyDescriptor === 'function') {
+		var descriptor = Object.getOwnPropertyDescriptor(obj, sym);
+		if (descriptor.value !== symVal || descriptor.enumerable !== true) { return false; }
+	}
+
+	return true;
+};
+
+
+/***/ }),
+
+/***/ 6339:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+
+var bind = __nccwpck_require__(8334);
+
+module.exports = bind.call(Function.call, Object.prototype.hasOwnProperty);
+
+
+/***/ }),
+
 /***/ 3287:
 /***/ ((__unused_webpack_module, exports) => {
 
@@ -7191,6 +7795,537 @@ module.exports = globalThis.DOMException
 
 /***/ }),
 
+/***/ 504:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+var hasMap = typeof Map === 'function' && Map.prototype;
+var mapSizeDescriptor = Object.getOwnPropertyDescriptor && hasMap ? Object.getOwnPropertyDescriptor(Map.prototype, 'size') : null;
+var mapSize = hasMap && mapSizeDescriptor && typeof mapSizeDescriptor.get === 'function' ? mapSizeDescriptor.get : null;
+var mapForEach = hasMap && Map.prototype.forEach;
+var hasSet = typeof Set === 'function' && Set.prototype;
+var setSizeDescriptor = Object.getOwnPropertyDescriptor && hasSet ? Object.getOwnPropertyDescriptor(Set.prototype, 'size') : null;
+var setSize = hasSet && setSizeDescriptor && typeof setSizeDescriptor.get === 'function' ? setSizeDescriptor.get : null;
+var setForEach = hasSet && Set.prototype.forEach;
+var hasWeakMap = typeof WeakMap === 'function' && WeakMap.prototype;
+var weakMapHas = hasWeakMap ? WeakMap.prototype.has : null;
+var hasWeakSet = typeof WeakSet === 'function' && WeakSet.prototype;
+var weakSetHas = hasWeakSet ? WeakSet.prototype.has : null;
+var hasWeakRef = typeof WeakRef === 'function' && WeakRef.prototype;
+var weakRefDeref = hasWeakRef ? WeakRef.prototype.deref : null;
+var booleanValueOf = Boolean.prototype.valueOf;
+var objectToString = Object.prototype.toString;
+var functionToString = Function.prototype.toString;
+var $match = String.prototype.match;
+var $slice = String.prototype.slice;
+var $replace = String.prototype.replace;
+var $toUpperCase = String.prototype.toUpperCase;
+var $toLowerCase = String.prototype.toLowerCase;
+var $test = RegExp.prototype.test;
+var $concat = Array.prototype.concat;
+var $join = Array.prototype.join;
+var $arrSlice = Array.prototype.slice;
+var $floor = Math.floor;
+var bigIntValueOf = typeof BigInt === 'function' ? BigInt.prototype.valueOf : null;
+var gOPS = Object.getOwnPropertySymbols;
+var symToString = typeof Symbol === 'function' && typeof Symbol.iterator === 'symbol' ? Symbol.prototype.toString : null;
+var hasShammedSymbols = typeof Symbol === 'function' && typeof Symbol.iterator === 'object';
+// ie, `has-tostringtag/shams
+var toStringTag = typeof Symbol === 'function' && Symbol.toStringTag && (typeof Symbol.toStringTag === hasShammedSymbols ? 'object' : 'symbol')
+    ? Symbol.toStringTag
+    : null;
+var isEnumerable = Object.prototype.propertyIsEnumerable;
+
+var gPO = (typeof Reflect === 'function' ? Reflect.getPrototypeOf : Object.getPrototypeOf) || (
+    [].__proto__ === Array.prototype // eslint-disable-line no-proto
+        ? function (O) {
+            return O.__proto__; // eslint-disable-line no-proto
+        }
+        : null
+);
+
+function addNumericSeparator(num, str) {
+    if (
+        num === Infinity
+        || num === -Infinity
+        || num !== num
+        || (num && num > -1000 && num < 1000)
+        || $test.call(/e/, str)
+    ) {
+        return str;
+    }
+    var sepRegex = /[0-9](?=(?:[0-9]{3})+(?![0-9]))/g;
+    if (typeof num === 'number') {
+        var int = num < 0 ? -$floor(-num) : $floor(num); // trunc(num)
+        if (int !== num) {
+            var intStr = String(int);
+            var dec = $slice.call(str, intStr.length + 1);
+            return $replace.call(intStr, sepRegex, '$&_') + '.' + $replace.call($replace.call(dec, /([0-9]{3})/g, '$&_'), /_$/, '');
+        }
+    }
+    return $replace.call(str, sepRegex, '$&_');
+}
+
+var utilInspect = __nccwpck_require__(7265);
+var inspectCustom = utilInspect.custom;
+var inspectSymbol = isSymbol(inspectCustom) ? inspectCustom : null;
+
+module.exports = function inspect_(obj, options, depth, seen) {
+    var opts = options || {};
+
+    if (has(opts, 'quoteStyle') && (opts.quoteStyle !== 'single' && opts.quoteStyle !== 'double')) {
+        throw new TypeError('option "quoteStyle" must be "single" or "double"');
+    }
+    if (
+        has(opts, 'maxStringLength') && (typeof opts.maxStringLength === 'number'
+            ? opts.maxStringLength < 0 && opts.maxStringLength !== Infinity
+            : opts.maxStringLength !== null
+        )
+    ) {
+        throw new TypeError('option "maxStringLength", if provided, must be a positive integer, Infinity, or `null`');
+    }
+    var customInspect = has(opts, 'customInspect') ? opts.customInspect : true;
+    if (typeof customInspect !== 'boolean' && customInspect !== 'symbol') {
+        throw new TypeError('option "customInspect", if provided, must be `true`, `false`, or `\'symbol\'`');
+    }
+
+    if (
+        has(opts, 'indent')
+        && opts.indent !== null
+        && opts.indent !== '\t'
+        && !(parseInt(opts.indent, 10) === opts.indent && opts.indent > 0)
+    ) {
+        throw new TypeError('option "indent" must be "\\t", an integer > 0, or `null`');
+    }
+    if (has(opts, 'numericSeparator') && typeof opts.numericSeparator !== 'boolean') {
+        throw new TypeError('option "numericSeparator", if provided, must be `true` or `false`');
+    }
+    var numericSeparator = opts.numericSeparator;
+
+    if (typeof obj === 'undefined') {
+        return 'undefined';
+    }
+    if (obj === null) {
+        return 'null';
+    }
+    if (typeof obj === 'boolean') {
+        return obj ? 'true' : 'false';
+    }
+
+    if (typeof obj === 'string') {
+        return inspectString(obj, opts);
+    }
+    if (typeof obj === 'number') {
+        if (obj === 0) {
+            return Infinity / obj > 0 ? '0' : '-0';
+        }
+        var str = String(obj);
+        return numericSeparator ? addNumericSeparator(obj, str) : str;
+    }
+    if (typeof obj === 'bigint') {
+        var bigIntStr = String(obj) + 'n';
+        return numericSeparator ? addNumericSeparator(obj, bigIntStr) : bigIntStr;
+    }
+
+    var maxDepth = typeof opts.depth === 'undefined' ? 5 : opts.depth;
+    if (typeof depth === 'undefined') { depth = 0; }
+    if (depth >= maxDepth && maxDepth > 0 && typeof obj === 'object') {
+        return isArray(obj) ? '[Array]' : '[Object]';
+    }
+
+    var indent = getIndent(opts, depth);
+
+    if (typeof seen === 'undefined') {
+        seen = [];
+    } else if (indexOf(seen, obj) >= 0) {
+        return '[Circular]';
+    }
+
+    function inspect(value, from, noIndent) {
+        if (from) {
+            seen = $arrSlice.call(seen);
+            seen.push(from);
+        }
+        if (noIndent) {
+            var newOpts = {
+                depth: opts.depth
+            };
+            if (has(opts, 'quoteStyle')) {
+                newOpts.quoteStyle = opts.quoteStyle;
+            }
+            return inspect_(value, newOpts, depth + 1, seen);
+        }
+        return inspect_(value, opts, depth + 1, seen);
+    }
+
+    if (typeof obj === 'function' && !isRegExp(obj)) { // in older engines, regexes are callable
+        var name = nameOf(obj);
+        var keys = arrObjKeys(obj, inspect);
+        return '[Function' + (name ? ': ' + name : ' (anonymous)') + ']' + (keys.length > 0 ? ' { ' + $join.call(keys, ', ') + ' }' : '');
+    }
+    if (isSymbol(obj)) {
+        var symString = hasShammedSymbols ? $replace.call(String(obj), /^(Symbol\(.*\))_[^)]*$/, '$1') : symToString.call(obj);
+        return typeof obj === 'object' && !hasShammedSymbols ? markBoxed(symString) : symString;
+    }
+    if (isElement(obj)) {
+        var s = '<' + $toLowerCase.call(String(obj.nodeName));
+        var attrs = obj.attributes || [];
+        for (var i = 0; i < attrs.length; i++) {
+            s += ' ' + attrs[i].name + '=' + wrapQuotes(quote(attrs[i].value), 'double', opts);
+        }
+        s += '>';
+        if (obj.childNodes && obj.childNodes.length) { s += '...'; }
+        s += '</' + $toLowerCase.call(String(obj.nodeName)) + '>';
+        return s;
+    }
+    if (isArray(obj)) {
+        if (obj.length === 0) { return '[]'; }
+        var xs = arrObjKeys(obj, inspect);
+        if (indent && !singleLineValues(xs)) {
+            return '[' + indentedJoin(xs, indent) + ']';
+        }
+        return '[ ' + $join.call(xs, ', ') + ' ]';
+    }
+    if (isError(obj)) {
+        var parts = arrObjKeys(obj, inspect);
+        if (!('cause' in Error.prototype) && 'cause' in obj && !isEnumerable.call(obj, 'cause')) {
+            return '{ [' + String(obj) + '] ' + $join.call($concat.call('[cause]: ' + inspect(obj.cause), parts), ', ') + ' }';
+        }
+        if (parts.length === 0) { return '[' + String(obj) + ']'; }
+        return '{ [' + String(obj) + '] ' + $join.call(parts, ', ') + ' }';
+    }
+    if (typeof obj === 'object' && customInspect) {
+        if (inspectSymbol && typeof obj[inspectSymbol] === 'function' && utilInspect) {
+            return utilInspect(obj, { depth: maxDepth - depth });
+        } else if (customInspect !== 'symbol' && typeof obj.inspect === 'function') {
+            return obj.inspect();
+        }
+    }
+    if (isMap(obj)) {
+        var mapParts = [];
+        if (mapForEach) {
+            mapForEach.call(obj, function (value, key) {
+                mapParts.push(inspect(key, obj, true) + ' => ' + inspect(value, obj));
+            });
+        }
+        return collectionOf('Map', mapSize.call(obj), mapParts, indent);
+    }
+    if (isSet(obj)) {
+        var setParts = [];
+        if (setForEach) {
+            setForEach.call(obj, function (value) {
+                setParts.push(inspect(value, obj));
+            });
+        }
+        return collectionOf('Set', setSize.call(obj), setParts, indent);
+    }
+    if (isWeakMap(obj)) {
+        return weakCollectionOf('WeakMap');
+    }
+    if (isWeakSet(obj)) {
+        return weakCollectionOf('WeakSet');
+    }
+    if (isWeakRef(obj)) {
+        return weakCollectionOf('WeakRef');
+    }
+    if (isNumber(obj)) {
+        return markBoxed(inspect(Number(obj)));
+    }
+    if (isBigInt(obj)) {
+        return markBoxed(inspect(bigIntValueOf.call(obj)));
+    }
+    if (isBoolean(obj)) {
+        return markBoxed(booleanValueOf.call(obj));
+    }
+    if (isString(obj)) {
+        return markBoxed(inspect(String(obj)));
+    }
+    if (!isDate(obj) && !isRegExp(obj)) {
+        var ys = arrObjKeys(obj, inspect);
+        var isPlainObject = gPO ? gPO(obj) === Object.prototype : obj instanceof Object || obj.constructor === Object;
+        var protoTag = obj instanceof Object ? '' : 'null prototype';
+        var stringTag = !isPlainObject && toStringTag && Object(obj) === obj && toStringTag in obj ? $slice.call(toStr(obj), 8, -1) : protoTag ? 'Object' : '';
+        var constructorTag = isPlainObject || typeof obj.constructor !== 'function' ? '' : obj.constructor.name ? obj.constructor.name + ' ' : '';
+        var tag = constructorTag + (stringTag || protoTag ? '[' + $join.call($concat.call([], stringTag || [], protoTag || []), ': ') + '] ' : '');
+        if (ys.length === 0) { return tag + '{}'; }
+        if (indent) {
+            return tag + '{' + indentedJoin(ys, indent) + '}';
+        }
+        return tag + '{ ' + $join.call(ys, ', ') + ' }';
+    }
+    return String(obj);
+};
+
+function wrapQuotes(s, defaultStyle, opts) {
+    var quoteChar = (opts.quoteStyle || defaultStyle) === 'double' ? '"' : "'";
+    return quoteChar + s + quoteChar;
+}
+
+function quote(s) {
+    return $replace.call(String(s), /"/g, '&quot;');
+}
+
+function isArray(obj) { return toStr(obj) === '[object Array]' && (!toStringTag || !(typeof obj === 'object' && toStringTag in obj)); }
+function isDate(obj) { return toStr(obj) === '[object Date]' && (!toStringTag || !(typeof obj === 'object' && toStringTag in obj)); }
+function isRegExp(obj) { return toStr(obj) === '[object RegExp]' && (!toStringTag || !(typeof obj === 'object' && toStringTag in obj)); }
+function isError(obj) { return toStr(obj) === '[object Error]' && (!toStringTag || !(typeof obj === 'object' && toStringTag in obj)); }
+function isString(obj) { return toStr(obj) === '[object String]' && (!toStringTag || !(typeof obj === 'object' && toStringTag in obj)); }
+function isNumber(obj) { return toStr(obj) === '[object Number]' && (!toStringTag || !(typeof obj === 'object' && toStringTag in obj)); }
+function isBoolean(obj) { return toStr(obj) === '[object Boolean]' && (!toStringTag || !(typeof obj === 'object' && toStringTag in obj)); }
+
+// Symbol and BigInt do have Symbol.toStringTag by spec, so that can't be used to eliminate false positives
+function isSymbol(obj) {
+    if (hasShammedSymbols) {
+        return obj && typeof obj === 'object' && obj instanceof Symbol;
+    }
+    if (typeof obj === 'symbol') {
+        return true;
+    }
+    if (!obj || typeof obj !== 'object' || !symToString) {
+        return false;
+    }
+    try {
+        symToString.call(obj);
+        return true;
+    } catch (e) {}
+    return false;
+}
+
+function isBigInt(obj) {
+    if (!obj || typeof obj !== 'object' || !bigIntValueOf) {
+        return false;
+    }
+    try {
+        bigIntValueOf.call(obj);
+        return true;
+    } catch (e) {}
+    return false;
+}
+
+var hasOwn = Object.prototype.hasOwnProperty || function (key) { return key in this; };
+function has(obj, key) {
+    return hasOwn.call(obj, key);
+}
+
+function toStr(obj) {
+    return objectToString.call(obj);
+}
+
+function nameOf(f) {
+    if (f.name) { return f.name; }
+    var m = $match.call(functionToString.call(f), /^function\s*([\w$]+)/);
+    if (m) { return m[1]; }
+    return null;
+}
+
+function indexOf(xs, x) {
+    if (xs.indexOf) { return xs.indexOf(x); }
+    for (var i = 0, l = xs.length; i < l; i++) {
+        if (xs[i] === x) { return i; }
+    }
+    return -1;
+}
+
+function isMap(x) {
+    if (!mapSize || !x || typeof x !== 'object') {
+        return false;
+    }
+    try {
+        mapSize.call(x);
+        try {
+            setSize.call(x);
+        } catch (s) {
+            return true;
+        }
+        return x instanceof Map; // core-js workaround, pre-v2.5.0
+    } catch (e) {}
+    return false;
+}
+
+function isWeakMap(x) {
+    if (!weakMapHas || !x || typeof x !== 'object') {
+        return false;
+    }
+    try {
+        weakMapHas.call(x, weakMapHas);
+        try {
+            weakSetHas.call(x, weakSetHas);
+        } catch (s) {
+            return true;
+        }
+        return x instanceof WeakMap; // core-js workaround, pre-v2.5.0
+    } catch (e) {}
+    return false;
+}
+
+function isWeakRef(x) {
+    if (!weakRefDeref || !x || typeof x !== 'object') {
+        return false;
+    }
+    try {
+        weakRefDeref.call(x);
+        return true;
+    } catch (e) {}
+    return false;
+}
+
+function isSet(x) {
+    if (!setSize || !x || typeof x !== 'object') {
+        return false;
+    }
+    try {
+        setSize.call(x);
+        try {
+            mapSize.call(x);
+        } catch (m) {
+            return true;
+        }
+        return x instanceof Set; // core-js workaround, pre-v2.5.0
+    } catch (e) {}
+    return false;
+}
+
+function isWeakSet(x) {
+    if (!weakSetHas || !x || typeof x !== 'object') {
+        return false;
+    }
+    try {
+        weakSetHas.call(x, weakSetHas);
+        try {
+            weakMapHas.call(x, weakMapHas);
+        } catch (s) {
+            return true;
+        }
+        return x instanceof WeakSet; // core-js workaround, pre-v2.5.0
+    } catch (e) {}
+    return false;
+}
+
+function isElement(x) {
+    if (!x || typeof x !== 'object') { return false; }
+    if (typeof HTMLElement !== 'undefined' && x instanceof HTMLElement) {
+        return true;
+    }
+    return typeof x.nodeName === 'string' && typeof x.getAttribute === 'function';
+}
+
+function inspectString(str, opts) {
+    if (str.length > opts.maxStringLength) {
+        var remaining = str.length - opts.maxStringLength;
+        var trailer = '... ' + remaining + ' more character' + (remaining > 1 ? 's' : '');
+        return inspectString($slice.call(str, 0, opts.maxStringLength), opts) + trailer;
+    }
+    // eslint-disable-next-line no-control-regex
+    var s = $replace.call($replace.call(str, /(['\\])/g, '\\$1'), /[\x00-\x1f]/g, lowbyte);
+    return wrapQuotes(s, 'single', opts);
+}
+
+function lowbyte(c) {
+    var n = c.charCodeAt(0);
+    var x = {
+        8: 'b',
+        9: 't',
+        10: 'n',
+        12: 'f',
+        13: 'r'
+    }[n];
+    if (x) { return '\\' + x; }
+    return '\\x' + (n < 0x10 ? '0' : '') + $toUpperCase.call(n.toString(16));
+}
+
+function markBoxed(str) {
+    return 'Object(' + str + ')';
+}
+
+function weakCollectionOf(type) {
+    return type + ' { ? }';
+}
+
+function collectionOf(type, size, entries, indent) {
+    var joinedEntries = indent ? indentedJoin(entries, indent) : $join.call(entries, ', ');
+    return type + ' (' + size + ') {' + joinedEntries + '}';
+}
+
+function singleLineValues(xs) {
+    for (var i = 0; i < xs.length; i++) {
+        if (indexOf(xs[i], '\n') >= 0) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function getIndent(opts, depth) {
+    var baseIndent;
+    if (opts.indent === '\t') {
+        baseIndent = '\t';
+    } else if (typeof opts.indent === 'number' && opts.indent > 0) {
+        baseIndent = $join.call(Array(opts.indent + 1), ' ');
+    } else {
+        return null;
+    }
+    return {
+        base: baseIndent,
+        prev: $join.call(Array(depth + 1), baseIndent)
+    };
+}
+
+function indentedJoin(xs, indent) {
+    if (xs.length === 0) { return ''; }
+    var lineJoiner = '\n' + indent.prev + indent.base;
+    return lineJoiner + $join.call(xs, ',' + lineJoiner) + '\n' + indent.prev;
+}
+
+function arrObjKeys(obj, inspect) {
+    var isArr = isArray(obj);
+    var xs = [];
+    if (isArr) {
+        xs.length = obj.length;
+        for (var i = 0; i < obj.length; i++) {
+            xs[i] = has(obj, i) ? inspect(obj[i], obj) : '';
+        }
+    }
+    var syms = typeof gOPS === 'function' ? gOPS(obj) : [];
+    var symMap;
+    if (hasShammedSymbols) {
+        symMap = {};
+        for (var k = 0; k < syms.length; k++) {
+            symMap['$' + syms[k]] = syms[k];
+        }
+    }
+
+    for (var key in obj) { // eslint-disable-line no-restricted-syntax
+        if (!has(obj, key)) { continue; } // eslint-disable-line no-restricted-syntax, no-continue
+        if (isArr && String(Number(key)) === key && key < obj.length) { continue; } // eslint-disable-line no-restricted-syntax, no-continue
+        if (hasShammedSymbols && symMap['$' + key] instanceof Symbol) {
+            // this is to prevent shammed Symbols, which are stored as strings, from being included in the string key section
+            continue; // eslint-disable-line no-restricted-syntax, no-continue
+        } else if ($test.call(/[^\w$]/, key)) {
+            xs.push(inspect(key, obj) + ': ' + inspect(obj[key], obj));
+        } else {
+            xs.push(key + ': ' + inspect(obj[key], obj));
+        }
+    }
+    if (typeof gOPS === 'function') {
+        for (var j = 0; j < syms.length; j++) {
+            if (isEnumerable.call(obj, syms[j])) {
+                xs.push('[' + inspect(syms[j]) + ']: ' + inspect(obj[syms[j]], obj));
+            }
+        }
+    }
+    return xs;
+}
+
+
+/***/ }),
+
+/***/ 7265:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+module.exports = __nccwpck_require__(3837).inspect;
+
+
+/***/ }),
+
 /***/ 1223:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
@@ -7236,6 +8371,1042 @@ function onceStrict (fn) {
   f.called = false
   return f
 }
+
+
+/***/ }),
+
+/***/ 4907:
+/***/ ((module) => {
+
+
+
+var replace = String.prototype.replace;
+var percentTwenties = /%20/g;
+
+var Format = {
+    RFC1738: 'RFC1738',
+    RFC3986: 'RFC3986'
+};
+
+module.exports = {
+    'default': Format.RFC3986,
+    formatters: {
+        RFC1738: function (value) {
+            return replace.call(value, percentTwenties, '+');
+        },
+        RFC3986: function (value) {
+            return String(value);
+        }
+    },
+    RFC1738: Format.RFC1738,
+    RFC3986: Format.RFC3986
+};
+
+
+/***/ }),
+
+/***/ 2760:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+
+var stringify = __nccwpck_require__(9954);
+var parse = __nccwpck_require__(3912);
+var formats = __nccwpck_require__(4907);
+
+module.exports = {
+    formats: formats,
+    parse: parse,
+    stringify: stringify
+};
+
+
+/***/ }),
+
+/***/ 3912:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+
+var utils = __nccwpck_require__(2360);
+
+var has = Object.prototype.hasOwnProperty;
+var isArray = Array.isArray;
+
+var defaults = {
+    allowDots: false,
+    allowPrototypes: false,
+    allowSparse: false,
+    arrayLimit: 20,
+    charset: 'utf-8',
+    charsetSentinel: false,
+    comma: false,
+    decoder: utils.decode,
+    delimiter: '&',
+    depth: 5,
+    ignoreQueryPrefix: false,
+    interpretNumericEntities: false,
+    parameterLimit: 1000,
+    parseArrays: true,
+    plainObjects: false,
+    strictNullHandling: false
+};
+
+var interpretNumericEntities = function (str) {
+    return str.replace(/&#(\d+);/g, function ($0, numberStr) {
+        return String.fromCharCode(parseInt(numberStr, 10));
+    });
+};
+
+var parseArrayValue = function (val, options) {
+    if (val && typeof val === 'string' && options.comma && val.indexOf(',') > -1) {
+        return val.split(',');
+    }
+
+    return val;
+};
+
+// This is what browsers will submit when the ✓ character occurs in an
+// application/x-www-form-urlencoded body and the encoding of the page containing
+// the form is iso-8859-1, or when the submitted form has an accept-charset
+// attribute of iso-8859-1. Presumably also with other charsets that do not contain
+// the ✓ character, such as us-ascii.
+var isoSentinel = 'utf8=%26%2310003%3B'; // encodeURIComponent('&#10003;')
+
+// These are the percent-encoded utf-8 octets representing a checkmark, indicating that the request actually is utf-8 encoded.
+var charsetSentinel = 'utf8=%E2%9C%93'; // encodeURIComponent('✓')
+
+var parseValues = function parseQueryStringValues(str, options) {
+    var obj = { __proto__: null };
+
+    var cleanStr = options.ignoreQueryPrefix ? str.replace(/^\?/, '') : str;
+    var limit = options.parameterLimit === Infinity ? undefined : options.parameterLimit;
+    var parts = cleanStr.split(options.delimiter, limit);
+    var skipIndex = -1; // Keep track of where the utf8 sentinel was found
+    var i;
+
+    var charset = options.charset;
+    if (options.charsetSentinel) {
+        for (i = 0; i < parts.length; ++i) {
+            if (parts[i].indexOf('utf8=') === 0) {
+                if (parts[i] === charsetSentinel) {
+                    charset = 'utf-8';
+                } else if (parts[i] === isoSentinel) {
+                    charset = 'iso-8859-1';
+                }
+                skipIndex = i;
+                i = parts.length; // The eslint settings do not allow break;
+            }
+        }
+    }
+
+    for (i = 0; i < parts.length; ++i) {
+        if (i === skipIndex) {
+            continue;
+        }
+        var part = parts[i];
+
+        var bracketEqualsPos = part.indexOf(']=');
+        var pos = bracketEqualsPos === -1 ? part.indexOf('=') : bracketEqualsPos + 1;
+
+        var key, val;
+        if (pos === -1) {
+            key = options.decoder(part, defaults.decoder, charset, 'key');
+            val = options.strictNullHandling ? null : '';
+        } else {
+            key = options.decoder(part.slice(0, pos), defaults.decoder, charset, 'key');
+            val = utils.maybeMap(
+                parseArrayValue(part.slice(pos + 1), options),
+                function (encodedVal) {
+                    return options.decoder(encodedVal, defaults.decoder, charset, 'value');
+                }
+            );
+        }
+
+        if (val && options.interpretNumericEntities && charset === 'iso-8859-1') {
+            val = interpretNumericEntities(val);
+        }
+
+        if (part.indexOf('[]=') > -1) {
+            val = isArray(val) ? [val] : val;
+        }
+
+        if (has.call(obj, key)) {
+            obj[key] = utils.combine(obj[key], val);
+        } else {
+            obj[key] = val;
+        }
+    }
+
+    return obj;
+};
+
+var parseObject = function (chain, val, options, valuesParsed) {
+    var leaf = valuesParsed ? val : parseArrayValue(val, options);
+
+    for (var i = chain.length - 1; i >= 0; --i) {
+        var obj;
+        var root = chain[i];
+
+        if (root === '[]' && options.parseArrays) {
+            obj = [].concat(leaf);
+        } else {
+            obj = options.plainObjects ? Object.create(null) : {};
+            var cleanRoot = root.charAt(0) === '[' && root.charAt(root.length - 1) === ']' ? root.slice(1, -1) : root;
+            var index = parseInt(cleanRoot, 10);
+            if (!options.parseArrays && cleanRoot === '') {
+                obj = { 0: leaf };
+            } else if (
+                !isNaN(index)
+                && root !== cleanRoot
+                && String(index) === cleanRoot
+                && index >= 0
+                && (options.parseArrays && index <= options.arrayLimit)
+            ) {
+                obj = [];
+                obj[index] = leaf;
+            } else if (cleanRoot !== '__proto__') {
+                obj[cleanRoot] = leaf;
+            }
+        }
+
+        leaf = obj;
+    }
+
+    return leaf;
+};
+
+var parseKeys = function parseQueryStringKeys(givenKey, val, options, valuesParsed) {
+    if (!givenKey) {
+        return;
+    }
+
+    // Transform dot notation to bracket notation
+    var key = options.allowDots ? givenKey.replace(/\.([^.[]+)/g, '[$1]') : givenKey;
+
+    // The regex chunks
+
+    var brackets = /(\[[^[\]]*])/;
+    var child = /(\[[^[\]]*])/g;
+
+    // Get the parent
+
+    var segment = options.depth > 0 && brackets.exec(key);
+    var parent = segment ? key.slice(0, segment.index) : key;
+
+    // Stash the parent if it exists
+
+    var keys = [];
+    if (parent) {
+        // If we aren't using plain objects, optionally prefix keys that would overwrite object prototype properties
+        if (!options.plainObjects && has.call(Object.prototype, parent)) {
+            if (!options.allowPrototypes) {
+                return;
+            }
+        }
+
+        keys.push(parent);
+    }
+
+    // Loop through children appending to the array until we hit depth
+
+    var i = 0;
+    while (options.depth > 0 && (segment = child.exec(key)) !== null && i < options.depth) {
+        i += 1;
+        if (!options.plainObjects && has.call(Object.prototype, segment[1].slice(1, -1))) {
+            if (!options.allowPrototypes) {
+                return;
+            }
+        }
+        keys.push(segment[1]);
+    }
+
+    // If there's a remainder, just add whatever is left
+
+    if (segment) {
+        keys.push('[' + key.slice(segment.index) + ']');
+    }
+
+    return parseObject(keys, val, options, valuesParsed);
+};
+
+var normalizeParseOptions = function normalizeParseOptions(opts) {
+    if (!opts) {
+        return defaults;
+    }
+
+    if (opts.decoder !== null && opts.decoder !== undefined && typeof opts.decoder !== 'function') {
+        throw new TypeError('Decoder has to be a function.');
+    }
+
+    if (typeof opts.charset !== 'undefined' && opts.charset !== 'utf-8' && opts.charset !== 'iso-8859-1') {
+        throw new TypeError('The charset option must be either utf-8, iso-8859-1, or undefined');
+    }
+    var charset = typeof opts.charset === 'undefined' ? defaults.charset : opts.charset;
+
+    return {
+        allowDots: typeof opts.allowDots === 'undefined' ? defaults.allowDots : !!opts.allowDots,
+        allowPrototypes: typeof opts.allowPrototypes === 'boolean' ? opts.allowPrototypes : defaults.allowPrototypes,
+        allowSparse: typeof opts.allowSparse === 'boolean' ? opts.allowSparse : defaults.allowSparse,
+        arrayLimit: typeof opts.arrayLimit === 'number' ? opts.arrayLimit : defaults.arrayLimit,
+        charset: charset,
+        charsetSentinel: typeof opts.charsetSentinel === 'boolean' ? opts.charsetSentinel : defaults.charsetSentinel,
+        comma: typeof opts.comma === 'boolean' ? opts.comma : defaults.comma,
+        decoder: typeof opts.decoder === 'function' ? opts.decoder : defaults.decoder,
+        delimiter: typeof opts.delimiter === 'string' || utils.isRegExp(opts.delimiter) ? opts.delimiter : defaults.delimiter,
+        // eslint-disable-next-line no-implicit-coercion, no-extra-parens
+        depth: (typeof opts.depth === 'number' || opts.depth === false) ? +opts.depth : defaults.depth,
+        ignoreQueryPrefix: opts.ignoreQueryPrefix === true,
+        interpretNumericEntities: typeof opts.interpretNumericEntities === 'boolean' ? opts.interpretNumericEntities : defaults.interpretNumericEntities,
+        parameterLimit: typeof opts.parameterLimit === 'number' ? opts.parameterLimit : defaults.parameterLimit,
+        parseArrays: opts.parseArrays !== false,
+        plainObjects: typeof opts.plainObjects === 'boolean' ? opts.plainObjects : defaults.plainObjects,
+        strictNullHandling: typeof opts.strictNullHandling === 'boolean' ? opts.strictNullHandling : defaults.strictNullHandling
+    };
+};
+
+module.exports = function (str, opts) {
+    var options = normalizeParseOptions(opts);
+
+    if (str === '' || str === null || typeof str === 'undefined') {
+        return options.plainObjects ? Object.create(null) : {};
+    }
+
+    var tempObj = typeof str === 'string' ? parseValues(str, options) : str;
+    var obj = options.plainObjects ? Object.create(null) : {};
+
+    // Iterate over the keys and setup the new object
+
+    var keys = Object.keys(tempObj);
+    for (var i = 0; i < keys.length; ++i) {
+        var key = keys[i];
+        var newObj = parseKeys(key, tempObj[key], options, typeof str === 'string');
+        obj = utils.merge(obj, newObj, options);
+    }
+
+    if (options.allowSparse === true) {
+        return obj;
+    }
+
+    return utils.compact(obj);
+};
+
+
+/***/ }),
+
+/***/ 9954:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+
+var getSideChannel = __nccwpck_require__(4334);
+var utils = __nccwpck_require__(2360);
+var formats = __nccwpck_require__(4907);
+var has = Object.prototype.hasOwnProperty;
+
+var arrayPrefixGenerators = {
+    brackets: function brackets(prefix) {
+        return prefix + '[]';
+    },
+    comma: 'comma',
+    indices: function indices(prefix, key) {
+        return prefix + '[' + key + ']';
+    },
+    repeat: function repeat(prefix) {
+        return prefix;
+    }
+};
+
+var isArray = Array.isArray;
+var push = Array.prototype.push;
+var pushToArray = function (arr, valueOrArray) {
+    push.apply(arr, isArray(valueOrArray) ? valueOrArray : [valueOrArray]);
+};
+
+var toISO = Date.prototype.toISOString;
+
+var defaultFormat = formats['default'];
+var defaults = {
+    addQueryPrefix: false,
+    allowDots: false,
+    charset: 'utf-8',
+    charsetSentinel: false,
+    delimiter: '&',
+    encode: true,
+    encoder: utils.encode,
+    encodeValuesOnly: false,
+    format: defaultFormat,
+    formatter: formats.formatters[defaultFormat],
+    // deprecated
+    indices: false,
+    serializeDate: function serializeDate(date) {
+        return toISO.call(date);
+    },
+    skipNulls: false,
+    strictNullHandling: false
+};
+
+var isNonNullishPrimitive = function isNonNullishPrimitive(v) {
+    return typeof v === 'string'
+        || typeof v === 'number'
+        || typeof v === 'boolean'
+        || typeof v === 'symbol'
+        || typeof v === 'bigint';
+};
+
+var sentinel = {};
+
+var stringify = function stringify(
+    object,
+    prefix,
+    generateArrayPrefix,
+    commaRoundTrip,
+    strictNullHandling,
+    skipNulls,
+    encoder,
+    filter,
+    sort,
+    allowDots,
+    serializeDate,
+    format,
+    formatter,
+    encodeValuesOnly,
+    charset,
+    sideChannel
+) {
+    var obj = object;
+
+    var tmpSc = sideChannel;
+    var step = 0;
+    var findFlag = false;
+    while ((tmpSc = tmpSc.get(sentinel)) !== void undefined && !findFlag) {
+        // Where object last appeared in the ref tree
+        var pos = tmpSc.get(object);
+        step += 1;
+        if (typeof pos !== 'undefined') {
+            if (pos === step) {
+                throw new RangeError('Cyclic object value');
+            } else {
+                findFlag = true; // Break while
+            }
+        }
+        if (typeof tmpSc.get(sentinel) === 'undefined') {
+            step = 0;
+        }
+    }
+
+    if (typeof filter === 'function') {
+        obj = filter(prefix, obj);
+    } else if (obj instanceof Date) {
+        obj = serializeDate(obj);
+    } else if (generateArrayPrefix === 'comma' && isArray(obj)) {
+        obj = utils.maybeMap(obj, function (value) {
+            if (value instanceof Date) {
+                return serializeDate(value);
+            }
+            return value;
+        });
+    }
+
+    if (obj === null) {
+        if (strictNullHandling) {
+            return encoder && !encodeValuesOnly ? encoder(prefix, defaults.encoder, charset, 'key', format) : prefix;
+        }
+
+        obj = '';
+    }
+
+    if (isNonNullishPrimitive(obj) || utils.isBuffer(obj)) {
+        if (encoder) {
+            var keyValue = encodeValuesOnly ? prefix : encoder(prefix, defaults.encoder, charset, 'key', format);
+            return [formatter(keyValue) + '=' + formatter(encoder(obj, defaults.encoder, charset, 'value', format))];
+        }
+        return [formatter(prefix) + '=' + formatter(String(obj))];
+    }
+
+    var values = [];
+
+    if (typeof obj === 'undefined') {
+        return values;
+    }
+
+    var objKeys;
+    if (generateArrayPrefix === 'comma' && isArray(obj)) {
+        // we need to join elements in
+        if (encodeValuesOnly && encoder) {
+            obj = utils.maybeMap(obj, encoder);
+        }
+        objKeys = [{ value: obj.length > 0 ? obj.join(',') || null : void undefined }];
+    } else if (isArray(filter)) {
+        objKeys = filter;
+    } else {
+        var keys = Object.keys(obj);
+        objKeys = sort ? keys.sort(sort) : keys;
+    }
+
+    var adjustedPrefix = commaRoundTrip && isArray(obj) && obj.length === 1 ? prefix + '[]' : prefix;
+
+    for (var j = 0; j < objKeys.length; ++j) {
+        var key = objKeys[j];
+        var value = typeof key === 'object' && typeof key.value !== 'undefined' ? key.value : obj[key];
+
+        if (skipNulls && value === null) {
+            continue;
+        }
+
+        var keyPrefix = isArray(obj)
+            ? typeof generateArrayPrefix === 'function' ? generateArrayPrefix(adjustedPrefix, key) : adjustedPrefix
+            : adjustedPrefix + (allowDots ? '.' + key : '[' + key + ']');
+
+        sideChannel.set(object, step);
+        var valueSideChannel = getSideChannel();
+        valueSideChannel.set(sentinel, sideChannel);
+        pushToArray(values, stringify(
+            value,
+            keyPrefix,
+            generateArrayPrefix,
+            commaRoundTrip,
+            strictNullHandling,
+            skipNulls,
+            generateArrayPrefix === 'comma' && encodeValuesOnly && isArray(obj) ? null : encoder,
+            filter,
+            sort,
+            allowDots,
+            serializeDate,
+            format,
+            formatter,
+            encodeValuesOnly,
+            charset,
+            valueSideChannel
+        ));
+    }
+
+    return values;
+};
+
+var normalizeStringifyOptions = function normalizeStringifyOptions(opts) {
+    if (!opts) {
+        return defaults;
+    }
+
+    if (opts.encoder !== null && typeof opts.encoder !== 'undefined' && typeof opts.encoder !== 'function') {
+        throw new TypeError('Encoder has to be a function.');
+    }
+
+    var charset = opts.charset || defaults.charset;
+    if (typeof opts.charset !== 'undefined' && opts.charset !== 'utf-8' && opts.charset !== 'iso-8859-1') {
+        throw new TypeError('The charset option must be either utf-8, iso-8859-1, or undefined');
+    }
+
+    var format = formats['default'];
+    if (typeof opts.format !== 'undefined') {
+        if (!has.call(formats.formatters, opts.format)) {
+            throw new TypeError('Unknown format option provided.');
+        }
+        format = opts.format;
+    }
+    var formatter = formats.formatters[format];
+
+    var filter = defaults.filter;
+    if (typeof opts.filter === 'function' || isArray(opts.filter)) {
+        filter = opts.filter;
+    }
+
+    return {
+        addQueryPrefix: typeof opts.addQueryPrefix === 'boolean' ? opts.addQueryPrefix : defaults.addQueryPrefix,
+        allowDots: typeof opts.allowDots === 'undefined' ? defaults.allowDots : !!opts.allowDots,
+        charset: charset,
+        charsetSentinel: typeof opts.charsetSentinel === 'boolean' ? opts.charsetSentinel : defaults.charsetSentinel,
+        delimiter: typeof opts.delimiter === 'undefined' ? defaults.delimiter : opts.delimiter,
+        encode: typeof opts.encode === 'boolean' ? opts.encode : defaults.encode,
+        encoder: typeof opts.encoder === 'function' ? opts.encoder : defaults.encoder,
+        encodeValuesOnly: typeof opts.encodeValuesOnly === 'boolean' ? opts.encodeValuesOnly : defaults.encodeValuesOnly,
+        filter: filter,
+        format: format,
+        formatter: formatter,
+        serializeDate: typeof opts.serializeDate === 'function' ? opts.serializeDate : defaults.serializeDate,
+        skipNulls: typeof opts.skipNulls === 'boolean' ? opts.skipNulls : defaults.skipNulls,
+        sort: typeof opts.sort === 'function' ? opts.sort : null,
+        strictNullHandling: typeof opts.strictNullHandling === 'boolean' ? opts.strictNullHandling : defaults.strictNullHandling
+    };
+};
+
+module.exports = function (object, opts) {
+    var obj = object;
+    var options = normalizeStringifyOptions(opts);
+
+    var objKeys;
+    var filter;
+
+    if (typeof options.filter === 'function') {
+        filter = options.filter;
+        obj = filter('', obj);
+    } else if (isArray(options.filter)) {
+        filter = options.filter;
+        objKeys = filter;
+    }
+
+    var keys = [];
+
+    if (typeof obj !== 'object' || obj === null) {
+        return '';
+    }
+
+    var arrayFormat;
+    if (opts && opts.arrayFormat in arrayPrefixGenerators) {
+        arrayFormat = opts.arrayFormat;
+    } else if (opts && 'indices' in opts) {
+        arrayFormat = opts.indices ? 'indices' : 'repeat';
+    } else {
+        arrayFormat = 'indices';
+    }
+
+    var generateArrayPrefix = arrayPrefixGenerators[arrayFormat];
+    if (opts && 'commaRoundTrip' in opts && typeof opts.commaRoundTrip !== 'boolean') {
+        throw new TypeError('`commaRoundTrip` must be a boolean, or absent');
+    }
+    var commaRoundTrip = generateArrayPrefix === 'comma' && opts && opts.commaRoundTrip;
+
+    if (!objKeys) {
+        objKeys = Object.keys(obj);
+    }
+
+    if (options.sort) {
+        objKeys.sort(options.sort);
+    }
+
+    var sideChannel = getSideChannel();
+    for (var i = 0; i < objKeys.length; ++i) {
+        var key = objKeys[i];
+
+        if (options.skipNulls && obj[key] === null) {
+            continue;
+        }
+        pushToArray(keys, stringify(
+            obj[key],
+            key,
+            generateArrayPrefix,
+            commaRoundTrip,
+            options.strictNullHandling,
+            options.skipNulls,
+            options.encode ? options.encoder : null,
+            options.filter,
+            options.sort,
+            options.allowDots,
+            options.serializeDate,
+            options.format,
+            options.formatter,
+            options.encodeValuesOnly,
+            options.charset,
+            sideChannel
+        ));
+    }
+
+    var joined = keys.join(options.delimiter);
+    var prefix = options.addQueryPrefix === true ? '?' : '';
+
+    if (options.charsetSentinel) {
+        if (options.charset === 'iso-8859-1') {
+            // encodeURIComponent('&#10003;'), the "numeric entity" representation of a checkmark
+            prefix += 'utf8=%26%2310003%3B&';
+        } else {
+            // encodeURIComponent('✓')
+            prefix += 'utf8=%E2%9C%93&';
+        }
+    }
+
+    return joined.length > 0 ? prefix + joined : '';
+};
+
+
+/***/ }),
+
+/***/ 2360:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+
+var formats = __nccwpck_require__(4907);
+
+var has = Object.prototype.hasOwnProperty;
+var isArray = Array.isArray;
+
+var hexTable = (function () {
+    var array = [];
+    for (var i = 0; i < 256; ++i) {
+        array.push('%' + ((i < 16 ? '0' : '') + i.toString(16)).toUpperCase());
+    }
+
+    return array;
+}());
+
+var compactQueue = function compactQueue(queue) {
+    while (queue.length > 1) {
+        var item = queue.pop();
+        var obj = item.obj[item.prop];
+
+        if (isArray(obj)) {
+            var compacted = [];
+
+            for (var j = 0; j < obj.length; ++j) {
+                if (typeof obj[j] !== 'undefined') {
+                    compacted.push(obj[j]);
+                }
+            }
+
+            item.obj[item.prop] = compacted;
+        }
+    }
+};
+
+var arrayToObject = function arrayToObject(source, options) {
+    var obj = options && options.plainObjects ? Object.create(null) : {};
+    for (var i = 0; i < source.length; ++i) {
+        if (typeof source[i] !== 'undefined') {
+            obj[i] = source[i];
+        }
+    }
+
+    return obj;
+};
+
+var merge = function merge(target, source, options) {
+    /* eslint no-param-reassign: 0 */
+    if (!source) {
+        return target;
+    }
+
+    if (typeof source !== 'object') {
+        if (isArray(target)) {
+            target.push(source);
+        } else if (target && typeof target === 'object') {
+            if ((options && (options.plainObjects || options.allowPrototypes)) || !has.call(Object.prototype, source)) {
+                target[source] = true;
+            }
+        } else {
+            return [target, source];
+        }
+
+        return target;
+    }
+
+    if (!target || typeof target !== 'object') {
+        return [target].concat(source);
+    }
+
+    var mergeTarget = target;
+    if (isArray(target) && !isArray(source)) {
+        mergeTarget = arrayToObject(target, options);
+    }
+
+    if (isArray(target) && isArray(source)) {
+        source.forEach(function (item, i) {
+            if (has.call(target, i)) {
+                var targetItem = target[i];
+                if (targetItem && typeof targetItem === 'object' && item && typeof item === 'object') {
+                    target[i] = merge(targetItem, item, options);
+                } else {
+                    target.push(item);
+                }
+            } else {
+                target[i] = item;
+            }
+        });
+        return target;
+    }
+
+    return Object.keys(source).reduce(function (acc, key) {
+        var value = source[key];
+
+        if (has.call(acc, key)) {
+            acc[key] = merge(acc[key], value, options);
+        } else {
+            acc[key] = value;
+        }
+        return acc;
+    }, mergeTarget);
+};
+
+var assign = function assignSingleSource(target, source) {
+    return Object.keys(source).reduce(function (acc, key) {
+        acc[key] = source[key];
+        return acc;
+    }, target);
+};
+
+var decode = function (str, decoder, charset) {
+    var strWithoutPlus = str.replace(/\+/g, ' ');
+    if (charset === 'iso-8859-1') {
+        // unescape never throws, no try...catch needed:
+        return strWithoutPlus.replace(/%[0-9a-f]{2}/gi, unescape);
+    }
+    // utf-8
+    try {
+        return decodeURIComponent(strWithoutPlus);
+    } catch (e) {
+        return strWithoutPlus;
+    }
+};
+
+var encode = function encode(str, defaultEncoder, charset, kind, format) {
+    // This code was originally written by Brian White (mscdex) for the io.js core querystring library.
+    // It has been adapted here for stricter adherence to RFC 3986
+    if (str.length === 0) {
+        return str;
+    }
+
+    var string = str;
+    if (typeof str === 'symbol') {
+        string = Symbol.prototype.toString.call(str);
+    } else if (typeof str !== 'string') {
+        string = String(str);
+    }
+
+    if (charset === 'iso-8859-1') {
+        return escape(string).replace(/%u[0-9a-f]{4}/gi, function ($0) {
+            return '%26%23' + parseInt($0.slice(2), 16) + '%3B';
+        });
+    }
+
+    var out = '';
+    for (var i = 0; i < string.length; ++i) {
+        var c = string.charCodeAt(i);
+
+        if (
+            c === 0x2D // -
+            || c === 0x2E // .
+            || c === 0x5F // _
+            || c === 0x7E // ~
+            || (c >= 0x30 && c <= 0x39) // 0-9
+            || (c >= 0x41 && c <= 0x5A) // a-z
+            || (c >= 0x61 && c <= 0x7A) // A-Z
+            || (format === formats.RFC1738 && (c === 0x28 || c === 0x29)) // ( )
+        ) {
+            out += string.charAt(i);
+            continue;
+        }
+
+        if (c < 0x80) {
+            out = out + hexTable[c];
+            continue;
+        }
+
+        if (c < 0x800) {
+            out = out + (hexTable[0xC0 | (c >> 6)] + hexTable[0x80 | (c & 0x3F)]);
+            continue;
+        }
+
+        if (c < 0xD800 || c >= 0xE000) {
+            out = out + (hexTable[0xE0 | (c >> 12)] + hexTable[0x80 | ((c >> 6) & 0x3F)] + hexTable[0x80 | (c & 0x3F)]);
+            continue;
+        }
+
+        i += 1;
+        c = 0x10000 + (((c & 0x3FF) << 10) | (string.charCodeAt(i) & 0x3FF));
+        /* eslint operator-linebreak: [2, "before"] */
+        out += hexTable[0xF0 | (c >> 18)]
+            + hexTable[0x80 | ((c >> 12) & 0x3F)]
+            + hexTable[0x80 | ((c >> 6) & 0x3F)]
+            + hexTable[0x80 | (c & 0x3F)];
+    }
+
+    return out;
+};
+
+var compact = function compact(value) {
+    var queue = [{ obj: { o: value }, prop: 'o' }];
+    var refs = [];
+
+    for (var i = 0; i < queue.length; ++i) {
+        var item = queue[i];
+        var obj = item.obj[item.prop];
+
+        var keys = Object.keys(obj);
+        for (var j = 0; j < keys.length; ++j) {
+            var key = keys[j];
+            var val = obj[key];
+            if (typeof val === 'object' && val !== null && refs.indexOf(val) === -1) {
+                queue.push({ obj: obj, prop: key });
+                refs.push(val);
+            }
+        }
+    }
+
+    compactQueue(queue);
+
+    return value;
+};
+
+var isRegExp = function isRegExp(obj) {
+    return Object.prototype.toString.call(obj) === '[object RegExp]';
+};
+
+var isBuffer = function isBuffer(obj) {
+    if (!obj || typeof obj !== 'object') {
+        return false;
+    }
+
+    return !!(obj.constructor && obj.constructor.isBuffer && obj.constructor.isBuffer(obj));
+};
+
+var combine = function combine(a, b) {
+    return [].concat(a, b);
+};
+
+var maybeMap = function maybeMap(val, fn) {
+    if (isArray(val)) {
+        var mapped = [];
+        for (var i = 0; i < val.length; i += 1) {
+            mapped.push(fn(val[i]));
+        }
+        return mapped;
+    }
+    return fn(val);
+};
+
+module.exports = {
+    arrayToObject: arrayToObject,
+    assign: assign,
+    combine: combine,
+    compact: compact,
+    decode: decode,
+    encode: encode,
+    isBuffer: isBuffer,
+    isRegExp: isRegExp,
+    maybeMap: maybeMap,
+    merge: merge
+};
+
+
+/***/ }),
+
+/***/ 4334:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+
+var GetIntrinsic = __nccwpck_require__(4538);
+var callBound = __nccwpck_require__(8803);
+var inspect = __nccwpck_require__(504);
+
+var $TypeError = GetIntrinsic('%TypeError%');
+var $WeakMap = GetIntrinsic('%WeakMap%', true);
+var $Map = GetIntrinsic('%Map%', true);
+
+var $weakMapGet = callBound('WeakMap.prototype.get', true);
+var $weakMapSet = callBound('WeakMap.prototype.set', true);
+var $weakMapHas = callBound('WeakMap.prototype.has', true);
+var $mapGet = callBound('Map.prototype.get', true);
+var $mapSet = callBound('Map.prototype.set', true);
+var $mapHas = callBound('Map.prototype.has', true);
+
+/*
+ * This function traverses the list returning the node corresponding to the
+ * given key.
+ *
+ * That node is also moved to the head of the list, so that if it's accessed
+ * again we don't need to traverse the whole list. By doing so, all the recently
+ * used nodes can be accessed relatively quickly.
+ */
+var listGetNode = function (list, key) { // eslint-disable-line consistent-return
+	for (var prev = list, curr; (curr = prev.next) !== null; prev = curr) {
+		if (curr.key === key) {
+			prev.next = curr.next;
+			curr.next = list.next;
+			list.next = curr; // eslint-disable-line no-param-reassign
+			return curr;
+		}
+	}
+};
+
+var listGet = function (objects, key) {
+	var node = listGetNode(objects, key);
+	return node && node.value;
+};
+var listSet = function (objects, key, value) {
+	var node = listGetNode(objects, key);
+	if (node) {
+		node.value = value;
+	} else {
+		// Prepend the new node to the beginning of the list
+		objects.next = { // eslint-disable-line no-param-reassign
+			key: key,
+			next: objects.next,
+			value: value
+		};
+	}
+};
+var listHas = function (objects, key) {
+	return !!listGetNode(objects, key);
+};
+
+module.exports = function getSideChannel() {
+	var $wm;
+	var $m;
+	var $o;
+	var channel = {
+		assert: function (key) {
+			if (!channel.has(key)) {
+				throw new $TypeError('Side channel does not contain ' + inspect(key));
+			}
+		},
+		get: function (key) { // eslint-disable-line consistent-return
+			if ($WeakMap && key && (typeof key === 'object' || typeof key === 'function')) {
+				if ($wm) {
+					return $weakMapGet($wm, key);
+				}
+			} else if ($Map) {
+				if ($m) {
+					return $mapGet($m, key);
+				}
+			} else {
+				if ($o) { // eslint-disable-line no-lonely-if
+					return listGet($o, key);
+				}
+			}
+		},
+		has: function (key) {
+			if ($WeakMap && key && (typeof key === 'object' || typeof key === 'function')) {
+				if ($wm) {
+					return $weakMapHas($wm, key);
+				}
+			} else if ($Map) {
+				if ($m) {
+					return $mapHas($m, key);
+				}
+			} else {
+				if ($o) { // eslint-disable-line no-lonely-if
+					return listHas($o, key);
+				}
+			}
+			return false;
+		},
+		set: function (key, value) {
+			if ($WeakMap && key && (typeof key === 'object' || typeof key === 'function')) {
+				if (!$wm) {
+					$wm = new $WeakMap();
+				}
+				$weakMapSet($wm, key, value);
+			} else if ($Map) {
+				if (!$m) {
+					$m = new $Map();
+				}
+				$mapSet($m, key, value);
+			} else {
+				if (!$o) {
+					/*
+					 * Initialize the linked list as an empty node, so that we don't have
+					 * to special-case handling of the first node: we can always refer to
+					 * it as (previous node).next, instead of something like (list).head
+					 */
+					$o = { key: {}, next: null };
+				}
+				listSet($o, key, value);
+			}
+		}
+	};
+	return channel;
+};
 
 
 /***/ }),
@@ -14624,6 +16795,248 @@ function wrappy (fn, cb) {
 
 /***/ }),
 
+/***/ 7020:
+/***/ ((__unused_webpack_module, exports) => {
+
+var __webpack_unused_export__;
+
+
+__webpack_unused_export__ = ({
+  value: true
+});
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
+function isLower(char) {
+  return char >= 0x61 /* 'a' */ && char <= 0x7a /* 'z' */;
+}
+
+function isUpper(char) {
+  return char >= 0x41 /* 'A' */ && char <= 0x5a /* 'Z' */;
+}
+
+function isDigit(char) {
+  return char >= 0x30 /* '0' */ && char <= 0x39 /* '9' */;
+}
+
+function toUpper(char) {
+  return char - 0x20;
+}
+
+function toUpperSafe(char) {
+  if (isLower(char)) {
+    return char - 0x20;
+  }
+  return char;
+}
+
+function toLower(char) {
+  return char + 0x20;
+}
+
+function camelize$1(str, separator) {
+  var firstChar = str.charCodeAt(0);
+  if (isDigit(firstChar) || isUpper(firstChar) || firstChar == separator) {
+    return str;
+  }
+  var out = [];
+  var changed = false;
+  if (isUpper(firstChar)) {
+    changed = true;
+    out.push(toLower(firstChar));
+  } else {
+    out.push(firstChar);
+  }
+
+  var length = str.length;
+  for (var i = 1; i < length; ++i) {
+    var c = str.charCodeAt(i);
+    if (c === separator) {
+      changed = true;
+      c = str.charCodeAt(++i);
+      if (isNaN(c)) {
+        return str;
+      }
+      out.push(toUpperSafe(c));
+    } else {
+      out.push(c);
+    }
+  }
+  return changed ? String.fromCharCode.apply(undefined, out) : str;
+}
+
+function decamelize$1(str, separator) {
+  var firstChar = str.charCodeAt(0);
+  if (!isLower(firstChar)) {
+    return str;
+  }
+  var length = str.length;
+  var changed = false;
+  var out = [];
+  for (var i = 0; i < length; ++i) {
+    var c = str.charCodeAt(i);
+    if (isUpper(c)) {
+      out.push(separator);
+      out.push(toLower(c));
+      changed = true;
+    } else {
+      out.push(c);
+    }
+  }
+  return changed ? String.fromCharCode.apply(undefined, out) : str;
+}
+
+function pascalize$1(str, separator) {
+  var firstChar = str.charCodeAt(0);
+  if (isDigit(firstChar) || firstChar == separator) {
+    return str;
+  }
+  var length = str.length;
+  var changed = false;
+  var out = [];
+  for (var i = 0; i < length; ++i) {
+    var c = str.charCodeAt(i);
+    if (c === separator) {
+      changed = true;
+      c = str.charCodeAt(++i);
+      if (isNaN(c)) {
+        return str;
+      }
+      out.push(toUpperSafe(c));
+    } else if (i === 0 && isLower(c)) {
+      changed = true;
+      out.push(toUpper(c));
+    } else {
+      out.push(c);
+    }
+  }
+  return changed ? String.fromCharCode.apply(undefined, out) : str;
+}
+
+function depascalize$1(str, separator) {
+  var firstChar = str.charCodeAt(0);
+  if (!isUpper(firstChar)) {
+    return str;
+  }
+  var length = str.length;
+  var changed = false;
+  var out = [];
+  for (var i = 0; i < length; ++i) {
+    var c = str.charCodeAt(i);
+    if (isUpper(c)) {
+      if (i > 0) {
+        out.push(separator);
+      }
+      out.push(toLower(c));
+      changed = true;
+    } else {
+      out.push(c);
+    }
+  }
+  return changed ? String.fromCharCode.apply(undefined, out) : str;
+}
+
+function shouldProcessValue(value) {
+  return value && (typeof value === 'undefined' ? 'undefined' : _typeof(value)) == 'object' && !(value instanceof Date) && !(value instanceof Function);
+}
+
+function processKeys(obj, fun, opts) {
+  var obj2 = void 0;
+  if (obj instanceof Array) {
+    obj2 = [];
+  } else {
+    if (typeof obj.prototype !== 'undefined') {
+      // return non-plain object unchanged
+      return obj;
+    }
+    obj2 = {};
+  }
+  for (var key in obj) {
+    var value = obj[key];
+    if (typeof key === 'string') key = fun(key, opts && opts.separator);
+    if (shouldProcessValue(value)) {
+      obj2[key] = processKeys(value, fun, opts);
+    } else {
+      obj2[key] = value;
+    }
+  }
+  return obj2;
+}
+
+function processKeysInPlace(obj, fun, opts) {
+  var keys = Object.keys(obj);
+  for (var idx = 0; idx < keys.length; ++idx) {
+    var key = keys[idx];
+    var value = obj[key];
+    var newKey = fun(key, opts && opts.separator);
+    if (newKey !== key) {
+      delete obj[key];
+    }
+    if (shouldProcessValue(value)) {
+      obj[newKey] = processKeys(value, fun, opts);
+    } else {
+      obj[newKey] = value;
+    }
+  }
+  return obj;
+}
+
+function camelize$$1(str, separator) {
+  return camelize$1(str, separator && separator.charCodeAt(0) || 0x5f /* _ */);
+}
+
+function decamelize$$1(str, separator) {
+  return decamelize$1(str, separator && separator.charCodeAt(0) || 0x5f /* _ */);
+}
+
+function pascalize$$1(str, separator) {
+  return pascalize$1(str, separator && separator.charCodeAt(0) || 0x5f /* _ */);
+}
+
+function depascalize$$1(str, separator) {
+  return depascalize$1(str, separator && separator.charCodeAt(0) || 0x5f /* _ */);
+}
+
+function camelizeKeys(obj, opts) {
+  opts = opts || {};
+  if (!shouldProcessValue(obj)) return obj;
+  if (opts.inPlace) return processKeysInPlace(obj, camelize$$1, opts);
+  return processKeys(obj, camelize$$1, opts);
+}
+
+function decamelizeKeys(obj, opts) {
+  opts = opts || {};
+  if (!shouldProcessValue(obj)) return obj;
+  if (opts.inPlace) return processKeysInPlace(obj, decamelize$$1, opts);
+  return processKeys(obj, decamelize$$1, opts);
+}
+
+function pascalizeKeys(obj, opts) {
+  opts = opts || {};
+  if (!shouldProcessValue(obj)) return obj;
+  if (opts.inPlace) return processKeysInPlace(obj, pascalize$$1, opts);
+  return processKeys(obj, pascalize$$1, opts);
+}
+
+function depascalizeKeys(obj, opts) {
+  opts = opts || {};
+  if (!shouldProcessValue(obj)) return obj;
+  if (opts.inPlace) return processKeysInPlace(obj, depascalize$$1, opts);
+  return processKeys(obj, depascalize$$1, opts);
+}
+
+__webpack_unused_export__ = camelize$$1;
+__webpack_unused_export__ = decamelize$$1;
+__webpack_unused_export__ = pascalize$$1;
+__webpack_unused_export__ = depascalize$$1;
+exports.k5 = camelizeKeys;
+exports.iF = decamelizeKeys;
+__webpack_unused_export__ = pascalizeKeys;
+__webpack_unused_export__ = depascalizeKeys;
+
+
+/***/ }),
+
 /***/ 2877:
 /***/ ((module) => {
 
@@ -15376,6 +17789,36 @@ module.exports = JSON.parse('[[[0,44],"disallowed_STD3_valid"],[[45,46],"valid"]
 /******/ __nccwpck_require__.m = __webpack_modules__;
 /******/ 
 /************************************************************************/
+/******/ /* webpack/runtime/create fake namespace object */
+/******/ (() => {
+/******/ 	var getProto = Object.getPrototypeOf ? (obj) => (Object.getPrototypeOf(obj)) : (obj) => (obj.__proto__);
+/******/ 	var leafPrototypes;
+/******/ 	// create a fake namespace object
+/******/ 	// mode & 1: value is a module id, require it
+/******/ 	// mode & 2: merge all properties of value into the ns
+/******/ 	// mode & 4: return value when already ns object
+/******/ 	// mode & 16: return value when it's Promise-like
+/******/ 	// mode & 8|1: behave like require
+/******/ 	__nccwpck_require__.t = function(value, mode) {
+/******/ 		if(mode & 1) value = this(value);
+/******/ 		if(mode & 8) return value;
+/******/ 		if(typeof value === 'object' && value) {
+/******/ 			if((mode & 4) && value.__esModule) return value;
+/******/ 			if((mode & 16) && typeof value.then === 'function') return value;
+/******/ 		}
+/******/ 		var ns = Object.create(null);
+/******/ 		__nccwpck_require__.r(ns);
+/******/ 		var def = {};
+/******/ 		leafPrototypes = leafPrototypes || [null, getProto({}), getProto([]), getProto(getProto)];
+/******/ 		for(var current = mode & 2 && value; typeof current == 'object' && !~leafPrototypes.indexOf(current); current = getProto(current)) {
+/******/ 			Object.getOwnPropertyNames(current).forEach((key) => (def[key] = () => (value[key])));
+/******/ 		}
+/******/ 		def['default'] = () => (value);
+/******/ 		__nccwpck_require__.d(ns, def);
+/******/ 		return ns;
+/******/ 	};
+/******/ })();
+/******/ 
 /******/ /* webpack/runtime/define property getters */
 /******/ (() => {
 /******/ 	// define getter functions for harmony exports
@@ -15493,6 +17936,193 @@ module.exports = JSON.parse('[[[0,44],"disallowed_STD3_valid"],[[45,46],"valid"]
 var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
+
+// NAMESPACE OBJECT: ./node_modules/@gitbeaker/core/dist/index.mjs
+var core_dist_namespaceObject = {};
+__nccwpck_require__.r(core_dist_namespaceObject);
+__nccwpck_require__.d(core_dist_namespaceObject, {
+  "Agents": () => (Agents),
+  "AlertManagement": () => (AlertManagement),
+  "ApplicationAppearance": () => (ApplicationAppearance),
+  "ApplicationPlanLimits": () => (ApplicationPlanLimits),
+  "ApplicationSettings": () => (ApplicationSettings),
+  "ApplicationStatistics": () => (ApplicationStatistics),
+  "Applications": () => (Applications),
+  "AuditEvents": () => (AuditEvents),
+  "Avatar": () => (Avatar),
+  "Branches": () => (Branches),
+  "BroadcastMessages": () => (BroadcastMessages),
+  "CommitDiscussions": () => (CommitDiscussions),
+  "Commits": () => (Commits),
+  "Composer": () => (Composer),
+  "Conan": () => (Conan),
+  "ContainerRegistry": () => (ContainerRegistry),
+  "DashboardAnnotations": () => (DashboardAnnotations),
+  "Debian": () => (Debian),
+  "DependencyProxy": () => (DependencyProxy),
+  "DeployKeys": () => (DeployKeys),
+  "DeployTokens": () => (DeployTokens),
+  "Deployments": () => (Deployments),
+  "DockerfileTemplates": () => (DockerfileTemplates),
+  "Environments": () => (Environments),
+  "EpicAwardEmojis": () => (EpicAwardEmojis),
+  "EpicDiscussions": () => (EpicDiscussions),
+  "EpicIssues": () => (EpicIssues),
+  "EpicLabelEvents": () => (EpicLabelEvents),
+  "EpicLinks": () => (EpicLinks),
+  "EpicNotes": () => (EpicNotes),
+  "Epics": () => (Epics),
+  "ErrorTrackingClientKeys": () => (ErrorTrackingClientKeys),
+  "ErrorTrackingSettings": () => (ErrorTrackingSettings),
+  "Events": () => (Events),
+  "Experiments": () => (Experiments),
+  "ExternalStatusChecks": () => (ExternalStatusChecks),
+  "FeatureFlagUserLists": () => (FeatureFlagUserLists),
+  "FeatureFlags": () => (FeatureFlags),
+  "FreezePeriods": () => (FreezePeriods),
+  "GeoNodes": () => (GeoNodes),
+  "GitLabCIYMLTemplates": () => (GitLabCIYMLTemplates),
+  "GitignoreTemplates": () => (GitignoreTemplates),
+  "Gitlab": () => (Gitlab),
+  "GitlabPages": () => (GitlabPages),
+  "GoProxy": () => (GoProxy),
+  "GroupAccessRequests": () => (GroupAccessRequests),
+  "GroupAccessTokens": () => (GroupAccessTokens),
+  "GroupActivityAnalytics": () => (GroupActivityAnalytics),
+  "GroupBadges": () => (GroupBadges),
+  "GroupCustomAttributes": () => (GroupCustomAttributes),
+  "GroupDORA4Metrics": () => (GroupDORA4Metrics),
+  "GroupHooks": () => (GroupHooks),
+  "GroupImportExports": () => (GroupImportExports),
+  "GroupInvitations": () => (GroupInvitations),
+  "GroupIssueBoards": () => (GroupIssueBoards),
+  "GroupIterations": () => (GroupIterations),
+  "GroupLDAPLinks": () => (GroupLDAPLinks),
+  "GroupLabels": () => (GroupLabels),
+  "GroupMemberRoles": () => (GroupMemberRoles),
+  "GroupMembers": () => (GroupMembers),
+  "GroupMilestones": () => (GroupMilestones),
+  "GroupProtectedEnvironments": () => (GroupProtectedEnvironments),
+  "GroupPushRules": () => (GroupPushRules),
+  "GroupRelationExports": () => (GroupRelationExports),
+  "GroupReleases": () => (GroupReleases),
+  "GroupRepositoryStorageMoves": () => (GroupRepositoryStorageMoves),
+  "GroupSAMLIdentities": () => (GroupSAMLIdentities),
+  "GroupSCIMIdentities": () => (GroupSCIMIdentities),
+  "GroupVariables": () => (GroupVariables),
+  "GroupWikis": () => (GroupWikis),
+  "Groups": () => (Groups),
+  "Helm": () => (Helm),
+  "Import": () => (Import),
+  "InstanceLevelCICDVariables": () => (InstanceLevelCICDVariables),
+  "Integrations": () => (Integrations),
+  "IssueAwardEmojis": () => (IssueAwardEmojis),
+  "IssueDiscussions": () => (IssueDiscussions),
+  "IssueIterationEvents": () => (IssueIterationEvents),
+  "IssueLabelEvents": () => (IssueLabelEvents),
+  "IssueLinks": () => (IssueLinks),
+  "IssueMilestoneEvents": () => (IssueMilestoneEvents),
+  "IssueNoteAwardEmojis": () => (IssueNoteAwardEmojis),
+  "IssueNotes": () => (IssueNotes),
+  "IssueStateEvents": () => (IssueStateEvents),
+  "IssueWeightEvents": () => (IssueWeightEvents),
+  "Issues": () => (Issues),
+  "IssuesStatistics": () => (IssuesStatistics),
+  "JobArtifacts": () => (JobArtifacts),
+  "Jobs": () => (Jobs),
+  "Keys": () => (Keys),
+  "License": () => (License),
+  "LicenseTemplates": () => (LicenseTemplates),
+  "LinkedEpics": () => (LinkedEpics),
+  "Lint": () => (Lint),
+  "Markdown": () => (Markdown),
+  "Maven": () => (Maven),
+  "MergeRequestApprovals": () => (MergeRequestApprovals),
+  "MergeRequestAwardEmojis": () => (MergeRequestAwardEmojis),
+  "MergeRequestContextCommits": () => (MergeRequestContextCommits),
+  "MergeRequestDiscussions": () => (MergeRequestDiscussions),
+  "MergeRequestDraftNotes": () => (MergeRequestDraftNotes),
+  "MergeRequestLabelEvents": () => (MergeRequestLabelEvents),
+  "MergeRequestMilestoneEvents": () => (MergeRequestMilestoneEvents),
+  "MergeRequestNoteAwardEmojis": () => (MergeRequestNoteAwardEmojis),
+  "MergeRequestNotes": () => (MergeRequestNotes),
+  "MergeRequests": () => (MergeRequests),
+  "MergeTrains": () => (MergeTrains),
+  "Metadata": () => (Metadata),
+  "Migrations": () => (Migrations),
+  "NPM": () => (NPM),
+  "Namespaces": () => (Namespaces),
+  "NotificationSettings": () => (NotificationSettings),
+  "NuGet": () => (NuGet),
+  "PackageRegistry": () => (PackageRegistry),
+  "Packages": () => (Packages),
+  "PagesDomains": () => (PagesDomains),
+  "PersonalAccessTokens": () => (PersonalAccessTokens),
+  "PipelineScheduleVariables": () => (PipelineScheduleVariables),
+  "PipelineSchedules": () => (PipelineSchedules),
+  "PipelineTriggerTokens": () => (PipelineTriggerTokens),
+  "Pipelines": () => (Pipelines),
+  "ProductAnalytics": () => (ProductAnalytics),
+  "ProjectAccessRequests": () => (ProjectAccessRequests),
+  "ProjectAccessTokens": () => (ProjectAccessTokens),
+  "ProjectAliases": () => (ProjectAliases),
+  "ProjectBadges": () => (ProjectBadges),
+  "ProjectCustomAttributes": () => (ProjectCustomAttributes),
+  "ProjectDORA4Metrics": () => (ProjectDORA4Metrics),
+  "ProjectHooks": () => (ProjectHooks),
+  "ProjectImportExports": () => (ProjectImportExports),
+  "ProjectInvitations": () => (ProjectInvitations),
+  "ProjectIssueBoards": () => (ProjectIssueBoards),
+  "ProjectIterations": () => (ProjectIterations),
+  "ProjectLabels": () => (ProjectLabels),
+  "ProjectMembers": () => (ProjectMembers),
+  "ProjectMilestones": () => (ProjectMilestones),
+  "ProjectProtectedEnvironments": () => (ProjectProtectedEnvironments),
+  "ProjectPushRules": () => (ProjectPushRules),
+  "ProjectRelationsExport": () => (ProjectRelationsExport),
+  "ProjectReleases": () => (ProjectReleases),
+  "ProjectRemoteMirrors": () => (ProjectRemoteMirrors),
+  "ProjectRepositoryStorageMoves": () => (ProjectRepositoryStorageMoves),
+  "ProjectSnippetAwardEmojis": () => (ProjectSnippetAwardEmojis),
+  "ProjectSnippetDiscussions": () => (ProjectSnippetDiscussions),
+  "ProjectSnippetNotes": () => (ProjectSnippetNotes),
+  "ProjectSnippets": () => (ProjectSnippets),
+  "ProjectStatistics": () => (ProjectStatistics),
+  "ProjectTemplates": () => (ProjectTemplates),
+  "ProjectVariables": () => (ProjectVariables),
+  "ProjectVulnerabilities": () => (ProjectVulnerabilities),
+  "ProjectWikis": () => (ProjectWikis),
+  "Projects": () => (Projects),
+  "ProtectedBranches": () => (ProtectedBranches),
+  "ProtectedTags": () => (ProtectedTags),
+  "PyPI": () => (PyPI),
+  "ReleaseLinks": () => (ReleaseLinks),
+  "Repositories": () => (Repositories),
+  "RepositoryFiles": () => (RepositoryFiles),
+  "RepositorySubmodules": () => (RepositorySubmodules),
+  "ResourceGroups": () => (ResourceGroups),
+  "RubyGems": () => (RubyGems),
+  "Runners": () => (Runners),
+  "Search": () => (Search),
+  "SecureFiles": () => (SecureFiles),
+  "ServiceData": () => (ServiceData),
+  "SidekiqMetrics": () => (SidekiqMetrics),
+  "SidekiqQueues": () => (SidekiqQueues),
+  "SnippetRepositoryStorageMoves": () => (SnippetRepositoryStorageMoves),
+  "Snippets": () => (Snippets),
+  "Suggestions": () => (Suggestions),
+  "SystemHooks": () => (SystemHooks),
+  "Tags": () => (Tags),
+  "TodoLists": () => (TodoLists),
+  "Topics": () => (Topics),
+  "UserCustomAttributes": () => (UserCustomAttributes),
+  "UserEmails": () => (UserEmails),
+  "UserGPGKeys": () => (UserGPGKeys),
+  "UserImpersonationTokens": () => (UserImpersonationTokens),
+  "UserSSHKeys": () => (UserSSHKeys),
+  "UserStarredMetricsDashboard": () => (UserStarredMetricsDashboard),
+  "Users": () => (Users)
+});
 
 // EXTERNAL MODULE: ./node_modules/dotenv/lib/main.js
 var main = __nccwpck_require__(2437);
@@ -17387,7 +20017,7 @@ const doBadDataWarn = (0,external_node_util_namespaceObject.deprecate)(() => {},
  * @param   Object  init   Custom options
  * @return  Void
  */
-class Request extends Body {
+class request_Request extends Body {
 	constructor(input, init = {}) {
 		let parsedURL;
 
@@ -17541,7 +20171,7 @@ class Request extends Body {
 	 * @return  Request
 	 */
 	clone() {
-		return new Request(this);
+		return new request_Request(this);
 	}
 
 	get [Symbol.toStringTag]() {
@@ -17549,7 +20179,7 @@ class Request extends Body {
 	}
 }
 
-Object.defineProperties(Request.prototype, {
+Object.defineProperties(request_Request.prototype, {
 	method: {enumerable: true},
 	url: {enumerable: true},
 	headers: {enumerable: true},
@@ -17714,10 +20344,10 @@ const supportedSchemas = new Set(['data:', 'http:', 'https:']);
  * @param   {*} [options_] - Fetch options
  * @return  {Promise<import('./response').default>}
  */
-async function fetch(url, options_) {
+async function src_fetch(url, options_) {
 	return new Promise((resolve, reject) => {
 		// Build request object
-		const request = new Request(url, options_);
+		const request = new request_Request(url, options_);
 		const {parsedURL, options} = getNodeRequestOptions(request);
 		if (!supportedSchemas.has(parsedURL.protocol)) {
 			throw new TypeError(`node-fetch cannot load ${url}. URL scheme "${parsedURL.protocol.replace(/:$/, '')}" is not supported.`);
@@ -17902,7 +20532,7 @@ async function fetch(url, options_) {
 						}
 
 						// HTTP-redirect fetch step 15
-						resolve(fetch(new Request(locationURL, requestOptions)));
+						resolve(src_fetch(new request_Request(locationURL, requestOptions)));
 						finalize();
 						return;
 					}
@@ -18110,7 +20740,7 @@ async function auth() {
     headers: myHeaders,
   };
 
-  var response = await fetch(
+  var response = await src_fetch(
     `${auth_ATLAN_INSTANCE_URL}/api/meta`,
     requestOptions
   ).catch((err) => {});
@@ -18160,6 +20790,8 @@ const get_downstream_assets_ATLAN_INSTANCE_URL =
   core.getInput("ATLAN_INSTANCE_URL") || process.env.ATLAN_INSTANCE_URL;
 const get_downstream_assets_ATLAN_API_TOKEN =
   core.getInput("ATLAN_API_TOKEN") || process.env.ATLAN_API_TOKEN;
+
+const ASSETS_LIMIT = 100;
 
 async function getDownstreamAssets( //Done
   asset,
@@ -18251,7 +20883,7 @@ ${get_image_url_getImageURL(
     return comment;
   };
 
-  var response = await fetch(
+  var response = await src_fetch(
     `${get_downstream_assets_ATLAN_INSTANCE_URL}/api/meta/lineage/list`,
     requestOptions
   )
@@ -18365,7 +20997,7 @@ async function getAsset({
     body: raw,
   };
   console.log("Before SendSegmentEventOfIntegration");
-  var response = await fetch(
+  var response = await src_fetch(
     `${get_asset_ATLAN_INSTANCE_URL}/api/meta/search/indexsearch#findAssetByExactName`,
     requestOptions
   )
@@ -18380,7 +21012,8 @@ async function getAsset({
         },
       });
     });
-
+  console.log("<><><><><><><><><><><><><>");
+  console.log(response);
   if (!response?.entities?.length)
     return {
       error: `❌ Model with name **${name}** could not be found or is deleted <br><br>`,
@@ -18417,7 +21050,7 @@ async function getClassifications({
     redirect: "follow",
   };
 
-  var response = await fetch(
+  var response = await src_fetch(
     `${get_classifications_ATLAN_INSTANCE_URL}/api/meta/types/typedefs?type=classification`,
     requestOptions
   )
@@ -18491,7 +21124,7 @@ async function createResource( //Done
     body: raw,
   };
 
-  var response = await fetch(
+  var response = await src_fetch(
     `${create_resource_ATLAN_INSTANCE_URL}/api/meta/entity/bulk`,
     requestOptions
   )
@@ -18537,7 +21170,7 @@ async function sendSegmentEvent(action, body) {
 
   var response = null;
   if (!segment_IS_DEV) {
-    response = await fetch(
+    response = await src_fetch(
       `${segment_ATLAN_INSTANCE_URL}/api/service/segment/track`,
       requestOptions
     )
@@ -18630,7 +21263,14 @@ class GitHubIntegration extends IntegrationInterface {
   async printDownstreamAssets({ octokit, context }) {
     //Done
     console.log("Brother");
-    const changedFiles = await this.getChangedFiles({ octokit, context }); //Complete
+    // const changedFiles = await this.getChangedFiles({ octokit, context }); //Complete
+    var changedFiles = [
+      {
+        fileName: "instacart_beverages_order_customer",
+        filePath: "instacart_beverages_order_customer.sql",
+        status: "modified",
+      },
+    ];
     let comments = ``;
     let totalChangedFiles = 0;
 
@@ -19149,7 +21789,7 @@ ${content}`;
         // Getting connector and certification images
         const connectorImage = get_image_url_getConnectorImage(connectorName);
         const certificationImage = certificateStatus
-          ? getCertificationImage(certificateStatus)
+          ? get_image_url_getCertificationImage(certificateStatus)
           : "";
 
         return [
@@ -19174,7 +21814,7 @@ ${content}`;
       asset.guid
     }/overview?utm_source=dbt_github_action) ${
       asset.attributes?.certificateStatus
-        ? getCertificationImage(asset.attributes.certificateStatus)
+        ? get_image_url_getCertificationImage(asset.attributes.certificateStatus)
         : ""
     }
 Materialised asset: ${get_image_url_getConnectorImage(
@@ -19183,7 +21823,7 @@ Materialised asset: ${get_image_url_getConnectorImage(
       materialisedAsset.guid
     }/overview?utm_source=dbt_github_action) ${
       materialisedAsset.attributes?.certificateStatus
-        ? getCertificationImage(materialisedAsset.attributes.certificateStatus)
+        ? get_image_url_getCertificationImage(materialisedAsset.attributes.certificateStatus)
         : ""
     }${environmentName ? ` | Environment Name: \`${environmentName}\`` : ""}${
       projectName ? ` | Project Name: \`${projectName}\`` : ""
@@ -19236,12 +21876,7777 @@ ${viewAssetButton}`;
   }
 }
 
+// EXTERNAL MODULE: ./node_modules/qs/lib/index.js
+var lib = __nccwpck_require__(2760);
+// EXTERNAL MODULE: ./node_modules/xcase/es5/index.js
+var es5 = __nccwpck_require__(7020);
+;// CONCATENATED MODULE: ./node_modules/@gitbeaker/requester-utils/dist/index.mjs
+
+
+
+// src/RequesterUtils.ts
+function formatQuery(params = {}) {
+  const decamelized = (0,es5/* decamelizeKeys */.iF)(params);
+  return (0,lib.stringify)(decamelized, { arrayFormat: "brackets" });
+}
+function isFormData(object) {
+  return typeof object === "object" && object.constructor.name === "FormData";
+}
+async function defaultOptionsHandler(resourceOptions, {
+  body,
+  searchParams,
+  sudo,
+  signal,
+  asStream = false,
+  method = "GET"
+} = {}) {
+  const { headers: preconfiguredHeaders, authHeaders, url } = resourceOptions;
+  const headers = { ...preconfiguredHeaders };
+  const defaultOptions = {
+    method,
+    asStream,
+    signal,
+    prefixUrl: url
+  };
+  defaultOptions.headers = headers;
+  if (sudo)
+    defaultOptions.headers.sudo = `${sudo}`;
+  if (body) {
+    if (isFormData(body)) {
+      defaultOptions.body = body;
+    } else {
+      defaultOptions.body = JSON.stringify((0,es5/* decamelizeKeys */.iF)(body));
+      defaultOptions.headers["content-type"] = "application/json";
+    }
+  }
+  const [authHeaderKey, authHeaderFn] = Object.entries(authHeaders)[0];
+  defaultOptions.headers[authHeaderKey] = await authHeaderFn();
+  const q = formatQuery(searchParams);
+  if (q)
+    defaultOptions.searchParams = q;
+  return Promise.resolve(defaultOptions);
+}
+function createRequesterFn(optionsHandler, requestHandler) {
+  const methods = ["get", "post", "put", "patch", "delete"];
+  return (serviceOptions) => {
+    const requester = {};
+    methods.forEach((m) => {
+      requester[m] = async (endpoint, options) => {
+        const defaultRequestOptions = await defaultOptionsHandler(serviceOptions, {
+          ...options,
+          method: m.toUpperCase()
+        });
+        const requestOptions = await optionsHandler(serviceOptions, defaultRequestOptions);
+        return requestHandler(endpoint, requestOptions);
+      };
+    });
+    return requester;
+  };
+}
+function extendClass(Base, customConfig = {}) {
+  return class extends Base {
+    constructor(...options) {
+      const [config, ...opts] = options;
+      super({ ...customConfig, ...config }, ...opts);
+    }
+  };
+}
+function presetResourceArguments(resources, customConfig = {}) {
+  const updated = {};
+  Object.entries(resources).filter(([, s]) => typeof s === "function").forEach(([k, r]) => {
+    updated[k] = extendClass(r, customConfig);
+  });
+  return updated;
+}
+
+// src/BaseResource.ts
+function getDynamicToken(tokenArgument) {
+  return tokenArgument instanceof Function ? tokenArgument() : Promise.resolve(tokenArgument);
+}
+var BaseResource = class {
+  url;
+  requester;
+  queryTimeout;
+  headers;
+  authHeaders;
+  camelize;
+  rejectUnauthorized;
+  constructor({
+    sudo,
+    profileToken,
+    camelize,
+    requesterFn,
+    profileMode = "execution",
+    host = "https://gitlab.com",
+    prefixUrl = "",
+    rejectUnauthorized = true,
+    queryTimeout = 3e5,
+    ...tokens
+  }) {
+    if (!requesterFn)
+      throw new ReferenceError("requesterFn must be passed");
+    this.url = [host, "api", "v4", prefixUrl].join("/");
+    this.headers = {};
+    this.authHeaders = {};
+    this.rejectUnauthorized = rejectUnauthorized;
+    this.camelize = camelize;
+    this.queryTimeout = queryTimeout;
+    if ("oauthToken" in tokens)
+      this.authHeaders.authorization = async () => {
+        const token = await getDynamicToken(tokens.oauthToken);
+        return `Bearer ${token}`;
+      };
+    else if ("jobToken" in tokens)
+      this.authHeaders["job-token"] = async () => getDynamicToken(tokens.jobToken);
+    else if ("token" in tokens)
+      this.authHeaders["private-token"] = async () => getDynamicToken(tokens.token);
+    else {
+      throw new ReferenceError("A token, oauthToken or jobToken must be passed");
+    }
+    if (profileToken) {
+      this.headers["X-Profile-Token"] = profileToken;
+      this.headers["X-Profile-Mode"] = profileMode;
+    }
+    if (sudo)
+      this.headers.Sudo = `${sudo}`;
+    this.requester = requesterFn({ ...this });
+  }
+};
+
+
+
+;// CONCATENATED MODULE: ./node_modules/@gitbeaker/core/dist/index.mjs
+
+
+
+
+// src/resources/Agents.ts
+function appendFormFromObject(object) {
+  const form = new FormData();
+  Object.entries(object).forEach(([k, v]) => {
+    if (!v)
+      return;
+    if (Array.isArray(v))
+      form.append(k, v[0], v[1]);
+    else
+      form.append(k, v);
+  });
+  return form;
+}
+function endpoint(strings, ...values) {
+  return values.reduce(
+    (string, value, index) => string + encodeURIComponent(value) + strings[index + 1],
+    strings[0]
+  );
+}
+function parseLinkHeader(linkString) {
+  const output = {};
+  const regex = /<([^>]+)>; rel="([^"]+)"/g;
+  let m;
+  while (m = regex.exec(linkString)) {
+    const [, v, k] = m;
+    output[k] = v;
+  }
+  return output;
+}
+function reformatObjectOptions(obj, prefixKey, decamelizeValues = false) {
+  const formatted = decamelizeValues ? (0,es5/* decamelizeKeys */.iF)(obj) : obj;
+  return lib.stringify({ [prefixKey]: formatted }, { encode: false }).split("&").reduce((acc, cur) => {
+    const [key, val] = cur.split("=");
+    acc[key] = val;
+    return acc;
+  }, {});
+}
+function packageResponse(response, showExpanded) {
+  return showExpanded ? {
+    data: response.body,
+    status: response.status,
+    headers: response.headers
+  } : response.body;
+}
+function getStream(response, showExpanded) {
+  return packageResponse(response, showExpanded);
+}
+function getSingle(camelize, response, showExpanded) {
+  const { status, headers } = response;
+  let { body } = response;
+  if (camelize)
+    body = (0,es5/* camelizeKeys */.k5)(body);
+  return packageResponse({ body, status, headers }, showExpanded);
+}
+async function getManyMore(camelize, getFn, endpoint2, response, requestOptions, acc) {
+  const { sudo, showExpanded, maxPages, pagination, page, perPage, idAfter, orderBy, sort } = requestOptions;
+  if (camelize)
+    response.body = (0,es5/* camelizeKeys */.k5)(response?.body);
+  const newAcc = [...acc || [], ...response.body];
+  const withinBounds = maxPages && perPage ? newAcc.length / +perPage < maxPages : true;
+  const { next = "" } = parseLinkHeader(response.headers.link);
+  if (!(page && (acc || []).length === 0) && next && withinBounds) {
+    const parsedQueryString = (0,lib.parse)(next.split("?")[1]);
+    const qs = { ...(0,es5/* camelizeKeys */.k5)(parsedQueryString) };
+    const newOpts = {
+      ...qs,
+      maxPages,
+      sudo,
+      showExpanded
+    };
+    const nextResponse = await getFn(endpoint2, {
+      searchParams: qs,
+      sudo
+    });
+    return getManyMore(camelize, getFn, endpoint2, nextResponse, newOpts, newAcc);
+  }
+  if (!showExpanded)
+    return newAcc;
+  const paginationInfo = pagination === "keyset" ? {
+    idAfter: idAfter ? +idAfter : null,
+    perPage: perPage ? +perPage : null,
+    orderBy,
+    sort
+  } : {
+    total: parseInt(response.headers["x-total"], 10),
+    next: parseInt(response.headers["x-next-page"], 10) || null,
+    current: parseInt(response.headers["x-page"], 10) || 1,
+    previous: parseInt(response.headers["x-prev-page"], 10) || null,
+    perPage: parseInt(response.headers["x-per-page"], 10),
+    totalPages: parseInt(response.headers["x-total-pages"], 10)
+  };
+  return {
+    data: newAcc,
+    paginationInfo
+  };
+}
+function get() {
+  return async (service, endpoint2, options) => {
+    const { asStream, sudo, showExpanded, maxPages, ...searchParams } = options || {};
+    const signal = service.queryTimeout ? AbortSignal.timeout(service.queryTimeout) : void 0;
+    const response = await service.requester.get(endpoint2, {
+      searchParams,
+      sudo,
+      asStream,
+      signal
+    });
+    const camelizeResponseBody = service.camelize || false;
+    if (asStream)
+      return getStream(response, showExpanded);
+    if (!Array.isArray(response.body))
+      return getSingle(
+        camelizeResponseBody,
+        response,
+        showExpanded
+      );
+    const reqOpts = {
+      sudo,
+      showExpanded,
+      maxPages,
+      ...searchParams
+    };
+    return getManyMore(
+      camelizeResponseBody,
+      (ep, op) => service.requester.get(ep, { ...op, signal }),
+      endpoint2,
+      response,
+      reqOpts
+    );
+  };
+}
+function post() {
+  return async (service, endpoint2, { searchParams, isForm, sudo, showExpanded, ...options } = {}) => {
+    const body = isForm ? appendFormFromObject(options) : options;
+    const response = await service.requester.post(endpoint2, {
+      searchParams,
+      body,
+      sudo,
+      signal: service.queryTimeout ? AbortSignal.timeout(service.queryTimeout) : void 0
+    });
+    if (service.camelize)
+      response.body = (0,es5/* camelizeKeys */.k5)(response.body);
+    return packageResponse(response, showExpanded);
+  };
+}
+function put() {
+  return async (service, endpoint2, { searchParams, isForm, sudo, showExpanded, ...options } = {}) => {
+    const body = isForm ? appendFormFromObject(options) : options;
+    const response = await service.requester.put(endpoint2, {
+      body,
+      searchParams,
+      sudo,
+      signal: service.queryTimeout ? AbortSignal.timeout(service.queryTimeout) : void 0
+    });
+    if (service.camelize)
+      response.body = (0,es5/* camelizeKeys */.k5)(response.body);
+    return packageResponse(response, showExpanded);
+  };
+}
+function patch() {
+  return async (service, endpoint2, { searchParams, isForm, sudo, showExpanded, ...options } = {}) => {
+    const body = isForm ? appendFormFromObject(options) : options;
+    const response = await service.requester.patch(endpoint2, {
+      body,
+      searchParams,
+      sudo,
+      signal: service.queryTimeout ? AbortSignal.timeout(service.queryTimeout) : void 0
+    });
+    if (service.camelize)
+      response.body = (0,es5/* camelizeKeys */.k5)(response.body);
+    return packageResponse(response, showExpanded);
+  };
+}
+function del() {
+  return async (service, endpoint2, { sudo, showExpanded, searchParams, ...options } = {}) => {
+    const response = await service.requester.delete(endpoint2, {
+      body: options,
+      searchParams,
+      sudo,
+      signal: service.queryTimeout ? AbortSignal.timeout(service.queryTimeout) : void 0
+    });
+    return packageResponse(response, showExpanded);
+  };
+}
+var RequestHelper = {
+  post,
+  put,
+  patch,
+  get,
+  del
+};
+
+// src/resources/Agents.ts
+var Agents = class extends BaseResource {
+  all(projectId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/cluster_agents`,
+      options
+    );
+  }
+  allTokens(projectId, agentId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/cluster_agents/${agentId}/tokens`,
+      options
+    );
+  }
+  createToken(projectId, agentId, name, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/cluster_agents/${agentId}/tokens`,
+      {
+        name,
+        ...options
+      }
+    );
+  }
+  show(projectId, agentId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/cluster_agents/${agentId}`,
+      options
+    );
+  }
+  showToken(projectId, agentId, tokenId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/cluster_agents/${agentId}/tokens/${tokenId}`,
+      options
+    );
+  }
+  register(projectId, name, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/cluster_agents`,
+      {
+        name,
+        ...options
+      }
+    );
+  }
+  removeToken(projectId, agentId, tokenId, options) {
+    return RequestHelper.del()(
+      this,
+      endpoint`projects/${projectId}/cluster_agents/${agentId}/tokens/${tokenId}`,
+      options
+    );
+  }
+  unregister(projectId, agentId, options) {
+    return RequestHelper.del()(
+      this,
+      endpoint`projects/${projectId}/cluster_agents/${agentId}`,
+      options
+    );
+  }
+};
+var AlertManagement = class extends BaseResource {
+  allMetricImages(projectId, alertIId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/alert_management_alerts/${alertIId}/metric_images`,
+      options
+    );
+  }
+  editMetricImage(projectId, alertIId, imageId, options) {
+    return RequestHelper.put()(
+      this,
+      endpoint`projects/${projectId}/alert_management_alerts/${alertIId}/metric_images/${imageId}`,
+      options
+    );
+  }
+  removeMetricImage(projectId, alertIId, imageId, options) {
+    return RequestHelper.del()(
+      this,
+      endpoint`projects/${projectId}/alert_management_alerts/${alertIId}/metric_images/${imageId}`,
+      options
+    );
+  }
+  uploadMetricImage(projectId, alertIId, metricImage, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/alert_management_alerts/${alertIId}/metric_images`,
+      {
+        isForm: true,
+        file: [metricImage.content, metricImage.filename],
+        ...options
+      }
+    );
+  }
+};
+var ApplicationAppearance = class extends BaseResource {
+  show(options) {
+    return RequestHelper.get()(
+      this,
+      "application/appearence",
+      options
+    );
+  }
+  edit({
+    logo,
+    pwaIcon,
+    ...options
+  } = {}) {
+    if (logo || pwaIcon) {
+      const opts = {
+        ...options,
+        isForm: true
+      };
+      if (logo)
+        opts.logo = [logo.content, logo.filename];
+      if (pwaIcon)
+        opts.pwaIcon = [pwaIcon.content, pwaIcon.filename];
+      return RequestHelper.put()(this, "application/appearence", opts);
+    }
+    return RequestHelper.put()(
+      this,
+      "application/appearence",
+      options
+    );
+  }
+};
+var ApplicationPlanLimits = class extends BaseResource {
+  show(options) {
+    return RequestHelper.get()(
+      this,
+      "application/plan_limits",
+      options
+    );
+  }
+  edit(planName, options = {}) {
+    const {
+      ciPipelineSize,
+      ciActiveJobs,
+      ciActivePipelines,
+      ciProjectSubscriptions,
+      ciPipelineSchedules,
+      ciNeedsSizeLimit,
+      ciRegisteredGroupRunners,
+      ciRegisteredProjectRunners,
+      conanMaxFileSize,
+      genericPackagesMaxFileSize,
+      helmMaxFileSize,
+      mavenMaxFileSize,
+      npmMaxFileSize,
+      nugetMaxFileSize,
+      pypiMaxFileSize,
+      terraformModuleMaxFileSize,
+      storageSizeLimit,
+      ...opts
+    } = options;
+    return RequestHelper.put()(this, "application/plan_limits", {
+      searchParams: {
+        planName,
+        ciPipelineSize,
+        ciActiveJobs,
+        ciActivePipelines,
+        ciProjectSubscriptions,
+        ciPipelineSchedules,
+        ciNeedsSizeLimit,
+        ciRegisteredGroupRunners,
+        ciRegisteredProjectRunners,
+        conanMaxFileSize,
+        genericPackagesMaxFileSize,
+        helmMaxFileSize,
+        mavenMaxFileSize,
+        npmMaxFileSize,
+        nugetMaxFileSize,
+        pypiMaxFileSize,
+        terraformModuleMaxFileSize,
+        storageSizeLimit
+      },
+      opts
+    });
+  }
+};
+var Applications = class extends BaseResource {
+  all(options) {
+    return RequestHelper.get()(this, "applications", options);
+  }
+  create(name, redirectUri, scopes, options) {
+    return RequestHelper.post()(this, "applications", {
+      name,
+      redirectUri,
+      scopes,
+      ...options
+    });
+  }
+  remove(applicationId, options) {
+    return RequestHelper.del()(this, `applications/${applicationId}`, options);
+  }
+};
+var ApplicationSettings = class extends BaseResource {
+  show(options) {
+    return RequestHelper.get()(this, "application/settings", options);
+  }
+  edit(options) {
+    return RequestHelper.put()(this, "application/settings", options);
+  }
+};
+var ApplicationStatistics = class extends BaseResource {
+  show(options) {
+    return RequestHelper.get()(this, "application/statistics", options);
+  }
+};
+function url({
+  projectId,
+  groupId
+} = {}) {
+  let prefix = "";
+  if (projectId)
+    prefix = endpoint`projects/${projectId}/`;
+  else if (groupId)
+    prefix = endpoint`groups/${groupId}/`;
+  return `${prefix}audit_events`;
+}
+var AuditEvents = class extends BaseResource {
+  all({
+    projectId,
+    groupId,
+    ...options
+  } = {}) {
+    const uri = url({ projectId, groupId });
+    return RequestHelper.get()(
+      this,
+      uri,
+      options
+    );
+  }
+  show(auditEventId, {
+    projectId,
+    groupId,
+    ...options
+  } = {}) {
+    const uri = url({ projectId, groupId });
+    return RequestHelper.get()(this, `${uri}/${auditEventId}`, options);
+  }
+};
+var Avatar = class extends BaseResource {
+  show(email, options) {
+    return RequestHelper.get()(this, "avatar", { email, ...options });
+  }
+};
+var BroadcastMessages = class extends BaseResource {
+  all(options) {
+    return RequestHelper.get()(this, "broadcast_messages", options);
+  }
+  create(options) {
+    return RequestHelper.post()(this, "broadcast_messages", options);
+  }
+  edit(broadcastMessageId, options) {
+    return RequestHelper.put()(
+      this,
+      `broadcast_messages/${broadcastMessageId}`,
+      options
+    );
+  }
+  remove(broadcastMessageId, options) {
+    return RequestHelper.del()(this, `broadcast_messages/${broadcastMessageId}`, options);
+  }
+  show(broadcastMessageId, options) {
+    return RequestHelper.get()(
+      this,
+      `broadcast_messages/${broadcastMessageId}`,
+      options
+    );
+  }
+};
+var Composer = class extends BaseResource {
+  create(projectId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/packages/composer`,
+      options
+    );
+  }
+  download(projectId, packageName, sha, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/packages/composer/archives/${packageName}`,
+      {
+        searchParams: { sha },
+        ...options
+      }
+    );
+  }
+  showMetadata(groupId, packageName, options) {
+    let url12;
+    if (options && options.sha) {
+      url12 = endpoint`groups/${groupId}/-/packages/composer/${packageName}$${options.sha}`;
+    } else {
+      url12 = endpoint`groups/${groupId}/-/packages/composer/p2/${packageName}`;
+    }
+    return RequestHelper.get()(this, url12, options);
+  }
+  showPackages(groupId, sha, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`groups/${groupId}/-/packages/composer/p/${sha}`,
+      options
+    );
+  }
+  showBaseRepository(groupId, options) {
+    const clonedService = { ...this };
+    if (options && options.composerVersion === "2") {
+      clonedService.headers["User-Agent"] = "Composer/2";
+    }
+    return RequestHelper.get()(
+      clonedService,
+      endpoint`groups/${groupId}/-/packages/composer/packages`,
+      options
+    );
+  }
+};
+function url2(projectId) {
+  return projectId ? endpoint`projects/${projectId}/packages/conan/v1` : "packages/conan/v1";
+}
+var Conan = class extends BaseResource {
+  authenticate({
+    projectId,
+    ...options
+  } = {}) {
+    return RequestHelper.get()(this, `${url2(projectId)}/users/authenticate`, options);
+  }
+  checkCredentials({
+    projectId,
+    ...options
+  } = {}) {
+    const prefix = url2(projectId);
+    return RequestHelper.get()(this, `${prefix}/users/check_credentials`, options);
+  }
+  downloadPackageFile(packageName, packageVersion, packageUsername, packageChannel, conanPackageReference, recipeRevision, packageRevision, filename, { projectId, ...options } = {}) {
+    const prefix = url2(projectId);
+    return RequestHelper.get()(
+      this,
+      `${prefix}/conans/${packageName}/${packageVersion}/${packageUsername}/${packageChannel}/${recipeRevision}/package/${conanPackageReference}/${packageRevision}/${filename}`,
+      options
+    );
+  }
+  downloadRecipeFile(packageName, packageVersion, packageUsername, packageChannel, recipeRevision, filename, { projectId, ...options } = {}) {
+    const prefix = url2(projectId);
+    return RequestHelper.get()(
+      this,
+      `${prefix}/conans/${packageName}/${packageVersion}/${packageUsername}/${packageChannel}/${recipeRevision}/export/${filename}`,
+      options
+    );
+  }
+  showPackageUploadUrls(packageName, packageVersion, packageUsername, packageChannel, conanPackageReference, { projectId, ...options } = {}) {
+    const prefix = url2(projectId);
+    return RequestHelper.get()(
+      this,
+      `${prefix}/conans/${packageName}/${packageVersion}/${packageUsername}/${packageChannel}/packages/${conanPackageReference}/upload_urls`,
+      options
+    );
+  }
+  showPackageDownloadUrls(packageName, packageVersion, packageUsername, packageChannel, conanPackageReference, { projectId, ...options } = {}) {
+    const prefix = url2(projectId);
+    return RequestHelper.get()(
+      this,
+      `${prefix}/conans/${packageName}/${packageVersion}/${packageUsername}/${packageChannel}/packages/${conanPackageReference}/download_urls`,
+      options
+    );
+  }
+  showPackageManifest(packageName, packageVersion, packageUsername, packageChannel, conanPackageReference, { projectId, ...options } = {}) {
+    const prefix = url2(projectId);
+    return RequestHelper.get()(
+      this,
+      `${prefix}/conans/${packageName}/${packageVersion}/${packageUsername}/${packageChannel}/packages/${conanPackageReference}/digest`,
+      options
+    );
+  }
+  showPackageSnapshot(packageName, packageVersion, packageUsername, packageChannel, conanPackageReference, { projectId, ...options } = {}) {
+    const prefix = url2(projectId);
+    return RequestHelper.get()(
+      this,
+      `${prefix}/conans/${packageName}/${packageVersion}/${packageUsername}/${packageChannel}/packages/${conanPackageReference}`,
+      options
+    );
+  }
+  ping({
+    projectId,
+    ...options
+  } = {}) {
+    return RequestHelper.post()(this, `${url2(projectId)}/ping`, options);
+  }
+  showRecipeUploadUrls(packageName, packageVersion, packageUsername, packageChannel, { projectId, ...options } = {}) {
+    const prefix = url2(projectId);
+    return RequestHelper.get()(
+      this,
+      `${prefix}/conans/${packageName}/${packageVersion}/${packageUsername}/${packageChannel}/upload_urls`,
+      options
+    );
+  }
+  showRecipeDownloadUrls(packageName, packageVersion, packageUsername, packageChannel, { projectId, ...options } = {}) {
+    const prefix = url2(projectId);
+    return RequestHelper.get()(
+      this,
+      `${prefix}/conans/${packageName}/${packageVersion}/${packageUsername}/${packageChannel}/download_urls`,
+      options
+    );
+  }
+  showRecipeManifest(packageName, packageVersion, packageUsername, packageChannel, { projectId, ...options } = {}) {
+    const prefix = url2(projectId);
+    return RequestHelper.get()(
+      this,
+      `${prefix}/conans/${packageName}/${packageVersion}/${packageUsername}/${packageChannel}/digest`,
+      options
+    );
+  }
+  showRecipeSnapshot(packageName, packageVersion, packageUsername, packageChannel, { projectId, ...options } = {}) {
+    const prefix = url2(projectId);
+    return RequestHelper.get()(
+      this,
+      `${prefix}/conans/${packageName}/${packageVersion}/${packageUsername}/${packageChannel}`,
+      options
+    );
+  }
+  removePackageFile(packageName, packageVersion, packageUsername, packageChannel, { projectId, ...options } = {}) {
+    const prefix = url2(projectId);
+    return RequestHelper.get()(
+      this,
+      `${prefix}/conans/${packageName}/${packageVersion}/${packageUsername}/${packageChannel}`,
+      options
+    );
+  }
+  search({
+    projectId,
+    ...options
+  } = {}) {
+    const prefix = url2(projectId);
+    return RequestHelper.get()(this, `${prefix}/conans/search`, options);
+  }
+  uploadPackageFile(packageFile, packageName, packageVersion, packageUsername, packageChannel, conanPackageReference, recipeRevision, packageRevision, options) {
+    const prefix = url2();
+    return RequestHelper.get()(
+      this,
+      `${prefix}/files/${packageName}/${packageVersion}/${packageUsername}/${packageChannel}/${recipeRevision}/package/${conanPackageReference}/${packageRevision}/${packageFile.filename}`,
+      {
+        isForm: true,
+        ...options,
+        file: [packageFile.content, packageFile.filename]
+      }
+    );
+  }
+  uploadRecipeFile(packageFile, packageName, packageVersion, packageUsername, packageChannel, recipeRevision, options) {
+    const prefix = url2();
+    return RequestHelper.get()(
+      this,
+      `${prefix}/files/${packageName}/${packageVersion}/${packageUsername}/${packageChannel}/${recipeRevision}/export/${packageFile.filename}`,
+      {
+        isForm: true,
+        ...options,
+        file: [packageFile.content, packageFile.filename]
+      }
+    );
+  }
+};
+var DashboardAnnotations = class extends BaseResource {
+  create(dashboardPath, startingAt, description, {
+    environmentId,
+    clusterId,
+    ...options
+  } = {}) {
+    let url12;
+    if (environmentId)
+      url12 = endpoint`environments/${environmentId}/metrics_dashboard/annotations`;
+    else if (clusterId)
+      url12 = endpoint`clusters/${clusterId}/metrics_dashboard/annotations`;
+    else
+      throw new Error(
+        "Missing required argument. Please supply a environmentId or a cluserId in the options parameter."
+      );
+    return RequestHelper.post()(this, url12, {
+      dashboardPath,
+      startingAt,
+      description,
+      ...options
+    });
+  }
+};
+function url3({
+  projectId,
+  groupId
+} = {}) {
+  if (projectId)
+    return endpoint`/projects/${projectId}/packages/debian`;
+  if (groupId)
+    return endpoint`/groups/${groupId}/-/packages/debian`;
+  throw new Error(
+    "Missing required argument. Please supply a projectId or a groupId in the options parameter"
+  );
+}
+var Debian = class extends BaseResource {
+  downloadBinaryFileIndex(distribution, component, architecture, {
+    projectId,
+    groupId,
+    ...options
+  }) {
+    const prefix = url3({
+      projectId,
+      groupId
+    });
+    return RequestHelper.get()(
+      this,
+      `${prefix}/dists/${distribution}/${component}/binary-${architecture}/Packages`,
+      options
+    );
+  }
+  downloadDistributionReleaseFile(distribution, {
+    projectId,
+    groupId,
+    ...options
+  }) {
+    const prefix = url3({
+      projectId,
+      groupId
+    });
+    return RequestHelper.get()(
+      this,
+      `${prefix}/dists/${distribution}/Release`,
+      options
+    );
+  }
+  downloadSignedDistributionReleaseFile(distribution, {
+    projectId,
+    groupId,
+    ...options
+  }) {
+    const prefix = url3({
+      projectId,
+      groupId
+    });
+    return RequestHelper.get()(
+      this,
+      `${prefix}/dists/${distribution}/InRelease`,
+      options
+    );
+  }
+  downloadReleaseFileSignature(distribution, {
+    projectId,
+    groupId,
+    ...options
+  }) {
+    const prefix = url3({
+      projectId,
+      groupId
+    });
+    return RequestHelper.get()(
+      this,
+      `${prefix}/dists/${distribution}/Release.gpg`,
+      options
+    );
+  }
+  downloadPackageFile(projectId, distribution, letter, packageName, packageVersion, filename, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/packages/debian/pool/${distribution}/${letter}/${packageName}/${packageVersion}/${filename}`,
+      options
+    );
+  }
+  uploadPackageFile(projectId, packageFile, options) {
+    return RequestHelper.put()(
+      this,
+      endpoint`projects/${projectId}/packages/debian/${packageFile.filename}`,
+      {
+        isForm: true,
+        ...options,
+        file: [packageFile.content, packageFile.filename]
+      }
+    );
+  }
+};
+var DependencyProxy = class extends BaseResource {
+  remove(groupId, options) {
+    return RequestHelper.post()(this, `groups/${groupId}/dependency_proxy/cache`, options);
+  }
+};
+var DeployKeys = class extends BaseResource {
+  all({
+    projectId,
+    userId,
+    ...options
+  } = {}) {
+    let url12;
+    if (projectId) {
+      url12 = endpoint`projects/${projectId}/deploy_keys`;
+    } else if (userId) {
+      url12 = endpoint`users/${userId}/project_deploy_keys`;
+    } else {
+      url12 = "deploy_keys";
+    }
+    return RequestHelper.get()(this, url12, options);
+  }
+  create(projectId, title, key, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/deploy_keys`,
+      {
+        title,
+        key,
+        ...options
+      }
+    );
+  }
+  edit(projectId, keyId, options) {
+    return RequestHelper.put()(
+      this,
+      endpoint`projects/${projectId}/deploy_keys/${keyId}`,
+      options
+    );
+  }
+  enable(projectId, keyId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/deploy_keys/${keyId}/enable`,
+      options
+    );
+  }
+  remove(projectId, keyId, options) {
+    return RequestHelper.del()(this, endpoint`projects/${projectId}/deploy_keys/${keyId}`, options);
+  }
+  show(projectId, keyId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/deploy_keys/${keyId}`,
+      options
+    );
+  }
+};
+var DeployTokens = class extends BaseResource {
+  all({
+    projectId,
+    groupId,
+    ...options
+  } = {}) {
+    let url12;
+    if (projectId)
+      url12 = endpoint`projects/${projectId}/deploy_tokens`;
+    else if (groupId)
+      url12 = endpoint`groups/${groupId}/deploy_tokens`;
+    else
+      url12 = "deploy_tokens";
+    return RequestHelper.get()(this, url12, options);
+  }
+  create(name, scopes, {
+    projectId,
+    groupId,
+    ...options
+  } = {}) {
+    let url12;
+    if (projectId)
+      url12 = endpoint`projects/${projectId}/deploy_tokens`;
+    else if (groupId)
+      url12 = endpoint`groups/${groupId}/deploy_tokens`;
+    else {
+      throw new Error(
+        "Missing required argument. Please supply a projectId or a groupId in the options parameter."
+      );
+    }
+    return RequestHelper.post()(this, url12, {
+      name,
+      scopes,
+      ...options
+    });
+  }
+  remove(tokenId, {
+    projectId,
+    groupId,
+    ...options
+  } = {}) {
+    let url12;
+    if (projectId)
+      url12 = endpoint`projects/${projectId}/deploy_tokens/${tokenId}`;
+    else if (groupId)
+      url12 = endpoint`groups/${groupId}/deploy_tokens/${tokenId}`;
+    else {
+      throw new Error(
+        "Missing required argument. Please supply a projectId or a groupId in the options parameter."
+      );
+    }
+    return RequestHelper.del()(this, url12, options);
+  }
+  show(tokenId, {
+    projectId,
+    groupId,
+    ...options
+  } = {}) {
+    let url12;
+    if (projectId)
+      url12 = endpoint`projects/${projectId}/deploy_tokens/${tokenId}`;
+    else if (groupId)
+      url12 = endpoint`groups/${groupId}/deploy_tokens/${tokenId}`;
+    else {
+      throw new Error(
+        "Missing required argument. Please supply a projectId or a groupId in the options parameter."
+      );
+    }
+    return RequestHelper.get()(
+      this,
+      url12,
+      options
+    );
+  }
+};
+var ResourceAccessRequests = class extends BaseResource {
+  constructor(resourceType, options) {
+    super({ prefixUrl: resourceType, ...options });
+  }
+  all(resourceId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`${resourceId}/access_requests`,
+      options
+    );
+  }
+  request(resourceId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`${resourceId}/access_requests`,
+      options
+    );
+  }
+  approve(resourceId, userId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`${resourceId}/access_requests/${userId}/approve`,
+      options
+    );
+  }
+  deny(resourceId, userId, options) {
+    return RequestHelper.del()(this, endpoint`${resourceId}/access_requests/${userId}`, options);
+  }
+};
+var ResourceAccessTokens = class extends BaseResource {
+  constructor(resourceType, options) {
+    super({ prefixUrl: resourceType, ...options });
+  }
+  all(resourceId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`${resourceId}/access_tokens`,
+      options
+    );
+  }
+  create(resourceId, name, scopes, options) {
+    return RequestHelper.post()(this, endpoint`${resourceId}/access_tokens`, {
+      name,
+      scopes,
+      ...options
+    });
+  }
+  revoke(resourceId, tokenId, options) {
+    return RequestHelper.del()(this, endpoint`${resourceId}/access_tokens/${tokenId}`, options);
+  }
+  show(resourceId, tokenId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`${resourceId}/access_tokens/${tokenId}`,
+      options
+    );
+  }
+};
+function url4(resourceId, resourceType2, resourceId2, awardId) {
+  const [rId, rId2] = [resourceId, resourceId2].map(encodeURIComponent);
+  const output = [rId, resourceType2, rId2];
+  output.push("award_emoji");
+  if (awardId)
+    output.push(awardId);
+  return output.join("/");
+}
+var ResourceAwardEmojis = class extends BaseResource {
+  resourceType2;
+  constructor(resourceType1, resourceType2, options) {
+    super({ prefixUrl: resourceType1, ...options });
+    this.resourceType2 = resourceType2;
+  }
+  all(resourceId, resourceIId, options) {
+    return RequestHelper.get()(
+      this,
+      url4(resourceId, this.resourceType2, resourceIId),
+      options
+    );
+  }
+  award(resourceId, resourceIId, name, options) {
+    return RequestHelper.post()(
+      this,
+      url4(resourceId, this.resourceType2, resourceIId),
+      {
+        name,
+        ...options
+      }
+    );
+  }
+  remove(resourceId, resourceIId, awardId, options) {
+    return RequestHelper.del()(
+      this,
+      url4(resourceId, this.resourceType2, resourceIId, awardId),
+      options
+    );
+  }
+  show(resourceId, resourceIId, awardId, options) {
+    return RequestHelper.get()(
+      this,
+      url4(resourceId, this.resourceType2, resourceIId, awardId),
+      options
+    );
+  }
+};
+function url5(resourceId, resourceType2, resourceId2, noteId, awardId) {
+  const [rId, rId2] = [resourceId, resourceId2].map(encodeURIComponent);
+  const output = [rId, resourceType2, rId2];
+  output.push("notes");
+  output.push(noteId);
+  output.push("award_emoji");
+  if (awardId)
+    output.push(awardId);
+  return output.join("/");
+}
+var ResourceNoteAwardEmojis = class extends BaseResource {
+  resourceType;
+  constructor(resourceType, options) {
+    super({ prefixUrl: "projects", ...options });
+    this.resourceType = resourceType;
+  }
+  all(projectId, resourceIId, noteId, options) {
+    return RequestHelper.get()(
+      this,
+      url5(projectId, this.resourceType, resourceIId, noteId),
+      options
+    );
+  }
+  award(projectId, resourceIId, noteId, name, options) {
+    return RequestHelper.post()(
+      this,
+      url5(projectId, this.resourceType, resourceIId, noteId),
+      {
+        name,
+        ...options
+      }
+    );
+  }
+  remove(projectId, resourceIId, noteId, awardId, options) {
+    return RequestHelper.del()(
+      this,
+      url5(projectId, this.resourceType, resourceIId, noteId, awardId),
+      options
+    );
+  }
+  show(projectId, resourceIId, noteId, awardId, options) {
+    return RequestHelper.get()(
+      this,
+      url5(projectId, this.resourceType, resourceIId, noteId, awardId),
+      options
+    );
+  }
+};
+var ResourceBadges = class extends BaseResource {
+  constructor(resourceType, options) {
+    super({ prefixUrl: resourceType, ...options });
+  }
+  add(resourceId, linkUrl, imageUrl, options) {
+    return RequestHelper.post()(this, endpoint`${resourceId}/badges`, {
+      linkUrl,
+      imageUrl,
+      ...options
+    });
+  }
+  all(resourceId, options) {
+    return RequestHelper.get()(this, endpoint`${resourceId}/badges`, options);
+  }
+  edit(resourceId, badgeId, options) {
+    return RequestHelper.put()(
+      this,
+      endpoint`${resourceId}/badges/${badgeId}`,
+      options
+    );
+  }
+  preview(resourceId, linkUrl, imageUrl, options) {
+    return RequestHelper.get()(this, endpoint`${resourceId}/badges/render`, {
+      linkUrl,
+      imageUrl,
+      ...options
+    });
+  }
+  remove(resourceId, badgeId, options) {
+    return RequestHelper.del()(this, endpoint`${resourceId}/badges/${badgeId}`, options);
+  }
+  show(resourceId, badgeId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`${resourceId}/badges/${badgeId}`,
+      options
+    );
+  }
+};
+var ResourceCustomAttributes = class extends BaseResource {
+  constructor(resourceType, options) {
+    super({ prefixUrl: resourceType, ...options });
+  }
+  all(resourceId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`${resourceId}/custom_attributes`,
+      options
+    );
+  }
+  remove(resourceId, customAttributeId, options) {
+    return RequestHelper.del()(
+      this,
+      endpoint`${resourceId}/custom_attributes/${customAttributeId}`,
+      options
+    );
+  }
+  set(resourceId, customAttributeId, value, options) {
+    return RequestHelper.put()(
+      this,
+      endpoint`${resourceId}/custom_attributes/${customAttributeId}`,
+      {
+        value,
+        ...options
+      }
+    );
+  }
+  show(resourceId, customAttributeId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`${resourceId}/custom_attributes/${customAttributeId}`,
+      options
+    );
+  }
+};
+var ResourceDORA4Metrics = class extends BaseResource {
+  constructor(resourceType, options) {
+    super({ prefixUrl: resourceType, ...options });
+  }
+  all(resourceId, metric, options) {
+    return RequestHelper.get()(this, endpoint`${resourceId}/dora/metrics`, {
+      metric,
+      ...options
+    });
+  }
+};
+var ResourceDiscussions = class extends BaseResource {
+  resource2Type;
+  constructor(resourceType, resource2Type, options) {
+    super({ prefixUrl: resourceType, ...options });
+    this.resource2Type = resource2Type;
+  }
+  addNote(resourceId, resource2Id, discussionId, noteId, body, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`${resourceId}/${this.resource2Type}/${resource2Id}/discussions/${discussionId}/notes`,
+      { searchParams: { body }, noteId, ...options }
+    );
+  }
+  all(resourceId, resource2Id, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`${resourceId}/${this.resource2Type}/${resource2Id}/discussions`,
+      options
+    );
+  }
+  create(resourceId, resource2Id, body, {
+    position,
+    ...options
+  } = {}) {
+    const opts = { ...options };
+    if (position) {
+      Object.assign(opts, reformatObjectOptions(position, "position", true));
+      opts.isForm = true;
+      opts.body = body;
+    } else {
+      opts.searchParams = { body };
+    }
+    return RequestHelper.post()(
+      this,
+      endpoint`${resourceId}/${this.resource2Type}/${resource2Id}/discussions`,
+      opts
+    );
+  }
+  editNote(resourceId, resource2Id, discussionId, noteId, { body, ...options } = {}) {
+    return RequestHelper.put()(
+      this,
+      endpoint`${resourceId}/${this.resource2Type}/${resource2Id}/discussions/${discussionId}/notes/${noteId}`,
+      {
+        searchParams: { body },
+        ...options
+      }
+    );
+  }
+  removeNote(resourceId, resource2Id, discussionId, noteId, options) {
+    return RequestHelper.del()(
+      this,
+      endpoint`${resourceId}/${this.resource2Type}/${resource2Id}/discussions/${discussionId}/notes/${noteId}`,
+      options
+    );
+  }
+  show(resourceId, resource2Id, discussionId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`${resourceId}/${this.resource2Type}/${resource2Id}/discussions/${discussionId}`,
+      options
+    );
+  }
+};
+var ResourceIssueBoards = class extends BaseResource {
+  constructor(resourceType, options) {
+    super({ prefixUrl: resourceType, ...options });
+  }
+  all(resourceId, options) {
+    return RequestHelper.get()(this, endpoint`${resourceId}/boards`, options);
+  }
+  allLists(resourceId, boardId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`${resourceId}/boards/${boardId}/lists`,
+      options
+    );
+  }
+  create(resourceId, name, options) {
+    return RequestHelper.post()(this, endpoint`${resourceId}/boards`, {
+      name,
+      ...options
+    });
+  }
+  createList(resourceId, boardId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`${resourceId}/boards/${boardId}/lists`,
+      options
+    );
+  }
+  edit(resourceId, boardId, options) {
+    return RequestHelper.put()(
+      this,
+      endpoint`${resourceId}/boards/${boardId}`,
+      options
+    );
+  }
+  editList(resourceId, boardId, listId, position, options) {
+    return RequestHelper.put()(
+      this,
+      endpoint`${resourceId}/boards/${boardId}/lists/${listId}`,
+      {
+        position,
+        ...options
+      }
+    );
+  }
+  remove(resourceId, boardId, options) {
+    return RequestHelper.del()(this, endpoint`${resourceId}/boards/${boardId}`, options);
+  }
+  removeList(resourceId, boardId, listId, options) {
+    return RequestHelper.del()(
+      this,
+      endpoint`${resourceId}/boards/${boardId}/lists/${listId}`,
+      options
+    );
+  }
+  show(resourceId, boardId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`${resourceId}/boards/${boardId}`,
+      options
+    );
+  }
+  showList(resourceId, boardId, listId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`${resourceId}/boards/${boardId}/lists/${listId}`,
+      options
+    );
+  }
+};
+var ResourceLabels = class extends BaseResource {
+  constructor(resourceType, options) {
+    super({ prefixUrl: resourceType, ...options });
+  }
+  all(resourceId, options) {
+    return RequestHelper.get()(this, endpoint`${resourceId}/labels`, options);
+  }
+  create(resourceId, labelName, color, options) {
+    return RequestHelper.post()(this, endpoint`${resourceId}/labels`, {
+      name: labelName,
+      color,
+      ...options
+    });
+  }
+  edit(resourceId, labelId, options) {
+    if (!options?.newName && !options?.color)
+      throw new Error(
+        "Missing required argument. Please supply a color or a newName in the options parameter."
+      );
+    return RequestHelper.put()(
+      this,
+      endpoint`${resourceId}/labels/${labelId}`,
+      options
+    );
+  }
+  promote(resourceId, labelId, options) {
+    return RequestHelper.put()(
+      this,
+      endpoint`${resourceId}/labels/${labelId}/promote`,
+      options
+    );
+  }
+  remove(resourceId, labelId, options) {
+    return RequestHelper.del()(this, endpoint`${resourceId}/labels/${labelId}`, options);
+  }
+  show(resourceId, labelId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`${resourceId}/labels/${labelId}`,
+      options
+    );
+  }
+  subscribe(resourceId, labelId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`${resourceId}/issues/${labelId}/subscribe`,
+      options
+    );
+  }
+  unsubscribe(resourceId, labelId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`${resourceId}/issues/${labelId}/unsubscribe`,
+      options
+    );
+  }
+};
+var ResourceMembers = class extends BaseResource {
+  constructor(resourceType, options) {
+    super({ prefixUrl: resourceType, ...options });
+  }
+  add(resourceId, userId, accessLevel, options) {
+    return RequestHelper.post()(this, endpoint`${resourceId}/members`, {
+      userId: String(userId),
+      accessLevel,
+      ...options
+    });
+  }
+  all(resourceId, {
+    includeInherited,
+    ...options
+  } = {}) {
+    let url12 = endpoint`${resourceId}/members`;
+    if (includeInherited)
+      url12 += "/all";
+    return RequestHelper.get()(this, url12, options);
+  }
+  edit(resourceId, userId, accessLevel, options) {
+    return RequestHelper.put()(this, endpoint`${resourceId}/members/${userId}`, {
+      accessLevel,
+      ...options
+    });
+  }
+  show(resourceId, userId, { includeInherited, ...options } = {}) {
+    const [rId, uId] = [resourceId, userId].map(encodeURIComponent);
+    const url12 = [rId, "members"];
+    if (includeInherited)
+      url12.push("all");
+    url12.push(uId);
+    return RequestHelper.get()(this, url12.join("/"), options);
+  }
+  remove(resourceId, userId, options) {
+    return RequestHelper.del()(this, endpoint`${resourceId}/members/${userId}`, options);
+  }
+};
+var ResourceMilestones = class extends BaseResource {
+  constructor(resourceType, options) {
+    super({ prefixUrl: resourceType, ...options });
+  }
+  all(resourceId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`${resourceId}/milestones`,
+      options
+    );
+  }
+  allAssignedIssues(resourceId, milestoneId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`${resourceId}/milestones/${milestoneId}/issues`,
+      options
+    );
+  }
+  allAssignedMergeRequests(resourceId, milestoneId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`${resourceId}/milestones/${milestoneId}/merge_requests`,
+      options
+    );
+  }
+  allBurndownChartEvents(resourceId, milestoneId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`${resourceId}/milestones/${milestoneId}/burndown_events`,
+      options
+    );
+  }
+  create(resourceId, title, options) {
+    return RequestHelper.post()(this, endpoint`${resourceId}/milestones`, {
+      title,
+      ...options
+    });
+  }
+  edit(resourceId, milestoneId, options) {
+    return RequestHelper.put()(
+      this,
+      endpoint`${resourceId}/milestones/${milestoneId}`,
+      options
+    );
+  }
+  remove(resourceId, milestoneId, options) {
+    return RequestHelper.del()(this, endpoint`${resourceId}/milestones/${milestoneId}`, options);
+  }
+  show(resourceId, milestoneId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`${resourceId}/milestones/${milestoneId}`,
+      options
+    );
+  }
+};
+var ResourceNotes = class extends BaseResource {
+  resource2Type;
+  constructor(resourceType, resource2Type, options) {
+    super({ prefixUrl: resourceType, ...options });
+    this.resource2Type = resource2Type;
+  }
+  all(resourceId, resource2Id, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`${resourceId}/${this.resource2Type}/${resource2Id}/notes`,
+      options
+    );
+  }
+  create(resourceId, resource2Id, body, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`${resourceId}/${this.resource2Type}/${resource2Id}/notes`,
+      {
+        body,
+        ...options
+      }
+    );
+  }
+  edit(resourceId, resource2Id, noteId, options) {
+    return RequestHelper.put()(
+      this,
+      endpoint`${resourceId}/${this.resource2Type}/${resource2Id}/notes/${noteId}`,
+      options
+    );
+  }
+  remove(resourceId, resource2Id, noteId, options) {
+    return RequestHelper.del()(
+      this,
+      endpoint`${resourceId}/${this.resource2Type}/${resource2Id}/notes/${noteId}`,
+      options
+    );
+  }
+  show(resourceId, resource2Id, noteId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`${resourceId}/${this.resource2Type}/${resource2Id}/notes/${noteId}`,
+      options
+    );
+  }
+};
+var ResourceTemplates = class extends BaseResource {
+  constructor(resourceType, options) {
+    super({ prefixUrl: ["templates", resourceType].join("/"), ...options });
+  }
+  all(options) {
+    process.emitWarning(
+      'This API will be deprecated as of Gitlabs v5 API. Please make the switch to "ProjectTemplates".',
+      "DeprecationWarning"
+    );
+    return RequestHelper.get()(this, "", options);
+  }
+  show(key, options) {
+    process.emitWarning(
+      'This API will be deprecated as of Gitlabs v5 API. Please make the switch to "ProjectTemplates".',
+      "DeprecationWarning"
+    );
+    return RequestHelper.get()(this, encodeURIComponent(key), options);
+  }
+};
+var ResourceVariables = class extends BaseResource {
+  constructor(resourceType, options) {
+    super({ prefixUrl: resourceType, ...options });
+  }
+  all(resourceId, options) {
+    return RequestHelper.get()(this, endpoint`${resourceId}/variables`, options);
+  }
+  create(resourceId, key, value, options) {
+    return RequestHelper.post()(this, endpoint`${resourceId}/variables`, {
+      key,
+      value,
+      ...options
+    });
+  }
+  edit(resourceId, key, value, options) {
+    return RequestHelper.put()(this, endpoint`${resourceId}/variables/${key}`, {
+      value,
+      ...options
+    });
+  }
+  show(resourceId, key, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`${resourceId}/variables/${key}`,
+      options
+    );
+  }
+  remove(resourceId, key, options) {
+    return RequestHelper.del()(this, endpoint`${resourceId}/variables/${key}`, options);
+  }
+};
+var ResourceWikis = class extends BaseResource {
+  constructor(resourceType, options) {
+    super({ prefixUrl: resourceType, ...options });
+  }
+  all(resourceId, options) {
+    return RequestHelper.get()(this, endpoint`${resourceId}/wikis`, options);
+  }
+  create(resourceId, content, title, options) {
+    return RequestHelper.post()(this, endpoint`${resourceId}/wikis`, {
+      content,
+      title,
+      ...options
+    });
+  }
+  edit(resourceId, slug, options) {
+    return RequestHelper.put()(this, endpoint`${resourceId}/wikis/${slug}`, options);
+  }
+  remove(resourceId, slug, options) {
+    return RequestHelper.del()(this, endpoint`${resourceId}/wikis/${slug}`, options);
+  }
+  show(resourceId, slug, options) {
+    return RequestHelper.get()(this, endpoint`${resourceId}/wikis/${slug}`, options);
+  }
+  uploadAttachment(resourceId, file, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`${resourceId}/wikis/attachments`,
+      {
+        ...options,
+        isForm: true,
+        file: [file.content, file.filename]
+      }
+    );
+  }
+};
+var ResourceHooks = class extends BaseResource {
+  constructor(resourceType, options) {
+    super({ prefixUrl: resourceType, ...options });
+  }
+  add(resourceId, url12, options) {
+    return RequestHelper.post()(this, endpoint`${resourceId}/hooks`, {
+      url: url12,
+      ...options
+    });
+  }
+  all(resourceId, options) {
+    return RequestHelper.get()(this, endpoint`${resourceId}/hooks`, options);
+  }
+  edit(resourceId, hookId, url12, options) {
+    return RequestHelper.put()(this, endpoint`${resourceId}/hooks/${hookId}`, {
+      url: url12,
+      ...options
+    });
+  }
+  remove(resourceId, hookId, options) {
+    return RequestHelper.del()(this, endpoint`${resourceId}/hooks/${hookId}`, options);
+  }
+  show(resourceId, hookId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`${resourceId}/hooks/${hookId}`,
+      options
+    );
+  }
+};
+var ResourcePushRules = class extends BaseResource {
+  constructor(resourceType, options) {
+    super({ prefixUrl: resourceType, ...options });
+  }
+  create(resourceId, options) {
+    return RequestHelper.post()(this, endpoint`${resourceId}/push_rule`, options);
+  }
+  edit(resourceId, options) {
+    return RequestHelper.put()(this, endpoint`${resourceId}/push_rule`, options);
+  }
+  remove(resourceId, options) {
+    return RequestHelper.del()(this, endpoint`${resourceId}/push_rule`, options);
+  }
+  show(resourceId, options) {
+    return RequestHelper.get()(this, endpoint`${resourceId}/push_rule`, options);
+  }
+};
+var ResourceRepositoryStorageMoves = class extends BaseResource {
+  resourceType;
+  resourceTypeSingular;
+  constructor(resourceType, options) {
+    super(options);
+    this.resourceType = resourceType;
+    this.resourceTypeSingular = resourceType.substring(0, resourceType.length - 1);
+  }
+  all(options) {
+    const resourceId = options?.[`${this.resourceTypeSingular}Id`];
+    const url12 = resourceId ? endpoint`${this.resourceType}/${resourceId}/repository_storage_moves` : `${this.resourceTypeSingular}_repository_storage_moves`;
+    return RequestHelper.get()(this, url12, options);
+  }
+  show(repositoryStorageId, options) {
+    const resourceId = options?.[`${this.resourceTypeSingular}Id`];
+    const url12 = resourceId ? endpoint`${this.resourceType}/${resourceId}/repository_storage_moves` : `${this.resourceTypeSingular}_repository_storage_moves`;
+    return RequestHelper.get()(
+      this,
+      `${url12}/${repositoryStorageId}`,
+      options
+    );
+  }
+  schedule(sourceStorageName, options) {
+    const resourceId = options?.[`${this.resourceTypeSingular}Id`];
+    const url12 = resourceId ? endpoint`${this.resourceType}/${resourceId}/repository_storage_moves` : `${this.resourceTypeSingular}_repository_storage_moves`;
+    return RequestHelper.post()(this, url12, {
+      sourceStorageName,
+      ...options
+    });
+  }
+};
+var ResourceInvitations = class extends BaseResource {
+  constructor(resourceType, options) {
+    super({ prefixUrl: resourceType, ...options });
+  }
+  add(resourceId, accessLevel, options) {
+    if (!options?.email && !options?.userId)
+      throw new Error(
+        "Missing required argument. Please supply a email or a userId in the options parameter."
+      );
+    return RequestHelper.post()(this, endpoint`${resourceId}/invitations`, {
+      accessLevel,
+      ...options
+    });
+  }
+  all(resourceId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`${resourceId}/invitations`,
+      options
+    );
+  }
+  edit(resourceId, email, options) {
+    return RequestHelper.put()(
+      this,
+      endpoint`${resourceId}/invitations/${email}`,
+      options
+    );
+  }
+  remove(resourceId, email, options) {
+    return RequestHelper.put()(
+      this,
+      endpoint`${resourceId}/invitations/${email}`,
+      options
+    );
+  }
+};
+var ResourceIterations = class extends BaseResource {
+  constructor(resourceType, options) {
+    super({ prefixUrl: resourceType, ...options });
+  }
+  all(resourceId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`${resourceId}/iterations`,
+      options
+    );
+  }
+};
+var ResourceProtectedEnvironments = class extends BaseResource {
+  constructor(resourceType, options) {
+    super({ prefixUrl: resourceType, ...options });
+  }
+  all(resourceId, options) {
+    return RequestHelper.get()(
+      this,
+      `${resourceId}/protected_environments`,
+      options
+    );
+  }
+  create(resourceId, name, deployAccessLevel, options) {
+    return RequestHelper.post()(
+      this,
+      `${resourceId}/protected_environments`,
+      {
+        name,
+        deployAccessLevel,
+        ...options
+      }
+    );
+  }
+  edit(resourceId, name, options) {
+    return RequestHelper.put()(
+      this,
+      `${resourceId}/protected_environments/${name}`,
+      options
+    );
+  }
+  show(resourceId, name, options) {
+    return RequestHelper.get()(
+      this,
+      `${resourceId}/protected_environments/${name}`,
+      options
+    );
+  }
+  remove(resourceId, name, options) {
+    return RequestHelper.del()(this, `${resourceId}/protected_environments/${name}`, options);
+  }
+};
+var ResourceIterationEvents = class extends BaseResource {
+  resource2Type;
+  constructor(resourceType, resource2Type, options) {
+    super({ prefixUrl: resourceType, ...options });
+    this.resource2Type = resource2Type;
+  }
+  all(resourceId, resource2Id, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`${resourceId}/${this.resource2Type}/${resource2Id}/resource_iteration_events`,
+      options
+    );
+  }
+  show(resourceId, resource2Id, iterationEventId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`${resourceId}/${this.resource2Type}/${resource2Id}/resource_iteration_events/${iterationEventId}`,
+      options
+    );
+  }
+};
+var ResourceLabelEvents = class extends BaseResource {
+  resource2Type;
+  constructor(resourceType, resource2Type, options) {
+    super({ prefixUrl: resourceType, ...options });
+    this.resource2Type = resource2Type;
+  }
+  all(resourceId, resource2Id, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`${resourceId}/${this.resource2Type}/${resource2Id}/resource_label_events`,
+      options
+    );
+  }
+  show(resourceId, resource2Id, labelEventId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`${resourceId}/${this.resource2Type}/${resource2Id}/resource_label_events/${labelEventId}`,
+      options
+    );
+  }
+};
+var ResourceMilestoneEvents = class extends BaseResource {
+  resource2Type;
+  constructor(resourceType, resource2Type, options) {
+    super({ prefixUrl: resourceType, ...options });
+    this.resource2Type = resource2Type;
+  }
+  all(resourceId, resource2Id, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`${resourceId}/${this.resource2Type}/${resource2Id}/resource_milestone_events`,
+      options
+    );
+  }
+  show(resourceId, resource2Id, milestoneEventId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`${resourceId}/${this.resource2Type}/${resource2Id}/resource_milestone_events/${milestoneEventId}`,
+      options
+    );
+  }
+};
+var ResourceStateEvents = class extends BaseResource {
+  resource2Type;
+  constructor(resourceType, resource2Type, options) {
+    super({ prefixUrl: resourceType, ...options });
+    this.resource2Type = resource2Type;
+  }
+  all(resourceId, resource2Id, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`${resourceId}/${this.resource2Type}/${resource2Id}/resource_state_events`,
+      options
+    );
+  }
+  show(resourceId, resource2Id, stateEventId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`${resourceId}/${this.resource2Type}/${resource2Id}/resource_state_events/${stateEventId}`,
+      options
+    );
+  }
+};
+
+// src/resources/DockerfileTemplates.ts
+var DockerfileTemplates = class extends ResourceTemplates {
+  constructor(options) {
+    super("dockerfiles", options);
+  }
+};
+var Events = class extends BaseResource {
+  all({
+    projectId,
+    userId,
+    ...options
+  } = {}) {
+    let url12;
+    if (projectId)
+      url12 = endpoint`projects/${projectId}/events`;
+    else if (userId)
+      url12 = endpoint`users/${userId}/events`;
+    else
+      url12 = "events";
+    return RequestHelper.get()(this, url12, options);
+  }
+};
+var Experiments = class extends BaseResource {
+  all(options) {
+    return RequestHelper.get()(this, "experiments", options);
+  }
+};
+var GeoNodes = class extends BaseResource {
+  all(options) {
+    return RequestHelper.get()(this, "geo_nodes", options);
+  }
+  allStatuses(options) {
+    return RequestHelper.get()(this, "geo_nodes/statuses", options);
+  }
+  allFailures(options) {
+    return RequestHelper.get()(this, "geo_nodes/current/failures", options);
+  }
+  create(name, url12, options) {
+    return RequestHelper.post()(this, "geo_nodes", { name, url: url12, ...options });
+  }
+  edit(geonodeId, options) {
+    return RequestHelper.put()(this, `geo_nodes/${geonodeId}`, options);
+  }
+  repair(geonodeId, options) {
+    return RequestHelper.post()(this, `geo_nodes/${geonodeId}/repair`, options);
+  }
+  remove(geonodeId, options) {
+    return RequestHelper.del()(this, `geo_nodes/${geonodeId}`, options);
+  }
+  show(geonodeId, options) {
+    return RequestHelper.get()(this, `geo_nodes/${geonodeId}`, options);
+  }
+  showStatus(geonodeId, options) {
+    return RequestHelper.get()(this, `geo_nodes/${geonodeId}/status`, options);
+  }
+};
+
+// src/resources/GitignoreTemplates.ts
+var GitignoreTemplates = class extends ResourceTemplates {
+  constructor(options) {
+    super("gitignores", options);
+  }
+};
+
+// src/resources/GitLabCIYMLTemplates.ts
+var GitLabCIYMLTemplates = class extends ResourceTemplates {
+  constructor(options) {
+    super("gitlab_ci_ymls", options);
+  }
+};
+var Import = class extends BaseResource {
+  importGithubRepository(personalAccessToken, repositoryId, targetNamespace, options) {
+    return RequestHelper.post()(this, "import/github", {
+      personalAccessToken,
+      repoId: repositoryId,
+      targetNamespace,
+      ...options
+    });
+  }
+  cancelGithubRepositoryImport(projectId, options) {
+    return RequestHelper.post()(this, "import/github/cancel", {
+      projectId,
+      ...options
+    });
+  }
+  importGithubGists(personalAccessToken, options) {
+    return RequestHelper.post()(this, "import/github/gists", {
+      personalAccessToken,
+      ...options
+    });
+  }
+  importBitbucketServerRepository(bitbucketServerUrl, bitbucketServerUsername, personalAccessToken, bitbucketServerProject, bitbucketServerRepository, options) {
+    return RequestHelper.post()(this, "import/bitbucket_server", {
+      bitbucketServerUrl,
+      bitbucketServerUsername,
+      personalAccessToken,
+      bitbucketServerProject,
+      bitbucketServerRepo: bitbucketServerRepository,
+      ...options
+    });
+  }
+};
+var InstanceLevelCICDVariables = class extends BaseResource {
+  all(options) {
+    return RequestHelper.get()(this, "admin/ci/variables", options);
+  }
+  create(key, value, options) {
+    return RequestHelper.post()(this, "admin/ci/variables", {
+      key,
+      value,
+      ...options
+    });
+  }
+  edit(keyId, value, options) {
+    return RequestHelper.put()(this, endpoint`admin/ci/variables/${keyId}`, {
+      value,
+      ...options
+    });
+  }
+  show(keyId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`admin/ci/variables/${keyId}`,
+      options
+    );
+  }
+  remove(keyId, options) {
+    return RequestHelper.get()(this, endpoint`admin/ci/variables/${keyId}`, options);
+  }
+};
+var Keys = class extends BaseResource {
+  show({
+    keyId,
+    fingerprint,
+    ...options
+  } = {}) {
+    let url12;
+    if (keyId)
+      url12 = `keys/${keyId}`;
+    else if (fingerprint)
+      url12 = `keys?fingerprint=${fingerprint}`;
+    else {
+      throw new Error(
+        "Missing required argument. Please supply a fingerprint or a keyId in the options parameter"
+      );
+    }
+    return RequestHelper.get()(this, url12, options);
+  }
+};
+var License = class extends BaseResource {
+  add(license, options) {
+    return RequestHelper.post()(this, "license", {
+      searchParams: { license },
+      ...options
+    });
+  }
+  all(options) {
+    return RequestHelper.get()(this, "licenses", options);
+  }
+  show(options) {
+    return RequestHelper.get()(this, "license", options);
+  }
+  remove(licenceId, options) {
+    return RequestHelper.del()(this, `license/${licenceId}`, options);
+  }
+  recalculateBillableUsers(licenceId, options) {
+    return RequestHelper.put()(
+      this,
+      `license/${licenceId}/refresh_billable_users`,
+      options
+    );
+  }
+};
+
+// src/resources/LicenseTemplates.ts
+var LicenseTemplates = class extends ResourceTemplates {
+  constructor(options) {
+    super("Licenses", options);
+  }
+};
+var Lint = class extends BaseResource {
+  check(projectId, options) {
+    return RequestHelper.get()(this, endpoint`projects/${projectId}/ci/lint`, options);
+  }
+  lint(projectId, content, options) {
+    return RequestHelper.post()(this, endpoint`projects/${projectId}/ci/lint`, {
+      ...options,
+      content
+    });
+  }
+};
+var Markdown = class extends BaseResource {
+  render(text, options) {
+    return RequestHelper.post()(this, "markdown", { text, ...options });
+  }
+};
+var Maven = class extends BaseResource {
+  downloadPackageFile(path, filename, {
+    projectId,
+    groupId,
+    ...options
+  }) {
+    let url12 = endpoint`packages/maven/${path}/${filename}`;
+    if (projectId)
+      url12 = endpoint`projects/${projectId}/${url12}`;
+    else if (groupId)
+      url12 = endpoint`groups/${groupId}/-/${url12}`;
+    return RequestHelper.get()(this, url12, options);
+  }
+  uploadPackageFile(projectId, path, packageFile, options) {
+    return RequestHelper.put()(
+      this,
+      endpoint`projects/${projectId}/packages/maven/${path}/${packageFile.filename}`,
+      {
+        isForm: true,
+        ...options,
+        file: [packageFile.content, packageFile.filename]
+      }
+    );
+  }
+};
+var Metadata = class extends BaseResource {
+  show(options) {
+    return RequestHelper.get()(this, "metadata", options);
+  }
+};
+var Migrations = class extends BaseResource {
+  all(options) {
+    return RequestHelper.get()(this, "bulk_imports", options);
+  }
+  create(configuration, entities, options) {
+    return RequestHelper.post()(this, "bulk_imports", {
+      configuration,
+      entities,
+      ...options
+    });
+  }
+  allEntities({
+    bulkImportId,
+    ...options
+  } = {}) {
+    const url12 = bulkImportId ? endpoint`bulk_imports/${bulkImportId}/entities` : "bulk_imports/entities";
+    return RequestHelper.get()(this, url12, options);
+  }
+  show(bulkImportId, options) {
+    return RequestHelper.get()(
+      this,
+      `bulk_imports/${bulkImportId}`,
+      options
+    );
+  }
+  showEntity(bulkImportId, entitityId, options) {
+    return RequestHelper.get()(
+      this,
+      `bulk_imports/${bulkImportId}/entities/${entitityId}`,
+      options
+    );
+  }
+};
+var Namespaces = class extends BaseResource {
+  all(options) {
+    return RequestHelper.get()(this, "namespaces", options);
+  }
+  exists(namespaceId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`namespaces/${namespaceId}/exists`,
+      options
+    );
+  }
+  show(namespaceId, options) {
+    return RequestHelper.get()(this, endpoint`namespaces/${namespaceId}`, options);
+  }
+};
+function url6({
+  projectId,
+  groupId
+} = {}) {
+  let prefix = "";
+  if (projectId)
+    prefix = endpoint`projects/${projectId}/`;
+  if (groupId)
+    prefix = endpoint`groups/${groupId}/`;
+  return `${prefix}notification_settings`;
+}
+var NotificationSettings = class extends BaseResource {
+  edit({
+    groupId,
+    projectId,
+    ...options
+  } = {}) {
+    const uri = url6({ groupId, projectId });
+    return RequestHelper.put()(this, uri, options);
+  }
+  show({
+    groupId,
+    projectId,
+    ...options
+  } = {}) {
+    const uri = url6({ groupId, projectId });
+    return RequestHelper.get()(this, uri, options);
+  }
+};
+function url7(projectId) {
+  return projectId ? endpoint`/projects/${projectId}/packages/npm` : "packages/npm";
+}
+var NPM = class extends BaseResource {
+  downloadPackageFile(projectId, packageName, filename, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/packages/npm/${packageName}/-/${filename}`,
+      options
+    );
+  }
+  removeDistTag(packageName, tag, options) {
+    const prefix = url7(options?.projectId);
+    return RequestHelper.del()(
+      this,
+      `${prefix}/-/package/${packageName}/dist-tags/${tag}`,
+      options
+    );
+  }
+  setDistTag(packageName, tag, options) {
+    const prefix = url7(options?.projectId);
+    return RequestHelper.put()(
+      this,
+      `${prefix}/-/package/${packageName}/dist-tags/${tag}`,
+      options
+    );
+  }
+  showDistTags(packageName, options) {
+    const prefix = url7(options?.projectId);
+    return RequestHelper.get()(
+      this,
+      `${prefix}/-/package/${packageName}/dist-tags`,
+      options
+    );
+  }
+  showMetadata(packageName, options) {
+    const prefix = url7(options?.projectId);
+    return RequestHelper.get()(this, `${prefix}/${packageName}`, options);
+  }
+  uploadPackageFile(projectId, packageName, versions, metadata, options) {
+    return RequestHelper.put()(
+      this,
+      endpoint`projects/${projectId}/packages/npm/${packageName}`,
+      {
+        ...options,
+        versions,
+        ...metadata
+      }
+    );
+  }
+};
+function url8({
+  projectId,
+  groupId
+} = {}) {
+  if (projectId)
+    return endpoint`/projects/${projectId}/packages/nuget`;
+  if (groupId)
+    return endpoint`/groups/${groupId}/-/packages/nuget`;
+  throw new Error(
+    "Missing required argument. Please supply a projectId or a groupId in the options parameter"
+  );
+}
+var NuGet = class extends BaseResource {
+  downloadPackageFile(projectId, packageName, packageVersion, filename, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/packages/nuget/download/${packageName}/${packageVersion}/${filename}`,
+      options
+    );
+  }
+  search(q, {
+    projectId,
+    groupId,
+    ...options
+  }) {
+    const uri = url8({ projectId, groupId });
+    return RequestHelper.get()(this, `${uri}/query`, { q, ...options });
+  }
+  showMetadata(packageName, {
+    projectId,
+    groupId,
+    ...options
+  }) {
+    const uri = url8({ projectId, groupId });
+    return RequestHelper.get()(
+      this,
+      `${uri}/metadata/${packageName}/index`,
+      options
+    );
+  }
+  showPackageIndex(projectId, packageName, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/packages/nuget/download/${packageName}/index`,
+      options
+    );
+  }
+  showServiceIndex({
+    projectId,
+    groupId,
+    ...options
+  }) {
+    const uri = url8({ projectId, groupId });
+    return RequestHelper.get()(
+      this,
+      `${uri}/index`,
+      options
+    );
+  }
+  showVersionMetadata(packageName, packageVersion, {
+    projectId,
+    groupId,
+    ...options
+  }) {
+    const uri = url8({ projectId, groupId });
+    return RequestHelper.get()(
+      this,
+      `${uri}/metadata/${packageName}/${packageVersion}`,
+      options
+    );
+  }
+  uploadPackageFile(projectId, packageName, packageVersion, packageFile, options) {
+    return RequestHelper.put()(this, endpoint`projects/${projectId}/packages/nuget`, {
+      isForm: true,
+      ...options,
+      packageName,
+      packageVersion,
+      file: [packageFile.content, packageFile.filename]
+    });
+  }
+  uploadSymbolPackage(projectId, packageName, packageVersion, packageFile, options) {
+    return RequestHelper.put()(
+      this,
+      endpoint`projects/${projectId}/packages/nuget/symbolpackage`,
+      {
+        isForm: true,
+        ...options,
+        packageName,
+        packageVersion,
+        file: [packageFile.content, packageFile.filename]
+      }
+    );
+  }
+};
+var PersonalAccessTokens = class extends BaseResource {
+  all(options) {
+    return RequestHelper.get()(
+      this,
+      "personal_access_tokens",
+      options
+    );
+  }
+  // Convience method - Also located in Users
+  create(userId, name, scopes, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`users/${userId}/personal_access_tokens`,
+      {
+        name,
+        scopes,
+        ...options
+      }
+    );
+  }
+  remove({
+    tokenId,
+    ...options
+  } = {}) {
+    const url12 = tokenId ? endpoint`personal_access_tokens/${tokenId}` : "personal_access_tokens/self";
+    return RequestHelper.del()(this, url12, options);
+  }
+  show({
+    tokenId,
+    ...options
+  } = {}) {
+    const url12 = tokenId ? endpoint`personal_access_tokens/${tokenId}` : "personal_access_tokens/self";
+    return RequestHelper.get()(this, url12, options);
+  }
+};
+var PyPI = class extends BaseResource {
+  downloadPackageFile(sha, fileIdentifier, {
+    projectId,
+    groupId,
+    ...options
+  } = {}) {
+    let url12;
+    if (projectId) {
+      url12 = endpoint`projects/${projectId}/packages/pypi/files/${sha}/${fileIdentifier}`;
+    } else if (groupId) {
+      url12 = endpoint`groups/${groupId}/packages/pypi/files/${sha}/${fileIdentifier}`;
+    } else {
+      throw new Error(
+        "Missing required argument. Please supply a projectId or a groupId in the options parameter"
+      );
+    }
+    return RequestHelper.get()(this, url12, options);
+  }
+  showPackageDescriptor(packageName, {
+    projectId,
+    groupId,
+    ...options
+  }) {
+    let url12;
+    if (projectId) {
+      url12 = endpoint`projects/${projectId}/packages/pypi/simple/${packageName}`;
+    } else if (groupId) {
+      url12 = endpoint`groups/${groupId}/packages/pypi/simple/${packageName}`;
+    } else {
+      throw new Error(
+        "Missing required argument. Please supply a projectId or a groupId in the options parameter"
+      );
+    }
+    return RequestHelper.get()(this, url12, options);
+  }
+  uploadPackageFile(projectId, packageFile, options) {
+    return RequestHelper.put()(this, endpoint`projects/${projectId}/packages/pypi`, {
+      ...options,
+      isForm: true,
+      file: [packageFile.content, packageFile.filename]
+    });
+  }
+};
+var RubyGems = class extends BaseResource {
+  allDependencies(projectId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/packages/rubygems/api/v1/dependencies`,
+      options
+    );
+  }
+  downloadGemFile(projectId, fileName, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/packages/rubygems/gems/${fileName}`,
+      options
+    );
+  }
+  uploadGemFile(projectId, packageFile, options) {
+    return RequestHelper.post()(this, `projects/${projectId}/packages/rubygems/api/v1/gems`, {
+      isForm: true,
+      ...options,
+      file: [packageFile.content, packageFile.filename]
+    });
+  }
+};
+var Search = class extends BaseResource {
+  all(scope, search, options) {
+    const { projectId, groupId, ...opts } = options || {};
+    let url12;
+    if (projectId)
+      url12 = endpoint`projects/${projectId}/`;
+    else if (groupId)
+      url12 = endpoint`groups/${groupId}/`;
+    else
+      url12 = "";
+    return RequestHelper.get()(this, `${url12}search`, {
+      scope,
+      search,
+      ...opts
+    });
+  }
+};
+var ServiceData = class extends BaseResource {
+  showMetricDefinitions(options) {
+    return RequestHelper.get()(this, "usage_data/metric_definitions", options);
+  }
+  showServicePingSQLQueries(options) {
+    return RequestHelper.get()(this, "usage_data/queries", options);
+  }
+  showUsageDataNonSQLMetrics(options) {
+    return RequestHelper.get()(
+      this,
+      "usage_data/non_sql_metrics",
+      options
+    );
+  }
+};
+var SidekiqMetrics = class extends BaseResource {
+  queueMetrics() {
+    return RequestHelper.get()(this, "sidekiq/queue_metrics");
+  }
+  processMetrics() {
+    return RequestHelper.get()(this, "sidekiq/process_metrics");
+  }
+  jobStats() {
+    return RequestHelper.get()(this, "sidekiq/job_stats");
+  }
+  compoundMetrics() {
+    return RequestHelper.get()(this, "sidekiq/compound_metrics");
+  }
+};
+var SidekiqQueues = class extends BaseResource {
+  remove(queueName, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`admin/sidekiq/queues/${queueName}`,
+      options
+    );
+  }
+};
+
+// src/resources/SnippetRepositoryStorageMoves.ts
+var SnippetRepositoryStorageMoves = class extends ResourceRepositoryStorageMoves {
+  constructor(options) {
+    super("snippets", options);
+  }
+};
+var Snippets = class extends BaseResource {
+  all({
+    public: ppublic,
+    ...options
+  } = {}) {
+    const url12 = ppublic ? "snippets/public" : "snippets";
+    return RequestHelper.get()(this, url12, options);
+  }
+  create(title, options) {
+    return RequestHelper.post()(this, "snippets", {
+      title,
+      ...options
+    });
+  }
+  edit(snippetId, options) {
+    return RequestHelper.put()(this, `snippets/${snippetId}`, options);
+  }
+  remove(snippetId, options) {
+    return RequestHelper.del()(this, `snippets/${snippetId}`, options);
+  }
+  show(snippetId, options) {
+    return RequestHelper.get()(this, `snippets/${snippetId}`, options);
+  }
+  showContent(snippetId, options) {
+    return RequestHelper.get()(this, `snippets/${snippetId}/raw`, options);
+  }
+  showRepositoryFileContent(snippetId, ref, filePath, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`snippets/${snippetId}/files/${ref}/${filePath}/raw`,
+      options
+    );
+  }
+  showUserAgentDetails(snippetId, options) {
+    return RequestHelper.get()(
+      this,
+      `snippets/${snippetId}/user_agent_detail`,
+      options
+    );
+  }
+};
+var Suggestions = class extends BaseResource {
+  edit(suggestionId, options) {
+    return RequestHelper.put()(
+      this,
+      `suggestions/${suggestionId}/apply`,
+      options
+    );
+  }
+  editBatch(suggestionIds, options) {
+    return RequestHelper.put()(this, `suggestions/batch_apply`, {
+      ...options,
+      ids: suggestionIds
+    });
+  }
+};
+var SystemHooks = class extends BaseResource {
+  all(options) {
+    return RequestHelper.get()(this, "hooks", options);
+  }
+  // Convenience method
+  add(url12, options) {
+    return this.create(url12, options);
+  }
+  create(url12, options) {
+    return RequestHelper.post()(this, "hooks", {
+      url: url12,
+      ...options
+    });
+  }
+  test(hookId, options) {
+    return RequestHelper.post()(this, `hooks/${hookId}`, options);
+  }
+  remove(hookId, options) {
+    return RequestHelper.del()(this, `hooks/${hookId}`, options);
+  }
+  show(hookId, options) {
+    return RequestHelper.post()(this, `hooks/${hookId}`, options);
+  }
+};
+var TodoLists = class extends BaseResource {
+  all(options) {
+    return RequestHelper.get()(this, "todos", options);
+  }
+  done({
+    todoId,
+    ...options
+  } = {}) {
+    let prefix = "todos";
+    if (todoId)
+      prefix += `/${todoId}`;
+    return RequestHelper.post()(
+      this,
+      `${prefix}/mark_as_done`,
+      options
+    );
+  }
+};
+var Topics = class extends BaseResource {
+  all(options) {
+    return RequestHelper.get()(this, "topics", options);
+  }
+  create(name, {
+    avatar,
+    ...options
+  } = {}) {
+    const opts = {
+      name,
+      ...options
+    };
+    if (avatar) {
+      opts.isForm = true;
+      opts.file = [avatar.content, avatar.filename];
+    }
+    return RequestHelper.post()(this, "topics", opts);
+  }
+  edit(topicId, {
+    avatar,
+    ...options
+  } = {}) {
+    const opts = { ...options };
+    if (avatar) {
+      opts.isForm = true;
+      opts.file = [avatar.content, avatar.filename];
+    }
+    return RequestHelper.put()(this, `topics/${topicId}`, opts);
+  }
+  merge(sourceTopicId, targetTopicId, options) {
+    return RequestHelper.post()(this, `topics/merge`, {
+      sourceTopicId,
+      targetTopicId,
+      ...options
+    });
+  }
+  remove(topicId, options) {
+    return RequestHelper.del()(this, `topics/${topicId}`, options);
+  }
+  show(topicId, options) {
+    return RequestHelper.get()(this, `topics/${topicId}`, options);
+  }
+};
+var Branches = class extends BaseResource {
+  all(projectId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/repository/branches`,
+      options
+    );
+  }
+  create(projectId, branchName, ref, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/repository/branches`,
+      {
+        branch: branchName,
+        ref,
+        ...options
+      }
+    );
+  }
+  remove(projectId, branchName, options) {
+    return RequestHelper.del()(
+      this,
+      endpoint`projects/${projectId}/repository/branches/${branchName}`,
+      options
+    );
+  }
+  removeMerged(projectId, options) {
+    return RequestHelper.del()(
+      this,
+      endpoint`projects/${projectId}/repository/merged_branches`,
+      options
+    );
+  }
+  show(projectId, branchName, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/repository/branches/${branchName}`,
+      options
+    );
+  }
+};
+
+// src/resources/CommitDiscussions.ts
+var CommitDiscussions = class extends ResourceDiscussions {
+  constructor(options) {
+    super("projects", "repository/commits", options);
+  }
+};
+var Commits = class extends BaseResource {
+  all(projectId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/repository/commits`,
+      options
+    );
+  }
+  allComments(projectId, sha, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/repository/commits/${sha}/comments`,
+      options
+    );
+  }
+  allDiscussions(projectId, sha, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/repository/commits/${sha}/discussions`,
+      options
+    );
+  }
+  allMergeRequests(projectId, sha, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/repository/commits/${sha}/merge_requests`,
+      options
+    );
+  }
+  allReferences(projectId, sha, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/repository/commits/${sha}/refs`,
+      options
+    );
+  }
+  allStatuses(projectId, sha, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/repository/commits/${sha}/statuses`,
+      options
+    );
+  }
+  cherryPick(projectId, sha, branch, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/repository/commits/${sha}/cherry_pick`,
+      {
+        branch,
+        ...options
+      }
+    );
+  }
+  create(projectId, branch, message, actions = [], options = {}) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/repository/commits`,
+      {
+        branch,
+        commitMessage: message,
+        actions,
+        ...options
+      }
+    );
+  }
+  createComment(projectId, sha, note, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/repository/commits/${sha}/comments`,
+      {
+        note,
+        ...options
+      }
+    );
+  }
+  editStatus(projectId, sha, state, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/statuses/${sha}`,
+      {
+        state,
+        ...options
+      }
+    );
+  }
+  revert(projectId, sha, branch, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/repository/commits/${sha}/revert`,
+      {
+        ...options,
+        branch
+      }
+    );
+  }
+  show(projectId, sha, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/repository/commits/${sha}`,
+      options
+    );
+  }
+  showDiff(projectId, sha, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/repository/commits/${sha}/diff`,
+      options
+    );
+  }
+  showGPGSignature(projectId, sha, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/repository/commits/${sha}/signature`,
+      options
+    );
+  }
+};
+var ContainerRegistry = class extends BaseResource {
+  allRepositories({
+    groupId,
+    projectId,
+    ...options
+  } = {}) {
+    let url12;
+    if (groupId)
+      url12 = endpoint`groups/${groupId}/registry/repositories`;
+    else if (projectId)
+      url12 = endpoint`projects/${projectId}/registry/repositories`;
+    else
+      throw new Error(
+        "Missing required argument. Please supply a groupId or a projectId in the options parameter."
+      );
+    return RequestHelper.get()(this, url12, options);
+  }
+  allTags(projectId, repositoryId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/registry/repositories/${repositoryId}/tags`,
+      options
+    );
+  }
+  editRegistryVisibility(projectId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}`,
+      options
+    );
+  }
+  removeRepository(projectId, repositoryId, options) {
+    return RequestHelper.del()(
+      this,
+      endpoint`projects/${projectId}/registry/repositories/${repositoryId}`,
+      options
+    );
+  }
+  removeTag(projectId, repositoryId, tagName, options) {
+    return RequestHelper.del()(
+      this,
+      endpoint`projects/${projectId}/registry/repositories/${repositoryId}/tags/${tagName}`,
+      options
+    );
+  }
+  removeTags(projectId, repositoryId, nameRegexDelete, options) {
+    return RequestHelper.del()(
+      this,
+      endpoint`projects/${projectId}/registry/repositories/${repositoryId}/tags`,
+      {
+        nameRegexDelete,
+        ...options
+      }
+    );
+  }
+  showRepository(repositoryId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`registry/repositories/${repositoryId}`,
+      options
+    );
+  }
+  showTag(projectId, repositoryId, tagName, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/registry/repositories/${repositoryId}/tags/${tagName}`,
+      options
+    );
+  }
+};
+var Deployments = class extends BaseResource {
+  all(projectId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/deployments`,
+      options
+    );
+  }
+  allMergeRequests(projectId, deploymentId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/deployments/${deploymentId}/merge_requests`,
+      options
+    );
+  }
+  create(projectId, environment, sha, ref, tag, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/deployments`,
+      {
+        environment,
+        sha,
+        ref,
+        tag,
+        ...options
+      }
+    );
+  }
+  edit(projectId, deploymentId, status, options) {
+    return RequestHelper.put()(
+      this,
+      endpoint`projects/${projectId}/deployments/${deploymentId}`,
+      {
+        ...options,
+        status
+      }
+    );
+  }
+  remove(projectId, deploymentId, options) {
+    return RequestHelper.del()(
+      this,
+      endpoint`projects/${projectId}/deployments/${deploymentId}`,
+      options
+    );
+  }
+  setApproval(projectId, deploymentId, status, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/deployments/${deploymentId}/approval`,
+      {
+        ...options,
+        status
+      }
+    );
+  }
+  show(projectId, deploymentId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/deployments/${deploymentId}`,
+      options
+    );
+  }
+};
+var Environments = class extends BaseResource {
+  all(projectId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/environments`,
+      options
+    );
+  }
+  create(projectId, name, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/environments`,
+      {
+        name,
+        ...options
+      }
+    );
+  }
+  edit(projectId, environmentId, options) {
+    return RequestHelper.put()(
+      this,
+      endpoint`projects/${projectId}/environments/${environmentId}`,
+      options
+    );
+  }
+  remove(projectId, environmentId, options) {
+    return RequestHelper.del()(
+      this,
+      endpoint`projects/${projectId}/environments/${environmentId}`,
+      options
+    );
+  }
+  removeReviewApps(projectId, options) {
+    return RequestHelper.del()(this, endpoint`projects/${projectId}/environments/review_apps`, options);
+  }
+  show(projectId, environmentId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/environments/${environmentId}`,
+      options
+    );
+  }
+  stop(projectId, environmentId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/environments/${environmentId}/stop`,
+      options
+    );
+  }
+  stopStale(projectId, before, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/environments/stop_stale`,
+      {
+        searchParams: { before },
+        ...options
+      }
+    );
+  }
+};
+var ErrorTrackingClientKeys = class extends BaseResource {
+  all(projectId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/error_tracking/client_keys`,
+      options
+    );
+  }
+  create(projectId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/error_tracking/client_keys`,
+      options
+    );
+  }
+  remove(projectId, options) {
+    return RequestHelper.del()(
+      this,
+      endpoint`projects/${projectId}/error_tracking/client_keys`,
+      options
+    );
+  }
+};
+var ErrorTrackingSettings = class extends BaseResource {
+  create(projectId, active, integrated, options) {
+    return RequestHelper.put()(
+      this,
+      endpoint`projects/${projectId}/error_tracking/settings`,
+      {
+        searchParams: {
+          active,
+          integrated
+        },
+        ...options
+      }
+    );
+  }
+  edit(projectId, active, { integrated, ...options } = {}) {
+    return RequestHelper.patch()(
+      this,
+      endpoint`projects/${projectId}/error_tracking/settings`,
+      {
+        searchParams: {
+          active,
+          integrated
+        },
+        ...options
+      }
+    );
+  }
+  show(projectId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/error_tracking/settings`,
+      options
+    );
+  }
+};
+var ExternalStatusChecks = class extends BaseResource {
+  all(projectId, options) {
+    const { mergerequestIId, ...opts } = options || {};
+    let url12 = endpoint`projects/${projectId}`;
+    if (mergerequestIId) {
+      url12 += endpoint`/merge_requests/${mergerequestIId}/status_checks`;
+    } else {
+      url12 += "/external_status_checks";
+    }
+    return RequestHelper.get()(this, url12, opts);
+  }
+  create(projectId, name, externalUrl, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/external_status_checks`,
+      {
+        name,
+        externalUrl,
+        ...options
+      }
+    );
+  }
+  edit(projectId, externalStatusCheckId, options) {
+    return RequestHelper.put()(
+      this,
+      endpoint`projects/${projectId}/external_status_checks/${externalStatusCheckId}`,
+      options
+    );
+  }
+  remove(projectId, externalStatusCheckId, options) {
+    return RequestHelper.del()(
+      this,
+      endpoint`projects/${projectId}/external_status_checks/${externalStatusCheckId}`,
+      options
+    );
+  }
+  set(projectId, mergerequestIId, sha, externalStatusCheckId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/merge_requests/${mergerequestIId}/status_check_responses`,
+      {
+        sha,
+        externalStatusCheckId,
+        ...options
+      }
+    );
+  }
+};
+var FeatureFlags = class extends BaseResource {
+  all(projectId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/feature_flags`,
+      options
+    );
+  }
+  create(projectId, flagName, version, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/feature_flags`,
+      {
+        name: flagName,
+        version,
+        ...options
+      }
+    );
+  }
+  edit(projectId, featureFlagName, options) {
+    return RequestHelper.put()(
+      this,
+      endpoint`projects/${projectId}/feature_flags/${featureFlagName}`,
+      options
+    );
+  }
+  remove(projectId, flagName, options) {
+    return RequestHelper.del()(
+      this,
+      endpoint`projects/${projectId}/feature_flags/${flagName}`,
+      options
+    );
+  }
+  show(projectId, flagName, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/feature_flags/${flagName}`,
+      options
+    );
+  }
+};
+var FeatureFlagUserLists = class extends BaseResource {
+  all(projectId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/feature_flags_user_lists`,
+      options
+    );
+  }
+  create(projectId, name, userXids, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/feature_flags_user_lists`,
+      {
+        name,
+        userXids,
+        ...options
+      }
+    );
+  }
+  edit(projectId, featureFlagUserListIId, options) {
+    return RequestHelper.put()(
+      this,
+      endpoint`projects/${projectId}/feature_flags_user_lists/${featureFlagUserListIId}`,
+      options
+    );
+  }
+  remove(projectId, featureFlagUserListIId, options) {
+    return RequestHelper.del()(
+      this,
+      endpoint`projects/${projectId}/feature_flags_user_lists/${featureFlagUserListIId}`,
+      options
+    );
+  }
+  show(projectId, featureFlagUserListIId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/feature_flags_user_lists/${featureFlagUserListIId}`,
+      options
+    );
+  }
+};
+var FreezePeriods = class extends BaseResource {
+  all(projectId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/freeze_periods`,
+      options
+    );
+  }
+  create(projectId, freezeStart, freezeEnd, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/freeze_periods`,
+      {
+        freezeStart,
+        freezeEnd,
+        ...options
+      }
+    );
+  }
+  edit(projectId, freezePeriodId, options) {
+    return RequestHelper.put()(
+      this,
+      endpoint`projects/${projectId}/freeze_periods/${freezePeriodId}`,
+      options
+    );
+  }
+  remove(projectId, freezePeriodId, options) {
+    return RequestHelper.del()(
+      this,
+      endpoint`projects/${projectId}/freeze_periods/${freezePeriodId}`,
+      options
+    );
+  }
+  show(projectId, freezePeriodId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/freeze_periods/${freezePeriodId}`,
+      options
+    );
+  }
+};
+var GitlabPages = class extends BaseResource {
+  remove(projectId, options) {
+    return RequestHelper.del()(this, endpoint`projects/${projectId}/pages`, options);
+  }
+};
+var GoProxy = class extends BaseResource {
+  all(projectId, moduleName, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/packages/go/${moduleName}/@v/list`,
+      options
+    );
+  }
+  showVersionMetadata(projectId, moduleName, moduleVersion, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/packages/go/${moduleName}/@v/${moduleVersion}.info`,
+      options
+    );
+  }
+  downloadModuleFile(projectId, moduleName, moduleVersion, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/packages/go/${moduleName}/@v/${moduleVersion}.mod`,
+      options
+    );
+  }
+  downloadModuleSource(projectId, moduleName, moduleVersion, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/packages/go/${moduleName}/@v/${moduleVersion}.zip`,
+      options
+    );
+  }
+};
+var Helm = class extends BaseResource {
+  downloadChartIndex(projectId, channel, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/packages/helm/${channel}/index.yaml`,
+      options
+    );
+  }
+  downloadChart(projectId, channel, filename, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/packages/helm/${channel}/charts/${filename}.tgz`,
+      options
+    );
+  }
+  import(projectId, channel, chart, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/packages/helm/api/${channel}/charts`,
+      {
+        isForm: true,
+        ...options,
+        chart: [chart.content, chart.filename]
+      }
+    );
+  }
+};
+var Integrations = class extends BaseResource {
+  all(projectId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/integrations`,
+      options
+    );
+  }
+  edit(projectId, integrationName, options) {
+    return RequestHelper.put()(
+      this,
+      endpoint`projects/${projectId}/integrations/${integrationName}`,
+      options
+    );
+  }
+  disable(projectId, integrationName, options) {
+    return RequestHelper.del()(
+      this,
+      endpoint`projects/${projectId}/integrations/${integrationName}`,
+      options
+    );
+  }
+  show(projectId, integrationName, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/integrations/${integrationName}`,
+      options
+    );
+  }
+};
+
+// src/resources/IssueAwardEmojis.ts
+var IssueAwardEmojis = class extends ResourceAwardEmojis {
+  constructor(options) {
+    super("projects", "issues", options);
+  }
+};
+
+// src/resources/IssueDiscussions.ts
+var IssueDiscussions = class extends ResourceDiscussions {
+  constructor(options) {
+    super("projects", "issues", options);
+  }
+};
+
+// src/resources/IssueIterationEvents.ts
+var IssueIterationEvents = class extends ResourceIterationEvents {
+  constructor(options) {
+    super("projects", "issues", options);
+  }
+};
+
+// src/resources/IssueLabelEvents.ts
+var IssueLabelEvents = class extends ResourceLabelEvents {
+  constructor(options) {
+    super("projects", "issues", options);
+  }
+};
+var IssueLinks = class extends BaseResource {
+  all(projectId, issueIId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/issues/${issueIId}/links`,
+      options
+    );
+  }
+  create(projectId, issueIId, targetProjectId, targetIssueIId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/issues/${issueIId}/links`,
+      {
+        targetProjectId,
+        targetIssueIid: targetIssueIId,
+        ...options
+      }
+    );
+  }
+  remove(projectId, issueIId, issueLinkId, options) {
+    return RequestHelper.del()(
+      this,
+      endpoint`projects/${projectId}/issues/${issueIId}/links/${issueLinkId}`,
+      options
+    );
+  }
+};
+
+// src/resources/IssueMilestoneEvents.ts
+var IssueMilestoneEvents = class extends ResourceMilestoneEvents {
+  constructor(options) {
+    super("projects", "issues", options);
+  }
+};
+
+// src/resources/IssueNoteAwardEmojis.ts
+var IssueNoteAwardEmojis = class extends ResourceNoteAwardEmojis {
+  constructor(options) {
+    super("issues", options);
+  }
+};
+
+// src/resources/IssueNotes.ts
+var IssueNotes = class extends ResourceNotes {
+  constructor(options) {
+    super("projects", "issues", options);
+  }
+};
+var Issues = class extends BaseResource {
+  addSpentTime(projectId, issueIId, duration, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/issues/${issueIId}/add_spent_time`,
+      {
+        duration,
+        ...options
+      }
+    );
+  }
+  addTimeEstimate(projectId, issueIId, duration, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/issues/${issueIId}/time_estimate`,
+      {
+        duration,
+        ...options
+      }
+    );
+  }
+  all({
+    projectId,
+    groupId,
+    ...options
+  } = {}) {
+    let url12;
+    if (projectId)
+      url12 = endpoint`projects/${projectId}/issues`;
+    else if (groupId)
+      url12 = endpoint`groups/${groupId}/issues`;
+    else
+      url12 = "issues";
+    return RequestHelper.get()(this, url12, options);
+  }
+  allMetricImages(projectId, issueIId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/issues/${issueIId}/metric_images`,
+      options
+    );
+  }
+  allParticipants(projectId, issueIId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/issues/${issueIId}/participants`,
+      options
+    );
+  }
+  allRelatedMergeRequests(projectId, issueIId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/issues/${issueIId}/related_merge_requests`,
+      options
+    );
+  }
+  create(projectId, title, options) {
+    return RequestHelper.post()(this, endpoint`projects/${projectId}/issues`, {
+      ...options,
+      title
+    });
+  }
+  createTodo(projectId, issueIId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/issues/${issueIId}/todo`,
+      options
+    );
+  }
+  clone(projectId, issueIId, destinationProjectId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/issues/${issueIId}/clone`,
+      {
+        toProjectId: destinationProjectId,
+        ...options
+      }
+    );
+  }
+  edit(projectId, issueIId, options) {
+    return RequestHelper.put()(
+      this,
+      endpoint`projects/${projectId}/issues/${issueIId}`,
+      options
+    );
+  }
+  editMetricImage(projectId, issueIId, imageId, options) {
+    return RequestHelper.put()(
+      this,
+      endpoint`projects/${projectId}/issues/${issueIId}/metric_images/${imageId}`,
+      options
+    );
+  }
+  move(projectId, issueIId, destinationProjectId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/issues/${issueIId}/move`,
+      {
+        toProjectId: destinationProjectId,
+        ...options
+      }
+    );
+  }
+  // Includes /promote already!
+  promote(projectId, issueIId, body, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/issues/${issueIId}/notes`,
+      {
+        searchParams: {
+          body: `${body} 
+ /promote`
+        },
+        ...options
+      }
+    );
+  }
+  remove(projectId, issueIId, options) {
+    return RequestHelper.del()(this, endpoint`projects/${projectId}/issues/${issueIId}`, options);
+  }
+  removeMetricImage(projectId, issueIId, imageId, options) {
+    return RequestHelper.del()(
+      this,
+      endpoint`projects/${projectId}/issues/${issueIId}/metric_images/${imageId}`,
+      options
+    );
+  }
+  reorder(projectId, issueIId, options) {
+    return RequestHelper.put()(
+      this,
+      endpoint`projects/${projectId}/issues/${issueIId}/reorder`,
+      options
+    );
+  }
+  resetSpentTime(projectId, issueIId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/issues/${issueIId}/reset_spent_time`,
+      options
+    );
+  }
+  resetTimeEstimate(projectId, issueIId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/issues/${issueIId}/reset_time_estimate`,
+      options
+    );
+  }
+  show(issueId, { projectId, ...options } = {}) {
+    const url12 = projectId ? endpoint`projects/${projectId}/issues/${issueId}` : `issues/${issueId}`;
+    return RequestHelper.get()(this, url12, options);
+  }
+  subscribe(projectId, issueIId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/issues/${issueIId}/subscribe`,
+      options
+    );
+  }
+  allClosedByMergeRequestst(projectId, issueIId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/issues/${issueIId}/closed_by`,
+      options
+    );
+  }
+  showTimeStats(projectId, issueIId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/issues/${issueIId}/time_stats`,
+      options
+    );
+  }
+  unsubscribe(projectId, issueIId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/issues/${issueIId}/unsubscribe`,
+      options
+    );
+  }
+  uploadMetricImage(projectId, issueIId, metricImage, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/issues/${issueIId}/metric_images`,
+      {
+        isForm: true,
+        ...options,
+        file: [metricImage.content, metricImage.filename]
+      }
+    );
+  }
+  showUserAgentDetails(projectId, issueIId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/issues/${issueIId}/user_agent_details`,
+      options
+    );
+  }
+};
+var IssuesStatistics = class extends BaseResource {
+  all({
+    projectId,
+    groupId,
+    ...options
+  } = {}) {
+    let url12;
+    if (projectId)
+      url12 = endpoint`projects/${projectId}/issues_statistics`;
+    else if (groupId)
+      url12 = endpoint`groups/${groupId}/issues_statistics`;
+    else
+      url12 = "issues_statistics";
+    return RequestHelper.get()(this, url12, options);
+  }
+};
+
+// src/resources/IssueStateEvents.ts
+var IssueStateEvents = class extends ResourceStateEvents {
+  constructor(options) {
+    super("projects", "issues", options);
+  }
+};
+
+// src/resources/IssueWeightEvents.ts
+var IssueWeightEvents = class extends ResourceStateEvents {
+  constructor(options) {
+    super("projects", "issues", options);
+  }
+};
+function generateDownloadPathForJob(projectId, jobId, artifactPath) {
+  let url12 = endpoint`projects/${projectId}/jobs/${jobId}/artifacts`;
+  if (artifactPath)
+    url12 += `/${artifactPath}`;
+  return url12;
+}
+function generateDownloadPath(projectId, ref, artifactPath) {
+  let url12 = endpoint`projects/${projectId}/jobs/artifacts/${ref}`;
+  if (artifactPath) {
+    url12 += endpoint`/raw/${artifactPath}`;
+  } else {
+    url12 += endpoint`/download`;
+  }
+  return url12;
+}
+var JobArtifacts = class extends BaseResource {
+  downloadArchive(projectId, {
+    jobId,
+    artifactPath,
+    ref,
+    ...options
+  } = {}) {
+    let url12;
+    if (jobId)
+      url12 = generateDownloadPathForJob(projectId, jobId, artifactPath);
+    else if (options?.job && ref)
+      url12 = generateDownloadPath(projectId, ref, artifactPath);
+    else
+      throw new Error(
+        "Missing one of the required parameters. See typing documentation for available arguments."
+      );
+    return RequestHelper.get()(this, url12, options);
+  }
+  keep(projectId, jobId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/jobs/${jobId}/artifacts/keep`,
+      options
+    );
+  }
+  remove(projectId, { jobId, ...options } = {}) {
+    let url12;
+    if (jobId) {
+      url12 = endpoint`projects/${projectId}/jobs/${jobId}/artifacts`;
+    } else {
+      url12 = endpoint`projects/${projectId}/artifacts`;
+    }
+    return RequestHelper.del()(this, url12, options);
+  }
+};
+var Jobs = class extends BaseResource {
+  all(projectId, {
+    pipelineId,
+    ...options
+  } = {}) {
+    const url12 = pipelineId ? endpoint`projects/${projectId}/pipelines/${pipelineId}/jobs` : endpoint`projects/${projectId}/jobs`;
+    return RequestHelper.get()(this, url12, options);
+  }
+  allPipelineBridges(projectId, pipelineId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/pipelines/${pipelineId}/bridges`,
+      options
+    );
+  }
+  cancel(projectId, jobId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/jobs/${jobId}/cancel`,
+      options
+    );
+  }
+  erase(projectId, jobId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/jobs/${jobId}/erase`,
+      options
+    );
+  }
+  play(projectId, jobId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/jobs/${jobId}/play`,
+      options
+    );
+  }
+  retry(projectId, jobId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/jobs/${jobId}/retry`,
+      options
+    );
+  }
+  show(projectId, jobId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/jobs/${jobId}`,
+      options
+    );
+  }
+  showConnectedJob(options) {
+    if (!this.headers["job-token"])
+      throw new Error('Missing required header "job-token"');
+    return RequestHelper.get()(this, "job", options);
+  }
+  showConnectedJobK8Agents(options) {
+    if (!this.headers["job-token"])
+      throw new Error('Missing required header "job-token"');
+    return RequestHelper.get()(this, "job/allowed_agents", options);
+  }
+  showLog(projectId, jobId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/jobs/${jobId}/trace`,
+      options
+    );
+  }
+};
+var MergeRequestApprovals = class extends BaseResource {
+  allApprovalRules(projectId, { mergerequestIId, ...options } = {}) {
+    let url12;
+    if (mergerequestIId) {
+      url12 = endpoint`projects/${projectId}/merge_requests/${mergerequestIId}/approval_rules`;
+    } else {
+      url12 = endpoint`projects/${projectId}/approval_rules`;
+    }
+    return RequestHelper.get()(this, url12, options);
+  }
+  approve(projectId, mergerequestIId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/merge_requests/${mergerequestIId}/approve`,
+      options
+    );
+  }
+  createApprovalRule(projectId, name, approvalsRequired, {
+    mergerequestIId,
+    ...options
+  } = {}) {
+    let url12;
+    if (mergerequestIId) {
+      url12 = endpoint`projects/${projectId}/merge_requests/${mergerequestIId}/approval_rules`;
+    } else {
+      url12 = endpoint`projects/${projectId}/approval_rules`;
+    }
+    return RequestHelper.post()(this, url12, { name, approvalsRequired, ...options });
+  }
+  editApprovalRule(projectId, approvalRuleId, name, approvalsRequired, {
+    mergerequestIId,
+    ...options
+  } = {}) {
+    let url12;
+    if (mergerequestIId) {
+      url12 = endpoint`projects/${projectId}/merge_requests/${mergerequestIId}/approval_rules/${approvalRuleId}`;
+    } else {
+      url12 = endpoint`projects/${projectId}/approval_rules/${approvalRuleId}`;
+    }
+    return RequestHelper.put()(this, url12, { name, approvalsRequired, ...options });
+  }
+  editConfiguration(projectId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/approvals`,
+      options
+    );
+  }
+  removeApprovalRule(projectId, approvalRuleId, {
+    mergerequestIId,
+    ...options
+  } = {}) {
+    let url12;
+    if (mergerequestIId) {
+      url12 = endpoint`projects/${projectId}/merge_requests/${mergerequestIId}/approval_rules/${approvalRuleId}`;
+    } else {
+      url12 = endpoint`projects/${projectId}/approval_rules/${approvalRuleId}`;
+    }
+    return RequestHelper.del()(this, url12, options);
+  }
+  showApprovalRule(projectId, approvalRuleId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/approval_rules/${approvalRuleId}`,
+      options
+    );
+  }
+  showApprovalState(projectId, mergerequestIId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/merge_requests/${mergerequestIId}/approval_state`,
+      options
+    );
+  }
+  showConfiguration(projectId, { mergerequestIId, ...options } = {}) {
+    let url12;
+    if (mergerequestIId) {
+      url12 = endpoint`projects/${projectId}/merge_requests/${mergerequestIId}/approvals`;
+    } else {
+      url12 = endpoint`projects/${projectId}/approvals`;
+    }
+    return RequestHelper.get()(this, url12, options);
+  }
+  unapprove(projectId, mergerequestIId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/merge_requests/${mergerequestIId}/unapprove`,
+      options
+    );
+  }
+};
+
+// src/resources/MergeRequestAwardEmojis.ts
+var MergeRequestAwardEmojis = class extends ResourceAwardEmojis {
+  constructor(options) {
+    super("projects", "merge_requests", options);
+  }
+};
+var MergeRequestContextCommits = class extends BaseResource {
+  all(projectId, mergerequestIId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/merge_requests/${mergerequestIId}/context_commits`,
+      options
+    );
+  }
+  create(projectId, commits, { mergerequestIId, ...options } = {}) {
+    const prefix = endpoint`projects/${projectId}/merge_requests`;
+    const url12 = mergerequestIId ? `${prefix}/${mergerequestIId}/context_commits` : prefix;
+    return RequestHelper.post()(this, url12, {
+      commits,
+      ...options
+    });
+  }
+  remove(projectId, mergerequestIId, options) {
+    return RequestHelper.del()(
+      this,
+      endpoint`projects/${projectId}/merge_requests/${mergerequestIId}/context_commits`,
+      options
+    );
+  }
+};
+
+// src/resources/MergeRequestDiscussions.ts
+var MergeRequestDiscussions = class extends ResourceDiscussions {
+  constructor(options) {
+    super("projects", "merge_requests", options);
+  }
+  resolve(projectId, mergerequestId, discussionId, resolved, options) {
+    return RequestHelper.put()(
+      this,
+      endpoint`${projectId}/merge_requests/${mergerequestId}/discussions/${discussionId}`,
+      {
+        searchParams: { resolved },
+        ...options
+      }
+    );
+  }
+};
+
+// src/resources/MergeRequestLabelEvents.ts
+var MergeRequestLabelEvents = class extends ResourceLabelEvents {
+  constructor(options) {
+    super("projects", "merge_requests", options);
+  }
+};
+
+// src/resources/MergeRequestMilestoneEvents.ts
+var MergeRequestMilestoneEvents = class extends ResourceMilestoneEvents {
+  constructor(options) {
+    super("projects", "merge_requests", options);
+  }
+};
+var MergeRequestDraftNotes = class extends BaseResource {
+  all(projectId, mergerequestIId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/merge_requests/${mergerequestIId}/draft_notes`,
+      options
+    );
+  }
+  create(projectId, mergerequestIId, note, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/merge_requests/${mergerequestIId}/draft_notes`,
+      {
+        ...options,
+        note
+      }
+    );
+  }
+  edit(projectId, mergerequestIId, draftNoteId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/merge_requests/${mergerequestIId}/draft_notes/${draftNoteId}`,
+      options
+    );
+  }
+  publish(projectId, mergerequestIId, draftNoteId, options) {
+    return RequestHelper.put()(
+      this,
+      endpoint`projects/${projectId}/merge_requests/${mergerequestIId}/draft_notes/${draftNoteId}/publish`,
+      options
+    );
+  }
+  publishBulk(projectId, mergerequestIId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/merge_requests/${mergerequestIId}/draft_notes/bulk_publish`,
+      options
+    );
+  }
+  remove(projectId, mergerequestIId, draftNoteId, options) {
+    return RequestHelper.del()(
+      this,
+      endpoint`projects/${projectId}/merge_requests/${mergerequestIId}/draft_notes/${draftNoteId}`,
+      options
+    );
+  }
+  show(projectId, mergerequestIId, draftNoteId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/merge_requests/${mergerequestIId}/draft_notes/${draftNoteId}`,
+      options
+    );
+  }
+};
+
+// src/resources/MergeRequestNotes.ts
+var MergeRequestNotes = class extends ResourceNotes {
+  constructor(options) {
+    super("projects", "merge_requests", options);
+  }
+};
+
+// src/resources/MergeRequestNoteAwardEmojis.ts
+var MergeRequestNoteAwardEmojis = class extends ResourceNoteAwardEmojis {
+  constructor(options) {
+    super("merge_requests", options);
+  }
+};
+var MergeRequests = class extends BaseResource {
+  // convenience method
+  accept(projectId, mergerequestIId, options) {
+    return this.merge(projectId, mergerequestIId, options);
+  }
+  addSpentTime(projectId, mergerequestIId, duration, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/merge_requests/${mergerequestIId}/add_spent_time`,
+      {
+        duration,
+        ...options
+      }
+    );
+  }
+  all({
+    projectId,
+    groupId,
+    ...options
+  } = {}) {
+    let prefix = "";
+    if (projectId) {
+      prefix = endpoint`projects/${projectId}/`;
+    } else if (groupId) {
+      prefix = endpoint`groups/${groupId}/`;
+    }
+    return RequestHelper.get()(this, `${prefix}merge_requests`, options);
+  }
+  allDiffs(projectId, mergerequestIId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/merge_requests/${mergerequestIId}/diffs`,
+      options
+    );
+  }
+  allCommits(projectId, mergerequestIId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/merge_requests/${mergerequestIId}/commits`,
+      options
+    );
+  }
+  allDiffVersions(projectId, mergerequestIId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/merge_requests/${mergerequestIId}/versions`,
+      options
+    );
+  }
+  allIssuesClosed(projectId, mergerequestIId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/merge_requests/${mergerequestIId}/closes_issues`,
+      options
+    );
+  }
+  allParticipants(projectId, mergerequestIId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/merge_requests/${mergerequestIId}/participants`,
+      options
+    );
+  }
+  allPipelines(projectId, mergerequestIId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/merge_requests/${mergerequestIId}/pipelines`,
+      options
+    );
+  }
+  cancelOnPipelineSuccess(projectId, mergerequestIId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/merge_requests/${mergerequestIId}/cancel_merge_when_pipeline_succeeds`,
+      options
+    );
+  }
+  create(projectId, sourceBranch, targetBranch, title, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/merge_requests`,
+      {
+        sourceBranch,
+        targetBranch,
+        title,
+        ...options
+      }
+    );
+  }
+  createPipeline(projectId, mergerequestIId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/merge_requests/${mergerequestIId}/pipelines`,
+      options
+    );
+  }
+  createTodo(projectId, mergerequestIId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/merge_requests/${mergerequestIId}/todo`,
+      options
+    );
+  }
+  edit(projectId, mergerequestIId, options) {
+    return RequestHelper.put()(
+      this,
+      endpoint`projects/${projectId}/merge_requests/${mergerequestIId}`,
+      options
+    );
+  }
+  merge(projectId, mergerequestIId, options) {
+    return RequestHelper.put()(
+      this,
+      endpoint`projects/${projectId}/merge_requests/${mergerequestIId}/merge`,
+      options
+    );
+  }
+  mergeToDefault(projectId, mergerequestIId, options) {
+    return RequestHelper.put()(
+      this,
+      endpoint`projects/${projectId}/merge_requests/${mergerequestIId}/merge_ref`,
+      options
+    );
+  }
+  rebase(projectId, mergerequestIId, options) {
+    return RequestHelper.put()(
+      this,
+      endpoint`projects/${projectId}/merge_requests/${mergerequestIId}/rebase`,
+      options
+    );
+  }
+  remove(projectId, mergerequestIId, options) {
+    return RequestHelper.del()(
+      this,
+      endpoint`projects/${projectId}/merge_requests/${mergerequestIId}`,
+      options
+    );
+  }
+  resetSpentTime(projectId, mergerequestIId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/merge_requests/${mergerequestIId}/reset_spent_time`,
+      options
+    );
+  }
+  resetTimeEstimate(projectId, mergerequestIId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/merge_requests/${mergerequestIId}/reset_time_estimate`,
+      options
+    );
+  }
+  setTimeEstimate(projectId, mergerequestIId, duration, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/merge_requests/${mergerequestIId}/time_estimate`,
+      {
+        duration,
+        ...options
+      }
+    );
+  }
+  show(projectId, mergerequestIId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/merge_requests/${mergerequestIId}`,
+      options
+    );
+  }
+  showChanges(projectId, mergerequestIId, options) {
+    process.emitWarning(
+      'This endpoint was deprecated in Gitlab API 15.7 and will be removed in API v5. Please use the "allDiffs" function instead.',
+      "DeprecationWarning"
+    );
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/merge_requests/${mergerequestIId}/changes`,
+      options
+    );
+  }
+  showDiffVersion(projectId, mergerequestIId, versionId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/merge_requests/${mergerequestIId}/versions/${versionId}`,
+      options
+    );
+  }
+  showTimeStats(projectId, mergerequestIId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/merge_requests/${mergerequestIId}/time_stats`,
+      options
+    );
+  }
+  subscribe(projectId, mergerequestIId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/merge_requests/${mergerequestIId}/subscribe`,
+      options
+    );
+  }
+  unsubscribe(projectId, mergerequestIId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/merge_requests/${mergerequestIId}/unsubscribe`,
+      options
+    );
+  }
+};
+var MergeTrains = class extends BaseResource {
+  all(projectId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/merge_trains`,
+      options
+    );
+  }
+  showStatus(projectId, mergeRequestIId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/merge_trains/merge_requests/${mergeRequestIId}`,
+      options
+    );
+  }
+  addMergeRequest(projectId, mergeRequestIId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/merge_trains/merge_requests/${mergeRequestIId}`,
+      options
+    );
+  }
+};
+var PackageRegistry = class extends BaseResource {
+  publish(projectId, packageName, packageVersion, packageFile, {
+    contentType,
+    ...options
+  } = {}) {
+    return RequestHelper.put()(
+      this,
+      endpoint`projects/${projectId}/packages/generic/${packageName}/${packageVersion}/${packageFile.filename}`,
+      {
+        isForm: true,
+        file: [packageFile.content, packageFile.filename],
+        ...options
+      }
+    );
+  }
+  download(projectId, packageName, packageVersion, filename, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/packages/generic/${packageName}/${packageVersion}/${filename}`,
+      options
+    );
+  }
+};
+var Packages = class extends BaseResource {
+  all({
+    projectId,
+    groupId,
+    ...options
+  } = {}) {
+    let url12;
+    if (projectId)
+      url12 = endpoint`projects/${projectId}/packages`;
+    else if (groupId)
+      url12 = endpoint`groups/${groupId}/packages`;
+    else {
+      throw new Error(
+        "Missing required argument. Please supply a projectId or a groupId in the options parameter."
+      );
+    }
+    return RequestHelper.get()(this, url12, options);
+  }
+  allFiles(projectId, packageId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/packages/${packageId}/package_files`,
+      options
+    );
+  }
+  remove(projectId, packageId, options) {
+    return RequestHelper.del()(
+      this,
+      endpoint`projects/${projectId}/packages/${packageId}`,
+      options
+    );
+  }
+  removeFile(projectId, packageId, projectFileId, options) {
+    return RequestHelper.del()(
+      this,
+      endpoint`projects/${projectId}/packages/${packageId}/package_files/${projectFileId}`,
+      options
+    );
+  }
+  show(projectId, packageId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/packages/${packageId}`,
+      options
+    );
+  }
+};
+var PagesDomains = class extends BaseResource {
+  all({
+    projectId,
+    ...options
+  } = {}) {
+    const prefix = projectId ? endpoint`projects/${projectId}/` : "";
+    return RequestHelper.get()(this, `${prefix}pages/domains`, options);
+  }
+  create(projectId, domain, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/pages/domains`,
+      {
+        domain,
+        ...options
+      }
+    );
+  }
+  edit(projectId, domain, options) {
+    return RequestHelper.put()(
+      this,
+      endpoint`projects/${projectId}/pages/domains/${domain}`,
+      options
+    );
+  }
+  show(projectId, domain, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/pages/domains/${domain}`,
+      options
+    );
+  }
+  remove(projectId, domain, options) {
+    return RequestHelper.del()(
+      this,
+      endpoint`projects/${projectId}/pages/domains/${domain}`,
+      options
+    );
+  }
+};
+var Pipelines = class extends BaseResource {
+  all(projectId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/pipelines`,
+      options
+    );
+  }
+  allVariables(projectId, pipelineId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/pipelines/${pipelineId}/variables`,
+      options
+    );
+  }
+  cancel(projectId, pipelineId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/pipelines/${pipelineId}/cancel`,
+      options
+    );
+  }
+  create(projectId, ref, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/pipeline`,
+      {
+        ref,
+        ...options
+      }
+    );
+  }
+  remove(projectId, pipelineId, options) {
+    return RequestHelper.del()(
+      this,
+      endpoint`projects/${projectId}/pipelines/${pipelineId}`,
+      options
+    );
+  }
+  retry(projectId, pipelineId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/pipelines/${pipelineId}/retry`,
+      options
+    );
+  }
+  show(projectId, pipelineId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/pipelines/${pipelineId}`,
+      options
+    );
+  }
+  showTestReport(projectId, pipelineId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/pipelines/${pipelineId}/test_report`,
+      options
+    );
+  }
+  showTestReportSummary(projectId, pipelineId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/pipelines/${pipelineId}/test_report_summary`,
+      options
+    );
+  }
+};
+var PipelineSchedules = class extends BaseResource {
+  all(projectId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/pipeline_schedules`,
+      options
+    );
+  }
+  allTriggeredPipelines(projectId, pipelineScheduleId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/pipeline_schedules/${pipelineScheduleId}/pipelines`,
+      options
+    );
+  }
+  create(projectId, description, ref, cron, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/pipeline_schedules`,
+      {
+        description,
+        ref,
+        cron,
+        ...options
+      }
+    );
+  }
+  edit(projectId, pipelineScheduleId, options) {
+    return RequestHelper.put()(
+      this,
+      endpoint`projects/${projectId}/pipeline_schedules/${pipelineScheduleId}`,
+      options
+    );
+  }
+  remove(projectId, pipelineScheduleId, options) {
+    return RequestHelper.del()(
+      this,
+      endpoint`projects/${projectId}/pipeline_schedules/${pipelineScheduleId}`,
+      options
+    );
+  }
+  run(projectId, pipelineScheduleId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/pipeline_schedules/${pipelineScheduleId}/play`,
+      options
+    );
+  }
+  show(projectId, pipelineScheduleId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/pipeline_schedules/${pipelineScheduleId}`,
+      options
+    );
+  }
+  takeOwnership(projectId, pipelineScheduleId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/pipeline_schedules/${pipelineScheduleId}/take_ownership`,
+      options
+    );
+  }
+};
+var PipelineScheduleVariables = class extends BaseResource {
+  all(projectId, pipelineScheduleId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/pipeline_schedules/${pipelineScheduleId}/variables`,
+      options
+    );
+  }
+  create(projectId, pipelineScheduleId, key, value, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/pipeline_schedules/${pipelineScheduleId}/variables`,
+      {
+        ...options,
+        key,
+        value
+      }
+    );
+  }
+  edit(projectId, pipelineScheduleId, key, value, options) {
+    return RequestHelper.put()(
+      this,
+      endpoint`projects/${projectId}/pipeline_schedules/${pipelineScheduleId}/variables/${key}`,
+      {
+        ...options,
+        value
+      }
+    );
+  }
+  remove(projectId, pipelineScheduleId, key, options) {
+    return RequestHelper.del()(
+      this,
+      endpoint`projects/${projectId}/pipeline_schedules/${pipelineScheduleId}/variables/${key}`,
+      options
+    );
+  }
+};
+var PipelineTriggerTokens = class extends BaseResource {
+  all(projectId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/triggers`,
+      options
+    );
+  }
+  create(projectId, description, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/triggers`,
+      {
+        description,
+        ...options
+      }
+    );
+  }
+  edit(projectId, triggerId, options) {
+    return RequestHelper.put()(
+      this,
+      endpoint`projects/${projectId}/triggers/${triggerId}`,
+      options
+    );
+  }
+  remove(projectId, triggerId, options) {
+    return RequestHelper.del()(
+      this,
+      endpoint`projects/${projectId}/triggers/${triggerId}`,
+      options
+    );
+  }
+  show(projectId, triggerId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/triggers/${triggerId}`,
+      options
+    );
+  }
+  trigger(projectId, ref, token, { variables, ...options } = {}) {
+    const opts = {
+      ...options,
+      searchParams: {
+        token,
+        ref
+      }
+    };
+    if (variables) {
+      opts.isForm = true;
+      Object.assign(opts, reformatObjectOptions(variables, "variables"));
+    }
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/trigger/pipeline`,
+      opts
+    );
+  }
+};
+var ProductAnalytics = class extends BaseResource {
+  allFunnels(projectId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/product_analytics/funnels`,
+      options
+    );
+  }
+  load(projectId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/product_analytics/request/load`,
+      options
+    );
+  }
+  dryRun(projectId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/product_analytics/request/dry-run`,
+      options
+    );
+  }
+  showMetadata(projectId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/product_analytics/request/meta`,
+      options
+    );
+  }
+};
+
+// src/resources/ProjectAccessRequests.ts
+var ProjectAccessRequests = class extends ResourceAccessRequests {
+  constructor(options) {
+    super("projects", options);
+  }
+};
+
+// src/resources/ProjectAccessTokens.ts
+var ProjectAccessTokens = class extends ResourceAccessTokens {
+  constructor(options) {
+    super("projects", options);
+  }
+};
+var ProjectAliases = class extends BaseResource {
+  all(options) {
+    return RequestHelper.get()(this, "project_aliases", options);
+  }
+  create(projectId, name, options) {
+    return RequestHelper.post()(this, "project_aliases", {
+      name,
+      projectId,
+      ...options
+    });
+  }
+  edit(name, options) {
+    return RequestHelper.post()(this, `project_aliases/${name}`, options);
+  }
+  remove(name, options) {
+    return RequestHelper.del()(this, `project_aliases/${name}`, options);
+  }
+};
+
+// src/resources/ProjectBadges.ts
+var ProjectBadges = class extends ResourceBadges {
+  constructor(options) {
+    super("projects", options);
+  }
+};
+
+// src/resources/ProjectCustomAttributes.ts
+var ProjectCustomAttributes = class extends ResourceCustomAttributes {
+  constructor(options) {
+    super("projects", options);
+  }
+};
+
+// src/resources/ProjectDORA4Metrics.ts
+var ProjectDORA4Metrics = class extends ResourceDORA4Metrics {
+  constructor(options) {
+    super("projects", options);
+  }
+};
+
+// src/resources/ProjectHooks.ts
+var ProjectHooks = class extends ResourceHooks {
+  constructor(options) {
+    super("projects", options);
+  }
+};
+var ProjectImportExports = class extends BaseResource {
+  download(projectId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/export/download`,
+      options
+    );
+  }
+  import(file, path, options) {
+    return RequestHelper.post()(this, "projects/import", {
+      isForm: true,
+      ...options,
+      file: [file.content, file.filename],
+      path
+    });
+  }
+  importRemote(url12, path, options) {
+    return RequestHelper.post()(this, "projects/remote-import", {
+      ...options,
+      path,
+      url: url12
+    });
+  }
+  importRemoteS3(accessKeyId, bucketName, fileKey, path, region, secretAccessKey, options) {
+    return RequestHelper.post()(this, "projects/remote-import", {
+      ...options,
+      accessKeyId,
+      bucketName,
+      fileKey,
+      path,
+      region,
+      secretAccessKey
+    });
+  }
+  showExportStatus(projectId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/export`,
+      options
+    );
+  }
+  showImportStatus(projectId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/import`,
+      options
+    );
+  }
+  scheduleExport(projectId, uploadConfig, options) {
+    return RequestHelper.post()(this, endpoint`projects/${projectId}/export`, {
+      ...options,
+      upload: uploadConfig
+    });
+  }
+};
+
+// src/resources/ProjectInvitations.ts
+var ProjectInvitations = class extends ResourceInvitations {
+  constructor(options) {
+    super("projects", options);
+  }
+};
+
+// src/resources/ProjectIssueBoards.ts
+var ProjectIssueBoards = class extends ResourceIssueBoards {
+  constructor(options) {
+    super("projects", options);
+  }
+};
+
+// src/resources/ProjectIterations.ts
+var ProjectIterations = class extends ResourceIterations {
+  constructor(options) {
+    super("project", options);
+  }
+};
+
+// src/resources/ProjectLabels.ts
+var ProjectLabels = class extends ResourceLabels {
+  constructor(options) {
+    super("projects", options);
+  }
+};
+
+// src/resources/ProjectMembers.ts
+var ProjectMembers = class extends ResourceMembers {
+  constructor(options) {
+    super("projects", options);
+  }
+};
+
+// src/resources/ProjectMilestones.ts
+var ProjectMilestones = class extends ResourceMilestones {
+  constructor(options) {
+    super("projects", options);
+  }
+  promote(projectId, milestoneId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`${projectId}/milestones/${milestoneId}/promote`,
+      options
+    );
+  }
+};
+
+// src/resources/ProjectProtectedEnvironments.ts
+var ProjectProtectedEnvironments = class extends ResourceProtectedEnvironments {
+  constructor(options) {
+    super("groups", options);
+  }
+};
+
+// src/resources/ProjectPushRules.ts
+var ProjectPushRules = class extends ResourcePushRules {
+  constructor(options) {
+    super("projects", options);
+  }
+};
+var ProjectRelationsExport = class extends BaseResource {
+  download(projectId, relation, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/export_relations/download`,
+      {
+        relation,
+        ...options
+      }
+    );
+  }
+  showExportStatus(projectId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/export_relations/status`,
+      options
+    );
+  }
+  scheduleExport(projectId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/export_relations`,
+      options
+    );
+  }
+};
+var ProjectReleases = class extends BaseResource {
+  all(projectId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/releases`,
+      options
+    );
+  }
+  create(projectId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/releases`,
+      options
+    );
+  }
+  createEvidence(projectId, tagName, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/releases/${tagName}/evidence`,
+      options
+    );
+  }
+  edit(projectId, tagName, options) {
+    return RequestHelper.put()(
+      this,
+      endpoint`projects/${projectId}/releases/${tagName}`,
+      options
+    );
+  }
+  download(projectId, tagName, filepath, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/releases/${tagName}/downloads/${filepath}`,
+      options
+    );
+  }
+  downloadLatest(projectId, filepath, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/releases/permalink/latest/downloads/${filepath}`,
+      options
+    );
+  }
+  remove(projectId, tagName, options) {
+    return RequestHelper.del()(this, endpoint`projects/${projectId}/releases/${tagName}`, options);
+  }
+  show(projectId, tagName, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/releases/${tagName}`,
+      options
+    );
+  }
+  showLatest(projectId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/releases/permalink/latest`,
+      options
+    );
+  }
+  showLatestEvidence(projectId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/releases/permalink/latest/evidence`,
+      options
+    );
+  }
+};
+var ProjectRemoteMirrors = class extends BaseResource {
+  all(projectId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/remote_mirrors`,
+      options
+    );
+  }
+  // Helper method - Duplicated from Projects
+  createPullMirror(projectId, url12, mirror, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/mirror/pull`,
+      {
+        importUrl: url12,
+        mirror,
+        ...options
+      }
+    );
+  }
+  createPushMirror(projectId, url12, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/remote_mirrors`,
+      {
+        url: url12,
+        ...options
+      }
+    );
+  }
+  edit(projectId, mirrorId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/remote_mirrors/${mirrorId}`,
+      options
+    );
+  }
+  remove(name, options) {
+    return RequestHelper.del()(this, `project_aliases/${name}`, options);
+  }
+  show(projectId, mirrorId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/remote_mirrors/${mirrorId}`,
+      options
+    );
+  }
+};
+
+// src/resources/ProjectRepositoryStorageMoves.ts
+var ProjectRepositoryStorageMoves = class extends ResourceRepositoryStorageMoves {
+  constructor(options) {
+    super("projects", options);
+  }
+};
+var Projects = class extends BaseResource {
+  all({
+    userId,
+    starredOnly,
+    ...options
+  } = {}) {
+    let uri;
+    if (userId && starredOnly)
+      uri = endpoint`users/${userId}/starred_projects`;
+    else if (userId)
+      uri = endpoint`users/${userId}/projects`;
+    else
+      uri = "projects";
+    return RequestHelper.get()(this, uri, options);
+  }
+  allTransferLocations(projectId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/transfer_locations`,
+      options
+    );
+  }
+  allUsers(projectId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/users`,
+      options
+    );
+  }
+  allGroups(projectId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/groups`,
+      options
+    );
+  }
+  allSharableGroups(projectId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/share_locations`,
+      options
+    );
+  }
+  allForks(projectId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/forks`,
+      options
+    );
+  }
+  allStarrers(projectId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/starrers`,
+      options
+    );
+  }
+  allStoragePaths(projectId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/storage`,
+      options
+    );
+  }
+  archive(projectId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/archive`,
+      options
+    );
+  }
+  create({
+    userId,
+    avatar,
+    ...options
+  } = {}) {
+    const url12 = userId ? `projects/user/${userId}` : "projects";
+    if (avatar) {
+      return RequestHelper.post()(this, url12, {
+        ...options,
+        isForm: true,
+        avatar: [avatar.content, avatar.filename]
+      });
+    }
+    return RequestHelper.post()(this, url12, { ...options, avatar });
+  }
+  createForkRelationship(projectId, forkedFromId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/fork/${forkedFromId}`,
+      options
+    );
+  }
+  // Helper method - Duplicated from ProjectRemoteMirrors
+  createPullMirror(projectId, url12, mirror, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/mirror/pull`,
+      {
+        importUrl: url12,
+        mirror,
+        ...options
+      }
+    );
+  }
+  downloadSnapshot(projectId, options) {
+    return RequestHelper.get()(this, endpoint`projects/${projectId}/snapshot`, options);
+  }
+  edit(projectId, { avatar, ...options } = {}) {
+    const url12 = endpoint`projects/${projectId}`;
+    if (avatar) {
+      return RequestHelper.put()(this, url12, {
+        ...options,
+        isForm: true,
+        avatar: [avatar.content, avatar.filename]
+      });
+    }
+    return RequestHelper.put()(this, url12, { ...options, avatar });
+  }
+  fork(projectId, options) {
+    return RequestHelper.post()(this, endpoint`projects/${projectId}/fork`, options);
+  }
+  housekeeping(projectId, options) {
+    return RequestHelper.post()(this, endpoint`projects/${projectId}/housekeeping`, options);
+  }
+  importProjectMembers(projectId, sourceProjectId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/import_project_members/${sourceProjectId}`,
+      options
+    );
+  }
+  remove(projectId, options) {
+    return RequestHelper.del()(this, endpoint`projects/${projectId}`, options);
+  }
+  removeForkRelationship(projectId, options) {
+    return RequestHelper.del()(this, endpoint`projects/${projectId}/fork`, options);
+  }
+  removeAvatar(projectId, options) {
+    return RequestHelper.put()(this, endpoint`projects/${projectId}`, {
+      ...options,
+      avatar: ""
+    });
+  }
+  restore(projectId, options) {
+    return RequestHelper.post()(this, endpoint`projects/${projectId}/restore`, options);
+  }
+  search(projectName, options) {
+    return RequestHelper.get()(this, "projects", {
+      search: projectName,
+      ...options
+    });
+  }
+  share(projectId, groupId, groupAccess, options) {
+    return RequestHelper.post()(this, endpoint`projects/${projectId}/share`, {
+      groupId,
+      groupAccess,
+      ...options
+    });
+  }
+  show(projectId, options) {
+    return RequestHelper.get()(this, endpoint`projects/${projectId}`, options);
+  }
+  showLanguages(projectId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/languages`,
+      options
+    );
+  }
+  showPullMirror(projectId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/mirror/pull`,
+      options
+    );
+  }
+  star(projectId, options) {
+    return RequestHelper.post()(this, endpoint`projects/${projectId}/star`, options);
+  }
+  transfer(projectId, namespaceId, options) {
+    return RequestHelper.put()(this, endpoint`projects/${projectId}/transfer`, {
+      ...options,
+      namespace: namespaceId
+    });
+  }
+  unarchive(projectId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/unarchive`,
+      options
+    );
+  }
+  unshare(projectId, groupId, options) {
+    return RequestHelper.del()(this, endpoint`projects/${projectId}/share/${groupId}`, options);
+  }
+  unstar(projectId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/unstar`,
+      options
+    );
+  }
+  /* Upload file to be used a reference within an issue, merge request or
+     comment
+  */
+  uploadForReference(projectId, file, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/uploads`,
+      {
+        ...options,
+        isForm: true,
+        file: [file.content, file.filename]
+      }
+    );
+  }
+  uploadAvatar(projectId, avatar, options) {
+    return RequestHelper.put()(this, endpoint`projects/${projectId}`, {
+      ...options,
+      isForm: true,
+      avatar: [avatar.content, avatar.filename]
+    });
+  }
+};
+
+// src/resources/ProjectSnippetAwardEmojis.ts
+var ProjectSnippetAwardEmojis = class extends ResourceAwardEmojis {
+  constructor(options) {
+    super("projects", "snippets", options);
+  }
+};
+
+// src/resources/ProjectSnippetDiscussions.ts
+var ProjectSnippetDiscussions = class extends ResourceDiscussions {
+  constructor(options) {
+    super("projects", "snippets", options);
+  }
+};
+
+// src/resources/ProjectSnippetNotes.ts
+var ProjectSnippetNotes = class extends ResourceNotes {
+  constructor(options) {
+    super("projects", "snippets", options);
+  }
+};
+var ProjectSnippets = class extends BaseResource {
+  all(projectId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/snippets`,
+      options
+    );
+  }
+  create(projectId, title, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/snippets`,
+      {
+        title,
+        ...options
+      }
+    );
+  }
+  edit(projectId, snippetId, options) {
+    return RequestHelper.put()(
+      this,
+      endpoint`projects/${projectId}/snippets/${snippetId}`,
+      options
+    );
+  }
+  remove(projectId, snippetId, options) {
+    return RequestHelper.del()(
+      this,
+      endpoint`projects/${projectId}/snippets/${snippetId}`,
+      options
+    );
+  }
+  show(projectId, snippetId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/snippets/${snippetId}`,
+      options
+    );
+  }
+  showContent(projectId, snippetId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/snippets/${snippetId}/raw`,
+      options
+    );
+  }
+  showRepositoryFileContent(projectId, snippetId, ref, filePath, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/snippets/${snippetId}/files/${ref}/${filePath}/raw`,
+      options
+    );
+  }
+  showUserAgentDetails(projectId, snippetId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/snippets/${snippetId}/user_agent_detail`,
+      options
+    );
+  }
+};
+var ProjectStatistics = class extends BaseResource {
+  show(projectId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/statistics`,
+      options
+    );
+  }
+};
+var ProjectTemplates = class extends BaseResource {
+  all(projectId, type, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/templates/${type}`,
+      options
+    );
+  }
+  show(projectId, type, name, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/templates/${type}/${name}`,
+      options
+    );
+  }
+};
+
+// src/resources/ProjectVariables.ts
+var ProjectVariables = class extends ResourceVariables {
+  constructor(options) {
+    super("projects", options);
+  }
+};
+var ProjectVulnerabilities = class extends BaseResource {
+  all(projectId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/vulnerabilities`,
+      options
+    );
+  }
+  create(projectId, findingId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/vulnerabilities`,
+      {
+        ...options,
+        searchParams: {
+          findingId
+        }
+      }
+    );
+  }
+};
+
+// src/resources/ProjectWikis.ts
+var ProjectWikis = class extends ResourceWikis {
+  constructor(options) {
+    super("projects", options);
+  }
+};
+var ProtectedBranches = class extends BaseResource {
+  all(projectId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/protected_branches`,
+      options
+    );
+  }
+  create(projectId, branchName, options) {
+    const { sudo, showExpanded, ...opts } = options || {};
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/protected_branches`,
+      {
+        searchParams: {
+          ...opts,
+          name: branchName
+        },
+        sudo,
+        showExpanded
+      }
+    );
+  }
+  // Convenience method - create
+  protect(projectId, branchName, options) {
+    return this.create(projectId, branchName, options);
+  }
+  edit(projectId, branchName, options) {
+    return RequestHelper.patch()(
+      this,
+      endpoint`projects/${projectId}/protected_branches/${branchName}`,
+      options
+    );
+  }
+  show(projectId, branchName, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/protected_branches/${branchName}`,
+      options
+    );
+  }
+  remove(projectId, branchName, options) {
+    return RequestHelper.del()(
+      this,
+      endpoint`projects/${projectId}/protected_branches/${branchName}`,
+      options
+    );
+  }
+  // Convenience method - remove
+  unprotect(projectId, branchName, options) {
+    return this.remove(projectId, branchName, options);
+  }
+};
+var ProtectedTags = class extends BaseResource {
+  all(projectId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/protected_tags`,
+      options
+    );
+  }
+  create(projectId, tagName, options) {
+    const { sudo, showExpanded, ...opts } = options || {};
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/protected_tags`,
+      {
+        searchParams: {
+          name: tagName,
+          ...opts
+        },
+        sudo,
+        showExpanded
+      }
+    );
+  }
+  // Convenience method - create
+  protect(projectId, tagName, options) {
+    return this.create(projectId, tagName, options);
+  }
+  show(projectId, tagName, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/protected_tags/${tagName}`,
+      options
+    );
+  }
+  remove(projectId, tagName, options) {
+    return RequestHelper.del()(
+      this,
+      endpoint`projects/${projectId}/protected_tags/${tagName}`,
+      options
+    );
+  }
+  // Convenience method - remove
+  unprotect(projectId, tagName, options) {
+    return this.remove(projectId, tagName, options);
+  }
+};
+var ReleaseLinks = class extends BaseResource {
+  all(projectId, tagName, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/releases/${tagName}/assets/links`,
+      options
+    );
+  }
+  create(projectId, tagName, name, url12, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/releases/${tagName}/assets/links`,
+      {
+        name,
+        url: url12,
+        ...options
+      }
+    );
+  }
+  edit(projectId, tagName, linkId, options) {
+    return RequestHelper.put()(
+      this,
+      endpoint`projects/${projectId}/releases/${tagName}/assets/links/${linkId}`,
+      options
+    );
+  }
+  remove(projectId, tagName, linkId, options) {
+    return RequestHelper.del()(
+      this,
+      endpoint`projects/${projectId}/releases/${tagName}/assets/links/${linkId}`,
+      options
+    );
+  }
+  show(projectId, tagName, linkId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/releases/${tagName}/assets/links/${linkId}`,
+      options
+    );
+  }
+};
+var Repositories = class extends BaseResource {
+  allContributors(projectId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/repository/contributors`,
+      options
+    );
+  }
+  allRepositoryTrees(projectId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/repository/tree`,
+      options
+    );
+  }
+  compare(projectId, from, to, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/repository/compare`,
+      {
+        from,
+        to,
+        ...options
+      }
+    );
+  }
+  editChangelog(projectId, version, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/repository/changelog`,
+      { ...options, version }
+    );
+  }
+  mergeBase(projectId, refs, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/repository/merge_base`,
+      {
+        ...options,
+        refs
+      }
+    );
+  }
+  showArchive(projectId, {
+    fileType = "tar.gz",
+    ...options
+  } = {}) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/repository/archive.${fileType}`,
+      options
+    );
+  }
+  showBlob(projectId, sha, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/repository/blobs/${sha}`,
+      options
+    );
+  }
+  showBlobRaw(projectId, sha, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/repository/blobs/${sha}/raw`,
+      options
+    );
+  }
+  showChangelog(projectId, version, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/repository/changelog`,
+      { ...options, version }
+    );
+  }
+};
+var RepositoryFiles = class extends BaseResource {
+  allFileBlames(projectId, filePath, ref, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/repository/files/${filePath}/blame`,
+      {
+        ref,
+        ...options
+      }
+    );
+  }
+  create(projectId, filePath, branch, content, commitMessage, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`projects/${projectId}/repository/files/${filePath}`,
+      {
+        branch,
+        content,
+        commitMessage,
+        ...options
+      }
+    );
+  }
+  edit(projectId, filePath, branch, content, commitMessage, options) {
+    return RequestHelper.put()(
+      this,
+      endpoint`projects/${projectId}/repository/files/${filePath}`,
+      {
+        branch,
+        content,
+        commitMessage,
+        ...options
+      }
+    );
+  }
+  remove(projectId, filePath, branch, commitMessage, options) {
+    return RequestHelper.del()(this, endpoint`projects/${projectId}/repository/files/${filePath}`, {
+      branch,
+      commitMessage,
+      ...options
+    });
+  }
+  show(projectId, filePath, ref, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/repository/files/${filePath}`,
+      {
+        ref,
+        ...options
+      }
+    );
+  }
+  showRaw(projectId, filePath, ref, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/repository/files/${filePath}/raw`,
+      {
+        ref,
+        ...options
+      }
+    );
+  }
+};
+var RepositorySubmodules = class extends BaseResource {
+  edit(projectId, submodule, branch, commitSha, options) {
+    return RequestHelper.put()(
+      this,
+      endpoint`projects/${projectId}/repository/submodules/${submodule}`,
+      {
+        branch,
+        commitSha,
+        ...options
+      }
+    );
+  }
+};
+var ResourceGroups = class extends BaseResource {
+  all(projectId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/resource_groups`,
+      options
+    );
+  }
+  edit(projectId, key, options) {
+    return RequestHelper.put()(
+      this,
+      endpoint`projects/${projectId}/resource_groups/${key}`,
+      options
+    );
+  }
+  show(projectId, key, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/resource_groups/${key}`,
+      options
+    );
+  }
+  allUpcomingJobs(projectId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/resource_groups/upcoming_jobs`,
+      options
+    );
+  }
+};
+var Runners = class extends BaseResource {
+  all({
+    projectId,
+    groupId,
+    owned,
+    ...options
+  } = {}) {
+    let url12;
+    if (projectId)
+      url12 = endpoint`projects/${projectId}/runners`;
+    else if (groupId)
+      url12 = endpoint`groups/${groupId}/runners`;
+    else if (owned)
+      url12 = "runners";
+    else
+      url12 = "runners/all";
+    return RequestHelper.get()(this, url12, options);
+  }
+  allJobs(runnerId, options) {
+    return RequestHelper.get()(this, `runners/${runnerId}/jobs`, options);
+  }
+  // https://docs.gitlab.com/15.9/ee/api/runners.html#register-a-new-runner
+  create(token, options) {
+    return RequestHelper.post()(this, `runners`, {
+      token,
+      ...options
+    });
+  }
+  edit(runnerId, options) {
+    return RequestHelper.put()(this, `runners/${runnerId}`, options);
+  }
+  enable(projectId, runnerId, options) {
+    return RequestHelper.post()(this, endpoint`projects/${projectId}/runners`, {
+      runnerId,
+      ...options
+    });
+  }
+  disable(projectId, runnerId, options) {
+    return RequestHelper.del()(this, endpoint`projects/${projectId}/runners/${runnerId}`, options);
+  }
+  // Create - Convenience method
+  register(token, options) {
+    return this.create(token, options);
+  }
+  remove({
+    runnerId,
+    token,
+    ...options
+  }) {
+    let url12;
+    if (runnerId)
+      url12 = `runners/${runnerId}`;
+    else if (token) {
+      url12 = "runners";
+    } else
+      throw new Error(
+        "Missing required argument. Please supply a runnerId or a token in the options parameter"
+      );
+    return RequestHelper.del()(this, url12, {
+      token,
+      ...options
+    });
+  }
+  resetRegistrationToken({
+    runnerId,
+    token,
+    ...options
+  } = {}) {
+    let url12;
+    if (runnerId)
+      url12 = endpoint`runners/${runnerId}/reset_registration_token`;
+    else if (token)
+      url12 = "runners/reset_registration_token";
+    else {
+      throw new Error("Missing either runnerId or token parameters");
+    }
+    return RequestHelper.post()(this, url12, {
+      token,
+      ...options
+    });
+  }
+  show(runnerId, options) {
+    return RequestHelper.get()(this, `runners/${runnerId}`, options);
+  }
+  verify(options) {
+    return RequestHelper.post()(this, `runners/verify`, options);
+  }
+};
+var SecureFiles = class extends BaseResource {
+  all(projectId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/secure_files`,
+      options
+    );
+  }
+  create(projectId, name, file, options) {
+    return RequestHelper.post()(this, `projects/${projectId}/secure_files`, {
+      isForm: true,
+      ...options,
+      file: [file.content, file.filename],
+      name
+    });
+  }
+  download(projectId, secureFileId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/secure_files/${secureFileId}/download`,
+      options
+    );
+  }
+  remove(projectId, secureFileId, options) {
+    return RequestHelper.del()(
+      this,
+      endpoint`projects/${projectId}/secure_files/${secureFileId}`,
+      options
+    );
+  }
+  show(projectId, secureFileId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/secure_files/${secureFileId}`,
+      options
+    );
+  }
+};
+var Tags = class extends BaseResource {
+  all(projectId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/repository/tags`,
+      options
+    );
+  }
+  create(projectId, tagName, ref, options) {
+    return RequestHelper.post()(this, endpoint`projects/${projectId}/repository/tags`, {
+      searchParams: {
+        tagName,
+        ref
+      },
+      ...options
+    });
+  }
+  remove(projectId, tagName, options) {
+    return RequestHelper.del()(
+      this,
+      endpoint`projects/${projectId}/repository/tags/${tagName}`,
+      options
+    );
+  }
+  show(projectId, tagName, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/repository/tags/${tagName}`,
+      options
+    );
+  }
+  showSignature(projectId, tagName, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/repository/tags/${tagName}/signature`,
+      options
+    );
+  }
+};
+var UserStarredMetricsDashboard = class extends BaseResource {
+  create(projectId, dashboardPath, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`projects/${projectId}/metrics/user_starred_dashboards`,
+      {
+        dashboardPath,
+        ...options
+      }
+    );
+  }
+  remove(projectId, options) {
+    return RequestHelper.del()(
+      this,
+      endpoint`projects/${projectId}/metrics/user_starred_dashboards`,
+      options
+    );
+  }
+};
+
+// src/resources/EpicAwardEmojis.ts
+var EpicAwardEmojis = class extends ResourceAwardEmojis {
+  constructor(options) {
+    super("epics", "issues", options);
+  }
+};
+
+// src/resources/EpicDiscussions.ts
+var EpicDiscussions = class extends ResourceDiscussions {
+  constructor(options) {
+    super("groups", "epics", options);
+  }
+};
+var EpicIssues = class extends BaseResource {
+  all(groupId, epicIId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`groups/${groupId}/epics/${epicIId}/issues`,
+      options
+    );
+  }
+  assign(groupId, epicIId, epicIssueId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`groups/${groupId}/epics/${epicIId}/issues/${epicIssueId}`,
+      options
+    );
+  }
+  edit(groupId, epicIId, epicIssueId, options) {
+    return RequestHelper.put()(
+      this,
+      endpoint`groups/${groupId}/epics/${epicIId}/issues/${epicIssueId}`,
+      options
+    );
+  }
+  remove(groupId, epicIId, epicIssueId, options) {
+    return RequestHelper.del()(
+      this,
+      endpoint`groups/${groupId}/epics/${epicIId}/issues/${epicIssueId}`,
+      options
+    );
+  }
+};
+
+// src/resources/EpicLabelEvents.ts
+var EpicLabelEvents = class extends ResourceLabelEvents {
+  constructor(options) {
+    super("groups", "epic", options);
+  }
+};
+var EpicLinks = class extends BaseResource {
+  all(groupId, epicIId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`groups/${groupId}/epics/${epicIId}/links`,
+      options
+    );
+  }
+  assign(groupId, epicIId, childEpicId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`groups/${groupId}/epics/${epicIId}/links/${childEpicId}`,
+      options
+    );
+  }
+  create(groupId, epicIId, title, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`groups/${groupId}/epics/${epicIId}/links`,
+      {
+        searchParams: {
+          title
+        },
+        ...options
+      }
+    );
+  }
+  reorder(groupId, epicIId, childEpicId, options) {
+    return RequestHelper.put()(
+      this,
+      endpoint`groups/${groupId}/epics/${epicIId}/links/${childEpicId}`,
+      options
+    );
+  }
+  unassign(groupId, epicIId, childEpicId, options) {
+    return RequestHelper.del()(
+      this,
+      endpoint`groups/${groupId}/epics/${epicIId}/links/${childEpicId}`,
+      options
+    );
+  }
+};
+
+// src/resources/EpicNotes.ts
+var EpicNotes = class extends ResourceNotes {
+  constructor(options) {
+    super("groups", "epics", options);
+  }
+};
+var Epics = class extends BaseResource {
+  all(groupId, options) {
+    return RequestHelper.get()(this, endpoint`groups/${groupId}/epics`, options);
+  }
+  create(groupId, title, options) {
+    return RequestHelper.post()(this, endpoint`groups/${groupId}/epics`, {
+      title,
+      ...options
+    });
+  }
+  createTodo(groupId, epicIId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`groups/${groupId}/epics/${epicIId}/todos`,
+      options
+    );
+  }
+  edit(groupId, epicIId, options) {
+    return RequestHelper.put()(
+      this,
+      endpoint`groups/${groupId}/epics/${epicIId}`,
+      options
+    );
+  }
+  remove(groupId, epicIId, options) {
+    return RequestHelper.del()(this, endpoint`groups/${groupId}/epics/${epicIId}`, options);
+  }
+  show(groupId, epicIId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`groups/${groupId}/epics/${epicIId}`,
+      options
+    );
+  }
+};
+
+// src/resources/GroupAccessRequests.ts
+var GroupAccessRequests = class extends ResourceAccessRequests {
+  constructor(options) {
+    super("groups", options);
+  }
+};
+
+// src/resources/GroupAccessTokens.ts
+var GroupAccessTokens = class extends ResourceAccessTokens {
+  constructor(options) {
+    super("groups", options);
+  }
+};
+var GroupActivityAnalytics = class extends BaseResource {
+  showIssuesCount(groupPath, options) {
+    return RequestHelper.get()(
+      this,
+      "analytics/group_activity/issues_count",
+      {
+        searchParams: {
+          groupPath
+        },
+        ...options
+      }
+    );
+  }
+  showMergeRequestsCount(groupPath, options) {
+    return RequestHelper.get()(
+      this,
+      "analytics/group_activity/merge_requests_count",
+      {
+        searchParams: {
+          groupPath
+        },
+        ...options
+      }
+    );
+  }
+  showNewMembersCount(groupPath, options) {
+    return RequestHelper.get()(
+      this,
+      "analytics/group_activity/new_members_count",
+      {
+        searchParams: {
+          groupPath
+        },
+        ...options
+      }
+    );
+  }
+};
+
+// src/resources/GroupBadges.ts
+var GroupBadges = class extends ResourceBadges {
+  constructor(options) {
+    super("groups", options);
+  }
+};
+
+// src/resources/GroupCustomAttributes.ts
+var GroupCustomAttributes = class extends ResourceCustomAttributes {
+  constructor(options) {
+    super("groups", options);
+  }
+};
+
+// src/resources/GroupDORA4Metrics.ts
+var GroupDORA4Metrics = class extends ResourceDORA4Metrics {
+  constructor(options) {
+    super("groups", options);
+  }
+};
+
+// src/resources/GroupHooks.ts
+var GroupHooks = class extends ResourceHooks {
+  constructor(options) {
+    super("groups", options);
+  }
+};
+var GroupImportExports = class extends BaseResource {
+  download(groupId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`groups/${groupId}/export/download`,
+      options
+    );
+  }
+  import(file, path, { parentId, name, ...options }) {
+    return RequestHelper.post()(this, "groups/import", {
+      isForm: true,
+      ...options,
+      file: [file.content, file.filename],
+      path,
+      name: name || path.split("/").at(0),
+      parentId
+    });
+  }
+  scheduleExport(groupId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`groups/${groupId}/export`,
+      options
+    );
+  }
+};
+
+// src/resources/GroupInvitations.ts
+var GroupInvitations = class extends ResourceInvitations {
+  constructor(options) {
+    super("groups", options);
+  }
+};
+
+// src/resources/GroupIssueBoards.ts
+var GroupIssueBoards = class extends ResourceIssueBoards {
+  constructor(options) {
+    super("groups", options);
+  }
+};
+
+// src/resources/GroupIterations.ts
+var GroupIterations = class extends ResourceIterations {
+  constructor(options) {
+    super("groups", options);
+  }
+};
+
+// src/resources/GroupLabels.ts
+var GroupLabels = class extends ResourceLabels {
+  constructor(options) {
+    super("groups", options);
+  }
+};
+var GroupLDAPLinks = class extends BaseResource {
+  add(groupId, groupAccess, provider, options) {
+    return RequestHelper.post()(this, endpoint`groups/${groupId}/ldap_group_links`, {
+      groupAccess,
+      provider,
+      ...options
+    });
+  }
+  all(groupId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`groups/${groupId}/ldap_group_links`,
+      options
+    );
+  }
+  remove(groupId, provider, options) {
+    return RequestHelper.del()(this, endpoint`groups/${groupId}/ldap_group_links`, {
+      provider,
+      ...options
+    });
+  }
+  sync(groupId, options) {
+    return RequestHelper.post()(this, endpoint`groups/${groupId}/ldap_sync`, options);
+  }
+};
+
+// src/resources/GroupMembers.ts
+var GroupMembers = class extends ResourceMembers {
+  constructor(options) {
+    super("groups", options);
+  }
+  allBillable(groupId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`${groupId}/billable_members`,
+      options
+    );
+  }
+  allPending(groupId, options) {
+    return RequestHelper.get()(this, endpoint`${groupId}/pending_members`, options);
+  }
+  allBillableMemberships(groupId, userId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`${groupId}/billable_members/${userId}/memberships`,
+      options
+    );
+  }
+  approve(groupId, userId, options) {
+    return RequestHelper.put()(
+      this,
+      endpoint`${groupId}/members/${userId}/approve`,
+      options
+    );
+  }
+  approveAll(groupId, options) {
+    return RequestHelper.put()(
+      this,
+      endpoint`${groupId}/members/approve_all`,
+      options
+    );
+  }
+  removeBillable(groupId, userId, options) {
+    return RequestHelper.del()(this, endpoint`${groupId}/billable_members/${userId}`, options);
+  }
+  removeOverrideFlag(groupId, userId, options) {
+    return RequestHelper.del()(
+      this,
+      endpoint`${groupId}/members/${userId}/override`,
+      options
+    );
+  }
+  setOverrideFlag(groupId, userId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`${groupId}/members/${userId}/override`,
+      options
+    );
+  }
+};
+var GroupMemberRoles = class extends BaseResource {
+  add(groupId, baseAccessLevel, options) {
+    return RequestHelper.post()(this, endpoint`groups/${groupId}/members`, {
+      baseAccessLevel,
+      ...options
+    });
+  }
+  all(groupId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`groups/${groupId}/member_roles`,
+      options
+    );
+  }
+  remove(groupId, memberRoleId, options) {
+    return RequestHelper.del()(
+      this,
+      endpoint`groups/${groupId}/member_roles/${memberRoleId}`,
+      options
+    );
+  }
+};
+
+// src/resources/GroupMilestones.ts
+var GroupMilestones = class extends ResourceMilestones {
+  constructor(options) {
+    super("groups", options);
+  }
+};
+
+// src/resources/GroupProtectedEnvironments.ts
+var GroupProtectedEnvironments = class extends ResourceProtectedEnvironments {
+  constructor(options) {
+    super("groups", options);
+  }
+};
+
+// src/resources/GroupPushRules.ts
+var GroupPushRules = class extends ResourcePushRules {
+  constructor(options) {
+    super("groups", options);
+  }
+};
+var GroupRelationExports = class extends BaseResource {
+  download(groupId, relation, options) {
+    return RequestHelper.get()(this, endpoint`groups/${groupId}/export_relations/download`, {
+      searchParams: { relation },
+      ...options
+    });
+  }
+  exportStatus(groupId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`groups/${groupId}/export_relations`,
+      options
+    );
+  }
+  scheduleExport(groupId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`groups/${groupId}/export_relations`,
+      options
+    );
+  }
+};
+var GroupReleases = class extends BaseResource {
+  all(groupId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`groups/${groupId}/releases`,
+      options
+    );
+  }
+};
+
+// src/resources/GroupRepositoryStorageMoves.ts
+var GroupRepositoryStorageMoves = class extends ResourceRepositoryStorageMoves {
+  constructor(options) {
+    super("groups", options);
+  }
+};
+var Groups = class extends BaseResource {
+  all(options) {
+    return RequestHelper.get()(this, "groups", options);
+  }
+  allDescendantGroups(groupId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`groups/${groupId}/descendant_groups`,
+      options
+    );
+  }
+  allProjects(groupId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`groups/${groupId}/projects`,
+      options
+    );
+  }
+  allSharedProjects(groupId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`groups/${groupId}/projects/shared`,
+      options
+    );
+  }
+  allSubgroups(groupId, options) {
+    return RequestHelper.get()(this, endpoint`groups/${groupId}/subgroups`, options);
+  }
+  allProvisionedUsers(groupId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`groups/${groupId}/provisioned_users`,
+      options
+    );
+  }
+  allTransferLocations(groupId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`groups/${groupId}/transfer_locations`,
+      options
+    );
+  }
+  create(name, path, { avatar, ...options } = {}) {
+    if (avatar) {
+      return RequestHelper.post()(this, "groups", {
+        ...options,
+        isForm: true,
+        avatar: [avatar.content, avatar.filename],
+        name,
+        path
+      });
+    }
+    return RequestHelper.post()(this, "groups", { name, path, ...options });
+  }
+  downloadAvatar(groupId, options) {
+    return RequestHelper.get()(this, endpoint`groups/${groupId}/avatar`, options);
+  }
+  edit(groupId, { avatar, ...options } = {}) {
+    if (avatar) {
+      return RequestHelper.post()(this, endpoint`groups/${groupId}`, {
+        ...options,
+        isForm: true,
+        avatar: [avatar.content, avatar.filename]
+      });
+    }
+    return RequestHelper.put()(this, endpoint`groups/${groupId}`, options);
+  }
+  remove(groupId, options) {
+    return RequestHelper.del()(this, endpoint`groups/${groupId}`, options);
+  }
+  removeAvatar(groupId, options) {
+    return RequestHelper.put()(this, endpoint`groups/${groupId}`, {
+      ...options,
+      avatar: ""
+    });
+  }
+  restore(groupId, options) {
+    return RequestHelper.post()(this, endpoint`groups/${groupId}/restore`, options);
+  }
+  search(nameOrPath, options) {
+    return RequestHelper.get()(this, "groups", {
+      search: nameOrPath,
+      ...options
+    });
+  }
+  share(groupId, sharedGroupId, groupAccess, options) {
+    return RequestHelper.post()(this, endpoint`groups/${groupId}/share`, {
+      groupId: sharedGroupId,
+      groupAccess,
+      ...options
+    });
+  }
+  show(groupId, options) {
+    return RequestHelper.get()(this, endpoint`groups/${groupId}`, options);
+  }
+  transfer(groupId, options) {
+    return RequestHelper.post()(this, endpoint`groups/${groupId}/transfer`, options);
+  }
+  transferProject(groupId, projectId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`groups/${groupId}/projects/${projectId}`,
+      options
+    );
+  }
+  unshare(groupId, sharedGroupId, options) {
+    return RequestHelper.del()(this, endpoint`groups/${groupId}/share/${sharedGroupId}`, options);
+  }
+  uploadAvatar(groupId, content, { filename, ...options } = {}) {
+    return RequestHelper.put()(this, endpoint`groups/${groupId}/avatar`, {
+      isForm: true,
+      ...options,
+      file: [content, filename]
+    });
+  }
+};
+var GroupSAMLIdentities = class extends BaseResource {
+  all(groupId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`groups/${groupId}/saml/identities`,
+      options
+    );
+  }
+  edit(groupId, identityId, options) {
+    return RequestHelper.patch()(
+      this,
+      endpoint`groups/${groupId}/saml/${identityId}`,
+      options
+    );
+  }
+};
+var GroupSCIMIdentities = class extends BaseResource {
+  all(groupId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`groups/${groupId}/scim/identities`,
+      options
+    );
+  }
+  edit(groupId, identityId, options) {
+    return RequestHelper.patch()(
+      this,
+      endpoint`groups/${groupId}/scim/${identityId}`,
+      options
+    );
+  }
+};
+
+// src/resources/GroupVariables.ts
+var GroupVariables = class extends ResourceVariables {
+  constructor(options) {
+    super("groups", options);
+  }
+};
+
+// src/resources/GroupWikis.ts
+var GroupWikis = class extends ResourceWikis {
+  constructor(options) {
+    super("groups", options);
+  }
+};
+var LinkedEpics = class extends BaseResource {
+  all(groupId, epicIId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`groups/${groupId}/epics/${epicIId}/related_epics`,
+      options
+    );
+  }
+  create(groupId, epicIId, targetEpicIId, targetGroupId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`groups/${groupId}/epics/${epicIId}/related_epics`,
+      {
+        searchParams: {
+          targetGroupId,
+          targetEpicIid: targetEpicIId
+        },
+        ...options
+      }
+    );
+  }
+  remove(groupId, epicIId, relatedEpicLinkId, options) {
+    return RequestHelper.del()(
+      this,
+      endpoint`groups/${groupId}/epics/${epicIId}/related_epics/${relatedEpicLinkId}`,
+      options
+    );
+  }
+};
+
+// src/resources/UserCustomAttributes.ts
+var UserCustomAttributes = class extends ResourceCustomAttributes {
+  constructor(options) {
+    super("users", options);
+  }
+};
+var url9 = (userId) => userId ? `users/${userId}/emails` : "user/emails";
+var UserEmails = class extends BaseResource {
+  // Convenience method for create
+  add(email, options) {
+    return this.create(email, options);
+  }
+  all({
+    userId,
+    ...options
+  } = {}) {
+    return RequestHelper.get()(
+      this,
+      url9(userId),
+      options
+    );
+  }
+  create(email, {
+    userId,
+    ...options
+  } = {}) {
+    return RequestHelper.post()(this, url9(userId), {
+      email,
+      ...options
+    });
+  }
+  show(emailId, options) {
+    return RequestHelper.get()(this, `user/emails/${emailId}`, options);
+  }
+  remove(emailId, { userId, ...options } = {}) {
+    return RequestHelper.del()(
+      this,
+      `${url9(userId)}/${emailId}`,
+      options
+    );
+  }
+};
+var url10 = (userId) => userId ? `users/${userId}/gpg_keys` : "user/gpg_keys";
+var UserGPGKeys = class extends BaseResource {
+  // Convienence method
+  add(key, options) {
+    return this.create(key, options);
+  }
+  all({
+    userId,
+    ...options
+  } = {}) {
+    return RequestHelper.get()(this, url10(userId), options);
+  }
+  create(key, { userId, ...options } = {}) {
+    return RequestHelper.post()(this, url10(userId), {
+      key,
+      ...options
+    });
+  }
+  show(keyId, { userId, ...options } = {}) {
+    return RequestHelper.get()(this, `${url10(userId)}/${keyId}`, options);
+  }
+  remove(keyId, { userId, ...options } = {}) {
+    return RequestHelper.del()(this, `${url10(userId)}/${keyId}`, options);
+  }
+};
+var UserImpersonationTokens = class extends BaseResource {
+  all(userId, options) {
+    return RequestHelper.get()(
+      this,
+      `users/${userId}/impersonation_tokens`,
+      options
+    );
+  }
+  create(userId, name, scopes, options) {
+    return RequestHelper.post()(
+      this,
+      `users/${userId}/impersonation_tokens`,
+      {
+        name,
+        scopes,
+        ...options
+      }
+    );
+  }
+  show(userId, tokenId, options) {
+    return RequestHelper.get()(
+      this,
+      `users/${userId}/impersonation_tokens/${tokenId}`,
+      options
+    );
+  }
+  remove(userId, tokenId, options) {
+    return RequestHelper.del()(this, `users/${userId}/impersonation_tokens/${tokenId}`, options);
+  }
+  // Convienence method
+  revoke(userId, tokenId, options) {
+    return this.remove(userId, tokenId, options);
+  }
+};
+var Users = class extends BaseResource {
+  activate(userId, options) {
+    return RequestHelper.post()(this, endpoint`users/${userId}/activate`, options);
+  }
+  all(options) {
+    return RequestHelper.get()(this, "users", options);
+  }
+  allActivities(options) {
+    return RequestHelper.get()(this, "user/activities", options);
+  }
+  allEvents(userId, options) {
+    return RequestHelper.get()(this, endpoint`users/${userId}/events`, options);
+  }
+  allFollowers(userId, options) {
+    return RequestHelper.get()(this, endpoint`users/${userId}/followers`, options);
+  }
+  allFollowing(userId, options) {
+    return RequestHelper.get()(this, endpoint`users/${userId}/following`, options);
+  }
+  allMemberships(userId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`users/${userId}/memberships`,
+      options
+    );
+  }
+  allProjects(userId, options) {
+    return RequestHelper.get()(this, endpoint`users/${userId}/projects`, options);
+  }
+  allContributedProjects(userId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`users/${userId}/contributed_projects`,
+      options
+    );
+  }
+  allStarredProjects(userId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`users/${userId}/starred_projects`,
+      options
+    );
+  }
+  approve(userId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`users/${userId}/approve`,
+      options
+    );
+  }
+  ban(userId, options) {
+    return RequestHelper.post()(this, endpoint`users/${userId}/ban`, options);
+  }
+  block(userId, options) {
+    return RequestHelper.post()(this, endpoint`users/${userId}/block`, options);
+  }
+  deactivate(userId, options) {
+    return RequestHelper.post()(this, endpoint`users/${userId}/deactivate`, options);
+  }
+  disableTwoFactor(userId, options) {
+    return RequestHelper.patch()(this, endpoint`users/${userId}/disable_two_factor`, options);
+  }
+  follow(userId, options) {
+    return RequestHelper.post()(this, endpoint`users/${userId}/follow`, options);
+  }
+  create(options) {
+    return RequestHelper.post()(this, "users", options);
+  }
+  createPersonalAccessToken(userId, name, scopes, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`users/${userId}/personal_access_tokens`,
+      {
+        name,
+        scopes,
+        ...options
+      }
+    );
+  }
+  createCIRunner(runnerType, options) {
+    return RequestHelper.post()(this, "user/runners", {
+      ...options,
+      runnerType
+    });
+  }
+  edit(userId, options) {
+    return RequestHelper.put()(this, endpoint`users/${userId}`, options);
+  }
+  editStatus(options) {
+    return RequestHelper.put()(this, "user/status", options);
+  }
+  editCurrentUserPreferences(viewDiffsFileByFile, showWhitespaceInDiffs, options) {
+    return RequestHelper.get()(this, "user/preferences", {
+      viewDiffsFileByFile,
+      showWhitespaceInDiffs,
+      ...options
+    });
+  }
+  reject(userId, options) {
+    return RequestHelper.post()(
+      this,
+      endpoint`users/${userId}/reject`,
+      options
+    );
+  }
+  show(userId, options) {
+    return RequestHelper.get()(
+      this,
+      endpoint`users/${userId}`,
+      options
+    );
+  }
+  showCount(options) {
+    return RequestHelper.get()(this, "user_counts", options);
+  }
+  showAssociationsCount(userId, options) {
+    return RequestHelper.get()(
+      this,
+      `users/${userId}/associations_count`,
+      options
+    );
+  }
+  showCurrentUser(options) {
+    return RequestHelper.get()(this, "user", options);
+  }
+  showCurrentUserPreferences(options) {
+    return RequestHelper.get()(this, "user/preferences", options);
+  }
+  showStatus(options) {
+    let url12;
+    if (options?.iDOrUsername)
+      url12 = `users/${options?.iDOrUsername}/status`;
+    else
+      url12 = "user/status";
+    return RequestHelper.get()(this, url12, options);
+  }
+  remove(userId, options) {
+    return RequestHelper.del()(this, endpoint`users/${userId}`, options);
+  }
+  removeAuthenticationIdentity(userId, provider, options) {
+    return RequestHelper.del()(this, endpoint`users/${userId}/identities/${provider}`, options);
+  }
+  unban(userId, options) {
+    return RequestHelper.post()(this, endpoint`users/${userId}/unban`, options);
+  }
+  unblock(userId, options) {
+    return RequestHelper.post()(this, endpoint`users/${userId}/unblock`, options);
+  }
+  unfollow(userId, options) {
+    return RequestHelper.post()(this, endpoint`users/${userId}/unfollow`, options);
+  }
+};
+var url11 = (userId) => userId ? `users/${userId}/keys` : "user/keys";
+var UserSSHKeys = class extends BaseResource {
+  // Convienence method for create
+  add(title, key, options) {
+    return this.create(title, key, options);
+  }
+  all({
+    userId,
+    ...options
+  } = {}) {
+    return RequestHelper.get()(
+      this,
+      url11(userId),
+      options
+    );
+  }
+  create(title, key, {
+    userId,
+    ...options
+  } = {}) {
+    return RequestHelper.post()(this, url11(userId), {
+      title,
+      key,
+      ...options
+    });
+  }
+  show(keyId, { userId, ...options } = {}) {
+    return RequestHelper.get()(
+      this,
+      `${url11(userId)}/${keyId}`,
+      options
+    );
+  }
+  remove(keyId, { userId, ...options } = {}) {
+    return RequestHelper.del()(this, `${url11(userId)}/${keyId}`, options);
+  }
+};
+var resources = {
+  Agents,
+  AlertManagement,
+  ApplicationAppearance,
+  ApplicationPlanLimits,
+  Applications,
+  ApplicationSettings,
+  ApplicationStatistics,
+  AuditEvents,
+  Avatar,
+  BroadcastMessages,
+  Composer,
+  Conan,
+  DashboardAnnotations,
+  Debian,
+  DependencyProxy,
+  DeployKeys,
+  DeployTokens,
+  DockerfileTemplates,
+  Events,
+  Experiments,
+  GeoNodes,
+  GitignoreTemplates,
+  GitLabCIYMLTemplates,
+  Import,
+  InstanceLevelCICDVariables,
+  Keys,
+  License,
+  LicenseTemplates,
+  Lint,
+  Markdown,
+  Maven,
+  Metadata,
+  Migrations,
+  Namespaces,
+  NotificationSettings,
+  NPM,
+  NuGet,
+  PersonalAccessTokens,
+  PyPI,
+  RubyGems,
+  Search,
+  ServiceData,
+  SidekiqMetrics,
+  SidekiqQueues,
+  SnippetRepositoryStorageMoves,
+  Snippets,
+  Suggestions,
+  SystemHooks,
+  TodoLists,
+  Topics,
+  Branches,
+  CommitDiscussions,
+  Commits,
+  ContainerRegistry,
+  Deployments,
+  Environments,
+  ErrorTrackingClientKeys,
+  ErrorTrackingSettings,
+  ExternalStatusChecks,
+  FeatureFlags,
+  FeatureFlagUserLists,
+  FreezePeriods,
+  GitlabPages,
+  GoProxy,
+  Helm,
+  Integrations,
+  IssueAwardEmojis,
+  IssueDiscussions,
+  IssueIterationEvents,
+  IssueLabelEvents,
+  IssueLinks,
+  IssueMilestoneEvents,
+  IssueNoteAwardEmojis,
+  IssueNotes,
+  Issues,
+  IssuesStatistics,
+  IssueStateEvents,
+  IssueWeightEvents,
+  JobArtifacts,
+  Jobs,
+  MergeRequestApprovals,
+  MergeRequestAwardEmojis,
+  MergeRequestContextCommits,
+  MergeRequestDiscussions,
+  MergeRequestLabelEvents,
+  MergeRequestMilestoneEvents,
+  MergeRequestDraftNotes,
+  MergeRequestNotes,
+  MergeRequestNoteAwardEmojis,
+  MergeRequests,
+  MergeTrains,
+  PackageRegistry,
+  Packages,
+  PagesDomains,
+  Pipelines,
+  PipelineSchedules,
+  PipelineScheduleVariables,
+  PipelineTriggerTokens,
+  ProductAnalytics,
+  ProjectAccessRequests,
+  ProjectAccessTokens,
+  ProjectAliases,
+  ProjectBadges,
+  ProjectCustomAttributes,
+  ProjectDORA4Metrics,
+  ProjectHooks,
+  ProjectImportExports,
+  ProjectInvitations,
+  ProjectIssueBoards,
+  ProjectIterations,
+  ProjectLabels,
+  ProjectMembers,
+  ProjectMilestones,
+  ProjectProtectedEnvironments,
+  ProjectPushRules,
+  ProjectRelationsExport,
+  ProjectReleases,
+  ProjectRemoteMirrors,
+  ProjectRepositoryStorageMoves,
+  Projects,
+  ProjectSnippetAwardEmojis,
+  ProjectSnippetDiscussions,
+  ProjectSnippetNotes,
+  ProjectSnippets,
+  ProjectStatistics,
+  ProjectTemplates,
+  ProjectVariables,
+  ProjectVulnerabilities,
+  ProjectWikis,
+  ProtectedBranches,
+  ProtectedTags,
+  ReleaseLinks,
+  Repositories,
+  RepositoryFiles,
+  RepositorySubmodules,
+  ResourceGroups,
+  Runners,
+  SecureFiles,
+  Tags,
+  UserStarredMetricsDashboard,
+  EpicAwardEmojis,
+  EpicDiscussions,
+  EpicIssues,
+  EpicLabelEvents,
+  EpicLinks,
+  EpicNotes,
+  Epics,
+  GroupAccessRequests,
+  GroupAccessTokens,
+  GroupActivityAnalytics,
+  GroupBadges,
+  GroupCustomAttributes,
+  GroupDORA4Metrics,
+  GroupHooks,
+  GroupImportExports,
+  GroupInvitations,
+  GroupIssueBoards,
+  GroupIterations,
+  GroupLabels,
+  GroupLDAPLinks,
+  GroupMembers,
+  GroupMemberRoles,
+  GroupMilestones,
+  GroupProtectedEnvironments,
+  GroupPushRules,
+  GroupRelationExports,
+  GroupReleases,
+  GroupRepositoryStorageMoves,
+  Groups,
+  GroupSAMLIdentities,
+  GroupSCIMIdentities,
+  GroupVariables,
+  GroupWikis,
+  LinkedEpics,
+  UserCustomAttributes,
+  UserEmails,
+  UserGPGKeys,
+  UserImpersonationTokens,
+  Users,
+  UserSSHKeys
+};
+var Gitlab = class extends BaseResource {
+  constructor(options) {
+    super(options);
+    Object.keys(resources).forEach((s) => {
+      this[s] = new resources[s](options);
+    });
+  }
+};
+
+
+
+;// CONCATENATED MODULE: ./node_modules/@gitbeaker/rest/dist/index.mjs
+
+
+
+// src/index.ts
+async function dist_defaultOptionsHandler(resourceOptions, requestOptions) {
+  const options = { ...requestOptions };
+  if (resourceOptions.url.includes("https") && resourceOptions.rejectUnauthorized != null && resourceOptions.rejectUnauthorized === false) {
+    if (typeof window !== "object") {
+      const { Agent } = await Promise.resolve(/* import() */).then(__nccwpck_require__.t.bind(__nccwpck_require__, 5687, 19));
+      options.agent = new Agent({
+        rejectUnauthorized: false
+      });
+    }
+  }
+  return options;
+}
+async function processBody(response) {
+  const contentType = (response.headers.get("content-type") || "").split(";")[0].trim();
+  if (contentType === "application/json") {
+    return response.json().then((v) => v || {});
+  }
+  if (contentType.startsWith("text/")) {
+    return response.text().then((t) => t || "");
+  }
+  return response.blob();
+}
+function delay(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+async function parseResponse(response, asStream = false) {
+  const { status, headers: rawHeaders } = response;
+  const headers = Object.fromEntries(rawHeaders.entries());
+  let body;
+  if (asStream) {
+    body = response.body;
+  } else {
+    body = status === 204 ? null : await processBody(response);
+  }
+  return { body, headers, status };
+}
+async function throwFailedRequestError(request, response) {
+  const content = await response.text();
+  const contentType = response.headers.get("Content-Type");
+  let description = "API Request Error";
+  if (contentType?.includes("application/json")) {
+    const output = JSON.parse(content);
+    description = JSON.stringify(output.error || output.message, null, 2);
+  } else {
+    description = content;
+  }
+  throw new Error(response.statusText, {
+    cause: {
+      description,
+      request,
+      response
+    }
+  });
+}
+function getConditionalMode(endpoint) {
+  if (endpoint.includes("repository/archive"))
+    return "same-origin";
+  return void 0;
+}
+async function defaultRequestHandler(endpoint, options) {
+  const retryCodes = [429, 502];
+  const maxRetries = 10;
+  const { prefixUrl, asStream, searchParams, ...opts } = options || {};
+  let baseUrl;
+  if (prefixUrl)
+    baseUrl = prefixUrl.endsWith("/") ? prefixUrl : `${prefixUrl}/`;
+  const url = new URL(endpoint, baseUrl);
+  url.search = searchParams || "";
+  const mode = getConditionalMode(endpoint);
+  for (let i = 0; i < maxRetries; i += 1) {
+    const request = new Request(url, { ...opts, mode });
+    const response = await fetch(request).catch((e) => {
+      if (e.name === "TimeoutError" || e.name === "AbortError") {
+        throw new Error("Query timeout was reached");
+      }
+      throw e;
+    });
+    if (response.ok)
+      return parseResponse(response, asStream);
+    if (!retryCodes.includes(response.status))
+      await throwFailedRequestError(request, response);
+    await delay(2 ** i * 0.25);
+    continue;
+  }
+  throw new Error(
+    `Could not successfully complete this request due to Error 429. Check the applicable rate limits for this endpoint.`
+  );
+}
+var requesterFn = createRequesterFn(dist_defaultOptionsHandler, defaultRequestHandler);
+
+// src/index.ts
+var API = presetResourceArguments(core_dist_namespaceObject, { requesterFn });
+var {
+  Agents: dist_Agents,
+  AlertManagement: dist_AlertManagement,
+  ApplicationAppearance: dist_ApplicationAppearance,
+  ApplicationPlanLimits: dist_ApplicationPlanLimits,
+  Applications: dist_Applications,
+  ApplicationSettings: dist_ApplicationSettings,
+  ApplicationStatistics: dist_ApplicationStatistics,
+  AuditEvents: dist_AuditEvents,
+  Avatar: dist_Avatar,
+  BroadcastMessages: dist_BroadcastMessages,
+  Composer: dist_Composer,
+  Conan: dist_Conan,
+  DashboardAnnotations: dist_DashboardAnnotations,
+  Debian: dist_Debian,
+  DependencyProxy: dist_DependencyProxy,
+  DeployKeys: dist_DeployKeys,
+  DeployTokens: dist_DeployTokens,
+  DockerfileTemplates: dist_DockerfileTemplates,
+  Events: dist_Events,
+  Experiments: dist_Experiments,
+  GeoNodes: dist_GeoNodes,
+  GitignoreTemplates: dist_GitignoreTemplates,
+  GitLabCIYMLTemplates: dist_GitLabCIYMLTemplates,
+  Import: dist_Import,
+  InstanceLevelCICDVariables: dist_InstanceLevelCICDVariables,
+  Keys: dist_Keys,
+  License: dist_License,
+  LicenseTemplates: dist_LicenseTemplates,
+  Lint: dist_Lint,
+  Markdown: dist_Markdown,
+  Maven: dist_Maven,
+  Metadata: dist_Metadata,
+  Migrations: dist_Migrations,
+  Namespaces: dist_Namespaces,
+  NotificationSettings: dist_NotificationSettings,
+  NPM: dist_NPM,
+  NuGet: dist_NuGet,
+  PersonalAccessTokens: dist_PersonalAccessTokens,
+  PyPI: dist_PyPI,
+  RubyGems: dist_RubyGems,
+  Search: dist_Search,
+  ServiceData: dist_ServiceData,
+  SidekiqMetrics: dist_SidekiqMetrics,
+  SidekiqQueues: dist_SidekiqQueues,
+  SnippetRepositoryStorageMoves: dist_SnippetRepositoryStorageMoves,
+  Snippets: dist_Snippets,
+  Suggestions: dist_Suggestions,
+  SystemHooks: dist_SystemHooks,
+  TodoLists: dist_TodoLists,
+  Topics: dist_Topics,
+  Branches: dist_Branches,
+  CommitDiscussions: dist_CommitDiscussions,
+  Commits: dist_Commits,
+  ContainerRegistry: dist_ContainerRegistry,
+  Deployments: dist_Deployments,
+  Environments: dist_Environments,
+  ErrorTrackingClientKeys: dist_ErrorTrackingClientKeys,
+  ErrorTrackingSettings: dist_ErrorTrackingSettings,
+  ExternalStatusChecks: dist_ExternalStatusChecks,
+  FeatureFlags: dist_FeatureFlags,
+  FeatureFlagUserLists: dist_FeatureFlagUserLists,
+  FreezePeriods: dist_FreezePeriods,
+  GitlabPages: dist_GitlabPages,
+  GoProxy: dist_GoProxy,
+  Helm: dist_Helm,
+  Integrations: dist_Integrations,
+  IssueAwardEmojis: dist_IssueAwardEmojis,
+  IssueDiscussions: dist_IssueDiscussions,
+  IssueIterationEvents: dist_IssueIterationEvents,
+  IssueLabelEvents: dist_IssueLabelEvents,
+  IssueLinks: dist_IssueLinks,
+  IssueMilestoneEvents: dist_IssueMilestoneEvents,
+  IssueNoteAwardEmojis: dist_IssueNoteAwardEmojis,
+  IssueNotes: dist_IssueNotes,
+  Issues: dist_Issues,
+  IssuesStatistics: dist_IssuesStatistics,
+  IssueStateEvents: dist_IssueStateEvents,
+  IssueWeightEvents: dist_IssueWeightEvents,
+  JobArtifacts: dist_JobArtifacts,
+  Jobs: dist_Jobs,
+  MergeRequestApprovals: dist_MergeRequestApprovals,
+  MergeRequestAwardEmojis: dist_MergeRequestAwardEmojis,
+  MergeRequestContextCommits: dist_MergeRequestContextCommits,
+  MergeRequestDiscussions: dist_MergeRequestDiscussions,
+  MergeRequestLabelEvents: dist_MergeRequestLabelEvents,
+  MergeRequestMilestoneEvents: dist_MergeRequestMilestoneEvents,
+  MergeRequestDraftNotes: dist_MergeRequestDraftNotes,
+  MergeRequestNotes: dist_MergeRequestNotes,
+  MergeRequestNoteAwardEmojis: dist_MergeRequestNoteAwardEmojis,
+  MergeRequests: dist_MergeRequests,
+  MergeTrains: dist_MergeTrains,
+  PackageRegistry: dist_PackageRegistry,
+  Packages: dist_Packages,
+  PagesDomains: dist_PagesDomains,
+  Pipelines: dist_Pipelines,
+  PipelineSchedules: dist_PipelineSchedules,
+  PipelineScheduleVariables: dist_PipelineScheduleVariables,
+  PipelineTriggerTokens: dist_PipelineTriggerTokens,
+  ProductAnalytics: dist_ProductAnalytics,
+  ProjectAccessRequests: dist_ProjectAccessRequests,
+  ProjectAccessTokens: dist_ProjectAccessTokens,
+  ProjectAliases: dist_ProjectAliases,
+  ProjectBadges: dist_ProjectBadges,
+  ProjectCustomAttributes: dist_ProjectCustomAttributes,
+  ProjectDORA4Metrics: dist_ProjectDORA4Metrics,
+  ProjectHooks: dist_ProjectHooks,
+  ProjectImportExports: dist_ProjectImportExports,
+  ProjectInvitations: dist_ProjectInvitations,
+  ProjectIssueBoards: dist_ProjectIssueBoards,
+  ProjectIterations: dist_ProjectIterations,
+  ProjectLabels: dist_ProjectLabels,
+  ProjectMembers: dist_ProjectMembers,
+  ProjectMilestones: dist_ProjectMilestones,
+  ProjectProtectedEnvironments: dist_ProjectProtectedEnvironments,
+  ProjectPushRules: dist_ProjectPushRules,
+  ProjectRelationsExport: dist_ProjectRelationsExport,
+  ProjectReleases: dist_ProjectReleases,
+  ProjectRemoteMirrors: dist_ProjectRemoteMirrors,
+  ProjectRepositoryStorageMoves: dist_ProjectRepositoryStorageMoves,
+  Projects: dist_Projects,
+  ProjectSnippetAwardEmojis: dist_ProjectSnippetAwardEmojis,
+  ProjectSnippetDiscussions: dist_ProjectSnippetDiscussions,
+  ProjectSnippetNotes: dist_ProjectSnippetNotes,
+  ProjectSnippets: dist_ProjectSnippets,
+  ProjectStatistics: dist_ProjectStatistics,
+  ProjectTemplates: dist_ProjectTemplates,
+  ProjectVariables: dist_ProjectVariables,
+  ProjectVulnerabilities: dist_ProjectVulnerabilities,
+  ProjectWikis: dist_ProjectWikis,
+  ProtectedBranches: dist_ProtectedBranches,
+  ProtectedTags: dist_ProtectedTags,
+  ReleaseLinks: dist_ReleaseLinks,
+  Repositories: dist_Repositories,
+  RepositoryFiles: dist_RepositoryFiles,
+  RepositorySubmodules: dist_RepositorySubmodules,
+  ResourceGroups: dist_ResourceGroups,
+  Runners: dist_Runners,
+  SecureFiles: dist_SecureFiles,
+  Tags: dist_Tags,
+  UserStarredMetricsDashboard: dist_UserStarredMetricsDashboard,
+  EpicAwardEmojis: dist_EpicAwardEmojis,
+  EpicDiscussions: dist_EpicDiscussions,
+  EpicIssues: dist_EpicIssues,
+  EpicLabelEvents: dist_EpicLabelEvents,
+  EpicLinks: dist_EpicLinks,
+  EpicNotes: dist_EpicNotes,
+  Epics: dist_Epics,
+  GroupAccessRequests: dist_GroupAccessRequests,
+  GroupAccessTokens: dist_GroupAccessTokens,
+  GroupActivityAnalytics: dist_GroupActivityAnalytics,
+  GroupBadges: dist_GroupBadges,
+  GroupCustomAttributes: dist_GroupCustomAttributes,
+  GroupDORA4Metrics: dist_GroupDORA4Metrics,
+  GroupHooks: dist_GroupHooks,
+  GroupImportExports: dist_GroupImportExports,
+  GroupInvitations: dist_GroupInvitations,
+  GroupIssueBoards: dist_GroupIssueBoards,
+  GroupIterations: dist_GroupIterations,
+  GroupLabels: dist_GroupLabels,
+  GroupLDAPLinks: dist_GroupLDAPLinks,
+  GroupMembers: dist_GroupMembers,
+  GroupMemberRoles: dist_GroupMemberRoles,
+  GroupMilestones: dist_GroupMilestones,
+  GroupProtectedEnvironments: dist_GroupProtectedEnvironments,
+  GroupPushRules: dist_GroupPushRules,
+  GroupRelationExports: dist_GroupRelationExports,
+  GroupReleases: dist_GroupReleases,
+  GroupRepositoryStorageMoves: dist_GroupRepositoryStorageMoves,
+  Groups: dist_Groups,
+  GroupSAMLIdentities: dist_GroupSAMLIdentities,
+  GroupSCIMIdentities: dist_GroupSCIMIdentities,
+  GroupVariables: dist_GroupVariables,
+  GroupWikis: dist_GroupWikis,
+  LinkedEpics: dist_LinkedEpics,
+  UserCustomAttributes: dist_UserCustomAttributes,
+  UserEmails: dist_UserEmails,
+  UserGPGKeys: dist_UserGPGKeys,
+  UserImpersonationTokens: dist_UserImpersonationTokens,
+  Users: dist_Users,
+  UserSSHKeys: dist_UserSSHKeys,
+  Gitlab: dist_Gitlab
+} = API;
+
+
+
+;// CONCATENATED MODULE: ./adapters/integrations/gitlab-integration.js
+// gitlabIntegration.js
+
+
+
+
+
+
+
+
+
+
+
+main.config();
+const gitlab_integration_ATLAN_INSTANCE_URL = process.env.ATLAN_INSTANCE_URL;
+const { IS_DEV: gitlab_integration_IS_DEV } = process.env;
+
+class GitLabIntegration extends IntegrationInterface {
+  constructor(token) {
+    super(token);
+  }
+
+  async run() {
+    //Done
+    console.log("Run Gitlab");
+    const timeStart = Date.now();
+
+    const gitlab = new dist_Gitlab({
+      host: "https://gitlab.com",
+      token: this.token,
+    });
+
+    const { CI_PROJECT_PATH, CI_MERGE_REQUEST_IID } = process.env;
+
+    if (!(await this.authIntegration({ gitlab })))
+      //Done
+      throw { message: "Wrong API Token" };
+
+    const { state, web_url, source_branch } = await gitlab.MergeRequests.show(
+      CI_PROJECT_PATH,
+      CI_MERGE_REQUEST_IID
+    );
+
+    let total_assets = 0;
+
+    if (state === "opened") {
+      total_assets = await this.printDownstreamAssets({
+        gitlab,
+        source_branch,
+      });
+    } else if (state === "merged") {
+      total_assets = await this.setResourceOnAsset({
+        gitlab,
+        web_url,
+        source_branch,
+      });
+    }
+
+    if (total_assets !== 0)
+      this.sendSegmentEventOfIntegration("dbt_ci_action_run", {
+        asset_count: total_assets,
+        total_time: Date.now() - timeStart,
+      });
+  }
+
+  async printDownstreamAssets({ gitlab, source_branch }) {
+    //Done
+    // Implementation for printing impact on GitHub
+    // Use this.token to access the token
+    const changedFiles = await this.getChangedFiles({ gitlab }); //Complete
+
+    let comments = ``;
+    let totalChangedFiles = 0;
+
+    for (const { fileName, filePath, headSHA } of changedFiles) {
+      const assetName = await this.getAssetName({
+        //Complete
+        gitlab,
+        fileName,
+        filePath,
+        headSHA,
+      });
+
+      const environments = getGitLabEnvironments();
+
+      let environment = null;
+      for (const [baseBranchName, environmentName] of environments) {
+        if (baseBranchName === source_branch) {
+          environment = environmentName;
+          break;
+        }
+      }
+
+      const asset = await getAsset({
+        //Complete
+        name: assetName,
+        sendSegmentEventOfIntegration: this.sendSegmentEventOfIntegration,
+        environment: environment,
+        integration: "gitlab",
+      });
+
+      if (asset.error) {
+        comments += asset.error;
+        totalChangedFiles++;
+        continue;
+      }
+
+      //Cross-check this part once with Jaagrav.
+
+      const totalModifiedFiles = changedFiles.filter(
+        (i) => i.status === "modified"
+      ).length;
+
+      const { guid } = asset.attributes.sqlAsset;
+      const timeStart = Date.now();
+      const downstreamAssets = await getDownstreamAssets(
+        //Done
+        asset,
+        guid,
+        totalModifiedFiles,
+        this.sendSegmentEventOfIntegration,
+        "gitlab"
+      );
+
+      if (totalChangedFiles !== 0) comments += "\n\n---\n\n";
+
+      if (downstreamAssets.error) {
+        comments += downstreamAssets.error;
+        totalChangedFiles++;
+        continue;
+      }
+
+      this.sendSegmentEventOfIntegration("dbt_ci_action_downstream_unfurl", {
+        //Complete
+        asset_guid: asset.guid,
+        asset_type: asset.typeName,
+        downstream_count: downstreamAssets.length,
+        total_fetch_time: Date.now() - timeStart,
+      });
+
+      const comment = await this.renderDownstreamAssetsComment({
+        //Complete
+        asset,
+        downstreamAssets,
+      });
+
+      comments += comment;
+
+      totalChangedFiles++;
+    }
+
+    comments = `### ${get_image_url_getImageURL("atlan-logo", 15, 15)} Atlan impact analysis
+Here is your downstream impact analysis for **${totalChangedFiles} ${
+      totalChangedFiles > 1 ? "models" : "model"
+    }** you have edited.
+
+${comments}`;
+
+    const existingComment = await this.checkCommentExists({ gitlab }); //Complete
+
+    if (totalChangedFiles > 0)
+      await this.createIssueComment({
+        //Complete
+        gitlab,
+        comments,
+        comment_id: existingComment?.id,
+      });
+
+    if (totalChangedFiles === 0 && existingComment)
+      await this.deleteComment({ gitlab, comment_id: existingComment.id }); //Complete
+
+    return totalChangedFiles;
+  }
+
+  async setResourceOnAsset({ gitlab, web_url, source_branch }) {
+    //Done
+    // Implementation for setting resources on GitHub
+    // Use this.token to access the token
+    const changedFiles = await this.getChangedFiles({ gitlab }); //Done
+    var totalChangedFiles = 0;
+
+    if (changedFiles.length === 0) return;
+
+    for (const { fileName, filePath, headSHA } of changedFiles) {
+      const assetName = await this.getAssetName({
+        gitlab,
+        fileName,
+        filePath,
+        headSHA,
+      });
+
+      const environments = getGitLabEnvironments();
+
+      let environment = null;
+      for (const [baseBranchName, environmentName] of environments) {
+        if (baseBranchName === source_branch) {
+          environment = environmentName;
+          break;
+        }
+      }
+
+      const asset = await getAsset({
+        //Done
+        name: assetName,
+        sendSegmentEventOfIntegration: this.sendSegmentEventOfIntegration,
+        environment: environment,
+        integration: "gitlab",
+      });
+
+      if (!asset) continue;
+
+      const { guid: modelGuid } = asset;
+      const { guid: tableAssetGuid } = asset.attributes.sqlAsset;
+
+      await createResource(
+        //Done
+        //Complete
+        modelGuid,
+        "Pull Request on GitLab",
+        web_url,
+        this.sendSegmentEventOfIntegration
+      );
+      await createResource(
+        //Done
+        tableAssetGuid,
+        "Pull Request on GitLab",
+        web_url,
+        this.sendSegmentEventOfIntegration
+      );
+
+      totalChangedFiles++;
+    }
+
+    const comment = await this.createIssueComment({
+      //Done
+      //Complete
+      gitlab,
+      content: `🎊 Congrats on the merge!
+
+This pull request has been added as a resource to all the assets modified. ✅
+`,
+      comment_id: null,
+      forceNewComment: true,
+    });
+
+    return totalChangedFiles;
+  }
+
+  async authIntegration({ gitlab }) {
+    //Done
+    const response = await auth();
+
+    if (response?.status === 401) {
+      //Complete
+      await this.createIssueComment(
+        gitlab,
+        `We couldn't connect to your Atlan Instance, please make sure to set the valid Atlan Bearer Token as \`ATLAN_API_TOKEN\` in your .gitlab-ci.yml file.
+
+Atlan Instance URL: ${gitlab_integration_ATLAN_INSTANCE_URL}`
+      );
+      return false;
+    }
+
+    if (response === undefined) {
+      await this.createIssueComment(
+        gitlab,
+        `We couldn't connect to your Atlan Instance, please make sure to set the valid Atlan Instance URL as \`ATLAN_INSTANCE_URL\` in your .gitlab-ci.yml file.
+
+Atlan Instance URL: ${gitlab_integration_ATLAN_INSTANCE_URL}
+
+Make sure your Atlan Instance URL is set in the following format.
+\`https://tenant.atlan.com\`
+
+`
+      );
+      return false;
+    }
+
+    return true;
+  }
+
+  async createIssueComment({
+    //Done
+    //Complete
+    gitlab,
+    content,
+    comment_id = null,
+    forceNewComment = false,
+  }) {
+    const { CI_PROJECT_PATH, CI_MERGE_REQUEST_IID } = process.env;
+
+    content = `<!-- ActionCommentIdentifier: atlan-dbt-action -->
+${content}`;
+
+    console.log(content);
+
+    if (gitlab_integration_IS_DEV) return content;
+
+    if (comment_id && !forceNewComment)
+      return await gitlab.MergeRequestNotes.edit(
+        CI_PROJECT_PATH,
+        CI_MERGE_REQUEST_IID,
+        comment_id,
+        content
+      );
+    return await gitlab.MergeRequestNotes.create(
+      CI_PROJECT_PATH,
+      CI_MERGE_REQUEST_IID,
+      content
+    );
+  }
+
+  async sendSegmentEventOfIntegration({ action, properties }) {
+    //Done
+    //Complete
+    // Implement your sendSegmentEvent logic here
+    // IMPORT ATLAN_INSTANCE_URL.
+    const domain = new URL(gitlab_integration_ATLAN_INSTANCE_URL).hostname;
+    const { CI_PROJECT_PATH, CI_JOB_URL } = process.env;
+
+    const raw = stringify({
+      category: "integration",
+      object: "gitlab",
+      action,
+      userId: "atlan-annonymous-github",
+      properties: {
+        ...properties,
+        gitlab_job_id: CI_JOB_URL,
+        domain,
+      },
+    });
+    // IMPORT SEGMENTEVENT
+    return sendSegmentEvent(action, raw);
+  }
+
+  async getChangedFiles({ gitlab }) {
+    //Done
+    //Complete
+    const { CI_PROJECT_PATH, CI_MERGE_REQUEST_IID } = process.env;
+
+    const { changes, diff_refs } = await gitlab.MergeRequests.changes(
+      CI_PROJECT_PATH,
+      CI_MERGE_REQUEST_IID
+    );
+    var changedFiles = changes
+      .map(({ new_path, old_path }) => {
+        try {
+          const [modelName] = new_path
+            .match(/.*models\/(.*)\.sql/)[1]
+            .split("/")
+            .reverse()[0]
+            .split(".");
+
+          //Cross-check this with Jaagrav. ###
+          if (modelName) {
+            if (old_path === null) {
+              return {
+                fileName: modelName,
+                filePath: new_path,
+                headSHA: diff_refs.head_sha,
+                status: "added",
+              };
+            } else if (new_path !== old_path) {
+              // File is renamed or moved
+              return {
+                fileName: modelName,
+                filePath: new_path,
+                headSHA: diff_refs.head_sha,
+                status: "renamed_or_moved",
+              };
+            } else {
+              // File is modified
+              return {
+                fileName: modelName,
+                filePath: new_path,
+                headSHA: diff_refs.head_sha,
+                status: "modified",
+              };
+            }
+          }
+        } catch (e) {}
+      })
+      .filter((i) => i !== undefined);
+
+    changedFiles = changedFiles.filter((item, index) => {
+      return (
+        changedFiles.findIndex((obj) => obj.fileName === item.fileName) ===
+        index
+      );
+    });
+
+    console.log(changedFiles);
+
+    return changedFiles;
+  }
+
+  async getAssetName({ gitlab, fileName, filePath, headSHA }) {
+    //Done
+    //Complete
+    var regExp = /config\(.*alias=\'([^']+)\'.*\)/im;
+    var fileContents = await this.getFileContents({
+      gitlab,
+      filePath,
+      headSHA,
+    });
+
+    var matches = regExp.exec(fileContents);
+
+    if (matches) {
+      return matches[1];
+    }
+
+    return fileName;
+  }
+
+  async getFileContents({ gitlab, filePath, headSHA }) {
+    //Done
+    //Complete
+    const { CI_PROJECT_PATH } = process.env;
+    const { content } = await gitlab.RepositoryFiles.show(
+      CI_PROJECT_PATH,
+      filePath,
+      headSHA
+    );
+    const buff = Buffer.from(content, "base64");
+
+    return buff.toString("utf8");
+  }
+
+  async checkCommentExists({ gitlab }) {
+    //Done
+    //Complete
+    const { CI_PROJECT_PATH, CI_MERGE_REQUEST_IID } = process.env;
+    if (gitlab_integration_IS_DEV) return null;
+
+    const comments = await gitlab.MergeRequestNotes.all(
+      CI_PROJECT_PATH,
+      CI_MERGE_REQUEST_IID
+    );
+
+    return comments.find(
+      // Why here we have hardocded value? What should be over here inplace of this.
+      (comment) =>
+        comment.author.username === "Jaagrav" &&
+        comment.body.includes(
+          "<!-- ActionCommentIdentifier: atlan-dbt-action -->"
+        )
+    );
+  }
+
+  async deleteComment({ gitlab, comment_id }) {
+    //Done
+    //Complete
+    const { CI_PROJECT_PATH, CI_MERGE_REQUEST_IID } = process.env;
+
+    return await gitlab.MergeRequestNotes.remove(
+      CI_PROJECT_PATH,
+      CI_MERGE_REQUEST_IID,
+      comment_id
+    );
+  }
+
+  async renderDownstreamAssetsComment({ asset, downstreamAssets }) {
+    //Done
+    let impactedData = downstreamAssets.map(
+      ({ displayText, guid, typeName, attributes, meanings }) => {
+        let readableTypeName = typeName
+          .toLowerCase()
+          .replace(attributes.connectorName, "")
+          .toUpperCase();
+        readableTypeName =
+          readableTypeName.charAt(0).toUpperCase() +
+          readableTypeName.slice(1).toLowerCase();
+        return [
+          guid,
+          displayText,
+          attributes.connectorName,
+          readableTypeName,
+          attributes?.userDescription || attributes?.description || "",
+          attributes?.certificateStatus || "",
+          [...attributes?.ownerUsers, ...attributes?.ownerGroups] || [],
+          meanings
+            .map(
+              ({ displayText, termGuid }) =>
+                `[${displayText}](${gitlab_integration_ATLAN_INSTANCE_URL}/assets/${termGuid}?utm_source=dbt_gitlab_action)`
+            )
+            ?.join(", ") || " ",
+          attributes?.sourceURL || "",
+        ];
+      }
+    );
+
+    impactedData = impactedData.sort((a, b) => a[3].localeCompare(b[3])); // Sort by typeName
+    impactedData = impactedData.sort((a, b) => a[2].localeCompare(b[2])); // Sort by connectorName
+
+    let rows = impactedData.map(
+      ([
+        guid,
+        displayText,
+        connectorName,
+        typeName,
+        description,
+        certificateStatus,
+        owners,
+        meanings,
+        sourceUrl,
+      ]) => {
+        const connectorImage = get_image_url_getConnectorImage(connectorName),
+          certificationImage = certificateStatus
+            ? get_image_url_getCertificationImage(certificateStatus)
+            : "";
+
+        return [
+          `${connectorImage} [${displayText}](${gitlab_integration_ATLAN_INSTANCE_URL}/assets/${guid}?utm_source=dbt_gitlab_action) ${certificationImage}`,
+          `\`${typeName}\``,
+          description,
+          owners.join(", ") || " ",
+          meanings,
+          sourceUrl ? `[Open in ${connectorName}](${sourceUrl})` : " ",
+        ];
+      }
+    );
+
+    const comment = `### ${get_image_url_getConnectorImage(
+      asset.attributes.connectorName
+    )} [${asset.displayText}](${gitlab_integration_ATLAN_INSTANCE_URL}/assets/${
+      asset.guid
+    }?utm_source=dbt_gitlab_action) ${
+      asset.attributes?.certificateStatus
+        ? get_image_url_getCertificationImage(asset.attributes.certificateStatus)
+        : ""
+    }
+
+    **${downstreamAssets.length} downstream assets** 👇
+    Name | Type | Description | Owners | Terms | Source URL
+    --- | --- | --- | --- | --- | ---
+    ${rows
+      .map((row) =>
+        row.map((i) => i.replace(/\|/g, "•").replace(/\n/g, "")).join(" | ")
+      )
+      .join("\n")}
+
+    ${get_image_url_getImageURL(
+      "atlan-logo",
+      15,
+      15
+    )} [View asset in Atlan](${gitlab_integration_ATLAN_INSTANCE_URL}/assets/${
+      asset.guid
+    }?utm_source=dbt_gitlab_action)`;
+
+    return comment;
+  }
+}
+
 ;// CONCATENATED MODULE: ./adapters/index.js
 // main.js
 
 
 
-// import GitLabIntegration from "./integrations/gitlab-integration.js";
+
 
 
 main.config();
@@ -19253,7 +29658,7 @@ async function run() {
   //Add new integrations over here
   console.log("oii");
   await runAction(GITHUB_TOKEN, GitHubIntegration);
-  // await runAction(GITLAB_TOKEN, GitLabIntegration);
+  await runAction(GITLAB_TOKEN, GitLabIntegration);
 }
 
 run();

@@ -3,7 +3,10 @@ import dotenv from "dotenv"; // Check do we actually need it or not
 import IntegrationInterface from "./contract/contract.js";
 import github from "@actions/github";
 import { isIgnoreModelAliasMatching } from "../../src/utils/get-environment-variables.js";
-import { getConnectorImage } from "../../src/utils/get-image-url.js";
+import {
+  getCertificationImage,
+  getConnectorImage,
+} from "../../src/utils/get-image-url.js";
 import { getEnvironments } from "../../src/utils/get-environment-variables.js";
 import stringify from "json-stringify-safe";
 import {
@@ -71,7 +74,14 @@ export default class GitHubIntegration extends IntegrationInterface {
   async printDownstreamAssets({ octokit, context }) {
     //Done
     console.log("Brother");
-    const changedFiles = await this.getChangedFiles({ octokit, context }); //Complete
+    // const changedFiles = await this.getChangedFiles({ octokit, context }); //Complete
+    var changedFiles = [
+      {
+        fileName: "instacart_beverages_order_customer",
+        filePath: "instacart_beverages_order_customer.sql",
+        status: "modified",
+      },
+    ];
     let comments = ``;
     let totalChangedFiles = 0;
 

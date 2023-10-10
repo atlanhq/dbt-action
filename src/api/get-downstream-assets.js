@@ -15,6 +15,8 @@ const ATLAN_INSTANCE_URL =
 const ATLAN_API_TOKEN =
   core.getInput("ATLAN_API_TOKEN") || process.env.ATLAN_API_TOKEN;
 
+const ASSETS_LIMIT = 100;
+
 export default async function getDownstreamAssets( //Done
   asset,
   guid,

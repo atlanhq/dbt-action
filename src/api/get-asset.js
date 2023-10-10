@@ -104,7 +104,8 @@ export default async function getAsset({
         },
       });
     });
-
+  console.log("<><><><><><><><><><><><><>");
+  console.log(response);
   if (!response?.entities?.length)
     return {
       error: `❌ Model with name **${name}** could not be found or is deleted <br><br>`,
