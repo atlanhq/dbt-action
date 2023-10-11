@@ -44,7 +44,7 @@ export default class GitLabIntegration extends IntegrationInterface {
       CI_PROJECT_PATH,
       CI_MERGE_REQUEST_IID
     );
-
+    console.log("At line 47", state, web_url, source_branch);
     let total_assets = 0;
 
     if (state === "opened") {
@@ -71,8 +71,9 @@ export default class GitLabIntegration extends IntegrationInterface {
     //Done
     // Implementation for printing impact on GitHub
     // Use this.token to access the token
+    console.log("At line 74 inside printDownstreamAssets");
     const changedFiles = await this.getChangedFiles({ gitlab }); //Complete
-
+    console.log("At line 75", changedFiles);
     let comments = ``;
     let totalChangedFiles = 0;
 
@@ -84,9 +85,9 @@ export default class GitLabIntegration extends IntegrationInterface {
         filePath,
         headSHA,
       });
-
+      console.log("At line 88");
       const environments = getGitLabEnvironments();
-
+      console.log("At line 90", environments);
       let environment = null;
       for (const [baseBranchName, environmentName] of environments) {
         if (baseBranchName === source_branch) {
@@ -94,7 +95,7 @@ export default class GitLabIntegration extends IntegrationInterface {
           break;
         }
       }
-
+      console.log("At line 98", environment);
       const asset = await getAsset({
         //Complete
         name: assetName,
@@ -108,13 +109,13 @@ export default class GitLabIntegration extends IntegrationInterface {
         totalChangedFiles++;
         continue;
       }
-
+      console.log("At line 112", asset);
       //Cross-check this part once with Jaagrav.
 
       const totalModifiedFiles = changedFiles.filter(
         (i) => i.status === "modified"
       ).length;
-
+      console.log("At line 118", totalModifiedFiles);
       const { guid } = asset.attributes.sqlAsset;
       const timeStart = Date.now();
       const downstreamAssets = await getDownstreamAssets(
@@ -125,7 +126,7 @@ export default class GitLabIntegration extends IntegrationInterface {
         this.sendSegmentEventOfIntegration,
         "gitlab"
       );
-
+      console.log("At line 129 Completed getDownstreamAssets");
       if (totalChangedFiles !== 0) comments += "\n\n---\n\n";
 
       if (downstreamAssets.error) {
@@ -159,9 +160,9 @@ Here is your downstream impact analysis for **${totalChangedFiles} ${
     }** you have edited.
 
 ${comments}`;
-
+    console.log("At line 163 in printDownstreamAssets");
     const existingComment = await this.checkCommentExists({ gitlab }); //Complete
-
+    console.log("At line 165 after checkCommentExists");
     if (totalChangedFiles > 0)
       await this.createIssueComment({
         //Complete
@@ -172,7 +173,7 @@ ${comments}`;
 
     if (totalChangedFiles === 0 && existingComment)
       await this.deleteComment({ gitlab, comment_id: existingComment.id }); //Complete
-
+    console.log("Completed PrintDownstreamAssets");
     return totalChangedFiles;
   }
 
@@ -291,12 +292,13 @@ Make sure your Atlan Instance URL is set in the following format.
     comment_id = null,
     forceNewComment = false,
   }) {
+    console.log("At line 295 inside createIssueComment");
     const { CI_PROJECT_PATH, CI_MERGE_REQUEST_IID } = process.env;
 
     content = `<!-- ActionCommentIdentifier: atlan-dbt-action -->
 ${content}`;
 
-    console.log(content);
+    console.log("At line 301 inside createIssueComment", content);
 
     if (IS_DEV) return content;
 
@@ -319,6 +321,7 @@ ${content}`;
     //Complete
     // Implement your sendSegmentEvent logic here
     // IMPORT ATLAN_INSTANCE_URL.
+    console.log("At line 324 inside sendSegmentOfIntegration");
     const domain = new URL(ATLAN_INSTANCE_URL).hostname;
     const { CI_PROJECT_PATH, CI_JOB_URL } = process.env;
 
@@ -340,12 +343,14 @@ ${content}`;
   async getChangedFiles({ gitlab }) {
     //Done
     //Complete
+    console.log("At line 344 Inside getChangedFiles");
     const { CI_PROJECT_PATH, CI_MERGE_REQUEST_IID } = process.env;
 
     const { changes, diff_refs } = await gitlab.MergeRequests.changes(
       CI_PROJECT_PATH,
       CI_MERGE_REQUEST_IID
     );
+    console.log("At line 351 Inside getChangedFiles");
     var changedFiles = changes
       .map(({ new_path, old_path }) => {
         try {
@@ -393,7 +398,7 @@ ${content}`;
       );
     });
 
-    console.log(changedFiles);
+    console.log("At line 399 Completed getChangedFiles ", changedFiles);
 
     return changedFiles;
   }
@@ -401,25 +406,27 @@ ${content}`;
   async getAssetName({ gitlab, fileName, filePath, headSHA }) {
     //Done
     //Complete
+    console.log("At line 407 inside getAssetName");
     var regExp = /config\(.*alias=\'([^']+)\'.*\)/im;
     var fileContents = await this.getFileContents({
       gitlab,
       filePath,
       headSHA,
     });
-
+    console.log("At line 414 inside getAssetName");
     var matches = regExp.exec(fileContents);
-
+    console.log("At line 416");
     if (matches) {
       return matches[1];
     }
-
+    console.log("At line 420 completed getAssetName");
     return fileName;
   }
 
   async getFileContents({ gitlab, filePath, headSHA }) {
     //Done
     //Complete
+    console.log("At line 427 inside getFileContents");
     const { CI_PROJECT_PATH } = process.env;
     const { content } = await gitlab.RepositoryFiles.show(
       CI_PROJECT_PATH,
@@ -427,13 +434,14 @@ ${content}`;
       headSHA
     );
     const buff = Buffer.from(content, "base64");
-
+    console.log("At line 435 inside getFileContents");
     return buff.toString("utf8");
   }
 
   async checkCommentExists({ gitlab }) {
     //Done
     //Complete
+    console.log("At line 442 inside checkCommentExists");
     const { CI_PROJECT_PATH, CI_MERGE_REQUEST_IID } = process.env;
     if (IS_DEV) return null;
 
@@ -455,6 +463,7 @@ ${content}`;
   async deleteComment({ gitlab, comment_id }) {
     //Done
     //Complete
+    console.log("At line 464 inside deleteComment");
     const { CI_PROJECT_PATH, CI_MERGE_REQUEST_IID } = process.env;
 
     return await gitlab.MergeRequestNotes.remove(
@@ -466,6 +475,7 @@ ${content}`;
 
   async renderDownstreamAssetsComment({ asset, downstreamAssets }) {
     //Done
+    console.log("At line 474 inside renderDownstreamAssetsComment");
     let impactedData = downstreamAssets.map(
       ({ displayText, guid, typeName, attributes, meanings }) => {
         let readableTypeName = typeName
@@ -493,7 +503,7 @@ ${content}`;
         ];
       }
     );
-
+    console.log("At line 502 in renderDownstreamAsset");
     impactedData = impactedData.sort((a, b) => a[3].localeCompare(b[3])); // Sort by typeName
     impactedData = impactedData.sort((a, b) => a[2].localeCompare(b[2])); // Sort by connectorName
 
@@ -551,7 +561,7 @@ ${content}`;
     )} [View asset in Atlan](${ATLAN_INSTANCE_URL}/assets/${
       asset.guid
     }?utm_source=dbt_gitlab_action)`;
-
+    console.log("At line 560 Completed renderDownstream");
     return comment;
   }
 }

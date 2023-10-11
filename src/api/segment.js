@@ -15,7 +15,7 @@ export async function sendSegmentEvent(action, body) {
     authorization: `Bearer ${ATLAN_API_TOKEN}`,
     "content-type": "application/json",
   };
-
+  console.log("At line 18 inide sendSegmentEvent");
   const requestOptions = {
     method: "POST",
     headers: myHeaders,
@@ -37,6 +37,6 @@ export async function sendSegmentEvent(action, body) {
   } else {
     console.log("send segment event", action, body);
   }
-
+  console.log("At line 40 inside sendSegmentEvent");
   return response;
 }

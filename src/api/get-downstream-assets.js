@@ -28,7 +28,7 @@ export default async function getDownstreamAssets( //Done
     authorization: `Bearer ${ATLAN_API_TOKEN}`,
     "content-type": "application/json",
   };
-
+  console.log("At line 31 inside getDownstreamAssets function");
   var raw = stringify({
     guid: guid,
     size: Math.max(Math.ceil(ASSETS_LIMIT / totalModifiedFiles), 1),
@@ -123,7 +123,7 @@ ${getImageURL(
         error: handleError(err),
       };
     });
-
+  console.log("At line 126 inside getDownstreamAssets function", response);
   if (response.error) return response;
 
   return response;

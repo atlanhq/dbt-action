@@ -21,7 +21,7 @@ export default async function getAsset({
     Authorization: `Bearer ${ATLAN_API_TOKEN}`,
     "Content-Type": "application/json",
   };
-
+  console.log("At line 24 inside getAsset function");
   var raw = stringify({
     dsl: {
       from: 0,
@@ -89,6 +89,7 @@ export default async function getAsset({
     body: raw,
   };
   console.log("Before SendSegmentEventOfIntegration");
+  console.log("At line 92 inside getAsset");
   var response = await fetch(
     `${ATLAN_INSTANCE_URL}/api/meta/search/indexsearch#findAssetByExactName`,
     requestOptions
