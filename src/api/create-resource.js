@@ -54,5 +54,9 @@ export default async function createResource(guid, name, link) {
 
     console.log("Created Resource:", response)
 
+    if(response?.errorCode) {
+        return null
+    }
+
     return response;
 }
