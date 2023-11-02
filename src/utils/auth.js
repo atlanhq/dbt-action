@@ -14,12 +14,12 @@ export default async function auth(octokit, context) {
     };
 
     var requestOptions = {
-        method: "POST",
+        method: "GET",
         headers: myHeaders,
     };
 
     var response = await fetch(
-        `${ATLAN_INSTANCE_URL}/api/meta`,
+        `${ATLAN_INSTANCE_URL}/api/service/whoami`,
         requestOptions
     ).catch((err) => {
     });
