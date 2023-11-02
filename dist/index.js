@@ -18656,6 +18656,7 @@ ${comments}`;
 
 
 
+
 const set_resource_on_asset_ATLAN_INSTANCE_URL =
   getInstanceUrl();
 
@@ -18672,12 +18673,13 @@ async function setResourceOnAsset({ octokit, context }) {
   ).length;
 
   for (const { fileName, filePath } of changedFiles) {
-    const assetName = await getAssetName({
+    const aliasName = await getAssetName({
       octokit,
       context,
       fileName,
       filePath,
     });
+    const assetName = isIgnoreModelAliasMatching() ? fileName : aliasName;
     const asset = await getAsset({ name: assetName });
 
     if (asset.error) continue;
@@ -18715,7 +18717,7 @@ async function setResourceOnAsset({ octokit, context }) {
       const { guid: tableAssetGuid } = materialisedView
       const resp = await createResource(
         tableAssetGuid,
-        "Pull Request on GitHub",
+        pull_request.title,
         pull_request.html_url
       );
       const md = `${getConnectorImage(materialisedView.attributes.connectorName)} [${
