@@ -1,4 +1,5 @@
 import { getAsset, createResource, getDownstreamAssets } from "../api/index.js";
+import { isIgnoreModelAliasMatching } from "../utils/get-environment-variables.js";
 import {
   createIssueComment,
   getChangedFiles,
@@ -23,12 +24,13 @@ export default async function setResourceOnAsset({ octokit, context }) {
   ).length;
 
   for (const { fileName, filePath } of changedFiles) {
-    const assetName = await getAssetName({
+    const aliasName = await getAssetName({
       octokit,
       context,
       fileName,
       filePath,
     });
+    const assetName = isIgnoreModelAliasMatching() ? fileName : aliasName;
     const asset = await getAsset({ name: assetName });
 
     if (asset.error) continue;
@@ -66,7 +68,7 @@ export default async function setResourceOnAsset({ octokit, context }) {
       const { guid: tableAssetGuid } = materialisedView
       const resp = await createResource(
         tableAssetGuid,
-        "Pull Request on GitHub",
+        pull_request.title,
         pull_request.html_url
       );
       const md = `${getConnectorImage(materialisedView.attributes.connectorName)} [${
