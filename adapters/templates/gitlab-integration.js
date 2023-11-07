@@ -5,7 +5,7 @@ export function getErrorResponseStatus401 (ATLAN_INSTANCE_URL, CI_PROJECT_NAME, 
 
 Atlan Instance URL: ${ATLAN_INSTANCE_URL}
     
-Set your CI/CD variables [here](https://gitlab.com/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}/-/settings/ci_cd). For more information on how to setup the Atlan dbt Action, please read the [setup documentation here](https://github.com/atlanhq/dbt-action/blob/main/README.md).`
+Set your CI/CD variables [here](https://gitlab.com/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}/-/settings/ci_cd). For more information on how to setup the Atlan dbt Action, please read the [setup documentation here](https://ask.atlan.com/hc/en-us/articles/8284983222415).`
 }
 
 export function getErrorResponseStatusUndefined(ATLAN_INSTANCE_URL, CI_PROJECT_NAME, CI_PROJECT_NAMESPACE) {
@@ -16,7 +16,7 @@ Atlan Instance URL: ${ATLAN_INSTANCE_URL}
 Make sure your Atlan Instance URL is set in the following format.
 \`https://tenant.atlan.com\`
     
-Set your CI/CD variables [here](https://gitlab.com/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}/-/settings/ci_cd). For more information on how to setup the Atlan dbt Action, please read the [setup documentation here](https://github.com/atlanhq/dbt-action/blob/main/README.md).`
+Set your CI/CD variables [here](https://gitlab.com/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}/-/settings/ci_cd). For more information on how to setup the Atlan dbt Action, please read the [setup documentation here](https://ask.atlan.com/hc/en-us/articles/8284983222415).`
 }
 
 export function getSetResourceOnAssetComment(tableMd, setResourceFailed) {
