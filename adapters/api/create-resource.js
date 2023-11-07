@@ -1,12 +1,12 @@
 import { v4 as uuidv4 } from "uuid";
 import fetch from "node-fetch";
 import stringify from "json-stringify-safe";
-import { getAPIToken, getInstanceUrl } from "../utils/index.js";
+import {
+  ATLAN_INSTANCE_URL,
+  ATLAN_API_TOKEN,
+} from "../utils/get-environment-variables.js";
 
-const ATLAN_INSTANCE_URL = getInstanceUrl();
-const ATLAN_API_TOKEN = getAPIToken();
-
-export default async function createResource( //Done
+export default async function createResource(
   guid,
   name,
   link,
@@ -49,14 +49,15 @@ export default async function createResource( //Done
     .then((e) => e.json())
     .catch((err) => {
       console.log(err);
-      sendSegmentEventOfIntegration("dbt_ci_action_failure", {
-        reason: "failed_to_create_resource",
-        asset_name: name,
-        msg: err,
+      sendSegmentEventOfIntegration({
+        action: "dbt_ci_action_failure",
+        properties: {
+          reason: "failed_to_create_resource",
+          asset_name: name, // This should change
+          msg: err,
+        },
       });
     });
-
-  console.log("Created Resource:", response);
 
   return response;
 }

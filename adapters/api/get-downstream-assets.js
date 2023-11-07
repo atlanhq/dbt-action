@@ -1,23 +1,18 @@
 import fetch from "node-fetch";
-import core from "@actions/core";
-import dotenv from "dotenv";
 import {
   getConnectorImage,
   getCertificationImage,
   getImageURL,
 } from "../utils/index.js";
 import stringify from "json-stringify-safe";
-
-dotenv.config();
-
-const ATLAN_INSTANCE_URL =
-  core.getInput("ATLAN_INSTANCE_URL") || process.env.ATLAN_INSTANCE_URL;
-const ATLAN_API_TOKEN =
-  core.getInput("ATLAN_API_TOKEN") || process.env.ATLAN_API_TOKEN;
+import {
+  ATLAN_INSTANCE_URL,
+  ATLAN_API_TOKEN,
+} from "../utils/get-environment-variables.js";
 
 const ASSETS_LIMIT = 100;
 
-export default async function getDownstreamAssets( //Done
+export default async function getDownstreamAssets(
   asset,
   guid,
   totalModifiedFiles,
@@ -28,7 +23,7 @@ export default async function getDownstreamAssets( //Done
     authorization: `Bearer ${ATLAN_API_TOKEN}`,
     "content-type": "application/json",
   };
-  console.log("At line 31 inside getDownstreamAssets function");
+
   var raw = stringify({
     guid: guid,
     size: Math.max(Math.ceil(ASSETS_LIMIT / totalModifiedFiles), 1),
@@ -96,12 +91,15 @@ ${getImageURL(
       asset.guid
     }/lineage/overview?utm_source=dbt_${integration}_action)`;
 
-    sendSegmentEventOfIntegration("dbt_ci_action_failure", {
-      reason: "failed_to_fetch_lineage",
-      asset_guid: asset.guid,
-      asset_name: asset.name,
-      asset_typeName: asset.typeName,
-      msg: err,
+    sendSegmentEventOfIntegration({
+      action: "dbt_ci_action_failure",
+      properties: {
+        reason: "failed_to_fetch_lineage",
+        asset_guid: asset.guid,
+        asset_name: asset.name,
+        asset_typeName: asset.typeName,
+        msg: err,
+      },
     });
 
     return comment;
@@ -123,7 +121,6 @@ ${getImageURL(
         error: handleError(err),
       };
     });
-  console.log("At line 126 inside getDownstreamAssets function", response);
   if (response.error) return response;
 
   return response;

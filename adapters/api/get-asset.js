@@ -1,17 +1,15 @@
 import fetch from "node-fetch";
-import core from "@actions/core";
-import dotenv from "dotenv";
 import stringify from "json-stringify-safe";
-
-dotenv.config();
-
-const ATLAN_INSTANCE_URL =
-  core.getInput("ATLAN_INSTANCE_URL") || process.env.ATLAN_INSTANCE_URL;
-const ATLAN_API_TOKEN =
-  core.getInput("ATLAN_API_TOKEN") || process.env.ATLAN_API_TOKEN;
+import {
+  getErrorModelNotFound,
+  getErrorDoesNotMaterialize,
+} from "../templates/atlan.js";
+import {
+  ATLAN_INSTANCE_URL,
+  ATLAN_API_TOKEN,
+} from "../utils/get-environment-variables.js";
 
 export default async function getAsset({
-  //Done
   name,
   sendSegmentEventOfIntegration,
   environment,
@@ -21,7 +19,7 @@ export default async function getAsset({
     Authorization: `Bearer ${ATLAN_API_TOKEN}`,
     "Content-Type": "application/json",
   };
-  console.log("At line 24 inside getAsset function");
+
   var raw = stringify({
     dsl: {
       from: 0,
@@ -88,8 +86,7 @@ export default async function getAsset({
     headers: myHeaders,
     body: raw,
   };
-  console.log("Before SendSegmentEventOfIntegration");
-  console.log("At line 92 inside getAsset");
+
   var response = await fetch(
     `${ATLAN_INSTANCE_URL}/api/meta/search/indexsearch#findAssetByExactName`,
     requestOptions
@@ -105,16 +102,47 @@ export default async function getAsset({
         },
       });
     });
-  console.log("<><><><><><><><><><><><><>");
-  console.log(response);
-  if (!response?.entities?.length)
+
+  if (!response?.entities?.length) {
     return {
-      error: `❌ Model with name **${name}** could not be found or is deleted <br><br>`,
+      error: getErrorModelNotFound(name),
     };
+  }
+
+  if (Array.isArray(response.entities)) {
+    response.entities.sort((entityA, entityB) => {
+      const hasDbtModelSqlAssetsA =
+        entityA.attributes.dbtModelSqlAssets &&
+        entityA.attributes.dbtModelSqlAssets.length > 0;
+      const hasDbtModelSqlAssetsB =
+        entityB.attributes.dbtModelSqlAssets &&
+        entityB.attributes.dbtModelSqlAssets.length > 0;
+
+      if (hasDbtModelSqlAssetsA && !hasDbtModelSqlAssetsB) {
+        return -1; // entityA comes before entityB
+      } else if (!hasDbtModelSqlAssetsA && hasDbtModelSqlAssetsB) {
+        return 1; // entityB comes before entityA
+      }
+
+      // Primary sorting criterion: Latest createTime comes first
+      if (entityA.createTime > entityB.createTime) {
+        return -1;
+      } else if (entityA.createTime < entityB.createTime) {
+        return 1;
+      }
+
+      return 0; // No difference in sorting for these two entities
+    });
+  }
 
   if (!response?.entities[0]?.attributes?.dbtModelSqlAssets?.length > 0)
     return {
-      error: `❌ Model with name [${name}](${ATLAN_INSTANCE_URL}/assets/${response.entities[0].guid}/overview?utm_source=dbt_${integration}_action) does not materialise any asset <br><br>`,
+      error: getErrorDoesNotMaterialize(
+        name,
+        ATLAN_INSTANCE_URL,
+        response,
+        integration
+      ),
     };
 
   return response.entities[0];
