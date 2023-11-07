@@ -23,10 +23,12 @@ export function getSetResourceOnAssetComment(tableMd, setResourceFailed) {
     return `## 🎊 Congrats on the merge!
   
   This pull request has been added as a resource to the following assets:
+    
+  ${setResourceFailed ? '> ⚠️  Seems like we were unable to set the resources for some of the assets due to insufficient permissions. To ensure that the pull request is linked as a resource, you will need to assign the right persona with requisite permissions to the API token.' : ''}
+    
   Name | Resource set successfully
   --- | ---
   ${tableMd}
-  ${setResourceFailed ? '> Seems like we were unable to set the resources for some of the assets due to insufficient permissions. To ensure that the pull request is linked as a resource, you will need to assign the right persona with requisite permissions to the API token.' : ''}
   `
 }
 
