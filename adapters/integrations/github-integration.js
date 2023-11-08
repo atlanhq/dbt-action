@@ -77,7 +77,8 @@ export default class GitHubIntegration extends IntegrationInterface {
       }
 
       if (total_assets !== 0) {
-        this.sendSegmentEventOfIntegration({
+        console.log("Checking");
+        await this.sendSegmentEventOfIntegration({
           action: "dbt_ci_action_run",
           properties: {
             asset_count: total_assets,
