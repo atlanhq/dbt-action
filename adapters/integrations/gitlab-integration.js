@@ -117,7 +117,7 @@ export default class GitLabIntegration extends IntegrationInterface {
       }
 
       if (total_assets !== 0)
-        this.sendSegmentEventOfIntegration({
+        await this.sendSegmentEventOfIntegration({
           action: "dbt_ci_action_run",
           properties: {
             asset_count: total_assets,

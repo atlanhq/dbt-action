@@ -77,7 +77,7 @@ export default class GitHubIntegration extends IntegrationInterface {
       }
 
       if (total_assets !== 0) {
-        this.sendSegmentEventOfIntegration({
+        await this.sendSegmentEventOfIntegration({
           action: "dbt_ci_action_run",
           properties: {
             asset_count: total_assets,
@@ -412,7 +412,9 @@ export default class GitHubIntegration extends IntegrationInterface {
               pull_request.html_url,
               this.sendSegmentEventOfIntegration
             );
+
             const md = getMDCommentForModel(ATLAN_INSTANCE_URL, model);
+
             tableMd += getTableMD(md, resp);
             if (!resp) {
               setResourceFailed = true;
@@ -433,10 +435,12 @@ export default class GitHubIntegration extends IntegrationInterface {
               pull_request.html_url,
               this.sendSegmentEventOfIntegration
             );
+
             const md = getMDCommentForMaterialisedView(
               ATLAN_INSTANCE_URL,
               materialisedView
             );
+
             tableMd += getTableMD(md, resp);
             if (!resp) {
               setResourceFailed = true;
@@ -858,6 +862,7 @@ ${content}`;
         headSHA,
         "createIssueComment"
       );
+
       return content;
     }
 
