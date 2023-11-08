@@ -24,14 +24,14 @@ export async function sendSegmentEvent(action, body) {
       `${ATLAN_INSTANCE_URL}/api/service/segment/track`,
       requestOptions
     )
-      .then(() => {
+      .then((resp) => {
+        console.log("Inside then", resp);
         console.log("send segment event", action, body);
       })
       .catch((err) => {
-        console.log("OHHH NO", response);
+        console.log("Catch err", err);
         console.log("couldn't send segment event", err);
       });
-    console.log("inside ", response);
   } else {
     console.log("Wuttt");
     console.log("send segment event", action, body);
