@@ -649,7 +649,8 @@ ${content}`;
           domain,
         },
       });
-
+      console.log("Action :", action);
+      console.log("raw", raw);
       return sendSegmentEvent(action, raw);
     } catch (error) {
       logger.withError(
