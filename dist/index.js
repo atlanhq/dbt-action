@@ -25393,13 +25393,13 @@ async function sendSegmentEvent(action, body) {
       requestOptions
     )
       .then(() => {
-        console.log("inside ", response);
         console.log("send segment event", action, body);
       })
       .catch((err) => {
         console.log("OHHH NO", response);
         console.log("couldn't send segment event", err);
       });
+    console.log("inside ", response);
   } else {
     console.log("Wuttt");
     console.log("send segment event", action, body);
