@@ -59,5 +59,6 @@ export default async function createResource(
       });
     });
 
+  if (response?.errorCode) return null;
   return response;
 }

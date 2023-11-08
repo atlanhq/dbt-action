@@ -413,7 +413,9 @@ export default class GitHubIntegration extends IntegrationInterface {
               pull_request.html_url,
               this.sendSegmentEventOfIntegration
             );
+
             const md = getMDCommentForModel(ATLAN_INSTANCE_URL, model);
+
             tableMd += getTableMD(md, resp);
             if (!resp) {
               setResourceFailed = true;
@@ -434,10 +436,12 @@ export default class GitHubIntegration extends IntegrationInterface {
               pull_request.html_url,
               this.sendSegmentEventOfIntegration
             );
+
             const md = getMDCommentForMaterialisedView(
               ATLAN_INSTANCE_URL,
               materialisedView
             );
+
             tableMd += getTableMD(md, resp);
             if (!resp) {
               setResourceFailed = true;
@@ -859,6 +863,7 @@ ${content}`;
         headSHA,
         "createIssueComment"
       );
+      console.log(content);
       return content;
     }
 
