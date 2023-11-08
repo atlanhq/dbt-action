@@ -10,13 +10,13 @@ export async function sendSegmentEvent(action, body) {
     authorization: `Bearer ${ATLAN_API_TOKEN}`,
     "content-type": "application/json",
   };
-
+  console.log("MyHeaders :", myHeaders);
   const requestOptions = {
     method: "POST",
     headers: myHeaders,
     body: body,
   };
-
+  console.log("requestOptions :", requestOptions);
   var response = null;
   console.log("IS_DEV", IS_DEV);
   if (!IS_DEV) {
