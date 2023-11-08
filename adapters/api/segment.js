@@ -18,12 +18,13 @@ export async function sendSegmentEvent(action, body) {
   };
 
   var response = null;
+
   if (!IS_DEV) {
     response = await fetch(
       `${ATLAN_INSTANCE_URL}/api/service/segment/track`,
       requestOptions
     )
-      .then(() => {
+      .then((resp) => {
         console.log("send segment event", action, body);
       })
       .catch((err) => {

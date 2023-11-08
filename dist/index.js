@@ -25366,6 +25366,7 @@ async function createResource(
       });
     });
 
+  if (response?.errorCode) return null;
   return response;
 }
 
@@ -25386,12 +25387,13 @@ async function sendSegmentEvent(action, body) {
   };
 
   var response = null;
+
   if (!IS_DEV) {
     response = await src_fetch(
       `${ATLAN_INSTANCE_URL}/api/service/segment/track`,
       requestOptions
     )
-      .then(() => {
+      .then((resp) => {
         console.log("send segment event", action, body);
       })
       .catch((err) => {
@@ -25571,7 +25573,7 @@ class GitHubIntegration extends IntegrationInterface {
       }
 
       if (total_assets !== 0) {
-        this.sendSegmentEventOfIntegration({
+        await this.sendSegmentEventOfIntegration({
           action: "dbt_ci_action_run",
           properties: {
             asset_count: total_assets,
@@ -25906,7 +25908,9 @@ class GitHubIntegration extends IntegrationInterface {
               pull_request.html_url,
               this.sendSegmentEventOfIntegration
             );
+
             const md = getMDCommentForModel(ATLAN_INSTANCE_URL, model);
+
             tableMd += getTableMD(md, resp);
             if (!resp) {
               setResourceFailed = true;
@@ -25927,10 +25931,12 @@ class GitHubIntegration extends IntegrationInterface {
               pull_request.html_url,
               this.sendSegmentEventOfIntegration
             );
+
             const md = getMDCommentForMaterialisedView(
               ATLAN_INSTANCE_URL,
               materialisedView
             );
+
             tableMd += getTableMD(md, resp);
             if (!resp) {
               setResourceFailed = true;
@@ -26352,6 +26358,7 @@ ${content}`;
         headSHA,
         "createIssueComment"
       );
+
       return content;
     }
 
@@ -34134,7 +34141,7 @@ class GitLabIntegration extends IntegrationInterface {
       }
 
       if (total_assets !== 0)
-        this.sendSegmentEventOfIntegration({
+        await this.sendSegmentEventOfIntegration({
           action: "dbt_ci_action_run",
           properties: {
             asset_count: total_assets,
