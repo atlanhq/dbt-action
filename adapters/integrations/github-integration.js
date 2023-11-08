@@ -77,7 +77,6 @@ export default class GitHubIntegration extends IntegrationInterface {
       }
 
       if (total_assets !== 0) {
-        console.log("Checking");
         await this.sendSegmentEventOfIntegration({
           action: "dbt_ci_action_run",
           properties: {
@@ -863,7 +862,7 @@ ${content}`;
         headSHA,
         "createIssueComment"
       );
-      console.log(content);
+
       return content;
     }
 

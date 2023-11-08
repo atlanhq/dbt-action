@@ -10,30 +10,27 @@ export async function sendSegmentEvent(action, body) {
     authorization: `Bearer ${ATLAN_API_TOKEN}`,
     "content-type": "application/json",
   };
-  console.log("MyHeaders :", myHeaders);
+
   const requestOptions = {
     method: "POST",
     headers: myHeaders,
     body: body,
   };
-  console.log("requestOptions :", requestOptions);
+
   var response = null;
-  console.log("IS_DEV", IS_DEV);
+
   if (!IS_DEV) {
     response = await fetch(
       `${ATLAN_INSTANCE_URL}/api/service/segment/track`,
       requestOptions
     )
       .then((resp) => {
-        console.log("Inside then", resp);
         console.log("send segment event", action, body);
       })
       .catch((err) => {
-        console.log("Catch err", err);
         console.log("couldn't send segment event", err);
       });
   } else {
-    console.log("Wuttt");
     console.log("send segment event", action, body);
   }
 
