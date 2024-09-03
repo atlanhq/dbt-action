@@ -24,16 +24,76 @@ export default async function getDownstreamAssets(asset, guid, totalModifiedFile
         "entityFilters": {
             "condition": "AND",
             "criterion": [
-                {
-                    "attributeName": "__typeName",
-                    "operator": "not_contains",
-                    "attributeValue": "Process"
-                },
-                {
-                    "attributeName": "__state",
-                    "operator": "eq",
-                    "attributeValue": "ACTIVE"
-                }
+              {
+                "attributeName": "__state",
+                "operator": "eq",
+                "attributeValue": "ACTIVE"
+              },
+              {
+                "attributeName": "__typeName",
+                "operator": "neq",
+                "attributeValue": "DbtProcess"
+              },
+              {
+                "attributeName": "__typeName",
+                "operator": "neq",
+                "attributeValue": "DbtColumnProcess"
+              },
+              {
+                "attributeName": "__typeName",
+                "operator": "neq",
+                "attributeValue": "DataEntityMappingProcess"
+              },
+              {
+                "attributeName": "__typeName",
+                "operator": "neq",
+                "attributeValue": "DataAttributeMappingProcess"
+              },
+              {
+                "attributeName": "__typeName",
+                "operator": "neq",
+                "attributeValue": "Process"
+              },
+              {
+                "attributeName": "__typeName",
+                "operator": "neq",
+                "attributeValue": "ColumnProcess"
+              },
+              {
+                "attributeName": "__typeName",
+                "operator": "neq",
+                "attributeValue": "BIProcess"
+              },
+              {
+                "attributeName": "__typeName",
+                "operator": "neq",
+                "attributeValue": "FivetranProcess"
+              },
+              {
+                "attributeName": "__typeName",
+                "operator": "neq",
+                "attributeValue": "FivetranColumnProcess"
+              }
+            ]
+        },
+        "entityTraversalFilters": {
+            "condition": "AND",
+            "criterion": [
+              {
+                "attributeName": "__state",
+                "operator": "eq",
+                "attributeValue": "ACTIVE"
+              }
+            ]
+        },
+        "relationshipTraversalFilters": {
+            "condition": "AND",
+            "criterion": [
+              {
+                "attributeName": "__state",
+                "operator": "eq",
+                "attributeValue": "ACTIVE"
+              }
             ]
         },
         "attributes": [
