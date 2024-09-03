@@ -16,7 +16,7 @@ async function run() {
     const octokit = github.getOctokit(GITHUB_TOKEN);
     const {pull_request} = context.payload;
     const {state, merged} = pull_request;
-
+    console.log("New code");
     if (!await auth(octokit, context)) throw {message: 'Wrong API Token'}
 
     let total_assets = 0;
