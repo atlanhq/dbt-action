@@ -161,6 +161,6 @@ ${getImageURL("atlan-logo", 15, 15)} [View lineage in Atlan](${ATLAN_INSTANCE_UR
     });
 
     if (response.error) return response;
-
-    return response;
+    const modifiedEntities = response.entities.filter(item => item.guid !== materialisedAsset.guid)
+    return {...response, entities: modifiedEntities};
 }

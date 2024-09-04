@@ -17848,7 +17848,7 @@ async function renderDownstreamAssetsComment(
     classifications
 ) {
     // Mapping the downstream assets data
-    let impactedData = downstreamAssets.entities.filter(item => item.guid !== materialisedAsset.guid).map(
+    let impactedData = downstreamAssets.entities.map(
         ({
              displayText,
              guid,
@@ -18321,8 +18321,8 @@ ${getImageURL("atlan-logo", 15, 15)} [View lineage in Atlan](${get_downstream_as
     });
 
     if (response.error) return response;
-
-    return response;
+    const modifiedEntities = response.entities.filter(item => item.guid !== materialisedAsset.guid)
+    return {...response, entities: modifiedEntities};
 }
 
 ;// CONCATENATED MODULE: ./src/api/get-asset.js

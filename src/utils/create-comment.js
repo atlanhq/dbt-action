@@ -22,7 +22,7 @@ export default async function renderDownstreamAssetsComment(
     classifications
 ) {
     // Mapping the downstream assets data
-    let impactedData = downstreamAssets.entities.filter(item => item.guid !== materialisedAsset.guid).map(
+    let impactedData = downstreamAssets.entities.map(
         ({
              displayText,
              guid,
