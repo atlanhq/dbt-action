@@ -18321,7 +18321,7 @@ ${getImageURL("atlan-logo", 15, 15)} [View lineage in Atlan](${get_downstream_as
     });
 
     if (response.error) return response;
-    const modifiedEntities = response.entities.filter(item => item.guid !== materialisedAsset.guid)
+    const modifiedEntities = response.entities.filter(item => item.guid !== guid)
     return {...response, entities: modifiedEntities};
 }
 
