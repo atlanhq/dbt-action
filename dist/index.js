@@ -18027,7 +18027,7 @@ async function getFileContents(octokit, context, filePath) {
     });
 
     if (!res) return null
-
+    console.log("content : ", res.data.content)
     const buff = Buffer.from(res.data.content, "base64");
 
     return buff.toString("utf8");
@@ -18079,7 +18079,7 @@ async function getChangedFiles(octokit, context) {
 async function getAssetName({octokit, context, fileName, filePath}) {
     var regExp = /{{\s*config\s*\(\s*(?:[^,]*,)*\s*alias\s*=\s*['"]([^'"]+)['"](?:\s*,[^,]*)*\s*\)\s*}}/im;
     var fileContents = await getFileContents(octokit, context, filePath);
-
+    console.log("file content :", fileContents) 
     if (fileContents) {
         var matches = regExp.exec(fileContents);
 
