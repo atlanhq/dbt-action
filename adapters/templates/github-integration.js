@@ -1,4 +1,4 @@
-import { getImageURL, getConnectorImage, getCertificationImage } from "../utils/index.js";
+import { getCertificationImage, getConnectorImage, getImageURL } from "../utils/index.js";
 
 export function getErrorResponseStatus401 (ATLAN_INSTANCE_URL, context) {
     return `We couldn't connect to your Atlan Instance, please make sure to set the valid Atlan Bearer Token as \`ATLAN_API_TOKEN\` as this repository's action secret. 
@@ -53,6 +53,18 @@ export function getAssetInfo(ATLAN_INSTANCE_URL, asset, materialisedAsset, envir
       }${environmentName ? ` | Environment Name: \`${environmentName}\`` : ""}${
         projectName ? ` | Project Name: \`${projectName}\`` : ""
       }`
+}
+
+export function getContractAssetInfo(ATLAN_INSTANCE_URL, asset) {
+  return `### ${getConnectorImage(
+      asset.attributes.connectorName
+    )} [${asset.displayText}](${ATLAN_INSTANCE_URL}/assets/${
+      asset.guid
+    }/overview?utm_source=dbt_github_action) ${
+      asset.attributes?.certificateStatus
+        ? getCertificationImage(asset.attributes.certificateStatus)
+        : ""
+    }`
 }
 
 export function getDownstreamTable(ATLAN_INSTANCE_URL, downstreamAssets, rows, materialisedAsset) {

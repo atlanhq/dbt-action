@@ -29,3 +29,4 @@ jobs:
             beta: Wide World Importers PE1
             test-action: Wide World Importers PE1
           IGNORE_MODEL_ALIAS_MATCHING: true
+          ATLAN_CONFIG: .atlan/config.yaml
