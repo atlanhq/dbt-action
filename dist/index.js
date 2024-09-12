@@ -34789,8 +34789,29 @@ ${content}`;
         headSHA,
       });
 
+      logger_logger.withInfo(
+        `Successfully fetched file contents. File size: ${fileContents.length} bytes`,
+        gitlab_integration_integrationName,
+        CI_COMMIT_SHA,
+        "getAssetName"
+      );      
+
       if (fileContents) {
+        logger_logger.withInfo(
+          "Starting regex matching",
+          gitlab_integration_integrationName,
+          CI_COMMIT_SHA,
+          "getAssetName"
+        );
         var matches = regExp.exec(fileContents);
+
+        logger_logger.withInfo(
+          "Successfully executed regex matching",
+          gitlab_integration_integrationName,
+          CI_COMMIT_SHA,
+          "getAssetName"
+        );
+
         if (matches) {
           logger_logger.withInfo(
             `Found a match: ${matches[1].trim()}`,
@@ -34836,13 +34857,6 @@ ${content}`;
         headSHA
       );
       const buff = Buffer.from(content, "base64");
-
-      logger_logger.withInfo(
-        "Successfully fetched file contents",
-        gitlab_integration_integrationName,
-        CI_COMMIT_SHA,
-        "getFileContents"
-      );
 
       return buff.toString("utf8");
     } catch (error) {
