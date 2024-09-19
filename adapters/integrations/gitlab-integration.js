@@ -781,16 +781,16 @@ ${content}`;
         );
         const startRegex =
             /{{\s*config\s*\(/im;
-        const startMatch = fileContent.match(startRegex);
+        const startMatch = fileContents.match(startRegex);
         let configSection = ''
         if (startMatch) {
             const startIndex = startMatch.index;
-            const openParensIndex = fileContent.indexOf('(', startIndex) + 1;
+            const openParensIndex = fileContents.indexOf('(', startIndex) + 1;
             let openParensCount = 1;
             let endIndex = openParensIndex;
 
-            while (openParensCount > 0 && endIndex < fileContent.length) {
-                const char = fileContent[endIndex];
+            while (openParensCount > 0 && endIndex < fileContents.length) {
+                const char = fileContents[endIndex];
 
                 if (char === '(') {
                     openParensCount++;
@@ -802,9 +802,9 @@ ${content}`;
             }
 
             const endMarker = '}}';
-            const finalEndIndex = fileContent.indexOf(endMarker, endIndex) + endMarker.length;
+            const finalEndIndex = fileContents.indexOf(endMarker, endIndex) + endMarker.length;
 
-            configSection = fileContent.substring(startIndex, finalEndIndex);
+            configSection = fileContents.substring(startIndex, finalEndIndex);
             logger.withInfo(
               "Extracted config section",
               integrationName,
