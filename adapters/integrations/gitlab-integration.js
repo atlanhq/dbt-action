@@ -784,23 +784,22 @@ ${content}`;
         const startMatch = fileContents.match(startRegex);
         let configSection = ''
         if (startMatch) {
-            const startIndex = startMatch.index;
-            const openParensIndex = fileContents.indexOf('(', startIndex) + 1;
-            let openParensCount = 1;
-            let endIndex = openParensIndex;
+          const startIndex = startMatch.index;
+          const openParensIndex = fileContents.indexOf('(', startIndex) + 1;
+          let openParensCount = 1;
+          let endIndex = openParensIndex;
 
-            while (openParensCount > 0 && endIndex < fileContents.length) {
-                const char = fileContents[endIndex];
+          while (openParensCount > 0 && endIndex < fileContents.length) {
+            const char = fileContents[endIndex];
 
-                if (char === '(') {
-                    openParensCount++;
-                } else if (char === ')') {
-                    openParensCount--;
-                }
-
-                endIndex++;
+            if (char === '(') {
+                openParensCount++;
+            } else if (char === ')') {
+                openParensCount--;
             }
-
+            endIndex++;
+            }
+            
             const endMarker = '}}';
             const finalEndIndex = fileContents.indexOf(endMarker, endIndex) + endMarker.length;
 
@@ -813,21 +812,21 @@ ${content}`;
             );
 
             if (configSection){
-                logger.withInfo(
-                  "Executing final regex",
-                  integrationName,
-                  CI_COMMIT_SHA,
-                  "getAssetName"
-                );
+              logger.withInfo(
+                "Executing final regex",
+                integrationName,
+                CI_COMMIT_SHA,
+                "getAssetName"
+              );
 
-                var matches = regExp.exec(configSection);
+              var matches = regExp.exec(configSection);
 
-                logger.withInfo(
-                  "Successfully executed regex matching",
-                  integrationName,
-                  CI_COMMIT_SHA,
-                  "getAssetName"
-                );
+              logger.withInfo(
+                "Successfully executed regex matching",
+                integrationName,
+                CI_COMMIT_SHA,
+                "getAssetName"
+              );
 
             }
             if (matches) {
