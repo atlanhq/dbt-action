@@ -25199,43 +25199,103 @@ async function getDownstreamAssets(
   };
 
   var raw = json_stringify_safe_stringify({
-    guid: guid,
-    size: Math.max(Math.ceil(ASSETS_LIMIT / totalModifiedFiles), 1),
-    from: 0,
-    depth: 21,
-    direction: "OUTPUT",
-    entityFilters: {
-      condition: "AND",
-      criterion: [
-        {
-          attributeName: "__typeName",
-          operator: "not_contains",
-          attributeValue: "Process",
-        },
-        {
-          attributeName: "__state",
-          operator: "eq",
-          attributeValue: "ACTIVE",
-        },
-      ],
+    "guid": guid,
+    "size": Math.max(Math.ceil(ASSETS_LIMIT / totalModifiedFiles), 1),
+    "from": 0,
+    "depth": 21,
+    "direction": "OUTPUT",
+    "entityFilters": {
+        "condition": "AND",
+        "criterion": [
+          {
+            "attributeName": "__state",
+            "operator": "eq",
+            "attributeValue": "ACTIVE"
+          },
+          {
+            "attributeName": "__typeName",
+            "operator": "neq",
+            "attributeValue": "DbtProcess"
+          },
+          {
+            "attributeName": "__typeName",
+            "operator": "neq",
+            "attributeValue": "DbtColumnProcess"
+          },
+          {
+            "attributeName": "__typeName",
+            "operator": "neq",
+            "attributeValue": "DataEntityMappingProcess"
+          },
+          {
+            "attributeName": "__typeName",
+            "operator": "neq",
+            "attributeValue": "DataAttributeMappingProcess"
+          },
+          {
+            "attributeName": "__typeName",
+            "operator": "neq",
+            "attributeValue": "Process"
+          },
+          {
+            "attributeName": "__typeName",
+            "operator": "neq",
+            "attributeValue": "ColumnProcess"
+          },
+          {
+            "attributeName": "__typeName",
+            "operator": "neq",
+            "attributeValue": "BIProcess"
+          },
+          {
+            "attributeName": "__typeName",
+            "operator": "neq",
+            "attributeValue": "FivetranProcess"
+          },
+          {
+            "attributeName": "__typeName",
+            "operator": "neq",
+            "attributeValue": "FivetranColumnProcess"
+          }
+        ]
     },
-    attributes: [
-      "name",
-      "description",
-      "userDescription",
-      "sourceURL",
-      "qualifiedName",
-      "connectorName",
-      "certificateStatus",
-      "certificateUpdatedBy",
-      "certificateUpdatedAt",
-      "ownerUsers",
-      "ownerGroups",
-      "classificationNames",
-      "meanings",
+    "entityTraversalFilters": {
+        "condition": "AND",
+        "criterion": [
+          {
+            "attributeName": "__state",
+            "operator": "eq",
+            "attributeValue": "ACTIVE"
+          }
+        ]
+    },
+    "relationshipTraversalFilters": {
+        "condition": "AND",
+        "criterion": [
+          {
+            "attributeName": "__state",
+            "operator": "eq",
+            "attributeValue": "ACTIVE"
+          }
+        ]
+    },
+    "attributes": [
+        "name",
+        "description",
+        "userDescription",
+        "sourceURL",
+        "qualifiedName",
+        "connectorName",
+        "certificateStatus",
+        "certificateUpdatedBy",
+        "certificateUpdatedAt",
+        "ownerUsers",
+        "ownerGroups",
+        "classificationNames",
+        "meanings"
     ],
-    excludeMeanings: false,
-    excludeClassifications: false,
+    "excludeMeanings": false,
+    "excludeClassifications": false
   });
 
   var requestOptions = {
@@ -25341,43 +25401,103 @@ async function getDownstreamLineageForAssets({
   };
 
   var raw = stringify({
-    guid: guid,
-    size: Math.max(Math.ceil(ASSETS_LIMIT / totalModifiedFiles), 1),
-    from: 0,
-    depth: 21,
-    direction: "OUTPUT",
-    entityFilters: {
-      condition: "AND",
-      criterion: [
-        {
-          attributeName: "__typeName",
-          operator: "not_contains",
-          attributeValue: "Process",
-        },
-        {
-          attributeName: "__state",
-          operator: "eq",
-          attributeValue: "ACTIVE",
-        },
-      ],
+    "guid": guid,
+    "size": Math.max(Math.ceil(ASSETS_LIMIT / totalModifiedFiles), 1),
+    "from": 0,
+    "depth": 21,
+    "direction": "OUTPUT",
+    "entityFilters": {
+        "condition": "AND",
+        "criterion": [
+          {
+            "attributeName": "__state",
+            "operator": "eq",
+            "attributeValue": "ACTIVE"
+          },
+          {
+            "attributeName": "__typeName",
+            "operator": "neq",
+            "attributeValue": "DbtProcess"
+          },
+          {
+            "attributeName": "__typeName",
+            "operator": "neq",
+            "attributeValue": "DbtColumnProcess"
+          },
+          {
+            "attributeName": "__typeName",
+            "operator": "neq",
+            "attributeValue": "DataEntityMappingProcess"
+          },
+          {
+            "attributeName": "__typeName",
+            "operator": "neq",
+            "attributeValue": "DataAttributeMappingProcess"
+          },
+          {
+            "attributeName": "__typeName",
+            "operator": "neq",
+            "attributeValue": "Process"
+          },
+          {
+            "attributeName": "__typeName",
+            "operator": "neq",
+            "attributeValue": "ColumnProcess"
+          },
+          {
+            "attributeName": "__typeName",
+            "operator": "neq",
+            "attributeValue": "BIProcess"
+          },
+          {
+            "attributeName": "__typeName",
+            "operator": "neq",
+            "attributeValue": "FivetranProcess"
+          },
+          {
+            "attributeName": "__typeName",
+            "operator": "neq",
+            "attributeValue": "FivetranColumnProcess"
+          }
+        ]
     },
-    attributes: [
-      "name",
-      "description",
-      "userDescription",
-      "sourceURL",
-      "qualifiedName",
-      "connectorName",
-      "certificateStatus",
-      "certificateUpdatedBy",
-      "certificateUpdatedAt",
-      "ownerUsers",
-      "ownerGroups",
-      "classificationNames",
-      "meanings",
+    "entityTraversalFilters": {
+        "condition": "AND",
+        "criterion": [
+          {
+            "attributeName": "__state",
+            "operator": "eq",
+            "attributeValue": "ACTIVE"
+          }
+        ]
+    },
+    "relationshipTraversalFilters": {
+        "condition": "AND",
+        "criterion": [
+          {
+            "attributeName": "__state",
+            "operator": "eq",
+            "attributeValue": "ACTIVE"
+          }
+        ]
+    },
+    "attributes": [
+        "name",
+        "description",
+        "userDescription",
+        "sourceURL",
+        "qualifiedName",
+        "connectorName",
+        "certificateStatus",
+        "certificateUpdatedBy",
+        "certificateUpdatedAt",
+        "ownerUsers",
+        "ownerGroups",
+        "classificationNames",
+        "meanings"
     ],
-    excludeMeanings: false,
-    excludeClassifications: false,
+    "excludeMeanings": false,
+    "excludeClassifications": false
   });
 
   var requestOptions = {
