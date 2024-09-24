@@ -6,3 +6,5 @@ event.json
 .idea
 .DS_Store
 .vscode/
+contracts/
+.atlan/

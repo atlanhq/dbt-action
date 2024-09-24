@@ -10,6 +10,7 @@ import {
 import stringify from "json-stringify-safe";
 
 export default async function getContractAsset({
+  dataset,
   assetQualifiedName,
 }) {
   var myHeaders = {
@@ -77,14 +78,14 @@ export default async function getContractAsset({
     .catch((err) => {
       return {
         error: err,
-        comment: getErrorAssetNotFound(assetQualifiedName)
+        comment: getErrorAssetNotFound(dataset)
       }
     });
 
   if (!response?.entities?.length) {
     return {
       error: "asset not found",
-      comment: getErrorAssetNotFound(assetQualifiedName),
+      comment: getErrorAssetNotFound(dataset),
     };
   }
   

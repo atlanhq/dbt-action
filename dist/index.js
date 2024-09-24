@@ -25095,9 +25095,8 @@ var json_stringify_safe_stringify = __nccwpck_require__(7073);
 
 
 async function getContractAsset({
-  name,
-  atlanConfig,
-  contractSpec,
+  dataset,
+  assetQualifiedName,
 }) {
   var myHeaders = {
     Authorization: `Bearer ${get_environment_variables_ATLAN_API_TOKEN}`,
@@ -25106,8 +25105,47 @@ async function getContractAsset({
 
   var raw = json_stringify_safe_stringify(
     {
-       "atlanConfig": atlanConfig,
-       "contractSpec": contractSpec
+      dsl: {
+          from: 0,
+          size: 1,
+          query: {
+              bool: {
+                  must: [
+                      {
+                          match: {
+                              __state: "ACTIVE"
+                          }
+                      },
+                      {
+                          term: {
+                              qualifiedName: assetQualifiedName
+                          }
+                      }
+                  ]
+              }
+          }
+      },
+      attributes: [
+          "guid",
+          "name",
+          "description",
+          "userDescription",
+          "sourceURL",
+          "qualifiedName",
+          "connectorName",
+          "certificateStatus",
+          "certificateUpdatedBy",
+          "certificateUpdatedAt",
+          "ownerUsers",
+          "ownerGroups",
+          "classificationNames",
+          "meanings"
+      ],
+      suppressLogs: true,
+      showSearchScore: false,
+      excludeClassifications: true,
+      includeClassificationNames: true,
+      excludeMeanings: false
     }
   );
 
@@ -25118,21 +25156,21 @@ async function getContractAsset({
   };
 
   var response = await src_fetch(
-    `${get_environment_variables_ATLAN_INSTANCE_URL}/api/service/contracts/asset`,
+    `${get_environment_variables_ATLAN_INSTANCE_URL}/api/meta/search/indexsearch`,
     requestOptions
   )
     .then((e) => e.json())
     .catch((err) => {
       return {
         error: err,
-        comment: getErrorAssetNotFound(name)
+        comment: getErrorAssetNotFound(dataset)
       }
     });
 
   if (!response?.entities?.length) {
     return {
       error: "asset not found",
-      comment: getErrorAssetNotFound(name),
+      comment: getErrorAssetNotFound(dataset),
     };
   }
   
@@ -29702,8 +29740,30 @@ class ContractIntegration extends IntegrationInterface {
 
         const atlanConfig = ATLAN_CONFIG;
 
-        // Read the file
-        const atlanConfigContent = external_fs_.readFileSync(atlanConfig, 'utf8');
+        // Read atlan config file
+        const config = this.readYamlFile(atlanConfig);
+        if (config.error) {
+          logger_logger.withError(
+            `Failed to read atlan config file ${atlanConfig}: ${config.error}`,
+            integrationName,
+            headSHA,
+            "printDownstreamAssets"
+          );
+          return;
+        }
+
+        let datasources = this.parseDatasourceFromConfig(config.contentYaml)
+
+        // If no datasources found, do not proceed
+        if (datasources.size <= 0) {
+          logger_logger.withError(
+            `No datasources found in atlan config ${atlanConfig}`,
+            integrationName,
+            headSHA,
+            "printDownstreamAssets"
+          );
+          return;
+        }
 
         for (const { fileName, filePath, status } of changedFiles) {
             // Skipping non yaml files
@@ -29740,12 +29800,33 @@ class ContractIntegration extends IntegrationInterface {
             if (!dataset) {
               continue
             }
-            
+
+            const assetQualifiedName = this.getQualifiedName(
+              datasources, 
+              contract.contentYaml
+            );
+
+            if (assetQualifiedName === undefined) {
+              logger_logger.withError(
+                `Failed to construct asset qualified name for contract ${filePath}`,
+                integrationName,
+                headSHA,
+                "printDownstreamAssets"
+              );
+              continue;
+            }
+
+            logger_logger.withInfo(
+              `Generated asset qualified name ${assetQualifiedName} for contract ${filePath}`,
+              integrationName,
+              headSHA,
+              "printDownstreamAssets"
+            );
+
             // Fetch asset from Atlan
             const asset = await getContractAsset({
-              name: dataset,
-              atlanConfig: atlanConfigContent,
-              contractSpec: contract.contentString
+              dataset,
+              assetQualifiedName: assetQualifiedName
             });
 
             if (asset.error) {
@@ -30376,6 +30457,42 @@ ${viewAssetButton}`;
       };
     }
   }
+
+  parseDatasourceFromConfig(configYaml) {
+    // Create a Map for keys starting with "data_source "
+    const dataSourceMap = new Map();
+
+    // Iterate through the object to find relevant keys
+    for (const [key, value] of Object.entries(configYaml)) {
+        console.log(key);
+        if (key.startsWith('data_source ')) {
+            // Trim the prefix and add to the Map
+            const trimmedKey = key.replace('data_source ', '');
+            dataSourceMap.set(trimmedKey, value);
+        }
+    }
+
+    return dataSourceMap;
+  }
+
+  getQualifiedName(datasources, contractYaml) {
+    if (contractYaml["data_source"] === undefined) {
+      return;
+    }
+
+    if (!datasources.has(contractYaml.data_source)) {
+      return;
+    }
+
+    let datasource = datasources.get(contractYaml.data_source)
+    const qualifiedName = datasource?.connection?.qualified_name || '';
+    const database = datasource?.database || '';
+    const schema = datasource?.schema || '';
+    // Format the output
+    const assetQualifiedName = `${qualifiedName}/${database}/${schema}/${contractYaml.dataset}`;
+    return assetQualifiedName;
+  }
+
 }
 
 ;// CONCATENATED MODULE: ./adapters/integrations/github-integration.js

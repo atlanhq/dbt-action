@@ -119,14 +119,11 @@ export default class ContractIntegration extends IntegrationInterface {
 
         const atlanConfig = ATLAN_CONFIG;
 
-        // Read the file
-        // const atlanConfigContent = fs.readFileSync(atlanConfig, 'utf8');
-
         // Read atlan config file
-        const configYaml = this.readYamlFile(atlanConfig);
-        if (configYaml.error) {
+        const config = this.readYamlFile(atlanConfig);
+        if (config.error) {
           logger.withError(
-            `Failed to read atlan config file ${atlanConfig}: ${configYaml.error}`,
+            `Failed to read atlan config file ${atlanConfig}: ${config.error}`,
             integrationName,
             headSHA,
             "printDownstreamAssets"
@@ -134,7 +131,7 @@ export default class ContractIntegration extends IntegrationInterface {
           return;
         }
 
-        let datasources = this.parseDatasourceFromConfig(configYaml)
+        let datasources = this.parseDatasourceFromConfig(config.contentYaml)
 
         // If no datasources found, do not proceed
         if (datasources.size <= 0) {
@@ -188,8 +185,26 @@ export default class ContractIntegration extends IntegrationInterface {
               contract.contentYaml
             );
 
+            if (assetQualifiedName === undefined) {
+              logger.withError(
+                `Failed to construct asset qualified name for contract ${filePath}`,
+                integrationName,
+                headSHA,
+                "printDownstreamAssets"
+              );
+              continue;
+            }
+
+            logger.withInfo(
+              `Generated asset qualified name ${assetQualifiedName} for contract ${filePath}`,
+              integrationName,
+              headSHA,
+              "printDownstreamAssets"
+            );
+
             // Fetch asset from Atlan
             const asset = await getContractAsset({
+              dataset,
               assetQualifiedName: assetQualifiedName
             });
 
@@ -828,6 +843,7 @@ ${viewAssetButton}`;
 
     // Iterate through the object to find relevant keys
     for (const [key, value] of Object.entries(configYaml)) {
+        console.log(key);
         if (key.startsWith('data_source ')) {
             // Trim the prefix and add to the Map
             const trimmedKey = key.replace('data_source ', '');
