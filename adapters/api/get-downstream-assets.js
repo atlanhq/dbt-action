@@ -184,8 +184,10 @@ export default async function getDownstreamAssets(
       };
     });
   if (response.error) return response;
+  
+  const modifiedEntities = response.entities.filter(item => item.guid !== guid)
 
-  return response;
+  return {...response, entities: modifiedEntities}
 }
 
 function contructCommentForDownstreamLineageFetchError({
@@ -355,5 +357,7 @@ export async function getDownstreamLineageForAssets({
     comment: contructCommentForDownstreamLineageFetchError({asset, utmSource}),
   };
 
-  return response;
+  const modifiedEntities = response.entities.filter(item => item.guid !== guid)
+
+  return {...response, entities: modifiedEntities}
 }

@@ -871,5 +871,4 @@ ${viewAssetButton}`;
     const assetQualifiedName = `${qualifiedName}/${database}/${schema}/${contractYaml.dataset}`;
     return assetQualifiedName;
   }
-
 }

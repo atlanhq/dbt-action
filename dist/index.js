@@ -25357,8 +25357,10 @@ async function getDownstreamAssets(
       };
     });
   if (response.error) return response;
+  
+  const modifiedEntities = response.entities.filter(item => item.guid !== guid)
 
-  return response;
+  return {...response, entities: modifiedEntities}
 }
 
 function contructCommentForDownstreamLineageFetchError({
@@ -25528,7 +25530,9 @@ async function getDownstreamLineageForAssets({
     comment: contructCommentForDownstreamLineageFetchError({asset, utmSource}),
   };
 
-  return response;
+  const modifiedEntities = response.entities.filter(item => item.guid !== guid)
+
+  return {...response, entities: modifiedEntities}
 }
 
 // EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
@@ -30612,7 +30616,6 @@ ${viewAssetButton}`;
     const assetQualifiedName = `${qualifiedName}/${database}/${schema}/${contractYaml.dataset}`;
     return assetQualifiedName;
   }
-
 }
 
 ;// CONCATENATED MODULE: ./adapters/integrations/github-integration.js
