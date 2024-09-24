@@ -10,9 +10,7 @@ import {
 import stringify from "json-stringify-safe";
 
 export default async function getContractAsset({
-  name,
-  atlanConfig,
-  contractSpec,
+  assetQualifiedName,
 }) {
   var myHeaders = {
     Authorization: `Bearer ${ATLAN_API_TOKEN}`,
@@ -21,8 +19,47 @@ export default async function getContractAsset({
 
   var raw = stringify(
     {
-       "atlanConfig": atlanConfig,
-       "contractSpec": contractSpec
+      dsl: {
+          from: 0,
+          size: 1,
+          query: {
+              bool: {
+                  must: [
+                      {
+                          match: {
+                              __state: "ACTIVE"
+                          }
+                      },
+                      {
+                          term: {
+                              qualifiedName: assetQualifiedName
+                          }
+                      }
+                  ]
+              }
+          }
+      },
+      attributes: [
+          "guid",
+          "name",
+          "description",
+          "userDescription",
+          "sourceURL",
+          "qualifiedName",
+          "connectorName",
+          "certificateStatus",
+          "certificateUpdatedBy",
+          "certificateUpdatedAt",
+          "ownerUsers",
+          "ownerGroups",
+          "classificationNames",
+          "meanings"
+      ],
+      suppressLogs: true,
+      showSearchScore: false,
+      excludeClassifications: true,
+      includeClassificationNames: true,
+      excludeMeanings: false
     }
   );
 
@@ -33,21 +70,21 @@ export default async function getContractAsset({
   };
 
   var response = await fetch(
-    `${ATLAN_INSTANCE_URL}/api/service/contracts/asset`,
+    `${ATLAN_INSTANCE_URL}/api/meta/search/indexsearch`,
     requestOptions
   )
     .then((e) => e.json())
     .catch((err) => {
       return {
         error: err,
-        comment: getErrorAssetNotFound(name)
+        comment: getErrorAssetNotFound(assetQualifiedName)
       }
     });
 
   if (!response?.entities?.length) {
     return {
       error: "asset not found",
-      comment: getErrorAssetNotFound(name),
+      comment: getErrorAssetNotFound(assetQualifiedName),
     };
   }
   

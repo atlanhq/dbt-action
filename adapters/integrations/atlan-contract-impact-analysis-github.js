@@ -120,7 +120,32 @@ export default class ContractIntegration extends IntegrationInterface {
         const atlanConfig = ATLAN_CONFIG;
 
         // Read the file
-        const atlanConfigContent = fs.readFileSync(atlanConfig, 'utf8');
+        // const atlanConfigContent = fs.readFileSync(atlanConfig, 'utf8');
+
+        // Read atlan config file
+        const configYaml = this.readYamlFile(atlanConfig);
+        if (configYaml.error) {
+          logger.withError(
+            `Failed to read atlan config file ${atlanConfig}: ${configYaml.error}`,
+            integrationName,
+            headSHA,
+            "printDownstreamAssets"
+          );
+          return;
+        }
+
+        let datasources = this.parseDatasourceFromConfig(configYaml)
+
+        // If no datasources found, do not proceed
+        if (datasources.size <= 0) {
+          logger.withError(
+            `No datasources found in atlan config ${atlanConfig}`,
+            integrationName,
+            headSHA,
+            "printDownstreamAssets"
+          );
+          return;
+        }
 
         for (const { fileName, filePath, status } of changedFiles) {
             // Skipping non yaml files
@@ -157,12 +182,15 @@ export default class ContractIntegration extends IntegrationInterface {
             if (!dataset) {
               continue
             }
-            
+
+            const assetQualifiedName = this.getQualifiedName(
+              datasources, 
+              contract.contentYaml
+            );
+
             // Fetch asset from Atlan
             const asset = await getContractAsset({
-              name: dataset,
-              atlanConfig: atlanConfigContent,
-              contractSpec: contract.contentString
+              assetQualifiedName: assetQualifiedName
             });
 
             if (asset.error) {
@@ -793,4 +821,39 @@ ${viewAssetButton}`;
       };
     }
   }
+
+  parseDatasourceFromConfig(configYaml) {
+    // Create a Map for keys starting with "data_source "
+    const dataSourceMap = new Map();
+
+    // Iterate through the object to find relevant keys
+    for (const [key, value] of Object.entries(configYaml)) {
+        if (key.startsWith('data_source ')) {
+            // Trim the prefix and add to the Map
+            const trimmedKey = key.replace('data_source ', '');
+            dataSourceMap.set(trimmedKey, value);
+        }
+    }
+
+    return dataSourceMap;
+  }
+
+  getQualifiedName(datasources, contractYaml) {
+    if (contractYaml["data_source"] === undefined) {
+      return;
+    }
+
+    if (!datasources.has(contractYaml.data_source)) {
+      return;
+    }
+
+    let datasource = datasources.get(contractYaml.data_source)
+    const qualifiedName = datasource?.connection?.qualified_name || '';
+    const database = datasource?.database || '';
+    const schema = datasource?.schema || '';
+    // Format the output
+    const assetQualifiedName = `${qualifiedName}/${database}/${schema}/${contractYaml.dataset}`;
+    return assetQualifiedName;
+  }
+
 }
