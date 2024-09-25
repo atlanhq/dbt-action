@@ -1,14 +1,15 @@
-import fetch from "node-fetch";
 import {
-  getConnectorImage,
+  ATLAN_API_TOKEN,
+  ATLAN_INSTANCE_URL,
+} from "../utils/get-environment-variables.js";
+import {
   getCertificationImage,
+  getConnectorImage,
   getImageURL,
 } from "../utils/index.js";
+
+import fetch from "node-fetch";
 import stringify from "json-stringify-safe";
-import {
-  ATLAN_INSTANCE_URL,
-  ATLAN_API_TOKEN,
-} from "../utils/get-environment-variables.js";
 
 const ASSETS_LIMIT = 100;
 
@@ -25,43 +26,103 @@ export default async function getDownstreamAssets(
   };
 
   var raw = stringify({
-    guid: guid,
-    size: Math.max(Math.ceil(ASSETS_LIMIT / totalModifiedFiles), 1),
-    from: 0,
-    depth: 21,
-    direction: "OUTPUT",
-    entityFilters: {
-      condition: "AND",
-      criterion: [
-        {
-          attributeName: "__typeName",
-          operator: "not_contains",
-          attributeValue: "Process",
-        },
-        {
-          attributeName: "__state",
-          operator: "eq",
-          attributeValue: "ACTIVE",
-        },
-      ],
+    "guid": guid,
+    "size": Math.max(Math.ceil(ASSETS_LIMIT / totalModifiedFiles), 1),
+    "from": 0,
+    "depth": 21,
+    "direction": "OUTPUT",
+    "entityFilters": {
+        "condition": "AND",
+        "criterion": [
+          {
+            "attributeName": "__state",
+            "operator": "eq",
+            "attributeValue": "ACTIVE"
+          },
+          {
+            "attributeName": "__typeName",
+            "operator": "neq",
+            "attributeValue": "DbtProcess"
+          },
+          {
+            "attributeName": "__typeName",
+            "operator": "neq",
+            "attributeValue": "DbtColumnProcess"
+          },
+          {
+            "attributeName": "__typeName",
+            "operator": "neq",
+            "attributeValue": "DataEntityMappingProcess"
+          },
+          {
+            "attributeName": "__typeName",
+            "operator": "neq",
+            "attributeValue": "DataAttributeMappingProcess"
+          },
+          {
+            "attributeName": "__typeName",
+            "operator": "neq",
+            "attributeValue": "Process"
+          },
+          {
+            "attributeName": "__typeName",
+            "operator": "neq",
+            "attributeValue": "ColumnProcess"
+          },
+          {
+            "attributeName": "__typeName",
+            "operator": "neq",
+            "attributeValue": "BIProcess"
+          },
+          {
+            "attributeName": "__typeName",
+            "operator": "neq",
+            "attributeValue": "FivetranProcess"
+          },
+          {
+            "attributeName": "__typeName",
+            "operator": "neq",
+            "attributeValue": "FivetranColumnProcess"
+          }
+        ]
     },
-    attributes: [
-      "name",
-      "description",
-      "userDescription",
-      "sourceURL",
-      "qualifiedName",
-      "connectorName",
-      "certificateStatus",
-      "certificateUpdatedBy",
-      "certificateUpdatedAt",
-      "ownerUsers",
-      "ownerGroups",
-      "classificationNames",
-      "meanings",
+    "entityTraversalFilters": {
+        "condition": "AND",
+        "criterion": [
+          {
+            "attributeName": "__state",
+            "operator": "eq",
+            "attributeValue": "ACTIVE"
+          }
+        ]
+    },
+    "relationshipTraversalFilters": {
+        "condition": "AND",
+        "criterion": [
+          {
+            "attributeName": "__state",
+            "operator": "eq",
+            "attributeValue": "ACTIVE"
+          }
+        ]
+    },
+    "attributes": [
+        "name",
+        "description",
+        "userDescription",
+        "sourceURL",
+        "qualifiedName",
+        "connectorName",
+        "certificateStatus",
+        "certificateUpdatedBy",
+        "certificateUpdatedAt",
+        "ownerUsers",
+        "ownerGroups",
+        "classificationNames",
+        "meanings"
     ],
-    excludeMeanings: false,
-    excludeClassifications: false,
+    "excludeMeanings": false,
+    "excludeClassifications": false
   });
 
   var requestOptions = {
@@ -71,25 +132,26 @@ export default async function getDownstreamAssets(
   };
 
   var handleError = (err) => {
-    const comment = `### ${getConnectorImage(
-      asset.attributes.connectorName
-    )} [${asset.displayText}](${ATLAN_INSTANCE_URL}/assets/${
-      asset.guid
-    }/overview?utm_source=dbt_${integration}_action) ${
-      asset.attributes?.certificateStatus
-        ? getCertificationImage(asset.attributes.certificateStatus)
-        : ""
-    }
-            
-_Failed to fetch impacted assets._
-            
-${getImageURL(
-  "atlan-logo",
-  15,
-  15
-)} [View lineage in Atlan](${ATLAN_INSTANCE_URL}/assets/${
-      asset.guid
-    }/lineage/overview?utm_source=dbt_${integration}_action)`;
+  const comment = `
+  ### ${getConnectorImage(asset.attributes.connectorName
+  )} [${asset.displayText}](${ATLAN_INSTANCE_URL}/assets/${
+    asset.guid
+  }/overview?utm_source=dbt_${integration}_action) ${
+    asset.attributes?.certificateStatus
+      ? getCertificationImage(asset.attributes.certificateStatus)
+      : ""
+  }
+          
+  _Failed to fetch impacted assets._
+              
+  ${getImageURL(
+    "atlan-logo",
+    15,
+    15
+  )} [View lineage in Atlan](${ATLAN_INSTANCE_URL}/assets/${
+        asset.guid
+    }/lineage/overview?utm_source=dbt_${integration}_action)
+  `;
 
     sendSegmentEventOfIntegration({
       action: "dbt_ci_action_failure",
@@ -122,6 +184,180 @@ ${getImageURL(
       };
     });
   if (response.error) return response;
+  
+  const modifiedEntities = response.entities.filter(item => item.guid !== guid)
 
-  return response;
+  return {...response, entities: modifiedEntities}
+}
+
+function contructCommentForDownstreamLineageFetchError({
+  asset,
+  utmSource
+}){
+  const comment = `
+  ### ${getConnectorImage(asset.attributes.connectorName
+  )} [${asset.displayText}](${ATLAN_INSTANCE_URL}/assets/${
+    asset.guid
+  }/overview?utm_source=${utmSource}) ${
+    asset.attributes?.certificateStatus
+      ? getCertificationImage(asset.attributes.certificateStatus)
+      : ""
+  }
+          
+  _Failed to fetch impacted assets._
+              
+  ${getImageURL(
+    "atlan-logo",
+    15,
+    15
+  )} [View lineage in Atlan](${ATLAN_INSTANCE_URL}/assets/${
+        asset.guid
+    }/lineage/overview?utm_source=${utmSource})
+  `;
+
+  return comment;
+}
+
+export async function getDownstreamLineageForAssets({
+  asset,
+  guid,
+  totalModifiedFiles,
+  utmSource
+}) {
+  var myHeaders = {
+    authorization: `Bearer ${ATLAN_API_TOKEN}`,
+    "content-type": "application/json",
+  };
+
+  var raw = stringify({
+    "guid": guid,
+    "size": Math.max(Math.ceil(ASSETS_LIMIT / totalModifiedFiles), 1),
+    "from": 0,
+    "depth": 21,
+    "direction": "OUTPUT",
+    "entityFilters": {
+        "condition": "AND",
+        "criterion": [
+          {
+            "attributeName": "__state",
+            "operator": "eq",
+            "attributeValue": "ACTIVE"
+          },
+          {
+            "attributeName": "__typeName",
+            "operator": "neq",
+            "attributeValue": "DbtProcess"
+          },
+          {
+            "attributeName": "__typeName",
+            "operator": "neq",
+            "attributeValue": "DbtColumnProcess"
+          },
+          {
+            "attributeName": "__typeName",
+            "operator": "neq",
+            "attributeValue": "DataEntityMappingProcess"
+          },
+          {
+            "attributeName": "__typeName",
+            "operator": "neq",
+            "attributeValue": "DataAttributeMappingProcess"
+          },
+          {
+            "attributeName": "__typeName",
+            "operator": "neq",
+            "attributeValue": "Process"
+          },
+          {
+            "attributeName": "__typeName",
+            "operator": "neq",
+            "attributeValue": "ColumnProcess"
+          },
+          {
+            "attributeName": "__typeName",
+            "operator": "neq",
+            "attributeValue": "BIProcess"
+          },
+          {
+            "attributeName": "__typeName",
+            "operator": "neq",
+            "attributeValue": "FivetranProcess"
+          },
+          {
+            "attributeName": "__typeName",
+            "operator": "neq",
+            "attributeValue": "FivetranColumnProcess"
+          }
+        ]
+    },
+    "entityTraversalFilters": {
+        "condition": "AND",
+        "criterion": [
+          {
+            "attributeName": "__state",
+            "operator": "eq",
+            "attributeValue": "ACTIVE"
+          }
+        ]
+    },
+    "relationshipTraversalFilters": {
+        "condition": "AND",
+        "criterion": [
+          {
+            "attributeName": "__state",
+            "operator": "eq",
+            "attributeValue": "ACTIVE"
+          }
+        ]
+    },
+    "attributes": [
+        "name",
+        "description",
+        "userDescription",
+        "sourceURL",
+        "qualifiedName",
+        "connectorName",
+        "certificateStatus",
+        "certificateUpdatedBy",
+        "certificateUpdatedAt",
+        "ownerUsers",
+        "ownerGroups",
+        "classificationNames",
+        "meanings"
+    ],
+    "excludeMeanings": false,
+    "excludeClassifications": false
+  });
+
+  var requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: raw,
+  };
+
+  var response = await fetch(
+    `${ATLAN_INSTANCE_URL}/api/meta/lineage/list`,
+    requestOptions
+  )
+    .then((e) => {
+      if (e.status === 200) {
+        return e.json();
+      } else {
+        throw e;
+      }
+    })
+    .catch((err) => {
+      return {
+        error: err,
+        comment: contructCommentForDownstreamLineageFetchError({asset, utmSource}),
+      };
+    });
+  if (response.error) return {
+    error: err,
+    comment: contructCommentForDownstreamLineageFetchError({asset, utmSource}),
+  };
+
+  const modifiedEntities = response.entities.filter(item => item.guid !== guid)
+
+  return {...response, entities: modifiedEntities}
 }
