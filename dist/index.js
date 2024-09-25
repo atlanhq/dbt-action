@@ -34803,23 +34803,66 @@ ${content}`;
           CI_COMMIT_SHA,
           "getAssetName"
         );
-        var matches = regExp.exec(fileContents);
+        const startRegex =
+            /{{\s*config\s*\(/im;
+        const startMatch = fileContents.match(startRegex);
+        let configSection = ''
+        if (startMatch) {
+          const startIndex = startMatch.index;
+          const openParensIndex = fileContents.indexOf('(', startIndex) + 1;
+          let openParensCount = 1;
+          let endIndex = openParensIndex;
 
-        logger_logger.withInfo(
-          "Successfully executed regex matching",
-          gitlab_integration_integrationName,
-          CI_COMMIT_SHA,
-          "getAssetName"
-        );
+          while (openParensCount > 0 && endIndex < fileContents.length) {
+            const char = fileContents[endIndex];
 
-        if (matches) {
-          logger_logger.withInfo(
-            `Found a match: ${matches[1].trim()}`,
-            gitlab_integration_integrationName,
-            CI_COMMIT_SHA,
-            "getAssetName"
-          );
-          return matches[1].trim();
+            if (char === '(') {
+                openParensCount++;
+            } else if (char === ')') {
+                openParensCount--;
+            }
+            endIndex++;
+            }
+            
+            const endMarker = '}}';
+            const finalEndIndex = fileContents.indexOf(endMarker, endIndex) + endMarker.length;
+
+            configSection = fileContents.substring(startIndex, finalEndIndex);
+            logger_logger.withInfo(
+              "Extracted config section",
+              gitlab_integration_integrationName,
+              CI_COMMIT_SHA,
+              "getAssetName"
+            );
+
+            if (configSection){
+              logger_logger.withInfo(
+                "Executing final regex",
+                gitlab_integration_integrationName,
+                CI_COMMIT_SHA,
+                "getAssetName"
+              );
+
+              var matches = regExp.exec(configSection);
+
+              logger_logger.withInfo(
+                "Successfully executed regex matching",
+                gitlab_integration_integrationName,
+                CI_COMMIT_SHA,
+                "getAssetName"
+              );
+
+            }
+            if (matches) {
+              logger_logger.withInfo(
+                `Found a match: ${matches[1].trim()}`,
+                gitlab_integration_integrationName,
+                CI_COMMIT_SHA,
+                "getAssetName"
+              );
+
+              return matches[1].trim();
+            }
         }
       }
 

@@ -779,23 +779,66 @@ ${content}`;
           CI_COMMIT_SHA,
           "getAssetName"
         );
-        var matches = regExp.exec(fileContents);
+        const startRegex =
+            /{{\s*config\s*\(/im;
+        const startMatch = fileContents.match(startRegex);
+        let configSection = ''
+        if (startMatch) {
+          const startIndex = startMatch.index;
+          const openParensIndex = fileContents.indexOf('(', startIndex) + 1;
+          let openParensCount = 1;
+          let endIndex = openParensIndex;
 
-        logger.withInfo(
-          "Successfully executed regex matching",
-          integrationName,
-          CI_COMMIT_SHA,
-          "getAssetName"
-        );
+          while (openParensCount > 0 && endIndex < fileContents.length) {
+            const char = fileContents[endIndex];
 
-        if (matches) {
-          logger.withInfo(
-            `Found a match: ${matches[1].trim()}`,
-            integrationName,
-            CI_COMMIT_SHA,
-            "getAssetName"
-          );
-          return matches[1].trim();
+            if (char === '(') {
+                openParensCount++;
+            } else if (char === ')') {
+                openParensCount--;
+            }
+            endIndex++;
+            }
+            
+            const endMarker = '}}';
+            const finalEndIndex = fileContents.indexOf(endMarker, endIndex) + endMarker.length;
+
+            configSection = fileContents.substring(startIndex, finalEndIndex);
+            logger.withInfo(
+              "Extracted config section",
+              integrationName,
+              CI_COMMIT_SHA,
+              "getAssetName"
+            );
+
+            if (configSection){
+              logger.withInfo(
+                "Executing final regex",
+                integrationName,
+                CI_COMMIT_SHA,
+                "getAssetName"
+              );
+
+              var matches = regExp.exec(configSection);
+
+              logger.withInfo(
+                "Successfully executed regex matching",
+                integrationName,
+                CI_COMMIT_SHA,
+                "getAssetName"
+              );
+
+            }
+            if (matches) {
+              logger.withInfo(
+                `Found a match: ${matches[1].trim()}`,
+                integrationName,
+                CI_COMMIT_SHA,
+                "getAssetName"
+              );
+
+              return matches[1].trim();
+            }
         }
       }
 
