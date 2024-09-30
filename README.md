@@ -4,7 +4,7 @@
 
 ## Overview
 
-_Have you ever changed a dbt model or a data contract only to later find it broke a downstream table or dashboard? 💔_
+_Have you ever changed a dbt model or a [data contract](https://ask.atlan.com/hc/en-us/articles/9281528742799-How-to-create-data-contracts) only to later find it broke a downstream table or dashboard? 💔_
 
 We've created a GitHub Action to help you out — putting Atlan's impact analysis right into your pull request. So now, before merging the PR, you can see the potential downstream impact of your changes.
 
