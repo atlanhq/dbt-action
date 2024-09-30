@@ -1,10 +1,10 @@
-# Atlan dbt Action
+# Atlan Action
 
 ![atlan<>dbt](https://user-images.githubusercontent.com/14099191/209542321-54d5557e-8abf-4d9a-9f6d-dcacb856f25f.png)
 
 ## Overview
 
-_Have you ever changed a dbt model only to later find it broke a downstream table or dashboard? 💔_
+_Have you ever changed a dbt model or a [data contract](https://ask.atlan.com/hc/en-us/articles/9281528742799-How-to-create-data-contracts) only to later find it broke a downstream table or dashboard? 💔_
 
 We've created a GitHub Action to help you out — putting Atlan's impact analysis right into your pull request. So now, before merging the PR, you can see the potential downstream impact of your changes.
 
@@ -31,7 +31,7 @@ Here's what it looks like 👇
    2. Add the following code to the workflow file:
 
       ```yaml
-      name: Atlan dbt action
+      name: Atlan action
 
       on:
         pull_request:
@@ -43,7 +43,7 @@ Here's what it looks like 👇
           runs-on: ubuntu-latest
           steps:
             - name: Run Action
-              uses: atlanhq/dbt-action@v1
+              uses: atlanhq/atlan-action@v2
               with:
                 GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
                 ATLAN_INSTANCE_URL: ${{secrets.ATLAN_INSTANCE_URL}}
@@ -52,7 +52,7 @@ Here's what it looks like 👇
 
 ## Test the action
 
-After you've completed the configuration above, create a pull request with a changed dbt model file to test the action. You should see the Atlan GitHub action running and then adding comments in your pull request:
+After you've completed the configuration above, create a pull request with a changed dbt model or data contract file to test the action. You should see the Atlan GitHub action running and then adding comments in your pull request:
 
 - The GitHub workflow will add and update a single comment for every file change.
 - The impacted assets in the comment will be displayed in a collapsible section and grouped by source and asset type.
@@ -84,7 +84,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Run Action
-        uses: atlanhq/dbt-action@v1
+        uses: atlanhq/atlan-action@v2
         with:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
           ATLAN_INSTANCE_URL: ${{secrets.ATLAN_INSTANCE_URL}}
@@ -105,7 +105,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Run Action
-        uses: atlanhq/dbt-action@v1
+        uses: atlanhq/atlan-action@v2
         with:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
           ATLAN_INSTANCE_URL: ${{secrets.ATLAN_INSTANCE_URL}}
