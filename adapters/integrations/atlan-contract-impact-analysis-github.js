@@ -843,7 +843,6 @@ ${viewAssetButton}`;
 
     // Iterate through the object to find relevant keys
     for (const [key, value] of Object.entries(configYaml)) {
-        console.log(key);
         if (key.startsWith('data_source ')) {
             // Trim the prefix and add to the Map
             const trimmedKey = key.replace('data_source ', '');
