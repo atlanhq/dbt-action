@@ -3,6 +3,8 @@ name: Test Action
 on:
   pull_request:
     types: [opened, edited, synchronize, reopened, closed]
+    paths:
+      - 'test/**'
 
 jobs:
   get-downstream-assets:
@@ -29,3 +31,4 @@ jobs:
             beta: Wide World Importers PE1
             test-action: Wide World Importers PE1
           IGNORE_MODEL_ALIAS_MATCHING: true
+          ATLAN_CONFIG: .atlan/config.yaml

@@ -1,8 +1,9 @@
-import fetch from "node-fetch";
 import {
-  ATLAN_INSTANCE_URL,
   ATLAN_API_TOKEN,
+  ATLAN_INSTANCE_URL,
 } from "../utils/get-environment-variables.js";
+
+import fetch from "node-fetch";
 
 export default async function getClassifications({
   sendSegmentEventOfIntegration,
