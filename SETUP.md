@@ -31,7 +31,7 @@ It is a very useful and easy to use library, which runs your Github Actions loca
 
 Since you as a developer would be using your Github PAT to test the action locally, you'll need to locally run the clone of your fork, in order to generate the event.json file, follow the following steps:
 
-- [Fork this repo.](https://github.com/atlanhq/dbt-action/fork)
+- [Fork this repo.](https://github.com/atlanhq/atlan-action/fork)
 - Create a pull request from `test-action` branch to `main` branch. Once you do so, it will automatically run the action.
 - Go to your forked repo's `Actions` page and open the workflow with the name `Test Action`.
 - Click on the one and only job, `Get Downstream Assets`.
@@ -58,4 +58,4 @@ Once and if `act` is setup properly, then you can simply use the command `npm st
 
 ## Contributing
 
-Please make sure to use the command `npm run sync` in order to sync changes, since the workflow [`.github/workflows/package-action.yml`](https://github.com/atlanhq/dbt-action/blob/main/.github/workflows/package-action.yml) updates the `dist/` in order to package the action code in case you forget to package the action before pushing.
+Please make sure to use the command `npm run sync` in order to sync changes, since the workflow [`.github/workflows/package-action.yml`](https://github.com/atlanhq/atlan-action/blob/main/.github/workflows/package-action.yml) updates the `dist/` in order to package the action code in case you forget to package the action before pushing.

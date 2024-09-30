@@ -24831,7 +24831,7 @@ function getErrorResponseStatus401 (ATLAN_INSTANCE_URL, context) {
 
 Atlan Instance URL: ${ATLAN_INSTANCE_URL}
     
-Set your repository action secrets [here](https://github.com/${context.payload.repository.full_name}/settings/secrets/actions). For more information on how to setup the Atlan dbt Action, please read the [setup documentation here](https://github.com/atlanhq/dbt-action/blob/main/README.md).`
+Set your repository action secrets [here](https://github.com/${context.payload.repository.full_name}/settings/secrets/actions). For more information on how to setup the Atlan Action, please read the [setup documentation here](https://github.com/atlanhq/atlan-action/blob/main/README.md).`
 }
 
 function getErrorResponseStatusUndefined(ATLAN_INSTANCE_URL, context) {
@@ -24842,7 +24842,7 @@ Atlan Instance URL: ${ATLAN_INSTANCE_URL}
 Make sure your Atlan Instance URL is set in the following format.
 \`https://tenant.atlan.com\`
     
-Set your repository action secrets [here](https://github.com/${context.payload.repository.full_name}/settings/secrets/actions). For more information on how to setup the Atlan dbt Action, please read the [setup documentation here](https://github.com/atlanhq/dbt-action/blob/main/README.md).`
+Set your repository action secrets [here](https://github.com/${context.payload.repository.full_name}/settings/secrets/actions). For more information on how to setup the Atlan Action, please read the [setup documentation here](https://github.com/atlanhq/atlan-action/blob/main/README.md).`
 }
 
 function getSetResourceOnAssetComment(tableMd, setResourceFailed) {
@@ -25120,6 +25120,15 @@ async function getContractAsset({
                           term: {
                               qualifiedName: assetQualifiedName
                           }
+                      },
+                      {
+                        terms: {
+                          "__typeName.keyword": [
+                            "Table",
+                            "MaterialisedView",
+                            "View"
+                          ]
+                        }
                       }
                   ]
               }
@@ -39056,7 +39065,7 @@ function gitlab_integration_getErrorResponseStatus401 (ATLAN_INSTANCE_URL, CI_PR
 
 Atlan Instance URL: ${ATLAN_INSTANCE_URL}
     
-Set your CI/CD variables [here](https://gitlab.com/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}/-/settings/ci_cd). For more information on how to setup the Atlan dbt Action, please read the [setup documentation here](https://ask.atlan.com/hc/en-us/articles/8284983222415).`
+Set your CI/CD variables [here](https://gitlab.com/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}/-/settings/ci_cd). For more information on how to setup the Atlan Action, please read the [setup documentation here](https://ask.atlan.com/hc/en-us/articles/8284983222415).`
 }
 
 function gitlab_integration_getErrorResponseStatusUndefined(ATLAN_INSTANCE_URL, CI_PROJECT_NAME, CI_PROJECT_NAMESPACE) {
@@ -39067,7 +39076,7 @@ Atlan Instance URL: ${ATLAN_INSTANCE_URL}
 Make sure your Atlan Instance URL is set in the following format.
 \`https://tenant.atlan.com\`
     
-Set your CI/CD variables [here](https://gitlab.com/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}/-/settings/ci_cd). For more information on how to setup the Atlan dbt Action, please read the [setup documentation here](https://ask.atlan.com/hc/en-us/articles/8284983222415).`
+Set your CI/CD variables [here](https://gitlab.com/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}/-/settings/ci_cd). For more information on how to setup the Atlan Action, please read the [setup documentation here](https://ask.atlan.com/hc/en-us/articles/8284983222415).`
 }
 
 function gitlab_integration_getSetResourceOnAssetComment(tableMd, setResourceFailed) {
