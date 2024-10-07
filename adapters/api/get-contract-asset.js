@@ -35,15 +35,6 @@ export default async function getContractAsset({
                           term: {
                               qualifiedName: assetQualifiedName
                           }
-                      },
-                      {
-                        terms: {
-                          "__typeName.keyword": [
-                            "Table",
-                            "MaterialisedView",
-                            "View"
-                          ]
-                        }
                       }
                   ]
               }
