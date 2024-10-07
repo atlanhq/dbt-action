@@ -765,29 +765,8 @@ ${content}`;
         headSHA,
       });
 
-      logger.withInfo(
-        `Successfully fetched file contents. File size: ${fileContents.length} bytes`,
-        integrationName,
-        CI_COMMIT_SHA,
-        "getAssetName"
-      );      
-
       if (fileContents) {
-        logger.withInfo(
-          "Starting regex matching",
-          integrationName,
-          CI_COMMIT_SHA,
-          "getAssetName"
-        );
         var matches = regExp.exec(fileContents);
-
-        logger.withInfo(
-          "Successfully executed regex matching",
-          integrationName,
-          CI_COMMIT_SHA,
-          "getAssetName"
-        );
-
         if (matches) {
           logger.withInfo(
             `Found a match: ${matches[1].trim()}`,
@@ -833,6 +812,13 @@ ${content}`;
         headSHA
       );
       const buff = Buffer.from(content, "base64");
+
+      logger.withInfo(
+        "Successfully fetched file contents",
+        integrationName,
+        CI_COMMIT_SHA,
+        "getFileContents"
+      );
 
       return buff.toString("utf8");
     } catch (error) {
