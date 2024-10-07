@@ -6,15 +6,6 @@ export function getErrorModelNotFound(name) {
   `;
 }
 
-export function getErrorAssetNotFound(name) {
-  return `### Asset: **${name}**
-  :warning: It seems that the underlying asset you were working with could not be found on Atlan. This could mean the asset is not synced or is currently unavailable.
-  To address this:
-  • Check asset sync: Ensure that the relevant assets are catalogued in Atlan.
-  • Review asset source: Double-check the source database or data pipeline to ensure all upstream data is flowing correctly.
-  `;
-}
-
 export function getErrorDoesNotMaterialize(
   name,
   ATLAN_INSTANCE_URL,
@@ -38,20 +29,4 @@ export function getBaseComment(totalChangedFiles, comments) {
       }** you have edited.
   
   ${comments}`
-}
-
-export function getContractImpactAnalysisBaseComment(
-  totalChangedFiles, 
-  comments,
-  warningComments
-) {
-  return `### ${getImageURL("atlan-logo", 15, 15)} Atlan impact analysis
-  We've detected changes in **${totalChangedFiles} ${
-        totalChangedFiles > 1 ? "contracts" : "contract"
-      }** that you've edited. Below is the downstream impact analysis of these changes.
-  
-  ${comments}
-  
-  ${warningComments}
-  `
 }

@@ -1,5 +1,5 @@
-import core from "@actions/core";
 import dotenv from "dotenv";
+import core from "@actions/core";
 dotenv.config();
 
 //Common env variables
@@ -15,9 +15,6 @@ export const IS_DEV = process.env.IS_DEV;
 export const IGNORE_MODEL_ALIAS_MATCHING =
   (process.env.IGNORE_MODEL_ALIAS_MATCHING ||
     core.getInput("IGNORE_MODEL_ALIAS_MATCHING")) == "true";
-
-export const ATLAN_CONFIG =
-  process.env.ATLAN_CONFIG || core.getInput("ATLAN_CONFIG");
 
 //GITLAB SPECIFIC ENV VARIABLES
 export async function getCIMergeRequestIID(
