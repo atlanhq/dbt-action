@@ -1,5 +1,5 @@
-name: "Atlan Action"
-description: "Whenever you make a change to a dbt model or a data contract, Atlan will add downstream lineage impact context right in your pull requests."
+name: "Atlan dbt Action"
+description: "Whenever you make a change to a dbt model, Atlan will add downstream lineage impact context right in your pull requests."
 author: "Atlan"
 
 inputs:

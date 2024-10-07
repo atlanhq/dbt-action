@@ -1,11 +1,11 @@
-import { getCertificationImage, getConnectorImage, getImageURL } from "../utils/index.js";
+import { getImageURL, getConnectorImage, getCertificationImage } from "../utils/index.js";
 
 export function getErrorResponseStatus401 (ATLAN_INSTANCE_URL, CI_PROJECT_NAME, CI_PROJECT_NAMESPACE) {
     return `We couldn't connect to your Atlan Instance, please make sure to set the valid Atlan Bearer Token as \`ATLAN_API_TOKEN\` as this repository's CI/CD variable. 
 
 Atlan Instance URL: ${ATLAN_INSTANCE_URL}
     
-Set your CI/CD variables [here](https://gitlab.com/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}/-/settings/ci_cd). For more information on how to setup the Atlan Action, please read the [setup documentation here](https://ask.atlan.com/hc/en-us/articles/8284983222415).`
+Set your CI/CD variables [here](https://gitlab.com/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}/-/settings/ci_cd). For more information on how to setup the Atlan dbt Action, please read the [setup documentation here](https://ask.atlan.com/hc/en-us/articles/8284983222415).`
 }
 
 export function getErrorResponseStatusUndefined(ATLAN_INSTANCE_URL, CI_PROJECT_NAME, CI_PROJECT_NAMESPACE) {
@@ -16,7 +16,7 @@ Atlan Instance URL: ${ATLAN_INSTANCE_URL}
 Make sure your Atlan Instance URL is set in the following format.
 \`https://tenant.atlan.com\`
     
-Set your CI/CD variables [here](https://gitlab.com/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}/-/settings/ci_cd). For more information on how to setup the Atlan Action, please read the [setup documentation here](https://ask.atlan.com/hc/en-us/articles/8284983222415).`
+Set your CI/CD variables [here](https://gitlab.com/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}/-/settings/ci_cd). For more information on how to setup the Atlan dbt Action, please read the [setup documentation here](https://ask.atlan.com/hc/en-us/articles/8284983222415).`
 }
 
 export function getSetResourceOnAssetComment(tableMd, setResourceFailed) {

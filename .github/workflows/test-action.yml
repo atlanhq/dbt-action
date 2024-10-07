@@ -3,8 +3,6 @@ name: Test Action
 on:
   pull_request:
     types: [opened, edited, synchronize, reopened, closed]
-    paths:
-      - 'test/**'
 
 jobs:
   get-downstream-assets:
