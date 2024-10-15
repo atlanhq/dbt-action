@@ -683,24 +683,90 @@ export default class GitHubIntegration extends IntegrationInterface {
         filePath,
       });
 
+      logger.withInfo(
+        `Successfully fetched file contents. File size: ${fileContents.length} bytes`,
+        integrationName,
+        headSHA,
+        "getAssetName"
+      );      
+
       if (fileContents) {
-        var matches = regExp.exec(fileContents);
-        if (matches) {
-          logger.withInfo(
-            `Found a match: ${matches[1].trim()}`,
-            integrationName,
-            headSHA,
-            "getAssetName"
-          );
-          return matches[1].trim();
+        logger.withInfo(
+          "Starting regex matching",
+          integrationName,
+          headSHA,
+          "getAssetName"
+        );
+        const startRegex =
+            /{{\s*config\s*\(/im;
+        const startMatch = fileContents.match(startRegex);
+        let configSection = ''
+        if (startMatch) {
+          const startIndex = startMatch.index;
+          const openParensIndex = fileContents.indexOf('(', startIndex) + 1;
+          let openParensCount = 1;
+          let endIndex = openParensIndex;
+
+          while (openParensCount > 0 && endIndex < fileContents.length) {
+            const char = fileContents[endIndex];
+
+            if (char === '(') {
+                openParensCount++;
+            } else if (char === ')') {
+                openParensCount--;
+            }
+            endIndex++;
+            }
+            
+            const endMarker = '}}';
+            const finalEndIndex = fileContents.indexOf(endMarker, endIndex) + endMarker.length;
+
+            configSection = fileContents.substring(startIndex, finalEndIndex);
+            logger.withInfo(
+              "Extracted config section",
+              integrationName,
+              headSHA,
+              "getAssetName"
+            );
+
+            if (configSection){
+              logger.withInfo(
+                "Executing final regex",
+                integrationName,
+                headSHA,
+                "getAssetName"
+              );
+
+              var matches = regExp.exec(configSection);
+
+              logger.withInfo(
+                "Successfully executed regex matching",
+                integrationName,
+                headSHA,
+                "getAssetName"
+              );
+
+            }
+            if (matches) {
+              logger.withInfo(
+                `Found a match: ${matches[1].trim()}`,
+                integrationName,
+                headSHA,
+                "getAssetName"
+              );
+
+              return matches[1].trim();
+            }
         }
       }
+
       logger.withInfo(
         `Using filename as asset name: ${fileName}`,
         integrationName,
         headSHA,
         "getAssetName"
       );
+
       return fileName;
     } catch (error) {
       logger.withError(
