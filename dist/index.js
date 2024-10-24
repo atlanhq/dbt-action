@@ -22466,66 +22466,95 @@ async function runAction(token, integrationModule) {
   await integration.run();
 }
 
-;// CONCATENATED MODULE: ./adapters/integrations/contract/contract.js
-// Common interface that each new integration has to implement
-class IntegrationInterface {
-  constructor(token) {
-    this.token = token;
+// EXTERNAL MODULE: ./node_modules/dotenv/lib/main.js
+var main = __nccwpck_require__(2437);
+// EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
+var core = __nccwpck_require__(2186);
+;// CONCATENATED MODULE: ./adapters/utils/get-environment-variables.js
+
+
+main.config();
+
+//Common env variables
+const ATLAN_INSTANCE_URL = new URL(
+  process.env.ATLAN_INSTANCE_URL || core.getInput("ATLAN_INSTANCE_URL")
+).origin;
+
+const ATLAN_API_TOKEN =
+  process.env.ATLAN_API_TOKEN || core.getInput("ATLAN_API_TOKEN");
+
+const IS_DEV = process.env.IS_DEV;
+
+const IGNORE_MODEL_ALIAS_MATCHING =
+  (process.env.IGNORE_MODEL_ALIAS_MATCHING ||
+    core.getInput("IGNORE_MODEL_ALIAS_MATCHING")) == "true";
+
+//GITLAB SPECIFIC ENV VARIABLES
+async function getCIMergeRequestIID(
+  gitlab,
+  CI_PROJECT_ID,
+  CI_COMMIT_SHA
+) {
+  if (!process.env.CI_MERGE_REQUEST_IID) {
+    const mergeRequestCommit = await gitlab.Commits.allMergeRequests(
+      CI_PROJECT_ID,
+      CI_COMMIT_SHA
+    );
+
+    const firstMergeRequest = mergeRequestCommit[0];
+    if (firstMergeRequest) {
+      return firstMergeRequest.iid;
+    }
   }
 
-  async run() {
-    throw new Error("Not Implemented");
-  }
+  return process.env.CI_MERGE_REQUEST_IID;
+}
 
-  async printDownstreamAssets(config) {
-    throw new Error("Not Implemented");
-  }
+const {
+  CI_PROJECT_PATH,
+  CI_PROJECT_ID,
+  CI_JOB_URL,
+  GITLAB_TOKEN,
+  CI_COMMIT_MESSAGE,
+  GITLAB_USER_LOGIN,
+  CI_PROJECT_NAME,
+  CI_COMMIT_SHA,
+  CI_PROJECT_NAMESPACE,
+} = process.env;
 
-  async setResourceOnAsset(config) {
-    throw new Error("Not Implemented");
-  }
+function getGitLabEnvironments() {
+  const { DBT_ENVIRONMENT_BRANCH_MAP } = process.env;
 
-  async authIntegration(config) {
-    throw new Error("Not Implemented");
-  }
+  if (DBT_ENVIRONMENT_BRANCH_MAP) {
+    const environmentLines = DBT_ENVIRONMENT_BRANCH_MAP.split("\n");
+    const environmentMap = {};
 
-  async sendSegmentEventOfIntegration({ action, properties }) {
-    throw new Error("Not Implemented");
-  }
+    environmentLines.forEach((line) => {
+      const [environment, branch] = line.split(":").map((item) => item.trim());
+      if (environment && branch) {
+        environmentMap[environment] = branch;
+      }
+    });
 
-  async getChangedFiles(config) {
-    throw new Error("Not Implemented");
-  }
-
-  async getAssetName(config) {
-    throw new Error("Not Implemented");
-  }
-
-  async getFileContents(config) {
-    throw new Error("Not Implemented");
-  }
-
-  async checkCommentExists(config) {
-    throw new Error("Not Implemented");
-  }
-
-  async createIssueComment(config) {
-    throw new Error("Not Implemented");
-  }
-
-  async deleteComment(config) {
-    throw new Error("Not Implemented");
-  }
-
-  async renderDownstreamAssetsComment() {
-    throw new Error("Not Implemented");
+    return environmentMap;
+  } else {
+    return {};
   }
 }
 
-// EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
-var github = __nccwpck_require__(5438);
-// EXTERNAL MODULE: ./node_modules/json-stringify-safe/stringify.js
-var stringify = __nccwpck_require__(7073);
+//GITHUB SPECIFIC ENV VARIABLES
+const GITHUB_TOKEN =
+  core.getInput("GITHUB_TOKEN") || process.env.GITHUB_TOKEN;
+
+const getEnvironments = () => {
+  return (
+    core.getInput("DBT_ENVIRONMENT_BRANCH_MAP")
+      ?.trim()
+      ?.split("\n")
+      ?.map((i) => i.split(":").map((i) => i.trim())) ?? []
+  );
+};
+
 ;// CONCATENATED MODULE: ./adapters/utils/get-image-url.js
 
 
@@ -24838,95 +24867,6 @@ function fixResponseChunkedTransferBadEnding(request, errorCallback) {
 	});
 }
 
-// EXTERNAL MODULE: ./node_modules/dotenv/lib/main.js
-var main = __nccwpck_require__(2437);
-// EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
-var core = __nccwpck_require__(2186);
-;// CONCATENATED MODULE: ./adapters/utils/get-environment-variables.js
-
-
-main.config();
-
-//Common env variables
-const ATLAN_INSTANCE_URL = new URL(
-  process.env.ATLAN_INSTANCE_URL || core.getInput("ATLAN_INSTANCE_URL")
-).origin;
-
-const ATLAN_API_TOKEN =
-  process.env.ATLAN_API_TOKEN || core.getInput("ATLAN_API_TOKEN");
-
-const IS_DEV = process.env.IS_DEV;
-
-const IGNORE_MODEL_ALIAS_MATCHING =
-  (process.env.IGNORE_MODEL_ALIAS_MATCHING ||
-    core.getInput("IGNORE_MODEL_ALIAS_MATCHING")) == "true";
-
-//GITLAB SPECIFIC ENV VARIABLES
-async function getCIMergeRequestIID(
-  gitlab,
-  CI_PROJECT_ID,
-  CI_COMMIT_SHA
-) {
-  if (!process.env.CI_MERGE_REQUEST_IID) {
-    const mergeRequestCommit = await gitlab.Commits.allMergeRequests(
-      CI_PROJECT_ID,
-      CI_COMMIT_SHA
-    );
-
-    const firstMergeRequest = mergeRequestCommit[0];
-    if (firstMergeRequest) {
-      return firstMergeRequest.iid;
-    }
-  }
-
-  return process.env.CI_MERGE_REQUEST_IID;
-}
-
-const {
-  CI_PROJECT_PATH,
-  CI_PROJECT_ID,
-  CI_JOB_URL,
-  GITLAB_TOKEN,
-  CI_COMMIT_MESSAGE,
-  GITLAB_USER_LOGIN,
-  CI_PROJECT_NAME,
-  CI_COMMIT_SHA,
-  CI_PROJECT_NAMESPACE,
-} = process.env;
-
-function getGitLabEnvironments() {
-  const { DBT_ENVIRONMENT_BRANCH_MAP } = process.env;
-
-  if (DBT_ENVIRONMENT_BRANCH_MAP) {
-    const environmentLines = DBT_ENVIRONMENT_BRANCH_MAP.split("\n");
-    const environmentMap = {};
-
-    environmentLines.forEach((line) => {
-      const [environment, branch] = line.split(":").map((item) => item.trim());
-      if (environment && branch) {
-        environmentMap[environment] = branch;
-      }
-    });
-
-    return environmentMap;
-  } else {
-    return {};
-  }
-}
-
-//GITHUB SPECIFIC ENV VARIABLES
-const GITHUB_TOKEN =
-  core.getInput("GITHUB_TOKEN") || process.env.GITHUB_TOKEN;
-
-const getEnvironments = () => {
-  return (
-    core.getInput("DBT_ENVIRONMENT_BRANCH_MAP")
-      ?.trim()
-      ?.split("\n")
-      ?.map((i) => i.split(":").map((i) => i.trim())) ?? []
-  );
-};
-
 ;// CONCATENATED MODULE: ./adapters/utils/auth.js
 
 
@@ -24957,6 +24897,8 @@ async function auth() {
 
 
 
+// EXTERNAL MODULE: ./node_modules/json-stringify-safe/stringify.js
+var stringify = __nccwpck_require__(7073);
 ;// CONCATENATED MODULE: ./adapters/api/get-downstream-assets.js
 
 
@@ -25519,13 +25461,72 @@ function getMDCommentForMaterialisedView(ATLAN_INSTANCE_URL, materialisedView) {
 function getTableMD(md, resp) {
     return `${md} | ${resp ? '✅' : '❌'} \n`
 }
+;// CONCATENATED MODULE: ./adapters/integrations/contract/contract.js
+// Common interface that each new integration has to implement
+class IntegrationInterface {
+  constructor(token) {
+    this.token = token;
+  }
+
+  async run() {
+    throw new Error("Not Implemented");
+  }
+
+  async printDownstreamAssets(config) {
+    throw new Error("Not Implemented");
+  }
+
+  async setResourceOnAsset(config) {
+    throw new Error("Not Implemented");
+  }
+
+  async authIntegration(config) {
+    throw new Error("Not Implemented");
+  }
+
+  async sendSegmentEventOfIntegration({ action, properties }) {
+    throw new Error("Not Implemented");
+  }
+
+  async getChangedFiles(config) {
+    throw new Error("Not Implemented");
+  }
+
+  async getAssetName(config) {
+    throw new Error("Not Implemented");
+  }
+
+  async getFileContents(config) {
+    throw new Error("Not Implemented");
+  }
+
+  async checkCommentExists(config) {
+    throw new Error("Not Implemented");
+  }
+
+  async createIssueComment(config) {
+    throw new Error("Not Implemented");
+  }
+
+  async deleteComment(config) {
+    throw new Error("Not Implemented");
+  }
+
+  async renderDownstreamAssetsComment() {
+    throw new Error("Not Implemented");
+  }
+}
+
+// EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
+var github = __nccwpck_require__(5438);
 ;// CONCATENATED MODULE: ./adapters/integrations/github-integration.js
+
+
+
+
+
+
 // githubIntegration.js
-
-
-
-
-
 
 
 
@@ -26071,6 +26072,8 @@ class GitHubIntegration extends IntegrationInterface {
           ...properties,
           github_action_id: `https://github.com/${context?.payload?.repository?.full_name}/actions/runs/${context?.runId}`,
           domain,
+          base_asset_type: "dbtModel",
+          action_repo_name: "dbt-action"
         },
       });
 
@@ -26604,6 +26607,111 @@ ${viewAssetButton}`;
   }
 }
 
+;// CONCATENATED MODULE: ./adapters/templates/gitlab-integration.js
+
+
+function gitlab_integration_getErrorResponseStatus401 (ATLAN_INSTANCE_URL, CI_PROJECT_NAME, CI_PROJECT_NAMESPACE) {
+    return `We couldn't connect to your Atlan Instance, please make sure to set the valid Atlan Bearer Token as \`ATLAN_API_TOKEN\` as this repository's CI/CD variable. 
+
+Atlan Instance URL: ${ATLAN_INSTANCE_URL}
+    
+Set your CI/CD variables [here](https://gitlab.com/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}/-/settings/ci_cd). For more information on how to setup the Atlan dbt Action, please read the [setup documentation here](https://ask.atlan.com/hc/en-us/articles/8284983222415).`
+}
+
+function gitlab_integration_getErrorResponseStatusUndefined(ATLAN_INSTANCE_URL, CI_PROJECT_NAME, CI_PROJECT_NAMESPACE) {
+    return `We couldn't connect to your Atlan Instance, please make sure to set the valid Atlan Instance URL as \`ATLAN_INSTANCE_URL\` as this repository's CI/CD variable. 
+
+Atlan Instance URL: ${ATLAN_INSTANCE_URL}
+    
+Make sure your Atlan Instance URL is set in the following format.
+\`https://tenant.atlan.com\`
+    
+Set your CI/CD variables [here](https://gitlab.com/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}/-/settings/ci_cd). For more information on how to setup the Atlan dbt Action, please read the [setup documentation here](https://ask.atlan.com/hc/en-us/articles/8284983222415).`
+}
+
+function gitlab_integration_getSetResourceOnAssetComment(tableMd, setResourceFailed) {
+    return `## 🎊 Congrats on the merge!
+  
+  This pull request has been added as a resource to the following assets:
+    
+  ${setResourceFailed ? '> ⚠️  Seems like we were unable to set the resources for some of the assets due to insufficient permissions. To ensure that the pull request is linked as a resource, you will need to assign the right persona with requisite permissions to the API token.' : ''}
+    
+  Name | Resource set successfully
+  --- | ---
+  ${tableMd}
+  `
+}
+
+function gitlab_integration_getAssetInfo(ATLAN_INSTANCE_URL, asset, materialisedAsset, environmentName, projectName) {
+  return `### ${getConnectorImage(
+      asset.attributes.connectorName
+    )} [${asset.displayText}](${ATLAN_INSTANCE_URL}/assets/${
+      asset.guid
+    }/overview?utm_source=dbt_gitlab_action) ${
+      asset.attributes?.certificateStatus
+        ? getCertificationImage(asset.attributes.certificateStatus)
+        : ""
+    }
+Materialised asset: ${getConnectorImage(
+      materialisedAsset.attributes.connectorName
+    )} [${materialisedAsset.attributes.name}](${ATLAN_INSTANCE_URL}/assets/${
+      materialisedAsset.guid
+    }/overview?utm_source=dbt_gitlab_action) ${
+      materialisedAsset.attributes?.certificateStatus
+        ? getCertificationImage(materialisedAsset.attributes.certificateStatus)
+        : ""
+    }${environmentName ? ` | Environment Name: \`${environmentName}\`` : ""}${
+      projectName ? ` | Project Name: \`${projectName}\`` : ""
+    }`
+}
+
+function gitlab_integration_getDownstreamTable(ATLAN_INSTANCE_URL, downstreamAssets, rows, materialisedAsset) {
+  return `<details><summary><b>${
+      downstreamAssets.entityCount
+    } downstream assets 👇</b></summary><br/>
+
+Name | Type | Description | Owners | Terms | Classifications | Source URL
+--- | --- | --- | --- | --- | --- | ---
+${rows
+  .map((row) =>
+    row.map((i) => i.replace(/\|/g, "•").replace(/\n/g, "")).join(" | ")
+  )
+  .join("\n")}
+
+${
+  downstreamAssets.hasMore
+    ? `[See more downstream assets at Atlan](${ATLAN_INSTANCE_URL}/assets/${materialisedAsset.guid}/lineage?utm_source=dbt_gitlab_action)`
+    : ""
+}
+
+</details>`
+}
+
+function gitlab_integration_getViewAssetButton(ATLAN_INSTANCE_URL, asset) {
+  return `${getImageURL(
+      "atlan-logo",
+      15,
+      15
+    )} [View asset in Atlan](${ATLAN_INSTANCE_URL}/assets/${
+      asset.guid
+    }/overview?utm_source=dbt_gitlab_action)`
+}
+
+function gitlab_integration_getMDCommentForModel(ATLAN_INSTANCE_URL, model) {
+  return `${getConnectorImage(model?.attributes?.connectorName)} [${
+      model?.displayText
+    }](${ATLAN_INSTANCE_URL}/assets/${model?.guid}/overview?utm_source=dbt_gitlab_action)`
+}
+
+function gitlab_integration_getMDCommentForMaterialisedView(ATLAN_INSTANCE_URL, materialisedView) {
+  return `${getConnectorImage(materialisedView?.attributes?.connectorName)} [${
+      materialisedView?.attributes?.name
+    }](${ATLAN_INSTANCE_URL}/assets/${materialisedView?.guid}/overview?utm_source=dbt_gitlab_action)`
+}
+
+function gitlab_integration_getTableMD(md, resp) {
+  return `${md} | ${resp ? '✅' : '❌'} \n`
+}
 // EXTERNAL MODULE: ./node_modules/qs/lib/index.js
 var lib = __nccwpck_require__(2760);
 // EXTERNAL MODULE: ./node_modules/xcase/es5/index.js
@@ -34016,119 +34124,15 @@ var {
 
 
 
-;// CONCATENATED MODULE: ./adapters/templates/gitlab-integration.js
-
-
-function gitlab_integration_getErrorResponseStatus401 (ATLAN_INSTANCE_URL, CI_PROJECT_NAME, CI_PROJECT_NAMESPACE) {
-    return `We couldn't connect to your Atlan Instance, please make sure to set the valid Atlan Bearer Token as \`ATLAN_API_TOKEN\` as this repository's CI/CD variable. 
-
-Atlan Instance URL: ${ATLAN_INSTANCE_URL}
-    
-Set your CI/CD variables [here](https://gitlab.com/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}/-/settings/ci_cd). For more information on how to setup the Atlan dbt Action, please read the [setup documentation here](https://ask.atlan.com/hc/en-us/articles/8284983222415).`
-}
-
-function gitlab_integration_getErrorResponseStatusUndefined(ATLAN_INSTANCE_URL, CI_PROJECT_NAME, CI_PROJECT_NAMESPACE) {
-    return `We couldn't connect to your Atlan Instance, please make sure to set the valid Atlan Instance URL as \`ATLAN_INSTANCE_URL\` as this repository's CI/CD variable. 
-
-Atlan Instance URL: ${ATLAN_INSTANCE_URL}
-    
-Make sure your Atlan Instance URL is set in the following format.
-\`https://tenant.atlan.com\`
-    
-Set your CI/CD variables [here](https://gitlab.com/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}/-/settings/ci_cd). For more information on how to setup the Atlan dbt Action, please read the [setup documentation here](https://ask.atlan.com/hc/en-us/articles/8284983222415).`
-}
-
-function gitlab_integration_getSetResourceOnAssetComment(tableMd, setResourceFailed) {
-    return `## 🎊 Congrats on the merge!
-  
-  This pull request has been added as a resource to the following assets:
-    
-  ${setResourceFailed ? '> ⚠️  Seems like we were unable to set the resources for some of the assets due to insufficient permissions. To ensure that the pull request is linked as a resource, you will need to assign the right persona with requisite permissions to the API token.' : ''}
-    
-  Name | Resource set successfully
-  --- | ---
-  ${tableMd}
-  `
-}
-
-function gitlab_integration_getAssetInfo(ATLAN_INSTANCE_URL, asset, materialisedAsset, environmentName, projectName) {
-  return `### ${getConnectorImage(
-      asset.attributes.connectorName
-    )} [${asset.displayText}](${ATLAN_INSTANCE_URL}/assets/${
-      asset.guid
-    }/overview?utm_source=dbt_gitlab_action) ${
-      asset.attributes?.certificateStatus
-        ? getCertificationImage(asset.attributes.certificateStatus)
-        : ""
-    }
-Materialised asset: ${getConnectorImage(
-      materialisedAsset.attributes.connectorName
-    )} [${materialisedAsset.attributes.name}](${ATLAN_INSTANCE_URL}/assets/${
-      materialisedAsset.guid
-    }/overview?utm_source=dbt_gitlab_action) ${
-      materialisedAsset.attributes?.certificateStatus
-        ? getCertificationImage(materialisedAsset.attributes.certificateStatus)
-        : ""
-    }${environmentName ? ` | Environment Name: \`${environmentName}\`` : ""}${
-      projectName ? ` | Project Name: \`${projectName}\`` : ""
-    }`
-}
-
-function gitlab_integration_getDownstreamTable(ATLAN_INSTANCE_URL, downstreamAssets, rows, materialisedAsset) {
-  return `<details><summary><b>${
-      downstreamAssets.entityCount
-    } downstream assets 👇</b></summary><br/>
-
-Name | Type | Description | Owners | Terms | Classifications | Source URL
---- | --- | --- | --- | --- | --- | ---
-${rows
-  .map((row) =>
-    row.map((i) => i.replace(/\|/g, "•").replace(/\n/g, "")).join(" | ")
-  )
-  .join("\n")}
-
-${
-  downstreamAssets.hasMore
-    ? `[See more downstream assets at Atlan](${ATLAN_INSTANCE_URL}/assets/${materialisedAsset.guid}/lineage?utm_source=dbt_gitlab_action)`
-    : ""
-}
-
-</details>`
-}
-
-function gitlab_integration_getViewAssetButton(ATLAN_INSTANCE_URL, asset) {
-  return `${getImageURL(
-      "atlan-logo",
-      15,
-      15
-    )} [View asset in Atlan](${ATLAN_INSTANCE_URL}/assets/${
-      asset.guid
-    }/overview?utm_source=dbt_gitlab_action)`
-}
-
-function gitlab_integration_getMDCommentForModel(ATLAN_INSTANCE_URL, model) {
-  return `${getConnectorImage(model?.attributes?.connectorName)} [${
-      model?.displayText
-    }](${ATLAN_INSTANCE_URL}/assets/${model?.guid}/overview?utm_source=dbt_gitlab_action)`
-}
-
-function gitlab_integration_getMDCommentForMaterialisedView(ATLAN_INSTANCE_URL, materialisedView) {
-  return `${getConnectorImage(materialisedView?.attributes?.connectorName)} [${
-      materialisedView?.attributes?.name
-    }](${ATLAN_INSTANCE_URL}/assets/${materialisedView?.guid}/overview?utm_source=dbt_gitlab_action)`
-}
-
-function gitlab_integration_getTableMD(md, resp) {
-  return `${md} | ${resp ? '✅' : '❌'} \n`
-}
 ;// CONCATENATED MODULE: ./adapters/integrations/gitlab-integration.js
+
+
+
+
+
+
+
 // gitlabIntegration.js
-
-
-
-
-
-
 
 
 
@@ -34737,6 +34741,8 @@ ${content}`;
           ...properties,
           gitlab_job_id: CI_JOB_URL,
           domain,
+          base_asset_type: "dbtModel",
+          action_repo_name: "dbt-action"
         },
       });
 

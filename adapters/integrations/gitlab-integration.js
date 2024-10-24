@@ -1,47 +1,48 @@
-// gitlabIntegration.js
-import IntegrationInterface from "./contract/contract.js";
-import { Gitlab } from "@gitbeaker/rest";
 import {
-  createResource,
-  getAsset,
-  getDownstreamAssets,
-  sendSegmentEvent,
-  getClassifications,
-} from "../api/index.js";
+  ATLAN_INSTANCE_URL,
+  CI_COMMIT_MESSAGE,
+  CI_COMMIT_SHA,
+  CI_JOB_URL,
+  CI_PROJECT_ID,
+  CI_PROJECT_NAME,
+  CI_PROJECT_NAMESPACE,
+  CI_PROJECT_PATH,
+  IGNORE_MODEL_ALIAS_MATCHING,
+  IS_DEV,
+  getCIMergeRequestIID,
+} from "../utils/get-environment-variables.js";
 import {
   auth,
-  getConnectorImage,
   getCertificationImage,
+  getConnectorImage,
   getGitLabEnvironments,
   truncate,
 } from "../utils/index.js";
-import stringify from "json-stringify-safe";
 import {
-  getSetResourceOnAssetComment,
-  getErrorResponseStatus401,
-  getErrorResponseStatusUndefined,
+  createResource,
+  getAsset,
+  getClassifications,
+  getDownstreamAssets,
+  sendSegmentEvent,
+} from "../api/index.js";
+import {
   getAssetInfo,
   getDownstreamTable,
-  getViewAssetButton,
-  getMDCommentForModel,
+  getErrorResponseStatus401,
+  getErrorResponseStatusUndefined,
   getMDCommentForMaterialisedView,
+  getMDCommentForModel,
+  getSetResourceOnAssetComment,
   getTableMD,
+  getViewAssetButton,
 } from "../templates/gitlab-integration.js";
-import { getNewModelAddedComment, getBaseComment } from "../templates/atlan.js";
-import {
-  IS_DEV,
-  ATLAN_INSTANCE_URL,
-  CI_PROJECT_PATH,
-  CI_PROJECT_ID,
-  CI_JOB_URL,
-  IGNORE_MODEL_ALIAS_MATCHING,
-  CI_COMMIT_MESSAGE,
-  CI_PROJECT_NAME,
-  CI_COMMIT_SHA,
-  getCIMergeRequestIID,
-  CI_PROJECT_NAMESPACE,
-} from "../utils/get-environment-variables.js";
+import { getBaseComment, getNewModelAddedComment } from "../templates/atlan.js";
+
+import { Gitlab } from "@gitbeaker/rest";
+// gitlabIntegration.js
+import IntegrationInterface from "./contract/contract.js";
 import logger from "../logger/logger.js";
+import stringify from "json-stringify-safe";
 const integrationName = "gitlab";
 var CI_MERGE_REQUEST_IID;
 
@@ -647,6 +648,8 @@ ${content}`;
           ...properties,
           gitlab_job_id: CI_JOB_URL,
           domain,
+          base_asset_type: "dbtModel",
+          action_repo_name: "dbt-action"
         },
       });
 

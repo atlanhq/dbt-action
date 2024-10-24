@@ -1,39 +1,40 @@
-// githubIntegration.js
-import IntegrationInterface from "./contract/contract.js";
-import github from "@actions/github";
-import stringify from "json-stringify-safe";
 import {
+  ATLAN_INSTANCE_URL,
+  IGNORE_MODEL_ALIAS_MATCHING,
+  IS_DEV,
+} from "../utils/get-environment-variables.js";
+import {
+  auth,
   getCertificationImage,
   getConnectorImage,
   getEnvironments,
-  auth,
   truncate,
 } from "../utils/index.js";
 import {
+  createResource,
   getAsset,
+  getClassifications,
   getDownstreamAssets,
   sendSegmentEvent,
-  createResource,
-  getClassifications,
 } from "../api/index.js";
 import {
-  getSetResourceOnAssetComment,
-  getErrorResponseStatus401,
-  getErrorResponseStatusUndefined,
   getAssetInfo,
   getDownstreamTable,
-  getViewAssetButton,
-  getMDCommentForModel,
+  getErrorResponseStatus401,
+  getErrorResponseStatusUndefined,
   getMDCommentForMaterialisedView,
+  getMDCommentForModel,
+  getSetResourceOnAssetComment,
   getTableMD,
+  getViewAssetButton,
 } from "../templates/github-integration.js";
-import { getNewModelAddedComment, getBaseComment } from "../templates/atlan.js";
-import {
-  IS_DEV,
-  ATLAN_INSTANCE_URL,
-  IGNORE_MODEL_ALIAS_MATCHING,
-} from "../utils/get-environment-variables.js";
+import { getBaseComment, getNewModelAddedComment } from "../templates/atlan.js";
+
+// githubIntegration.js
+import IntegrationInterface from "./contract/contract.js";
+import github from "@actions/github";
 import logger from "../logger/logger.js";
+import stringify from "json-stringify-safe";
 var headSHA;
 const integrationName = "github";
 export default class GitHubIntegration extends IntegrationInterface {
@@ -575,6 +576,8 @@ export default class GitHubIntegration extends IntegrationInterface {
           ...properties,
           github_action_id: `https://github.com/${context?.payload?.repository?.full_name}/actions/runs/${context?.runId}`,
           domain,
+          base_asset_type: "dbtModel",
+          action_repo_name: "dbt-action"
         },
       });
 
