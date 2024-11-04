@@ -120,8 +120,7 @@ ${downstreamAssets.hasMore ? `[See more downstream assets at Atlan](${ATLAN_INST
     const viewAssetButton = `${getImageURL("atlan-logo", 15, 15)} [View asset in Atlan](${ATLAN_INSTANCE_URL}/assets/${asset.guid}/overview?utm_source=dbt_github_action)`;
 
     // Deprecation callout
-    const deprecationCallout = `<br> 
-    :warning: This action is no longer maintained. Please migrate to atlan-action 
+    const deprecationCallout = `<br> :warning: This action is no longer maintained. Please migrate to atlan-action 
 by following the steps at: https://link-to-migration-guide`
 
     // Generating the final comment based on the presence of downstream assets
@@ -163,8 +162,15 @@ export async function checkCommentExists(octokit, context) {
 export async function createIssueComment(octokit, context, content, comment_id = null, forceNewComment = false) {
     const {pull_request} = context.payload;
 
+    // Deprecation callout
+    const deprecationCallout = `<br> 
+    :warning: This action is no longer maintained. Please migrate to atlan-action 
+by following the steps at: https://link-to-migration-guide`
+
     content = `<!-- ActionCommentIdentifier: atlan-dbt-action -->
-${content}`
+${content}
+
+${deprecationCallout}`
 
     const commentObj = {
         ...context.repo,
