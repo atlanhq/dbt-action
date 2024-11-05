@@ -17980,8 +17980,15 @@ async function checkCommentExists(octokit, context) {
 async function createIssueComment(octokit, context, content, comment_id = null, forceNewComment = false) {
     const {pull_request} = context.payload;
 
+    // Deprecation callout
+    let deprecationCallout = `:warning: Deprecation Notice: This action is scheduled for deprecation and will no longer be supported after June 2025. To ensure a smooth transition and continued functionality, please migrate to atlan-action by following the migration guide available [here](https://ask.atlan.com/hc/en-us/articles/11121331752719).`
+
+    deprecationCallout = "\n\n---\n\n" + deprecationCallout;
+    
     content = `<!-- ActionCommentIdentifier: atlan-dbt-action -->
-${content}`
+${content}
+
+${deprecationCallout}`
 
     const commentObj = {
         ...context.repo,
