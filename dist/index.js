@@ -17946,8 +17946,7 @@ ${downstreamAssets.hasMore ? `[See more downstream assets at Atlan](${create_com
     const viewAssetButton = `${getImageURL("atlan-logo", 15, 15)} [View asset in Atlan](${create_comment_ATLAN_INSTANCE_URL}/assets/${asset.guid}/overview?utm_source=dbt_github_action)`;
 
     // Deprecation callout
-    const deprecationCallout = ` 
-    :warning: Deprecation Notice: 
+    const deprecationCallout = `:warning: Deprecation Notice: 
     This action is scheduled for deprecation and will no longer be supported after June 2025. 
     To ensure a smooth transition and continued functionality, please migrate to atlan-action by following the migration guide available [here](https://ask.atlan.com/hc/en-us/articles/11121331752719).`
 
@@ -17991,8 +17990,7 @@ async function createIssueComment(octokit, context, content, comment_id = null, 
     const {pull_request} = context.payload;
 
     // Deprecation callout
-    const deprecationCallout = ` 
-    :warning: Deprecation Notice: 
+    const deprecationCallout = `:warning: Deprecation Notice: 
     This action is scheduled for deprecation and will no longer be supported after June 2025. 
     To ensure a smooth transition and continued functionality, please migrate to atlan-action by following the migration guide available [here](https://ask.atlan.com/hc/en-us/articles/11121331752719).`
 
