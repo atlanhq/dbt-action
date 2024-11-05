@@ -119,26 +119,19 @@ ${downstreamAssets.hasMore ? `[See more downstream assets at Atlan](${ATLAN_INST
     // Generating the "View asset in Atlan" button
     const viewAssetButton = `${getImageURL("atlan-logo", 15, 15)} [View asset in Atlan](${ATLAN_INSTANCE_URL}/assets/${asset.guid}/overview?utm_source=dbt_github_action)`;
 
-    // Deprecation callout
-    const deprecationCallout = `:warning: Deprecation Notice: This action is scheduled for deprecation and will no longer be supported after June 2025. To ensure a smooth transition and continued functionality, please migrate to atlan-action by following the migration guide available [here](https://ask.atlan.com/hc/en-us/articles/11121331752719).`
-
     // Generating the final comment based on the presence of downstream assets
     if (downstreamAssets.entities.length > 0) {
         return `${assetInfo}
         
 ${downstreamTable}
 
-${viewAssetButton}
-
-${deprecationCallout}`;
+${viewAssetButton}`;
     } else {
         return `${assetInfo}
         
 No downstream assets found.
 
-${viewAssetButton}
-
-${deprecationCallout}`;
+${viewAssetButton}`;
     }
 }
 
@@ -162,8 +155,10 @@ export async function createIssueComment(octokit, context, content, comment_id =
     const {pull_request} = context.payload;
 
     // Deprecation callout
-    const deprecationCallout = `:warning: Deprecation Notice: This action is scheduled for deprecation and will no longer be supported after June 2025. To ensure a smooth transition and continued functionality, please migrate to atlan-action by following the migration guide available [here](https://ask.atlan.com/hc/en-us/articles/11121331752719).`
+    let deprecationCallout = `:warning: Deprecation Notice: This action is scheduled for deprecation and will no longer be supported after June 2025. To ensure a smooth transition and continued functionality, please migrate to atlan-action by following the migration guide available [here](https://ask.atlan.com/hc/en-us/articles/11121331752719).`
 
+    deprecationCallout = "\n\n---\n\n" + deprecationCallout;
+    
     content = `<!-- ActionCommentIdentifier: atlan-dbt-action -->
 ${content}
 
