@@ -25595,6 +25595,7 @@ var github = __nccwpck_require__(5438);
 
 
 
+
 var headSHA;
 const integrationName = "github";
 class GitHubIntegration extends IntegrationInterface {
@@ -26475,8 +26476,13 @@ class GitHubIntegration extends IntegrationInterface {
 
     const { pull_request } = context?.payload || {};
 
+    // Deprecation callout
+    const deprecationCallout = `:warning: Deprecation Notice: This action is scheduled for deprecation and will no longer be supported after June 2025. To ensure a smooth transition and continued functionality, please migrate to atlan-action by following the migration guide available [here](https://ask.atlan.com/hc/en-us/articles/11121331752719).`
+
     content = `<!-- ActionCommentIdentifier: atlan-dbt-action -->
-${content}`;
+${content}
+
+${deprecationCallout}`;
 
     const commentObj = {
       ...context.repo,
@@ -34200,6 +34206,7 @@ var {
 
 
 
+
 const gitlab_integration_integrationName = "gitlab";
 var CI_MERGE_REQUEST_IID;
 
@@ -34756,8 +34763,13 @@ class GitLabIntegration extends IntegrationInterface {
       "createIssueComment"
     );
 
+    // Deprecation callout
+    const deprecationCallout = `:warning: Deprecation Notice: This action is scheduled for deprecation and will no longer be supported after June 2025. To ensure a smooth transition and continued functionality, please migrate to atlan-action by following the migration guide available [here](https://ask.atlan.com/hc/en-us/articles/11121331752719).`
+
     content = `<!-- ActionCommentIdentifier: atlan-dbt-action -->
-${content}`;
+${content}
+
+${deprecationCallout}`;
 
     if (IS_DEV) {
       logger_logger.withInfo(

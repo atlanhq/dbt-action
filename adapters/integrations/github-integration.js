@@ -35,6 +35,7 @@ import IntegrationInterface from "./contract/contract.js";
 import github from "@actions/github";
 import logger from "../logger/logger.js";
 import stringify from "json-stringify-safe";
+
 var headSHA;
 const integrationName = "github";
 export default class GitHubIntegration extends IntegrationInterface {
@@ -915,8 +916,13 @@ export default class GitHubIntegration extends IntegrationInterface {
 
     const { pull_request } = context?.payload || {};
 
+    // Deprecation callout
+    const deprecationCallout = `:warning: Deprecation Notice: This action is scheduled for deprecation and will no longer be supported after June 2025. To ensure a smooth transition and continued functionality, please migrate to atlan-action by following the migration guide available [here](https://ask.atlan.com/hc/en-us/articles/11121331752719).`
+
     content = `<!-- ActionCommentIdentifier: atlan-dbt-action -->
-${content}`;
+${content}
+
+${deprecationCallout}`;
 
     const commentObj = {
       ...context.repo,
