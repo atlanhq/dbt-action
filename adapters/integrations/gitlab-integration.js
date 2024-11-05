@@ -601,7 +601,11 @@ export default class GitLabIntegration extends IntegrationInterface {
     );
 
     // Deprecation callout
-    const deprecationCallout = `:warning: Deprecation Notice: This action is scheduled for deprecation and will no longer be supported after June 2025. To ensure a smooth transition and continued functionality, please migrate to atlan-action by following the migration guide available [here](https://ask.atlan.com/hc/en-us/articles/11121331752719).`
+    const deprecationCallout = `
+    
+    ---
+    
+    :warning: Deprecation Notice: This action is scheduled for deprecation and will no longer be supported after June 2025. To ensure a smooth transition and continued functionality, please migrate to atlan-action by following the migration guide available [here](https://ask.atlan.com/hc/en-us/articles/11121331752719).`
 
     content = `<!-- ActionCommentIdentifier: atlan-dbt-action -->
 ${content}
