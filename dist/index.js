@@ -17948,7 +17948,8 @@ ${downstreamAssets.hasMore ? `[See more downstream assets at Atlan](${create_com
     // Deprecation callout
     const deprecationCallout = `<br> 
     :warning: Deprecation Notice: <br>
-    This action is no longer maintained. Please migrate to atlan-action by following the steps at: https://link-to-migration-guide`
+    This action is scheduled for deprecation and will no longer be supported after June 2025. 
+    To ensure a smooth transition and continued functionality, please migrate to atlan-action by following the migration guide available [here](https://ask.atlan.com/hc/en-us/articles/11121331752719).`
 
     // Generating the final comment based on the presence of downstream assets
     if (downstreamAssets.entities.length > 0) {
@@ -17992,7 +17993,8 @@ async function createIssueComment(octokit, context, content, comment_id = null, 
     // Deprecation callout
     const deprecationCallout = `<br> 
     :warning: Deprecation Notice: <br>
-    This action is no longer maintained. Please migrate to atlan-action by following the steps at: https://link-to-migration-guide`
+    This action is scheduled for deprecation and will no longer be supported after June 2025. 
+    To ensure a smooth transition and continued functionality, please migrate to atlan-action by following the migration guide available [here](https://ask.atlan.com/hc/en-us/articles/11121331752719).`
 
     content = `<!-- ActionCommentIdentifier: atlan-dbt-action -->
 ${content}
