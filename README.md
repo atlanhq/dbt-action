@@ -2,6 +2,9 @@
 
 ![atlan<>dbt](https://user-images.githubusercontent.com/14099191/209542321-54d5557e-8abf-4d9a-9f6d-dcacb856f25f.png)
 
+> [!WARNING] 
+> Deprecation Notice: This action is scheduled for deprecation and will no longer be supported after June 2025. To ensure a smooth transition and continued functionality, please migrate to [atlan-action](https://github.com/marketplace/actions/atlan-action) by following the migration guide available [here](https://ask.atlan.com/hc/en-us/articles/11121331752719).
+
 ## Overview
 
 _Have you ever changed a dbt model only to later find it broke a downstream table or dashboard? 💔_
