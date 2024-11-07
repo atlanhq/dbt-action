@@ -43,6 +43,7 @@ import { Gitlab } from "@gitbeaker/rest";
 import IntegrationInterface from "./contract/contract.js";
 import logger from "../logger/logger.js";
 import stringify from "json-stringify-safe";
+
 const integrationName = "gitlab";
 var CI_MERGE_REQUEST_IID;
 
@@ -599,8 +600,15 @@ export default class GitLabIntegration extends IntegrationInterface {
       "createIssueComment"
     );
 
+    // Deprecation callout
+    let deprecationCallout = `:warning: Deprecation Notice: This action is scheduled for deprecation and will no longer be supported after June 2025. To ensure a smooth transition and continued functionality, please migrate to atlan-action by following the migration guide available [here](https://ask.atlan.com/hc/en-us/articles/11121331752719).`
+
+    deprecationCallout = "\n\n---\n\n" + deprecationCallout;
+    
     content = `<!-- ActionCommentIdentifier: atlan-dbt-action -->
-${content}`;
+${content}
+
+${deprecationCallout}`;
 
     if (IS_DEV) {
       logger.withInfo(
