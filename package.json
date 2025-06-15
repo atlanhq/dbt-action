@@ -32,7 +32,7 @@
     "@gitbeaker/cli": "^39.19.0",
     "@gitbeaker/core": "^39.19.0",
     "@gitbeaker/requester-utils": "^39.19.0",
-    "@gitbeaker/rest": "^39.19.0",
+    "@gitbeaker/rest": "^39.34.3",
     "@vercel/ncc": "^0.34.0",
     "dotenv": "^16.0.3",
     "json-stringify-safe": "^5.0.1",
